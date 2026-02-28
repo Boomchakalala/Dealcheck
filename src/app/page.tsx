@@ -278,13 +278,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Demo Warning */}
-        {isDemoMode && demoWarning && (
-          <Callout variant="warning" className="mb-8">
-            <strong>Demo mode:</strong> {demoWarning}
-          </Callout>
-        )}
-
         {/* Error */}
         {error && (
           <Callout variant="warning" className="mb-8">
