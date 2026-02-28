@@ -41,9 +41,9 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
   };
 
   return (
-    <div className={cn('flex flex-col h-full bg-slate-950 border-r border-slate-800', className)}>
+    <div className={cn('flex flex-col h-full bg-slate-900 border-r border-slate-700', className)}>
       {/* Header */}
-      <div className="p-4 border-b border-slate-800">
+      <div className="p-4 border-b border-slate-700">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-bold text-white">Deals</h2>
           {onClose && (
@@ -58,7 +58,7 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
 
         <button
           onClick={onNewThread}
-          className="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm"
         >
           <Plus className="w-4 h-4" />
           New Deal
@@ -72,7 +72,7 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
             placeholder="Search deals..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-slate-900/60 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            className="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           />
         </div>
       </div>
@@ -95,14 +95,14 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
                 className={cn(
                   'w-full text-left p-3 rounded-lg transition-all',
                   currentThreadId === thread.id
-                    ? 'bg-emerald-600/10 border border-emerald-500/30'
-                    : 'hover:bg-slate-800/50 border border-transparent'
+                    ? 'bg-emerald-600/20 border-l-2 border-emerald-500'
+                    : 'hover:bg-slate-800 border-l-2 border-transparent'
                 )}
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <h3 className={cn(
                     'font-semibold text-sm truncate',
-                    currentThreadId === thread.id ? 'text-emerald-400' : 'text-white'
+                    currentThreadId === thread.id ? 'text-emerald-400' : 'text-slate-200'
                   )}>
                     {thread.title}
                   </h3>
@@ -125,7 +125,7 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
       </div>
 
       {/* Footer hint */}
-      <div className="p-3 border-t border-slate-800">
+      <div className="p-3 border-t border-slate-700">
         <div className="px-2 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-lg">
           <p className="text-xs text-amber-400">
             Free plan: 1 deal thread + limited replies
