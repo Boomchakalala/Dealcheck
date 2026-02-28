@@ -89,51 +89,51 @@ function generateDemoAnalysis(input: string): string {
 
 **Verdict: Vendor-favorable**
 
-- The proposal lacks flexibility with rigid commitment terms
-- Payment structure appears to favor the vendor's cash flow over buyer protection
-- Limited details on service levels, exit terms, and performance guarantees
+- Rigid 12-month lock-in with no clear exit terms if service fails
+- Full annual prepayment ($6K) shifts all cash flow risk to buyer - you're funding their operations
+- No SLA, support details, or performance guarantees mentioned - you're buying a black box
 
 ## 2️⃣ What Matters Most
 
-- **Payment terms**: Upfront or annual payment significantly increases your risk. Request monthly or quarterly billing.
-- **Commitment length**: 12-month minimum may be standard, but ensure there's a clear exit clause for non-performance.
-- **Service scope**: The proposal lacks specifics. Don't commit until you have a detailed SLA and deliverables list.
+- **Payment structure**: Annual prepayment is a red flag. Request monthly or quarterly billing - if they push back, ask for 15% discount to offset your risk.
+- **Exit clause**: No mention of cancellation terms. Demand a 30-60 day out if they miss service levels.
+- **Service scope**: "Standard support" is vague. Get specifics on uptime SLA, response times, and what happens when things break.
 
 ## 3️⃣ What to Ask For
 
-- Ask for monthly payment terms, or at minimum quarterly billing with the option to review and exit after 6 months.
-- Request a detailed Service Level Agreement (SLA) that outlines uptime guarantees, support response times, and remedies for non-performance.
-- Clarify what happens if you need to terminate early - request a pro-rated refund clause or at least a 30-day cancellation notice option.
-- Link the payment schedule to performance milestones or service delivery checkpoints.
+- Switch to monthly billing, or at minimum quarterly with a 6-month review checkpoint
+- Written SLA covering uptime (99%+), support response times, and remedies for non-performance
+- Clear exit clause: 30-day termination notice if SLAs aren't met, with pro-rated refund
+- Define "standard support" - email only? What response time? Weekends covered?
 
 ## 4️⃣ Suggested Reply
 
 ---
 
-Hi [Vendor Name],
+Hi [Vendor],
 
-Thank you for the proposal. We're interested in moving forward, but would like to discuss a few items to ensure this works for both parties:
+Thanks for the quote. We're interested but need to align on a few points before moving forward:
 
-1. **Payment terms**: We'd prefer monthly billing rather than upfront payment. Would quarterly billing be possible as an alternative?
+1. **Payment**: We need monthly billing. If annual is required, we'd need a 15% discount to offset the prepayment risk.
 
-2. **Service details**: Could you provide a detailed SLA covering uptime guarantees, support response times, and what happens if service levels aren't met?
+2. **SLA**: Please provide uptime guarantees, support response times, and what happens if targets aren't met.
 
-3. **Flexibility**: We'd like the option to review at 6 months. Can we include a clause allowing termination with 30 days notice if service expectations aren't met?
+3. **Flexibility**: We need a 30-day exit clause if service levels slip, with pro-rated refund.
 
-Happy to discuss these points further. Looking forward to finding a structure that works well for both sides.
+Let me know if these work. Happy to discuss.
 
-Best regards,
+Best,
 [Your Name]
 
 ---
 
 ## 5️⃣ If They Push Back
 
-If they insist on annual prepayment and won't budge, consider requesting a discount (10-15%) in exchange for the prepayment risk you're taking on. You could also ask for a trial period (1-2 months) at the monthly rate before committing to the annual term, which demonstrates good faith on both sides.
+If they won't budge on annual payment, counter with: "We'll accept annual terms if you add a 60-day performance review at month 6, with the option to exit if SLAs aren't met, plus a 10% discount for the prepayment risk." This gives you an escape hatch and compensates for the risk.
 
 ---
 
-**Note**: This is a demo analysis. To use real AI-powered analysis, please add a valid OpenAI API key with available credits.`;
+**Note**: This is demo mode. For real AI analysis tailored to your deal, add a valid OpenAI API key with available credits.`;
 }
 
 export async function POST(request: Request) {
