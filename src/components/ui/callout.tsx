@@ -10,22 +10,22 @@ export function Callout({ variant = 'info', children, className, ...props }: Cal
   const Icon = variant === 'warning' ? AlertCircle : Info;
 
   const variants = {
-    info: 'bg-slate-900/40 border-slate-800 text-slate-300',
-    warning: 'bg-amber-500/5 border-amber-500/20 text-amber-300',
+    info: 'bg-blue-50 border-blue-200 text-blue-900',
+    warning: 'bg-amber-50 border-amber-200 text-amber-900',
   };
 
   return (
     <div
       className={cn(
-        'flex items-start gap-3 p-4 rounded-xl border backdrop-blur-sm',
+        'flex items-start gap-3 p-4 rounded-xl border',
         variants[variant],
         className
       )}
       {...props}
     >
       <Icon className={cn(
-        'w-4 h-4 mt-0.5 flex-shrink-0',
-        variant === 'warning' ? 'text-amber-400' : 'text-emerald-400'
+        'w-5 h-5 mt-0.5 flex-shrink-0',
+        variant === 'warning' ? 'text-amber-600' : 'text-blue-600'
       )} />
       <div className="text-sm leading-relaxed">{children}</div>
     </div>
