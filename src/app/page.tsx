@@ -1,56 +1,94 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { Upload, FileText, Image as ImageIcon, File, X, Copy, Check, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Loader2, Paperclip, Send, Eye, EyeOff } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Menu, FileText, Image as ImageIcon, File, X, Copy, Check, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Loader2, Paperclip, Send, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Callout } from '@/components/ui/callout';
+import { Sidebar } from '@/components/Sidebar';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs-new';
 import { redactText } from '@/lib/redact';
 import { getMissingItems } from '@/lib/missingInfo';
-
-interface AnalysisData {
-  realityCheck: { verdict: string; points: string[] };
-  whatMatters: string[];
-  whatToAsk: string[];
-  suggestedReply: string;
-  pushBack: string;
-}
-
-const SAMPLE_INPUT = `COMMERCIAL PROPOSAL - Cloud Hosting Services
-
-Dear Customer,
-
-Thank you for your interest in our enterprise cloud hosting solution.
-
-PRICING:
-- Monthly Fee: $500/month
-- Setup Fee: $250 (one-time)
-
-TERMS:
-- Minimum contract: 12 months
-- Payment: Annual prepayment required ($6,000)
-- Auto-renewal: Yes, unless cancelled 60 days prior
-
-SERVICES INCLUDED:
-- 100GB storage
-- 2TB bandwidth
-- Standard support (email only)
-
-Please sign and return the attached agreement to proceed.
-
-Best regards,
-Cloud Services Team`;
+import {
+  Thread,
+  ThreadDoc,
+  Message,
+  loadThreads,
+  getCurrentThreadId,
+  createThread,
+  addThread,
+  updateThread,
+  addDocument,
+  removeDocument,
+  addMessage,
+  buildAnalysisContext,
+} from '@/lib/threads';
 
 export default function Home() {
-  const [input, setInput] = useState('');
-  const [analysis, setAnalysis] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('docs');
+
+  // Doc form state
+  const [docType, setDocType] = useState<'quote' | 'msa' | 'sla' | 'other'>('quote');
+  const [docName, setDocName] = useState('');
+  const [docText, setDocText] = useState('');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [extracting, setExtracting] = useState(false);
+
+  // Conversation state
+  const [msgRole, setMsgRole] = useState<'vendor' | 'user'>('vendor');
+  const [msgContent, setMsgContent] = useState('');
+  const [analyzing, setAnalyzing] = useState(false);
+
+  // Redaction
   const [redactionMode, setRedactionMode] = useState(true);
   const [showRedactedPreview, setShowRedactedPreview] = useState(false);
+
+  // General
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const currentThread = threads.find(t => t.id === currentThreadId);
+
+  // Load threads on mount
+  useEffect(() => {
+    const loaded = loadThreads();
+    setThreads(loaded);
+
+    const currentId = getCurrentThreadId();
+    if (currentId && loaded.some(t => t.id === currentId)) {
+      setCurrentThreadId(currentId);
+    } else if (loaded.length > 0) {
+      setCurrentThreadId(loaded[0].id);
+    }
+  }, []);
+
+  const handleNewThread = () => {
+    const newThread = createThread('New Deal');
+    const updated = addThread(newThread);
+    setThreads(updated);
+    setCurrentThreadId(newThread.id);
+    setSidebarOpen(false);
+  };
+
+  const handleSelectThread = (id: string) => {
+    setCurrentThreadId(id);
+    localStorage.setItem('dealcheck_current_thread', id);
+  };
+
+  const handleUpdateThreadTitle = (title: string) => {
+    if (!currentThreadId) return;
+    const updated = updateThread(currentThreadId, { title });
+    setThreads(updated);
+  };
+
+  const handleUpdateSupplier = (supplier: string) => {
+    if (!currentThreadId) return;
+    const updated = updateThread(currentThreadId, { supplier });
+    setThreads(updated);
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -74,7 +112,8 @@ export default function Home() {
       }
 
       const data = await response.json();
-      setInput(data.text);
+      setDocText(data.text);
+      setDocName(file.name);
       setExtracting(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to process file');
@@ -83,21 +122,52 @@ export default function Home() {
     }
   };
 
-  const clearFile = () => {
+  const handleAddDocument = () => {
+    if (!currentThreadId || !docText.trim()) return;
+
+    const updated = addDocument(currentThreadId, {
+      type: docType,
+      name: docName || undefined,
+      text: docText,
+    });
+
+    setThreads(updated);
+    setDocText('');
+    setDocName('');
     setUploadedFile(null);
-    setInput('');
+    setError(null);
   };
 
-  const analyzeAsDeal = async () => {
-    if (!input.trim()) return;
+  const handleRemoveDocument = (docId: string) => {
+    if (!currentThreadId) return;
+    const updated = removeDocument(currentThreadId, docId);
+    setThreads(updated);
+  };
 
-    setLoading(true);
+  const handleAddMessage = () => {
+    if (!currentThreadId || !msgContent.trim()) return;
+
+    const updated = addMessage(currentThreadId, {
+      role: msgRole,
+      content: msgContent,
+    });
+
+    setThreads(updated);
+    setMsgContent('');
+  };
+
+  const handleAnalyzeAndReply = async () => {
+    if (!currentThreadId || !currentThread) return;
+
+    setAnalyzing(true);
     setError(null);
-    setAnalysis(null);
 
     try {
+      // Build context from thread
+      const context = buildAnalysisContext(currentThread, msgContent);
+
       // Apply redaction if enabled
-      const textToAnalyze = redactionMode ? redactText(input) : input;
+      const textToAnalyze = redactionMode ? redactText(context) : context;
 
       const response = await fetch('/api/analyze', {
         method: 'POST',
@@ -111,258 +181,480 @@ export default function Home() {
         throw new Error(data.error || 'Analysis failed');
       }
 
-      setAnalysis(data.analysis);
+      // Save vendor message if present
+      if (msgContent.trim()) {
+        const withVendorMsg = addMessage(currentThreadId, {
+          role: 'vendor',
+          content: msgContent,
+        });
+        setThreads(withVendorMsg);
+      }
+
+      // Save AI response as message
+      const withAiMsg = addMessage(currentThreadId, {
+        role: 'ai',
+        content: data.analysis,
+      });
+
+      // Update lastAnalysis
+      const updated = updateThread(currentThreadId, {
+        lastAnalysis: data.analysis,
+      });
+
+      setThreads(updated);
+      setMsgContent('');
+      setActiveTab('conversation');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
-      setLoading(false);
+      setAnalyzing(false);
     }
-  };
-
-  const loadSample = () => {
-    setInput(SAMPLE_INPUT);
-    setUploadedFile(null);
   };
 
   const getFileIcon = (fileName: string) => {
     if (fileName.endsWith('.pdf')) return <FileText className="w-4 h-4 text-red-500" />;
     if (fileName.match(/\.(jpg|jpeg|png|gif|webp)$/i)) return <ImageIcon className="w-4 h-4 text-blue-500" />;
-    return <File className="w-4 h-4 text-gray-500" />;
+    return <File className="w-4 h-4 text-slate-500" />;
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="32" height="32" rx="8" fill="#10B981"/>
-                <path d="M9 16L14 21L23 11" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <h1 className="text-2xl font-bold text-gray-900">DealCheck</h1>
-            </div>
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-xs font-medium text-green-700">AI-Powered</span>
-            </div>
-          </div>
-        </div>
-      </header>
+  const getDocTypeBadge = (type: string) => {
+    const variants: Record<string, string> = {
+      quote: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      msa: 'bg-blue-100 text-blue-800 border-blue-200',
+      sla: 'bg-purple-100 text-purple-800 border-purple-200',
+      other: 'bg-slate-100 text-slate-800 border-slate-200',
+    };
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        {/* Hero */}
-        <div className="text-center mb-12">
-          <h2 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-4 tracking-tight">
-            Save Thousands on
-            <span className="block text-green-600 mt-2">Every Deal</span>
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Get AI-powered procurement guidance in seconds. If you don't ask, you don't get.
-            <span className="block mt-2 text-gray-500 text-lg">One email could save you $1,000 - $20,000+</span>
+    return (
+      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border uppercase ${variants[type] || variants.other}`}>
+        {type}
+      </span>
+    );
+  };
+
+  if (threads.length === 0 && !currentThreadId) {
+    // Empty state
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="mb-6">
+            <svg width="64" height="64" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
+              <rect width="32" height="32" rx="8" fill="#10B981"/>
+              <path d="M9 16L14 21L23 11" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">Welcome to DealCheck</h1>
+          <p className="text-slate-400 mb-6">
+            Your AI-powered procurement workspace. Track deals, analyze terms, and negotiate with confidence.
           </p>
+          <Button onClick={handleNewThread} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Start Your First Deal
+          </Button>
         </div>
+      </div>
+    );
+  }
 
-        {/* Stats Bar */}
-        <div className="grid grid-cols-3 gap-4 mb-12">
-          <div className="text-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div className="text-2xl font-bold text-green-600">$18K</div>
-            <div className="text-xs text-gray-600 mt-1">Avg. Savings</div>
-          </div>
-          <div className="text-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div className="text-2xl font-bold text-green-600">2 min</div>
-            <div className="text-xs text-gray-600 mt-1">Analysis Time</div>
-          </div>
-          <div className="text-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div className="text-2xl font-bold text-green-600">98%</div>
-            <div className="text-xs text-gray-600 mt-1">Success Rate</div>
+  return (
+    <div className="h-screen flex overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Sidebar - Desktop */}
+      <div className="hidden lg:block w-80">
+        <Sidebar
+          threads={threads}
+          currentThreadId={currentThreadId}
+          onSelectThread={handleSelectThread}
+          onNewThread={handleNewThread}
+        />
+      </div>
+
+      {/* Sidebar - Mobile Overlay */}
+      {sidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setSidebarOpen(false)}>
+          <div className="w-80 h-full" onClick={(e) => e.stopPropagation()}>
+            <Sidebar
+              threads={threads}
+              currentThreadId={currentThreadId}
+              onSelectThread={handleSelectThread}
+              onNewThread={handleNewThread}
+              onClose={() => setSidebarOpen(false)}
+            />
           </div>
         </div>
+      )}
 
-        {/* Chat-style Input */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-xl mb-8">
-          <div className="p-6 border-b border-gray-100">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">Paste Your Supplier's Proposal</h3>
-                <p className="text-sm text-gray-600 mt-1">Get instant analysis and negotiation guidance</p>
-              </div>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Thread Header */}
+        <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-lg">
+          <div className="px-4 sm:px-6 py-4">
+            <div className="flex items-center gap-3 mb-3">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <Menu className="w-5 h-5 text-slate-400" />
+              </button>
 
-              {/* Redaction Mode Toggle */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setRedactionMode(!redactionMode)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    redactionMode ? 'bg-green-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      redactionMode ? 'translate-x-6' : 'translate-x-1'
-                    }`}
+              <div className="flex-1 min-w-0">
+                <input
+                  type="text"
+                  value={currentThread?.title || ''}
+                  onChange={(e) => handleUpdateThreadTitle(e.target.value)}
+                  className="w-full bg-transparent text-xl font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded px-2 py-1"
+                  placeholder="Deal title..."
+                />
+                <div className="flex items-center gap-3 mt-1">
+                  <input
+                    type="text"
+                    value={currentThread?.supplier || ''}
+                    onChange={(e) => handleUpdateSupplier(e.target.value)}
+                    className="bg-slate-900/60 text-sm text-slate-300 px-2 py-1 rounded border border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    placeholder="Supplier name..."
                   />
-                </button>
-                <div className="text-right">
-                  <div className="text-xs font-medium text-gray-900">Redaction mode</div>
-                  <div className="text-xs text-gray-500">(work docs safe)</div>
-                </div>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-2">
-              {redactionMode
-                ? '🔒 Masks names, emails, phone numbers, IDs, and exact amounts before analysis.'
-                : '⚠️ Text will be sent as-is. Only use with non-sensitive documents.'}
-            </p>
-          </div>
-
-          <div className="p-6">
-            {/* File Preview */}
-            {uploadedFile && (
-              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {getFileIcon(uploadedFile.name)}
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{uploadedFile.name}</p>
-                    <p className="text-xs text-gray-600">
-                      {(uploadedFile.size / 1024).toFixed(1)} KB
-                      {extracting && <span className="ml-2">• Extracting...</span>}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={clearFile}
-                  className="p-1 hover:bg-white rounded transition-colors"
-                  disabled={extracting}
-                >
-                  <X className="w-4 h-4 text-gray-500" />
-                </button>
-              </div>
-            )}
-
-            {/* Message Box */}
-            <div className="relative">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Paste your supplier's email, quote, or proposal here..."
-                rows={12}
-                className="w-full px-4 py-3 pr-16 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-sm"
-                disabled={extracting || loading}
-              />
-
-              {/* Character count */}
-              {input && (
-                <div className="absolute top-3 right-3">
-                  <span className="text-xs text-gray-400 bg-white px-2 py-1 rounded border border-gray-200">
-                    {input.length}
+                  <span className="text-xs text-slate-500">
+                    Updated {currentThread ? new Date(currentThread.updatedAt).toLocaleString() : ''}
                   </span>
                 </div>
-              )}
+              </div>
             </div>
 
-            {/* Redacted Preview */}
-            {redactionMode && input && (
-              <div className="mt-3">
-                <button
-                  onClick={() => setShowRedactedPreview(!showRedactedPreview)}
-                  className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  {showRedactedPreview ? (
-                    <EyeOff className="w-3 h-3" />
-                  ) : (
-                    <Eye className="w-3 h-3" />
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList>
+                <TabsTrigger value="docs">
+                  Docs ({currentThread?.docs.length || 0})
+                </TabsTrigger>
+                <TabsTrigger value="conversation">
+                  Conversation ({currentThread?.messages.length || 0})
+                </TabsTrigger>
+                <TabsTrigger value="analysis">
+                  Analysis
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </header>
+
+        {/* Tab Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+            <Tabs value={activeTab}>
+              {/* DOCS TAB */}
+              <TabsContent value="docs" className="space-y-6">
+                {/* Add Document Form */}
+                <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+                  <h3 className="text-lg font-bold text-white mb-4">Add Document</h3>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          Document Type
+                        </label>
+                        <select
+                          value={docType}
+                          onChange={(e) => setDocType(e.target.value as any)}
+                          className="w-full px-3 py-2 bg-slate-950/60 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        >
+                          <option value="quote">Quote / Proposal</option>
+                          <option value="msa">MSA / Contract</option>
+                          <option value="sla">SLA / Service Terms</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                          Name (optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={docName}
+                          onChange={(e) => setDocName(e.target.value)}
+                          placeholder="e.g., Q1 2025 Quote"
+                          className="w-full px-3 py-2 bg-slate-950/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                      </div>
+                    </div>
+
+                    {uploadedFile && (
+                      <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {getFileIcon(uploadedFile.name)}
+                          <div>
+                            <p className="text-sm font-medium text-white">{uploadedFile.name}</p>
+                            <p className="text-xs text-slate-400">
+                              {(uploadedFile.size / 1024).toFixed(1)} KB
+                              {extracting && <span className="ml-2">• Extracting...</span>}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setUploadedFile(null);
+                            setDocText('');
+                          }}
+                          disabled={extracting}
+                          className="p-1 hover:bg-slate-800 rounded transition-colors"
+                        >
+                          <X className="w-4 h-4 text-slate-400" />
+                        </button>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Document Text
+                      </label>
+                      <textarea
+                        value={docText}
+                        onChange={(e) => setDocText(e.target.value)}
+                        rows={8}
+                        placeholder="Paste document text here or upload a file..."
+                        disabled={extracting}
+                        className="w-full px-3 py-2 bg-slate-950/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3">
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={extracting}
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        <Paperclip className="w-4 h-4" />
+                        Upload File
+                      </button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,.png,.jpg,.jpeg,.docx,.doc"
+                        onChange={handleFileUpload}
+                        disabled={extracting}
+                      />
+
+                      <Button
+                        onClick={handleAddDocument}
+                        disabled={!docText.trim() || extracting}
+                        className="gap-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add to Deal
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Documents List */}
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-4">
+                    Documents ({currentThread?.docs.length || 0})
+                  </h3>
+
+                  {currentThread?.summary && (
+                    <div className="mb-4 p-4 bg-slate-800/50 border border-slate-700 rounded-xl">
+                      <p className="text-sm text-slate-300">
+                        <span className="font-semibold text-emerald-400">Summary: </span>
+                        {currentThread.summary}
+                      </p>
+                    </div>
                   )}
-                  {showRedactedPreview ? 'Hide' : 'View'} redacted preview
-                </button>
-                {showRedactedPreview && (
-                  <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 max-h-32 overflow-y-auto">
-                    <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono">
-                      {redactText(input)}
-                    </pre>
+
+                  {!currentThread?.docs.length ? (
+                    <div className="text-center py-12 text-slate-500">
+                      No documents added yet. Add your first document above.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {currentThread.docs.map(doc => (
+                        <div key={doc.id} className="bg-slate-900/60 rounded-xl border border-slate-800 p-4">
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <div className="flex items-center gap-2">
+                              {getDocTypeBadge(doc.type)}
+                              {doc.name && (
+                                <span className="text-sm font-medium text-white">{doc.name}</span>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => handleRemoveDocument(doc.id)}
+                              className="p-1 hover:bg-red-500/10 text-red-400 hover:text-red-300 rounded transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <p className="text-sm text-slate-400 line-clamp-3">
+                            {doc.text.substring(0, 200)}...
+                          </p>
+                          <p className="text-xs text-slate-600 mt-2">
+                            Added {new Date(doc.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              {/* CONVERSATION TAB */}
+              <TabsContent value="conversation" className="space-y-6">
+                {/* Messages Timeline */}
+                <div className="space-y-4">
+                  {!currentThread?.messages.length ? (
+                    <div className="text-center py-12 text-slate-500">
+                      No messages yet. Add a vendor message or your note below.
+                    </div>
+                  ) : (
+                    currentThread.messages.map(msg => (
+                      <div
+                        key={msg.id}
+                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`max-w-2xl rounded-xl p-4 ${
+                            msg.role === 'vendor'
+                              ? 'bg-slate-900/60 border border-slate-800'
+                              : msg.role === 'user'
+                              ? 'bg-emerald-600/10 border border-emerald-500/30'
+                              : 'bg-blue-600/10 border border-blue-500/30'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className={`text-xs font-bold uppercase ${
+                              msg.role === 'vendor' ? 'text-slate-400' :
+                              msg.role === 'user' ? 'text-emerald-400' : 'text-blue-400'
+                            }`}>
+                              {msg.role === 'vendor' ? '📨 Vendor' : msg.role === 'user' ? '✍️ Me' : '🤖 AI Analysis'}
+                            </span>
+                            <span className="text-xs text-slate-600">
+                              {new Date(msg.createdAt).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="text-sm text-slate-300 whitespace-pre-wrap">
+                            {msg.content}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Add Message Form */}
+                <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="msgRole"
+                          value="vendor"
+                          checked={msgRole === 'vendor'}
+                          onChange={() => setMsgRole('vendor')}
+                          className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <span className="text-sm text-slate-300">Vendor message</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="msgRole"
+                          value="user"
+                          checked={msgRole === 'user'}
+                          onChange={() => setMsgRole('user')}
+                          className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <span className="text-sm text-slate-300">My note</span>
+                      </label>
+                    </div>
+
+                    <textarea
+                      value={msgContent}
+                      onChange={(e) => setMsgContent(e.target.value)}
+                      rows={4}
+                      placeholder={msgRole === 'vendor' ? "Paste vendor's email or response..." : "Add your internal note..."}
+                      className="w-full px-3 py-2 bg-slate-950/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setRedactionMode(!redactionMode)}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                            redactionMode ? 'bg-emerald-600' : 'bg-slate-700'
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                              redactionMode ? 'translate-x-5' : 'translate-x-1'
+                            }`}
+                          />
+                        </button>
+                        <span className="text-xs text-slate-400">Redaction mode</span>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handleAddMessage}
+                          disabled={!msgContent.trim()}
+                          variant="secondary"
+                        >
+                          Add message
+                        </Button>
+                        <Button
+                          onClick={handleAnalyzeAndReply}
+                          disabled={analyzing}
+                          className="gap-2"
+                        >
+                          {analyzing ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              Analyzing...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4" />
+                              Analyze & draft reply
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {error && (
+                  <Callout variant="warning">
+                    <strong>Error:</strong> {error}
+                  </Callout>
+                )}
+              </TabsContent>
+
+              {/* ANALYSIS TAB */}
+              <TabsContent value="analysis">
+                {currentThread?.lastAnalysis ? (
+                  <AnalysisDisplay analysis={currentThread.lastAnalysis} />
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="mb-4">
+                      <MessageSquare className="w-16 h-16 text-slate-700 mx-auto" />
+                    </div>
+                    <p className="text-slate-400 mb-2">No analysis yet</p>
+                    <p className="text-sm text-slate-600">
+                      Add documents and use "Analyze & draft reply" in the Conversation tab
+                    </p>
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* Bottom Actions Bar */}
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-              <div className="flex items-center gap-2">
-                {/* File Upload Button */}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={extracting || loading}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors group disabled:opacity-50"
-                  title="Attach file"
-                >
-                  <Paperclip className="w-5 h-5 text-gray-500 group-hover:text-gray-700" />
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  accept=".pdf,.png,.jpg,.jpeg,.docx,.doc"
-                  onChange={handleFileUpload}
-                  disabled={extracting || loading}
-                />
-
-                {/* Example Button */}
-                <button
-                  onClick={loadSample}
-                  disabled={loading}
-                  className="text-xs text-green-600 hover:text-green-700 font-medium px-3 py-2 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50"
-                >
-                  Try example
-                </button>
-              </div>
-
-              {/* Send Button */}
-              <Button
-                onClick={analyzeAsDeal}
-                disabled={loading || !input.trim() || extracting}
-                className="gap-2"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    Analyze Deal
-                    <Send className="w-4 h-4" />
-                  </>
-                )}
-              </Button>
-            </div>
+              </TabsContent>
+            </Tabs>
           </div>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <Callout variant="warning" className="mb-8">
-            <strong>Error:</strong> {error}
-          </Callout>
-        )}
-
-        {/* Results */}
-        {analysis && <AnalysisDisplay analysis={analysis} originalInput={input} />}
-
-        {/* Footer */}
-        <div className="mt-16 text-center border-t border-gray-200 pt-8">
-          <p className="text-sm text-gray-500">
-            Trusted by procurement professionals worldwide • Not legal or pricing advice
-          </p>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
 
-function AnalysisDisplay({ analysis, originalInput }: { analysis: string; originalInput: string }) {
+function AnalysisDisplay({ analysis }: { analysis: string }) {
   const [copied, setCopied] = useState('');
-  const parsed = parseAnalysis(analysis);
-  const missingItems = getMissingItems(originalInput);
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -370,144 +662,100 @@ function AnalysisDisplay({ analysis, originalInput }: { analysis: string; origin
     setTimeout(() => setCopied(''), 2000);
   };
 
-  const getBadgeVariant = (verdict: string): 'balanced' | 'vendor-favorable' | 'high-risk' => {
-    const v = verdict.toLowerCase();
-    if (v.includes('balanced')) return 'balanced';
-    if (v.includes('vendor')) return 'vendor-favorable';
-    return 'high-risk';
-  };
+  // Parse sections from analysis
+  const sections = analysis.split(/##\s+/);
+  const parsed: Record<string, string> = {};
+
+  sections.forEach(section => {
+    if (section.includes('Reality Check') || section.includes('1️⃣')) {
+      parsed.realityCheck = section;
+    } else if (section.includes('What Matters') || section.includes('2️⃣')) {
+      parsed.risks = section;
+    } else if (section.includes('What to Ask') || section.includes('3️⃣')) {
+      parsed.questions = section;
+    } else if (section.includes('Suggested Reply') || section.includes('4️⃣')) {
+      parsed.reply = section;
+    } else if (section.includes('Push Back') || section.includes('5️⃣')) {
+      parsed.pushback = section;
+    }
+  });
 
   return (
     <div className="space-y-6">
-      {/* Missing Information Checklist */}
-      {missingItems.length > 0 && (
-        <div className="bg-amber-50 rounded-2xl border border-amber-200 shadow-lg p-6 sm:p-8">
-          <div className="flex items-start gap-4 mb-6">
-            <div className="p-3 bg-amber-100 rounded-xl border border-amber-200">
-              <ShieldAlert className="w-6 h-6 text-amber-700" />
+      {/* Reality Check */}
+      {parsed.realityCheck && (
+        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20">
+              <ShieldAlert className="w-6 h-6 text-red-400" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">Deal Reality Check</h3>
+              <div className="text-sm text-slate-300 whitespace-pre-wrap">{parsed.realityCheck}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Risks / What Matters */}
+      {parsed.risks && (
+        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
+              <Target className="w-6 h-6 text-blue-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Missing Information</h3>
-              <p className="text-sm text-gray-700">
-                These important terms weren't found in the proposal. Ask about them before signing.
-              </p>
+              <h3 className="text-xl font-bold text-white mb-2">Key Points</h3>
+              <div className="text-sm text-slate-300 whitespace-pre-wrap">{parsed.risks}</div>
             </div>
           </div>
-          <ul className="space-y-2">
-            {missingItems.map((item, idx) => (
-              <li key={idx} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-amber-100">
-                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold mt-0.5">
-                  !
-                </span>
-                <span className="text-gray-800 leading-relaxed">{item.label}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       )}
 
-      {missingItems.length === 0 && (
-        <div className="bg-green-50 rounded-2xl border border-green-200 shadow-lg p-6">
-          <div className="flex items-center gap-3">
-            <Check className="w-5 h-5 text-green-600" />
-            <p className="text-sm text-green-800 font-medium">
-              Great! This proposal covers all major procurement checkpoints.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Section 1: Reality Check */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 sm:p-8">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 bg-red-50 rounded-xl border border-red-100">
-            <ShieldAlert className="w-6 h-6 text-red-600" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Deal Reality Check</h3>
-            <Badge variant={getBadgeVariant(parsed.realityCheck.verdict)} className="text-sm">
-              {parsed.realityCheck.verdict}
-            </Badge>
-          </div>
-        </div>
-        <ul className="space-y-3">
-          {parsed.realityCheck.points.map((point, idx) => (
-            <li key={idx} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-sm font-bold mt-0.5">
-                {idx + 1}
-              </span>
-              <span className="text-gray-700 leading-relaxed">{point}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Section 2: What Matters Most */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 sm:p-8">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
-            <Target className="w-6 h-6 text-blue-600" />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900">What Matters Most</h3>
-        </div>
-        <ul className="space-y-3">
-          {parsed.whatMatters.map((point, idx) => (
-            <li key={idx} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-              <span className="flex-shrink-0 w-7 h-7 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold">
-                {idx + 1}
-              </span>
-              <span className="text-gray-700 leading-relaxed">{point}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Section 3: What to Ask For */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 sm:p-8">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 bg-green-50 rounded-xl border border-green-100">
-            <MessageSquare className="w-6 h-6 text-green-600" />
-          </div>
-          <div className="flex-1 flex items-center justify-between">
-            <h3 className="text-2xl font-bold text-gray-900">What to Ask For</h3>
+      {/* Questions */}
+      {parsed.questions && (
+        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                <MessageSquare className="w-6 h-6 text-emerald-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">Questions to Ask</h3>
+              </div>
+            </div>
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => copyToClipboard(parsed.whatToAsk.join('\n\n'), 'ask')}
+              onClick={() => copyToClipboard(parsed.questions, 'questions')}
             >
-              {copied === 'ask' ? (
-                <><Check className="w-4 h-4 mr-1.5 text-green-600" /> Copied</>
+              {copied === 'questions' ? (
+                <><Check className="w-4 h-4 mr-1.5 text-emerald-600" /> Copied</>
               ) : (
                 <><Copy className="w-4 h-4 mr-1.5" /> Copy</>
               )}
             </Button>
           </div>
+          <div className="text-sm text-slate-300 whitespace-pre-wrap">{parsed.questions}</div>
         </div>
-        <ul className="space-y-3">
-          {parsed.whatToAsk.map((point, idx) => (
-            <li key={idx} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-              <ArrowRight className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-700 leading-relaxed">{point}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      )}
 
-      {/* Section 4: Suggested Reply */}
-      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200 shadow-lg p-6 sm:p-8">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 bg-green-100 rounded-xl border border-green-200">
-            <Mail className="w-6 h-6 text-green-700" />
-          </div>
-          <div className="flex-1 flex items-center justify-between">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900">Your Negotiation Email</h3>
-              <p className="text-sm text-gray-600 mt-1">Copy and send this to your supplier</p>
+      {/* Suggested Reply */}
+      {parsed.reply && (
+        <div className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-2xl border border-emerald-500/20 p-6">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-emerald-500/20 rounded-xl border border-emerald-500/30">
+                <Mail className="w-6 h-6 text-emerald-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Suggested Reply</h3>
+                <p className="text-sm text-slate-400">Copy and customize for your situation</p>
+              </div>
             </div>
             <Button
-              variant="primary"
               size="sm"
-              onClick={() => copyToClipboard(parsed.suggestedReply, 'reply')}
+              onClick={() => copyToClipboard(parsed.reply, 'reply')}
             >
               {copied === 'reply' ? (
                 <><Check className="w-4 h-4 mr-1.5" /> Copied!</>
@@ -516,74 +764,34 @@ function AnalysisDisplay({ analysis, originalInput }: { analysis: string; origin
               )}
             </Button>
           </div>
-        </div>
-        <div className="p-5 bg-white rounded-xl border border-green-200 shadow-sm">
-          <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed">
-            {parsed.suggestedReply}
-          </pre>
-        </div>
-      </div>
-
-      {/* Section 5: If They Push Back */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 sm:p-8">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 bg-amber-50 rounded-xl border border-amber-100">
-            <ArrowRight className="w-6 h-6 text-amber-600" />
+          <div className="p-4 bg-slate-950/50 rounded-xl border border-emerald-500/10">
+            <pre className="text-sm text-slate-300 whitespace-pre-wrap font-sans">{parsed.reply}</pre>
           </div>
-          <h3 className="text-2xl font-bold text-gray-900">If They Push Back</h3>
         </div>
-        <div className="p-5 bg-gray-50 rounded-xl">
-          <p className="text-gray-700 leading-relaxed text-base">{parsed.pushBack}</p>
+      )}
+
+      {/* Push Back Strategy */}
+      {parsed.pushback && (
+        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
+              <ArrowRight className="w-6 h-6 text-amber-400" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">If They Push Back</h3>
+              <div className="text-sm text-slate-300 whitespace-pre-wrap">{parsed.pushback}</div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Fallback: show raw if parsing failed */}
+      {!parsed.realityCheck && !parsed.risks && !parsed.questions && !parsed.reply && (
+        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+          <h3 className="text-xl font-bold text-white mb-4">Analysis Result</h3>
+          <pre className="text-sm text-slate-300 whitespace-pre-wrap font-sans">{analysis}</pre>
+        </div>
+      )}
     </div>
   );
-}
-
-function parseAnalysis(text: string): AnalysisData {
-  const sections = text.split(/##\s+/);
-
-  const result: AnalysisData = {
-    realityCheck: { verdict: '', points: [] },
-    whatMatters: [],
-    whatToAsk: [],
-    suggestedReply: '',
-    pushBack: '',
-  };
-
-  sections.forEach((section) => {
-    if (section.includes('Deal Reality Check')) {
-      const lines = section.split('\n').filter(l => l.trim());
-      const verdict = lines.find(l => l.includes('Verdict:'))?.replace(/.*Verdict:\s*\*?\*?/, '').replace(/\*?\*?/, '').trim() || 'Unknown';
-      result.realityCheck.verdict = verdict;
-      result.realityCheck.points = lines
-        .filter(l => l.trim().startsWith('-'))
-        .map(l => l.replace(/^-\s*/, '').trim());
-    } else if (section.includes('What Matters Most')) {
-      result.whatMatters = section
-        .split('\n')
-        .filter(l => l.trim().startsWith('-'))
-        .map(l => l.replace(/^-\s*/, '').replace(/\*\*/g, '').trim());
-    } else if (section.includes('What to Ask For')) {
-      result.whatToAsk = section
-        .split('\n')
-        .filter(l => l.trim().startsWith('-'))
-        .map(l => l.replace(/^-\s*/, '').trim());
-    } else if (section.includes('Suggested Reply')) {
-      const parts = section.split('---');
-      if (parts.length >= 2) {
-        result.suggestedReply = parts[1].trim();
-      } else {
-        result.suggestedReply = section.replace(/.*Suggested Reply\n+/, '').trim();
-      }
-    } else if (section.includes('If They Push Back')) {
-      result.pushBack = section
-        .replace(/.*If They Push Back\n+/, '')
-        .replace(/---.*$/, '')
-        .replace(/\*\*Note\*\*:.*$/, '')
-        .trim();
-    }
-  });
-
-  return result;
 }
