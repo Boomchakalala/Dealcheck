@@ -379,6 +379,44 @@ function AnalysisDisplay({ analysis, originalInput }: { analysis: string; origin
 
   return (
     <div className="space-y-6">
+      {/* Missing Information Checklist */}
+      {missingItems.length > 0 && (
+        <div className="bg-amber-50 rounded-2xl border border-amber-200 shadow-lg p-6 sm:p-8">
+          <div className="flex items-start gap-4 mb-6">
+            <div className="p-3 bg-amber-100 rounded-xl border border-amber-200">
+              <ShieldAlert className="w-6 h-6 text-amber-700" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Missing Information</h3>
+              <p className="text-sm text-gray-700">
+                These important terms weren't found in the proposal. Ask about them before signing.
+              </p>
+            </div>
+          </div>
+          <ul className="space-y-2">
+            {missingItems.map((item, idx) => (
+              <li key={idx} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-amber-100">
+                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold mt-0.5">
+                  !
+                </span>
+                <span className="text-gray-800 leading-relaxed">{item.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {missingItems.length === 0 && (
+        <div className="bg-green-50 rounded-2xl border border-green-200 shadow-lg p-6">
+          <div className="flex items-center gap-3">
+            <Check className="w-5 h-5 text-green-600" />
+            <p className="text-sm text-green-800 font-medium">
+              Great! This proposal covers all major procurement checkpoints.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Section 1: Reality Check */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 sm:p-8">
         <div className="flex items-start gap-4 mb-6">
