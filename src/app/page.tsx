@@ -183,8 +183,37 @@ export default function Home() {
         {/* Chat-style Input */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-xl mb-8">
           <div className="p-6 border-b border-gray-100">
-            <h3 className="text-xl font-bold text-gray-900">Paste Your Supplier's Proposal</h3>
-            <p className="text-sm text-gray-600 mt-1">Get instant analysis and negotiation guidance</p>
+            <div className="flex items-start justify-between mb-2">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">Paste Your Supplier's Proposal</h3>
+                <p className="text-sm text-gray-600 mt-1">Get instant analysis and negotiation guidance</p>
+              </div>
+
+              {/* Redaction Mode Toggle */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setRedactionMode(!redactionMode)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    redactionMode ? 'bg-green-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      redactionMode ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                <div className="text-right">
+                  <div className="text-xs font-medium text-gray-900">Redaction mode</div>
+                  <div className="text-xs text-gray-500">(work docs safe)</div>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {redactionMode
+                ? '🔒 Masks names, emails, phone numbers, IDs, and exact amounts before analysis.'
+                : '⚠️ Text will be sent as-is. Only use with non-sensitive documents.'}
+            </p>
           </div>
 
           <div className="p-6">
