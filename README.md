@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DealCheck
 
-## Getting Started
+**Clarity before commitment**
 
-First, run the development server:
+DealCheck is a procurement advisor tool for non-procurement professionals (founders, ops managers, finance managers, first-time buyers). Analyze supplier emails, quotes, and commercial proposals to get structured, practical guidance.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Paste & Analyze**: Simple textarea input for supplier communications
+- **AI-Powered**: Uses OpenAI GPT-4 to provide structured analysis
+- **5-Section Output**:
+  1. Deal Reality Check
+  2. What Matters Most
+  3. What to Ask For
+  4. Suggested Reply (copy-paste ready)
+  5. If They Push Back
+- **Calm & Clear**: Designed to reduce anxiety and provide practical clarity
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- OpenAI API
 
-## Learn More
+## Setup
 
-To learn more about Next.js, take a look at the following resources:
+1. Install dependencies:
+   ```bash
+   bun install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Create `.env.local` file and add your OpenAI API key:
+   ```
+   OPENAI_API_KEY=your_openai_api_key_here
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Run the development server:
+   ```bash
+   bun dev
+   ```
 
-## Deploy on Vercel
+4. Open [http://localhost:3000](http://localhost:3000)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Usage
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Paste a supplier email, quote, or commercial proposal into the textarea
+2. Click "Analyze Deal"
+3. Receive structured guidance following the 5-section format
+4. Use the suggested reply template to respond professionally
+
+## What DealCheck Does NOT Do
+
+- Provide legal advice
+- Give pricing benchmarks or market rates
+- Use aggressive negotiation tactics
+- Overwhelm you with too many points
+
+## Environment Variables
+
+- `OPENAI_API_KEY` - Your OpenAI API key (required)
+
+## License
+
+MIT
