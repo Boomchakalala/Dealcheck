@@ -144,12 +144,20 @@ export async function POST(request: Request) {
     }
 
     // Check if OpenAI API key is configured
-    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
+    const apiKey = process.env.OPENAI_API_KEY;
+    console.log('API Key exists:', !!apiKey);
+    console.log('API Key length:', apiKey?.length || 0);
+
+    if (!apiKey || apiKey === 'your_openai_api_key_here') {
       return NextResponse.json(
         { error: 'OpenAI API key not configured. Please add your API key to .env.local' },
         { status: 500 }
       );
     }
+
+    const openai = new OpenAI({
+      apiKey: apiKey,
+    });
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
