@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Upload, FileText, Image as ImageIcon, File, X, Copy, Check, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Loader2, Paperclip, Send } from 'lucide-react';
+import { Upload, FileText, Image as ImageIcon, File, X, Copy, Check, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Loader2, Paperclip, Send, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Callout } from '@/components/ui/callout';
+import { redactText } from '@/lib/redact';
+import { getMissingItems } from '@/lib/missingInfo';
 
 interface AnalysisData {
   realityCheck: { verdict: string; points: string[] };
@@ -46,6 +48,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [extracting, setExtracting] = useState(false);
+  const [redactionMode, setRedactionMode] = useState(true);
+  const [showRedactedPreview, setShowRedactedPreview] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,10 +96,13 @@ export default function Home() {
     setAnalysis(null);
 
     try {
+      // Apply redaction if enabled
+      const textToAnalyze = redactionMode ? redactText(input) : input;
+
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input }),
+        body: JSON.stringify({ input: textToAnalyze }),
       });
 
       const data = await response.json();
