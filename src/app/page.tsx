@@ -261,6 +261,30 @@ export default function Home() {
               )}
             </div>
 
+            {/* Redacted Preview */}
+            {redactionMode && input && (
+              <div className="mt-3">
+                <button
+                  onClick={() => setShowRedactedPreview(!showRedactedPreview)}
+                  className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  {showRedactedPreview ? (
+                    <EyeOff className="w-3 h-3" />
+                  ) : (
+                    <Eye className="w-3 h-3" />
+                  )}
+                  {showRedactedPreview ? 'Hide' : 'View'} redacted preview
+                </button>
+                {showRedactedPreview && (
+                  <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 max-h-32 overflow-y-auto">
+                    <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono">
+                      {redactText(input)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Bottom Actions Bar */}
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-2">
@@ -322,7 +346,7 @@ export default function Home() {
         )}
 
         {/* Results */}
-        {analysis && <AnalysisDisplay analysis={analysis} />}
+        {analysis && <AnalysisDisplay analysis={analysis} originalInput={input} />}
 
         {/* Footer */}
         <div className="mt-16 text-center border-t border-gray-200 pt-8">
@@ -335,9 +359,10 @@ export default function Home() {
   );
 }
 
-function AnalysisDisplay({ analysis }: { analysis: string }) {
+function AnalysisDisplay({ analysis, originalInput }: { analysis: string; originalInput: string }) {
   const [copied, setCopied] = useState('');
   const parsed = parseAnalysis(analysis);
+  const missingItems = getMissingItems(originalInput);
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
