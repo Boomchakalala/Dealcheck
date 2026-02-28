@@ -149,54 +149,51 @@ export async function POST(request: Request) {
 
     // Check if OpenAI API key is configured
     if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
-      console.warn('OpenAI API key not configured, using demo mode');
-      return NextResponse.json({
-        analysis: generateDemoAnalysis(input),
-        demo: true
-      });
+      return NextResponse.json(
+        { error: 'OpenAI API key not configured. Please add your API key to .env.local' },
+        { status: 500 }
+      );
     }
 
-    try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'system',
-            content: DEALCHECK_SYSTEM_PROMPT,
-          },
-          {
-            role: 'user',
-            content: input,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 2000,
-      });
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'system',
+          content: DEALCHECK_SYSTEM_PROMPT,
+        },
+        {
+          role: 'user',
+          content: input,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 2000,
+    });
 
-      const analysis = completion.choices[0]?.message?.content || 'No analysis generated';
-      return NextResponse.json({ analysis });
+    const analysis = completion.choices[0]?.message?.content || 'No analysis generated';
+    return NextResponse.json({ analysis });
 
-    } catch (openaiError: any) {
-      // Handle OpenAI-specific errors
-      console.error('OpenAI API error:', openaiError);
-
-      // If quota exceeded or authentication failed, fall back to demo mode
-      if (openaiError.status === 429 || openaiError.status === 401) {
-        console.warn('OpenAI quota exceeded or auth failed, using demo mode');
-        return NextResponse.json({
-          analysis: generateDemoAnalysis(input),
-          demo: true,
-          warning: 'Using demo mode. OpenAI API quota exceeded or invalid key. Please check your billing at platform.openai.com'
-        });
-      }
-
-      throw openaiError;
-    }
-
-  } catch (error) {
+  } catch (error: any) {
     console.error('Analysis error:', error);
+
+    // Provide specific error messages
+    if (error.status === 429) {
+      return NextResponse.json(
+        { error: 'OpenAI API quota exceeded. Please check your billing at platform.openai.com' },
+        { status: 429 }
+      );
+    }
+
+    if (error.status === 401) {
+      return NextResponse.json(
+        { error: 'Invalid OpenAI API key. Please check your API key.' },
+        { status: 401 }
+      );
+    }
+
     return NextResponse.json(
-      { error: 'Failed to analyze the deal. Please try again.' },
+      { error: error.message || 'Failed to analyze the deal. Please try again.' },
       { status: 500 }
     );
   }
