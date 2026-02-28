@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Menu, FileText, Image as ImageIcon, File, X, Copy, Check, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Loader2, Paperclip, Send, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
+import { Menu, FileText, Image as ImageIcon, File, X, Copy, Check, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Loader2, Paperclip, Send, Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Callout } from '@/components/ui/callout';
 import { Sidebar } from '@/components/Sidebar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs-new';
 import { redactText } from '@/lib/redact';
-import { getMissingItems } from '@/lib/missingInfo';
 import {
   Thread,
   ThreadDoc,
@@ -44,13 +43,15 @@ export default function Home() {
 
   // Redaction
   const [redactionMode, setRedactionMode] = useState(true);
-  const [showRedactedPreview, setShowRedactedPreview] = useState(false);
 
   // General
   const [error, setError] = useState<string | null>(null);
+  const [debugOpen, setDebugOpen] = useState(false);
+  const [lastApiStatus, setLastApiStatus] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const currentThread = threads.find(t => t.id === currentThreadId);
+  const isDev = process.env.NODE_ENV === 'development';
 
   // Load threads on mount
   useEffect(() => {
@@ -62,6 +63,7 @@ export default function Home() {
       setCurrentThreadId(currentId);
     } else if (loaded.length > 0) {
       setCurrentThreadId(loaded[0].id);
+      localStorage.setItem('dealcheck_current_thread', loaded[0].id);
     }
   }, []);
 
@@ -71,6 +73,7 @@ export default function Home() {
     setThreads(updated);
     setCurrentThreadId(newThread.id);
     setSidebarOpen(false);
+    setActiveTab('docs');
   };
 
   const handleSelectThread = (id: string) => {
@@ -156,19 +159,46 @@ export default function Home() {
     setMsgContent('');
   };
 
-  const handleAnalyzeAndReply = async () => {
-    if (!currentThreadId || !currentThread) return;
+  // PART B: Single unified analysis function
+  const runAnalysis = async () => {
+    // Guard: ensure we have a thread
+    if (!currentThreadId || !currentThread) {
+      setError('No active deal thread. Please create one first.');
+      return;
+    }
+
+    // Guard: ensure we have content to analyze
+    if (currentThread.docs.length === 0 && currentThread.messages.length === 0 && !msgContent.trim()) {
+      setError('Please add a document or paste a message before analyzing.');
+      return;
+    }
 
     setAnalyzing(true);
     setError(null);
+    setLastApiStatus('Starting analysis...');
 
     try {
-      // Build context from thread
-      const context = buildAnalysisContext(currentThread, msgContent);
+      // Step 1: Build context from thread
+      const context = buildAnalysisContext(currentThread, msgContent.trim() || undefined);
+      setLastApiStatus(`Built context: ${context.length} chars`);
 
-      // Apply redaction if enabled
+      // Step 2: Apply redaction if enabled
       const textToAnalyze = redactionMode ? redactText(context) : context;
+      setLastApiStatus(`Redaction ${redactionMode ? 'ON' : 'OFF'}, sending ${textToAnalyze.length} chars`);
 
+      // Step 3: Add vendor/user message to thread BEFORE API call
+      let updatedThreads = threads;
+      if (msgContent.trim()) {
+        updatedThreads = addMessage(currentThreadId, {
+          role: msgRole,
+          content: msgContent,
+        });
+        setThreads(updatedThreads);
+        setMsgContent('');
+      }
+
+      // Step 4: Call API
+      setLastApiStatus('Calling /api/analyze...');
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -178,34 +208,33 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
+        setLastApiStatus(`API error: ${response.status} ${data.error || 'Unknown'}`);
         throw new Error(data.error || 'Analysis failed');
       }
 
-      // Save vendor message if present
-      if (msgContent.trim()) {
-        const withVendorMsg = addMessage(currentThreadId, {
-          role: 'vendor',
-          content: msgContent,
-        });
-        setThreads(withVendorMsg);
-      }
+      setLastApiStatus(`API success: ${data.analysis?.length || 0} chars received`);
 
-      // Save AI response as message
+      // Step 5: Add AI message to thread
       const withAiMsg = addMessage(currentThreadId, {
         role: 'ai',
         content: data.analysis,
       });
 
-      // Update lastAnalysis
-      const updated = updateThread(currentThreadId, {
+      // Step 6: Update lastAnalysis
+      const finalThreads = updateThread(currentThreadId, {
         lastAnalysis: data.analysis,
       });
 
-      setThreads(updated);
-      setMsgContent('');
-      setActiveTab('conversation');
+      setThreads(finalThreads);
+      setLastApiStatus('Analysis complete, saved to thread');
+
+      // Step 7: Switch to Analysis tab
+      setActiveTab('analysis');
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      const errMsg = err instanceof Error ? err.message : 'Something went wrong';
+      setError(errMsg);
+      setLastApiStatus(`Error: ${errMsg}`);
     } finally {
       setAnalyzing(false);
     }
@@ -257,7 +286,7 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="h-screen flex overflow-hidden bg-slate-950">
       {/* Sidebar - Desktop */}
       <div className="hidden lg:block w-80">
         <Sidebar
@@ -284,16 +313,16 @@ export default function Home() {
       )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden bg-slate-100">
         {/* Thread Header */}
-        <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-lg">
+        <header className="border-b border-slate-200 bg-white shadow-sm">
           <div className="px-4 sm:px-6 py-4">
             <div className="flex items-center gap-3 mb-3">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
               >
-                <Menu className="w-5 h-5 text-slate-400" />
+                <Menu className="w-5 h-5 text-slate-600" />
               </button>
 
               <div className="flex-1 min-w-0">
@@ -301,7 +330,7 @@ export default function Home() {
                   type="text"
                   value={currentThread?.title || ''}
                   onChange={(e) => handleUpdateThreadTitle(e.target.value)}
-                  className="w-full bg-transparent text-xl font-bold text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded px-2 py-1"
+                  className="w-full bg-transparent text-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 rounded px-2 py-1"
                   placeholder="Deal title..."
                 />
                 <div className="flex items-center gap-3 mt-1">
@@ -309,7 +338,7 @@ export default function Home() {
                     type="text"
                     value={currentThread?.supplier || ''}
                     onChange={(e) => handleUpdateSupplier(e.target.value)}
-                    className="bg-slate-900/60 text-sm text-slate-300 px-2 py-1 rounded border border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="bg-slate-50 text-sm text-slate-700 px-2 py-1 rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
                     placeholder="Supplier name..."
                   />
                   <span className="text-xs text-slate-500">
@@ -337,25 +366,49 @@ export default function Home() {
         </header>
 
         {/* Tab Content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-slate-50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+            {/* Debug Panel (dev only) */}
+            {isDev && (
+              <div className="mb-4">
+                <button
+                  onClick={() => setDebugOpen(!debugOpen)}
+                  className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-700"
+                >
+                  {debugOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  Debug Info
+                </button>
+                {debugOpen && (
+                  <div className="mt-2 p-3 bg-white border border-slate-200 rounded-lg text-xs font-mono space-y-1">
+                    <div><strong>Thread ID:</strong> {currentThreadId || 'none'}</div>
+                    <div><strong>Docs:</strong> {currentThread?.docs.length || 0}</div>
+                    <div><strong>Messages:</strong> {currentThread?.messages.length || 0}</div>
+                    <div><strong>Last API:</strong> {lastApiStatus || 'No calls yet'}</div>
+                    {currentThread && (
+                      <div><strong>Has Analysis:</strong> {currentThread.lastAnalysis ? 'Yes' : 'No'}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <Tabs value={activeTab}>
               {/* DOCS TAB */}
               <TabsContent value="docs" className="space-y-6">
                 {/* Add Document Form */}
-                <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Add Document</h3>
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">Add Document</h3>
 
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
                           Document Type
                         </label>
                         <select
                           value={docType}
                           onChange={(e) => setDocType(e.target.value as any)}
-                          className="w-full px-3 py-2 bg-slate-950/60 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
                         >
                           <option value="quote">Quote / Proposal</option>
                           <option value="msa">MSA / Contract</option>
@@ -364,7 +417,7 @@ export default function Home() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
                           Name (optional)
                         </label>
                         <input
@@ -372,18 +425,18 @@ export default function Home() {
                           value={docName}
                           onChange={(e) => setDocName(e.target.value)}
                           placeholder="e.g., Q1 2025 Quote"
-                          className="w-full px-3 py-2 bg-slate-950/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
                         />
                       </div>
                     </div>
 
                     {uploadedFile && (
-                      <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg flex items-center justify-between">
+                      <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {getFileIcon(uploadedFile.name)}
                           <div>
-                            <p className="text-sm font-medium text-white">{uploadedFile.name}</p>
-                            <p className="text-xs text-slate-400">
+                            <p className="text-sm font-medium text-slate-900">{uploadedFile.name}</p>
+                            <p className="text-xs text-slate-600">
                               {(uploadedFile.size / 1024).toFixed(1)} KB
                               {extracting && <span className="ml-2">• Extracting...</span>}
                             </p>
@@ -395,15 +448,15 @@ export default function Home() {
                             setDocText('');
                           }}
                           disabled={extracting}
-                          className="p-1 hover:bg-slate-800 rounded transition-colors"
+                          className="p-1 hover:bg-white rounded transition-colors"
                         >
-                          <X className="w-4 h-4 text-slate-400" />
+                          <X className="w-4 h-4 text-slate-500" />
                         </button>
                       </div>
                     )}
 
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
                         Document Text
                       </label>
                       <textarea
@@ -412,7 +465,7 @@ export default function Home() {
                         rows={8}
                         placeholder="Paste document text here or upload a file..."
                         disabled={extracting}
-                        className="w-full px-3 py-2 bg-slate-950/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
                       />
                     </div>
 
@@ -420,7 +473,7 @@ export default function Home() {
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={extracting}
-                        className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors disabled:opacity-50"
                       >
                         <Paperclip className="w-4 h-4" />
                         Upload File
@@ -448,45 +501,45 @@ export default function Home() {
 
                 {/* Documents List */}
                 <div>
-                  <h3 className="text-lg font-bold text-white mb-4">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">
                     Documents ({currentThread?.docs.length || 0})
                   </h3>
 
                   {currentThread?.summary && (
-                    <div className="mb-4 p-4 bg-slate-800/50 border border-slate-700 rounded-xl">
-                      <p className="text-sm text-slate-300">
-                        <span className="font-semibold text-emerald-400">Summary: </span>
+                    <div className="mb-4 p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+                      <p className="text-sm text-slate-700">
+                        <span className="font-semibold text-emerald-600">Summary: </span>
                         {currentThread.summary}
                       </p>
                     </div>
                   )}
 
                   {!currentThread?.docs.length ? (
-                    <div className="text-center py-12 text-slate-500">
+                    <div className="text-center py-12 text-slate-500 bg-white rounded-xl border border-slate-200">
                       No documents added yet. Add your first document above.
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {currentThread.docs.map(doc => (
-                        <div key={doc.id} className="bg-slate-900/60 rounded-xl border border-slate-800 p-4">
+                        <div key={doc.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <div className="flex items-center gap-2">
                               {getDocTypeBadge(doc.type)}
                               {doc.name && (
-                                <span className="text-sm font-medium text-white">{doc.name}</span>
+                                <span className="text-sm font-medium text-slate-900">{doc.name}</span>
                               )}
                             </div>
                             <button
                               onClick={() => handleRemoveDocument(doc.id)}
-                              className="p-1 hover:bg-red-500/10 text-red-400 hover:text-red-300 rounded transition-colors"
+                              className="p-1 hover:bg-red-50 text-red-500 hover:text-red-600 rounded transition-colors"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
-                          <p className="text-sm text-slate-400 line-clamp-3">
+                          <p className="text-sm text-slate-600 line-clamp-3">
                             {doc.text.substring(0, 200)}...
                           </p>
-                          <p className="text-xs text-slate-600 mt-2">
+                          <p className="text-xs text-slate-500 mt-2">
                             Added {new Date(doc.createdAt).toLocaleString()}
                           </p>
                         </div>
@@ -501,7 +554,7 @@ export default function Home() {
                 {/* Messages Timeline */}
                 <div className="space-y-4">
                   {!currentThread?.messages.length ? (
-                    <div className="text-center py-12 text-slate-500">
+                    <div className="text-center py-12 text-slate-500 bg-white rounded-xl border border-slate-200">
                       No messages yet. Add a vendor message or your note below.
                     </div>
                   ) : (
@@ -511,26 +564,26 @@ export default function Home() {
                         className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-2xl rounded-xl p-4 ${
+                          className={`max-w-2xl rounded-xl p-4 shadow-sm ${
                             msg.role === 'vendor'
-                              ? 'bg-slate-900/60 border border-slate-800'
+                              ? 'bg-white border border-slate-200'
                               : msg.role === 'user'
-                              ? 'bg-emerald-600/10 border border-emerald-500/30'
-                              : 'bg-blue-600/10 border border-blue-500/30'
+                              ? 'bg-emerald-50 border border-emerald-200'
+                              : 'bg-blue-50 border border-blue-200'
                           }`}
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <span className={`text-xs font-bold uppercase ${
-                              msg.role === 'vendor' ? 'text-slate-400' :
-                              msg.role === 'user' ? 'text-emerald-400' : 'text-blue-400'
+                              msg.role === 'vendor' ? 'text-slate-600' :
+                              msg.role === 'user' ? 'text-emerald-700' : 'text-blue-700'
                             }`}>
                               {msg.role === 'vendor' ? '📨 Vendor' : msg.role === 'user' ? '✍️ Me' : '🤖 AI Analysis'}
                             </span>
-                            <span className="text-xs text-slate-600">
+                            <span className="text-xs text-slate-500">
                               {new Date(msg.createdAt).toLocaleString()}
                             </span>
                           </div>
-                          <div className="text-sm text-slate-300 whitespace-pre-wrap">
+                          <div className="text-sm text-slate-900 whitespace-pre-wrap">
                             {msg.content}
                           </div>
                         </div>
@@ -540,7 +593,7 @@ export default function Home() {
                 </div>
 
                 {/* Add Message Form */}
-                <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
                   <div className="space-y-4">
                     <div className="flex items-center gap-4">
                       <label className="flex items-center gap-2">
@@ -552,7 +605,7 @@ export default function Home() {
                           onChange={() => setMsgRole('vendor')}
                           className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
                         />
-                        <span className="text-sm text-slate-300">Vendor message</span>
+                        <span className="text-sm text-slate-700">Vendor message</span>
                       </label>
                       <label className="flex items-center gap-2">
                         <input
@@ -563,7 +616,7 @@ export default function Home() {
                           onChange={() => setMsgRole('user')}
                           className="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
                         />
-                        <span className="text-sm text-slate-300">My note</span>
+                        <span className="text-sm text-slate-700">My note</span>
                       </label>
                     </div>
 
@@ -572,15 +625,15 @@ export default function Home() {
                       onChange={(e) => setMsgContent(e.target.value)}
                       rows={4}
                       placeholder={msgRole === 'vendor' ? "Paste vendor's email or response..." : "Add your internal note..."}
-                      className="w-full px-3 py-2 bg-slate-950/60 border border-slate-700 rounded-lg text-white placeholder-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
                     />
 
                     <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <button
                           onClick={() => setRedactionMode(!redactionMode)}
                           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                            redactionMode ? 'bg-emerald-600' : 'bg-slate-700'
+                            redactionMode ? 'bg-emerald-600' : 'bg-slate-300'
                           }`}
                         >
                           <span
@@ -589,7 +642,7 @@ export default function Home() {
                             }`}
                           />
                         </button>
-                        <span className="text-xs text-slate-400">Redaction mode</span>
+                        <span className="text-xs text-slate-600">Redaction mode</span>
                       </div>
 
                       <div className="flex gap-2">
@@ -601,8 +654,8 @@ export default function Home() {
                           Add message
                         </Button>
                         <Button
-                          onClick={handleAnalyzeAndReply}
-                          disabled={analyzing}
+                          onClick={runAnalysis}
+                          disabled={analyzing || (currentThread?.docs.length === 0 && currentThread?.messages.length === 0 && !msgContent.trim())}
                           className="gap-2"
                         >
                           {analyzing ? (
@@ -634,12 +687,12 @@ export default function Home() {
                 {currentThread?.lastAnalysis ? (
                   <AnalysisDisplay analysis={currentThread.lastAnalysis} />
                 ) : (
-                  <div className="text-center py-12">
+                  <div className="text-center py-12 bg-white rounded-xl border border-slate-200 shadow-sm">
                     <div className="mb-4">
-                      <MessageSquare className="w-16 h-16 text-slate-700 mx-auto" />
+                      <MessageSquare className="w-16 h-16 text-slate-300 mx-auto" />
                     </div>
-                    <p className="text-slate-400 mb-2">No analysis yet</p>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-slate-600 mb-2 font-medium">No analysis yet</p>
+                    <p className="text-sm text-slate-500">
                       Add documents and use "Analyze & draft reply" in the Conversation tab
                     </p>
                   </div>
@@ -684,14 +737,16 @@ function AnalysisDisplay({ analysis }: { analysis: string }) {
     <div className="space-y-6">
       {/* Reality Check */}
       {parsed.realityCheck && (
-        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div className="flex items-start gap-4 mb-4">
-            <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20">
-              <ShieldAlert className="w-6 h-6 text-red-400" />
+            <div className="p-3 bg-red-50 rounded-xl border border-red-100">
+              <ShieldAlert className="w-6 h-6 text-red-600" />
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-white mb-2">Deal Reality Check</h3>
-              <div className="text-sm text-slate-300 whitespace-pre-wrap">{parsed.realityCheck}</div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Deal Reality Check</h3>
+              <div className="text-sm text-slate-700 whitespace-pre-wrap prose prose-sm max-w-none">
+                {parsed.realityCheck}
+              </div>
             </div>
           </div>
         </div>
@@ -699,14 +754,16 @@ function AnalysisDisplay({ analysis }: { analysis: string }) {
 
       {/* Risks / What Matters */}
       {parsed.risks && (
-        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div className="flex items-start gap-4 mb-4">
-            <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
-              <Target className="w-6 h-6 text-blue-400" />
+            <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
+              <Target className="w-6 h-6 text-blue-600" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-bold text-white mb-2">Key Points</h3>
-              <div className="text-sm text-slate-300 whitespace-pre-wrap">{parsed.risks}</div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Key Points</h3>
+              <div className="text-sm text-slate-700 whitespace-pre-wrap prose prose-sm max-w-none">
+                {parsed.risks}
+              </div>
             </div>
           </div>
         </div>
@@ -714,14 +771,14 @@ function AnalysisDisplay({ analysis }: { analysis: string }) {
 
       {/* Questions */}
       {parsed.questions && (
-        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-                <MessageSquare className="w-6 h-6 text-emerald-400" />
+              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                <MessageSquare className="w-6 h-6 text-emerald-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-2">Questions to Ask</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Questions to Ask</h3>
               </div>
             </div>
             <Button
@@ -736,21 +793,23 @@ function AnalysisDisplay({ analysis }: { analysis: string }) {
               )}
             </Button>
           </div>
-          <div className="text-sm text-slate-300 whitespace-pre-wrap">{parsed.questions}</div>
+          <div className="text-sm text-slate-700 whitespace-pre-wrap prose prose-sm max-w-none">
+            {parsed.questions}
+          </div>
         </div>
       )}
 
       {/* Suggested Reply */}
       {parsed.reply && (
-        <div className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-2xl border border-emerald-500/20 p-6">
+        <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border border-emerald-200 shadow-sm p-6">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-emerald-500/20 rounded-xl border border-emerald-500/30">
-                <Mail className="w-6 h-6 text-emerald-400" />
+              <div className="p-3 bg-emerald-100 rounded-xl border border-emerald-200">
+                <Mail className="w-6 h-6 text-emerald-700" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1">Suggested Reply</h3>
-                <p className="text-sm text-slate-400">Copy and customize for your situation</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-1">Suggested Reply</h3>
+                <p className="text-sm text-slate-600">Copy and customize for your situation</p>
               </div>
             </div>
             <Button
@@ -764,22 +823,26 @@ function AnalysisDisplay({ analysis }: { analysis: string }) {
               )}
             </Button>
           </div>
-          <div className="p-4 bg-slate-950/50 rounded-xl border border-emerald-500/10">
-            <pre className="text-sm text-slate-300 whitespace-pre-wrap font-sans">{parsed.reply}</pre>
+          <div className="p-4 bg-white rounded-xl border border-emerald-100 shadow-sm">
+            <pre className="text-sm text-slate-900 whitespace-pre-wrap font-sans">
+              {parsed.reply}
+            </pre>
           </div>
         </div>
       )}
 
       {/* Push Back Strategy */}
       {parsed.pushback && (
-        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div className="flex items-start gap-4 mb-4">
-            <div className="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
-              <ArrowRight className="w-6 h-6 text-amber-400" />
+            <div className="p-3 bg-amber-50 rounded-xl border border-amber-100">
+              <ArrowRight className="w-6 h-6 text-amber-600" />
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-white mb-2">If They Push Back</h3>
-              <div className="text-sm text-slate-300 whitespace-pre-wrap">{parsed.pushback}</div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">If They Push Back</h3>
+              <div className="text-sm text-slate-700 whitespace-pre-wrap prose prose-sm max-w-none">
+                {parsed.pushback}
+              </div>
             </div>
           </div>
         </div>
@@ -787,9 +850,11 @@ function AnalysisDisplay({ analysis }: { analysis: string }) {
 
       {/* Fallback: show raw if parsing failed */}
       {!parsed.realityCheck && !parsed.risks && !parsed.questions && !parsed.reply && (
-        <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
-          <h3 className="text-xl font-bold text-white mb-4">Analysis Result</h3>
-          <pre className="text-sm text-slate-300 whitespace-pre-wrap font-sans">{analysis}</pre>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <h3 className="text-xl font-bold text-slate-900 mb-4">Analysis Result</h3>
+          <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans">
+            {analysis}
+          </pre>
         </div>
       )}
     </div>
