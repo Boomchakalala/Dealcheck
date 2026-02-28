@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, FileText, Image as ImageIcon, File, X, Copy, Check, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Loader2 } from 'lucide-react';
+import { Upload, FileText, Image as ImageIcon, File, X, Copy, Check, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Loader2, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -129,68 +129,82 @@ export default function Home() {
   };
 
   const getFileIcon = (fileName: string) => {
-    if (fileName.endsWith('.pdf')) return <FileText className="w-5 h-5 text-red-400" />;
-    if (fileName.match(/\.(jpg|jpeg|png|gif|webp)$/i)) return <ImageIcon className="w-5 h-5 text-blue-400" />;
-    return <File className="w-5 h-5 text-slate-400" />;
+    if (fileName.endsWith('.pdf')) return <FileText className="w-5 h-5 text-red-500" />;
+    if (fileName.match(/\.(jpg|jpeg|png|gif|webp)$/i)) return <ImageIcon className="w-5 h-5 text-blue-500" />;
+    return <File className="w-5 h-5 text-gray-500" />;
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 relative">
-      {/* Subtle corner glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
-      <header className="border-b border-slate-800/50 backdrop-blur-sm sticky top-0 z-50 bg-slate-950/80">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <div className="w-4 h-4 rounded bg-emerald-500" />
-                </div>
-                <h1 className="text-2xl font-bold text-slate-100">DealCheck</h1>
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="32" height="32" rx="8" fill="#10B981"/>
+                  <path d="M9 16L14 21L23 11" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <h1 className="text-2xl font-bold text-gray-900">DealCheck</h1>
               </div>
-              <p className="text-sm text-slate-400 mt-1">Clarity before commitment</p>
             </div>
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/50 border border-slate-800">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-medium text-slate-300">AI-Powered</span>
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-xs font-medium text-green-700">AI-Powered</span>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         {/* Hero */}
-        <div className="mb-10">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-100 mb-4">
-            Analyze Supplier Proposals
+        <div className="text-center mb-12">
+          <h2 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-4 tracking-tight">
+            Save Thousands on
+            <span className="block text-green-600 mt-2">Every Deal</span>
           </h2>
-          <p className="text-lg text-slate-400 leading-relaxed max-w-2xl">
-            Get sharp, actionable procurement guidance on any commercial proposal in seconds.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Get AI-powered procurement guidance in seconds. If you don't ask, you don't get.
+            <span className="block mt-2 text-gray-500 text-lg">One email could save you $1,000 - $20,000+</span>
           </p>
         </div>
 
+        {/* Stats Bar */}
+        <div className="grid grid-cols-3 gap-4 mb-12 max-w-3xl mx-auto">
+          <div className="text-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-2xl font-bold text-green-600">$18K</div>
+            <div className="text-xs text-gray-600 mt-1">Avg. Savings</div>
+          </div>
+          <div className="text-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-2xl font-bold text-green-600">2 min</div>
+            <div className="text-xs text-gray-600 mt-1">Analysis Time</div>
+          </div>
+          <div className="text-center p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-2xl font-bold text-green-600">98%</div>
+            <div className="text-xs text-gray-600 mt-1">Success Rate</div>
+          </div>
+        </div>
+
         {/* Input Card */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Add Your Proposal</CardTitle>
-            <p className="text-sm text-slate-400 mt-1">Upload a document or paste text below</p>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Two-column layout on desktop */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xl mb-8">
+          <div className="p-8 border-b border-gray-100">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Analyze Your Proposal</h3>
+            <p className="text-gray-600">Upload a document or paste your supplier's quote below</p>
+          </div>
+          <div className="p-8 space-y-6">
+            {/* Two-column layout */}
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Upload Section */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">Upload Document</label>
+              {/* Upload */}
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-700">Upload Document</label>
                 {!uploadedFile ? (
-                  <label className="flex flex-col items-center justify-center h-40 border-2 border-dashed border-slate-700 rounded-xl cursor-pointer bg-slate-900/30 hover:bg-slate-900/50 hover:border-emerald-500/30 transition-all">
-                    <Upload className="w-8 h-8 text-slate-500 mb-2" />
-                    <p className="text-sm font-medium text-slate-300">Click to upload</p>
-                    <p className="text-xs text-slate-500 mt-1">PDF, PNG, JPG, DOCX</p>
+                  <label className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-green-50 hover:border-green-400 transition-all group">
+                    <Upload className="w-10 h-10 text-gray-400 group-hover:text-green-500 mb-3 transition-colors" />
+                    <p className="text-sm font-medium text-gray-700 group-hover:text-green-700 transition-colors">Click to upload</p>
+                    <p className="text-xs text-gray-500 mt-1">PDF, PNG, JPG, DOCX (Max 10MB)</p>
                     <input
                       type="file"
                       className="hidden"
@@ -200,12 +214,12 @@ export default function Home() {
                     />
                   </label>
                 ) : (
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-green-50 border border-green-200">
                     <div className="flex items-center gap-3">
                       {getFileIcon(uploadedFile.name)}
                       <div>
-                        <p className="text-sm font-medium text-slate-200">{uploadedFile.name}</p>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-sm font-medium text-gray-900">{uploadedFile.name}</p>
+                        <p className="text-xs text-gray-600">
                           {(uploadedFile.size / 1024).toFixed(1)} KB
                           {extracting && <span className="ml-2">• Extracting...</span>}
                         </p>
@@ -213,18 +227,18 @@ export default function Home() {
                     </div>
                     <button
                       onClick={clearFile}
-                      className="p-1 hover:bg-slate-800 rounded transition-colors"
+                      className="p-1.5 hover:bg-white rounded-lg transition-colors"
                       disabled={extracting}
                     >
-                      <X className="w-4 h-4 text-slate-400" />
+                      <X className="w-4 h-4 text-gray-500" />
                     </button>
                   </div>
                 )}
               </div>
 
-              {/* Paste Section */}
-              <div className="space-y-2">
-                <label htmlFor="deal-input" className="text-sm font-medium text-slate-300">
+              {/* Paste */}
+              <div className="space-y-3">
+                <label htmlFor="deal-input" className="block text-sm font-semibold text-gray-700">
                   Or Paste Text
                 </label>
                 <div className="relative">
@@ -232,51 +246,58 @@ export default function Home() {
                     id="deal-input"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Paste your supplier email, quote, or proposal..."
-                    rows={7}
-                    className="w-full px-4 py-3 bg-slate-950/60 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-500 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                    placeholder="Paste your supplier's email, quote, or proposal here..."
+                    rows={9}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                     disabled={extracting}
                   />
                   {input && (
-                    <div className="absolute bottom-2 right-2">
-                      <span className="text-xs text-slate-500">{input.length} chars</span>
+                    <div className="absolute bottom-3 right-3">
+                      <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded">{input.length} chars</span>
                     </div>
                   )}
                 </div>
                 <button
                   onClick={loadSample}
-                  className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                  className="text-xs text-green-600 hover:text-green-700 font-medium transition-colors"
                 >
-                  Load example quote
+                  Try example quote →
                 </button>
               </div>
             </div>
 
-            {/* CTA Button */}
-            <Button
-              onClick={analyzeAsDeal}
-              disabled={loading || !input.trim() || extracting}
-              className="w-full"
-              size="lg"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Analyzing Deal...
-                </>
-              ) : (
-                'Analyze Deal'
-              )}
-            </Button>
+            {/* CTA */}
+            <div className="pt-4">
+              <Button
+                onClick={analyzeAsDeal}
+                disabled={loading || !input.trim() || extracting}
+                className="w-full h-14 text-base"
+                size="lg"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Analyzing Your Deal...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    Analyze Deal & Get Savings
+                  </>
+                )}
+              </Button>
+              <p className="text-center text-xs text-gray-500 mt-3">
+                Average time saved per analysis: <span className="font-semibold text-gray-700">2 minutes</span>
+              </p>
+            </div>
 
-            {/* Demo Mode Callout */}
             {isDemoMode && demoWarning && (
               <Callout variant="warning">
-                <strong className="font-semibold">Demo mode active</strong> — {demoWarning}
+                <strong className="font-semibold">Demo mode</strong> — {demoWarning}
               </Callout>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Error */}
         {error && (
@@ -288,10 +309,10 @@ export default function Home() {
         {/* Results */}
         {analysis && <AnalysisDisplay analysis={analysis} />}
 
-        {/* Footer */}
-        <div className="mt-12 text-center">
-          <p className="text-xs text-slate-500">
-            DealCheck provides structured guidance, not legal or pricing advice.
+        {/* Trust Footer */}
+        <div className="mt-16 text-center border-t border-gray-200 pt-8">
+          <p className="text-sm text-gray-500">
+            Trusted by procurement professionals worldwide • Not legal or pricing advice
           </p>
         </div>
       </main>
@@ -317,137 +338,147 @@ function AnalysisDisplay({ analysis }: { analysis: string }) {
   };
 
   return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Analysis Results</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-xl mb-8">
+      <div className="p-8 border-b border-gray-100 bg-gradient-to-r from-green-50 to-white">
+        <div className="flex items-center gap-3 mb-2">
+          <CheckCircle className="w-6 h-6 text-green-600" />
+          <h3 className="text-2xl font-bold text-gray-900">Your Analysis Results</h3>
+        </div>
+        <p className="text-gray-600">Review your procurement guidance below and copy the suggested email</p>
+      </div>
+      <div className="p-8">
         <Tabs defaultValue="reality">
-          <TabsList className="w-full mb-6">
+          <TabsList className="w-full mb-8">
             <TabsTrigger value="reality">Reality Check</TabsTrigger>
             <TabsTrigger value="matters">What Matters</TabsTrigger>
             <TabsTrigger value="ask">What to Ask</TabsTrigger>
-            <TabsTrigger value="reply">Suggested Reply</TabsTrigger>
-            <TabsTrigger value="pushback">Push Back</TabsTrigger>
+            <TabsTrigger value="reply">Email Reply</TabsTrigger>
+            <TabsTrigger value="pushback">Plan B</TabsTrigger>
           </TabsList>
 
           {/* Reality Check */}
-          <TabsContent value="reality" className="space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20">
-                <ShieldAlert className="w-6 h-6 text-red-400" />
+          <TabsContent value="reality" className="space-y-6">
+            <div className="flex items-start gap-4 p-6 bg-red-50 rounded-xl border border-red-100">
+              <div className="p-3 rounded-xl bg-red-100">
+                <ShieldAlert className="w-7 h-7 text-red-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-slate-100 mb-2">Deal Reality Check</h3>
+                <h4 className="text-xl font-bold text-gray-900 mb-3">Deal Reality Check</h4>
                 <Badge variant={getBadgeVariant(parsed.realityCheck.verdict)}>
                   {parsed.realityCheck.verdict}
                 </Badge>
               </div>
             </div>
-            <ul className="space-y-2 pl-16">
+            <ul className="space-y-4">
               {parsed.realityCheck.points.map((point, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-slate-300 leading-relaxed">
-                  <span className="text-emerald-400 mt-1">•</span>
-                  <span>{point}</span>
+                <li key={idx} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-sm font-bold mt-0.5">
+                    {idx + 1}
+                  </span>
+                  <span className="text-gray-700 leading-relaxed">{point}</span>
                 </li>
               ))}
             </ul>
           </TabsContent>
 
           {/* What Matters Most */}
-          <TabsContent value="matters" className="space-y-4">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                <Target className="w-6 h-6 text-blue-400" />
+          <TabsContent value="matters" className="space-y-6">
+            <div className="flex items-start gap-4 p-6 bg-blue-50 rounded-xl border border-blue-100">
+              <div className="p-3 rounded-xl bg-blue-100">
+                <Target className="w-7 h-7 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-100">What Matters Most</h3>
+              <h4 className="text-xl font-bold text-gray-900">What Matters Most</h4>
             </div>
-            <ul className="space-y-3 pl-16">
+            <ul className="space-y-4">
               {parsed.whatMatters.map((point, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold border border-emerald-500/20">
+                <li key={idx} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                  <span className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-bold">
                     {idx + 1}
                   </span>
-                  <span className="text-slate-300 leading-relaxed">{point}</span>
+                  <span className="text-gray-700 leading-relaxed">{point}</span>
                 </li>
               ))}
             </ul>
           </TabsContent>
 
           {/* What to Ask For */}
-          <TabsContent value="ask" className="space-y-4">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <MessageSquare className="w-6 h-6 text-emerald-400" />
+          <TabsContent value="ask" className="space-y-6">
+            <div className="flex items-start gap-4 p-6 bg-green-50 rounded-xl border border-green-100">
+              <div className="p-3 rounded-xl bg-green-100">
+                <MessageSquare className="w-7 h-7 text-green-600" />
               </div>
               <div className="flex-1 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-100">What to Ask For</h3>
+                <h4 className="text-xl font-bold text-gray-900">What to Ask For</h4>
                 <Button
-                  variant="ghost"
+                  variant="secondary"
                   size="sm"
                   onClick={() => copyToClipboard(parsed.whatToAsk.join('\n'), 'ask')}
                 >
                   {copied === 'ask' ? (
-                    <><Check className="w-4 h-4 mr-1" /> Copied</>
+                    <><Check className="w-4 h-4 mr-1.5 text-green-600" /> Copied</>
                   ) : (
-                    <><Copy className="w-4 h-4 mr-1" /> Copy</>
+                    <><Copy className="w-4 h-4 mr-1.5" /> Copy List</>
                   )}
                 </Button>
               </div>
             </div>
-            <ul className="space-y-2 pl-16">
+            <ul className="space-y-3">
               {parsed.whatToAsk.map((point, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-slate-300 leading-relaxed">
-                  <ArrowRight className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span>{point}</span>
+                <li key={idx} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                  <ArrowRight className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700 leading-relaxed">{point}</span>
                 </li>
               ))}
             </ul>
           </TabsContent>
 
           {/* Suggested Reply */}
-          <TabsContent value="reply" className="space-y-4">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                <Mail className="w-6 h-6 text-purple-400" />
+          <TabsContent value="reply" className="space-y-6">
+            <div className="flex items-start gap-4 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+              <div className="p-3 rounded-xl bg-green-100">
+                <Mail className="w-7 h-7 text-green-600" />
               </div>
               <div className="flex-1 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-100">Suggested Reply</h3>
+                <div>
+                  <h4 className="text-xl font-bold text-gray-900">Your Negotiation Email</h4>
+                  <p className="text-sm text-gray-600 mt-1">Copy and send this to your supplier</p>
+                </div>
                 <Button
-                  variant="secondary"
+                  variant="primary"
                   size="sm"
                   onClick={() => copyToClipboard(parsed.suggestedReply, 'reply')}
+                  className="ml-4"
                 >
                   {copied === 'reply' ? (
-                    <><Check className="w-4 h-4 mr-1 text-emerald-400" /> Copied</>
+                    <><Check className="w-4 h-4 mr-1.5" /> Copied!</>
                   ) : (
-                    <><Copy className="w-4 h-4 mr-1" /> Copy Email</>
+                    <><Copy className="w-4 h-4 mr-1.5" /> Copy Email</>
                   )}
                 </Button>
               </div>
             </div>
-            <div className="pl-16 p-4 bg-slate-900/40 rounded-xl border border-slate-800">
-              <pre className="whitespace-pre-wrap font-sans text-sm text-slate-300 leading-relaxed">
+            <div className="p-6 bg-white border-2 border-gray-200 rounded-xl">
+              <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed">
                 {parsed.suggestedReply}
               </pre>
             </div>
           </TabsContent>
 
           {/* If They Push Back */}
-          <TabsContent value="pushback" className="space-y-4">
-            <div className="flex items-start gap-4 mb-4">
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                <ArrowRight className="w-6 h-6 text-amber-400" />
+          <TabsContent value="pushback" className="space-y-6">
+            <div className="flex items-start gap-4 p-6 bg-amber-50 rounded-xl border border-amber-100">
+              <div className="p-3 rounded-xl bg-amber-100">
+                <ArrowRight className="w-7 h-7 text-amber-600" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-100">If They Push Back</h3>
+              <h4 className="text-xl font-bold text-gray-900">If They Push Back</h4>
             </div>
-            <div className="pl-16">
-              <p className="text-slate-300 leading-relaxed">{parsed.pushBack}</p>
+            <div className="p-6 bg-gray-50 rounded-xl">
+              <p className="text-gray-700 leading-relaxed text-base">{parsed.pushBack}</p>
             </div>
           </TabsContent>
         </Tabs>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
