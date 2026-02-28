@@ -79,59 +79,6 @@ EXAMPLES OF SHARP vs GENERIC:
 
 Remember: BE SPECIFIC. REFERENCE ACTUAL TERMS. NO FLUFF.`;
 
-// Demo analysis generator for when OpenAI is unavailable
-function generateDemoAnalysis(input: string): string {
-  return `## 1️⃣ Deal Reality Check
-
-**Verdict: Vendor-favorable**
-
-- Rigid 12-month lock-in with no clear exit terms if service fails
-- Full annual prepayment ($6K) shifts all cash flow risk to buyer - you're funding their operations
-- No SLA, support details, or performance guarantees mentioned - you're buying a black box
-
-## 2️⃣ What Matters Most
-
-- **Payment structure**: Annual prepayment is a red flag. Request monthly or quarterly billing - if they push back, ask for 15% discount to offset your risk.
-- **Exit clause**: No mention of cancellation terms. Demand a 30-60 day out if they miss service levels.
-- **Service scope**: "Standard support" is vague. Get specifics on uptime SLA, response times, and what happens when things break.
-
-## 3️⃣ What to Ask For
-
-- Switch to monthly billing, or at minimum quarterly with a 6-month review checkpoint
-- Written SLA covering uptime (99%+), support response times, and remedies for non-performance
-- Clear exit clause: 30-day termination notice if SLAs aren't met, with pro-rated refund
-- Define "standard support" - email only? What response time? Weekends covered?
-
-## 4️⃣ Suggested Reply
-
----
-
-Hi [Vendor],
-
-Thanks for the quote. We're interested but need to align on a few points before moving forward:
-
-1. **Payment**: We need monthly billing. If annual is required, we'd need a 15% discount to offset the prepayment risk.
-
-2. **SLA**: Please provide uptime guarantees, support response times, and what happens if targets aren't met.
-
-3. **Flexibility**: We need a 30-day exit clause if service levels slip, with pro-rated refund.
-
-Let me know if these work. Happy to discuss.
-
-Best,
-[Your Name]
-
----
-
-## 5️⃣ If They Push Back
-
-If they won't budge on annual payment, counter with: "We'll accept annual terms if you add a 60-day performance review at month 6, with the option to exit if SLAs aren't met, plus a 10% discount for the prepayment risk." This gives you an escape hatch and compensates for the risk.
-
----
-
-**Note**: This is demo mode. For real AI analysis tailored to your deal, add a valid OpenAI API key with available credits.`;
-}
-
 export async function POST(request: Request) {
   try {
     const { input } = await request.json();
