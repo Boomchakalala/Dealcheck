@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 const DEALCHECK_SYSTEM_PROMPT = `You are DealCheck - a sharp, experienced procurement advisor for non-procurement professionals.
 
 Your analysis must be:
