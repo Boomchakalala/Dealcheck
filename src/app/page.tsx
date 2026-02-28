@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, FileText, Image as ImageIcon, File, X, CheckCircle2, AlertCircle, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Copy, Check } from 'lucide-react';
+import { Upload, FileText, Image as ImageIcon, File, X, CheckCircle2, AlertCircle, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Copy, Check, Sparkles } from 'lucide-react';
 
 interface AnalysisData {
   realityCheck: { verdict: string; points: string[] };
@@ -100,41 +100,57 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Animated background pattern */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE0YzMuMzE0IDAgNiAyLjY4NiA2IDZzLTIuNjg2IDYtNiA2LTYtMi42ODYtNi02IDIuNjg2LTYgNi02ek0yMCAzNGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-40"></div>
+
+      {/* Gradient orbs */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute -bottom-32 left-1/2 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+      <div className="border-b border-white/10 bg-white/5 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                DealCheck
-              </h1>
-              <p className="text-sm text-gray-600 mt-1">Clarity before commitment</p>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-white">
+                  DealCheck
+                </h1>
+                <p className="text-sm text-purple-200">Clarity before commitment</p>
+              </div>
             </div>
-            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
-              <CheckCircle2 className="w-4 h-4 text-green-500" />
-              <span>AI-Powered Analysis</span>
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-sm text-white font-medium">AI-Powered</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative z-10">
         {/* Hero Section */}
         <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-            Analyze Supplier Proposals with Confidence
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            Analyze Supplier Proposals with
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+              Confidence & Clarity
+            </span>
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-            Upload a document or paste your supplier email, quote, or commercial proposal for structured procurement guidance.
+          <p className="text-lg text-purple-200 max-w-2xl mx-auto">
+            Get sharp, actionable guidance on any commercial proposal in seconds
           </p>
         </div>
 
         {/* Input Section */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 mb-8">
+        <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 mb-8 shadow-2xl">
           <div className="mb-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Add Your Proposal</h3>
-            <p className="text-sm text-gray-600">Upload a document or paste the text below</p>
+            <h3 className="text-xl font-bold text-white mb-2">Add Your Proposal</h3>
+            <p className="text-sm text-purple-200">Upload a document or paste the text below</p>
           </div>
 
           {/* Combined Input Area */}
@@ -142,14 +158,14 @@ export default function Home() {
             {/* File Upload - Compact Version */}
             {!uploadedFile ? (
               <div className="relative">
-                <label className="flex items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-indigo-50 hover:border-indigo-400 transition-all duration-200">
+                <label className="flex items-center justify-center w-full h-24 border-2 border-dashed border-white/30 rounded-2xl cursor-pointer bg-white/5 hover:bg-white/10 hover:border-purple-400 transition-all duration-200">
                   <div className="flex items-center gap-3">
-                    <Upload className="w-5 h-5 text-gray-500" />
+                    <Upload className="w-5 h-5 text-purple-300" />
                     <div className="text-left">
-                      <p className="text-sm font-medium text-gray-700">
+                      <p className="text-sm font-medium text-white">
                         Upload a file
                       </p>
-                      <p className="text-xs text-gray-500">PDF, PNG, JPG, DOCX</p>
+                      <p className="text-xs text-purple-300">PDF, PNG, JPG, DOCX</p>
                     </div>
                   </div>
                   <input
@@ -162,12 +178,12 @@ export default function Home() {
                 </label>
               </div>
             ) : (
-              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl border border-purple-400/30 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
                   {getFileIcon(uploadedFile.name)}
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{uploadedFile.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm font-medium text-white">{uploadedFile.name}</p>
+                    <p className="text-xs text-purple-200">
                       {(uploadedFile.size / 1024).toFixed(1)} KB
                       {extracting && <span className="ml-2">• Extracting text...</span>}
                     </p>
@@ -175,10 +191,10 @@ export default function Home() {
                 </div>
                 <button
                   onClick={clearFile}
-                  className="p-2 hover:bg-white rounded-lg transition-colors"
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                   disabled={extracting}
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-purple-200" />
                 </button>
               </div>
             )}
@@ -186,10 +202,10 @@ export default function Home() {
             {/* OR Divider */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
+                <div className="w-full border-t border-white/20"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-3 text-gray-500 font-medium">or paste text</span>
+                <span className="bg-slate-900 px-3 text-purple-300 font-medium">or paste text</span>
               </div>
             </div>
 
@@ -201,13 +217,13 @@ export default function Home() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Paste your supplier email, quote, or commercial proposal here..."
                 rows={12}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 placeholder-gray-400 resize-y transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-transparent text-white placeholder-purple-300/50 resize-y transition-all backdrop-blur-sm"
                 disabled={extracting}
               />
               {input && (
                 <div className="absolute top-3 right-3">
-                  <div className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">
-                    {input.length} characters
+                  <div className="px-3 py-1 bg-green-500/20 border border-green-400/30 text-green-300 text-xs font-medium rounded-lg backdrop-blur-sm">
+                    {input.length} chars
                   </div>
                 </div>
               )}
@@ -217,7 +233,7 @@ export default function Home() {
           <button
             onClick={analyzeAsDeal}
             disabled={loading || !input.trim() || extracting}
-            className="mt-6 w-full px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="mt-6 w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-2xl hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-2xl hover:shadow-purple-500/50 transform hover:scale-[1.02]"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -225,29 +241,32 @@ export default function Home() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Analyzing...
+                Analyzing Deal...
               </span>
             ) : (
-              'Analyze Deal'
+              <span className="flex items-center justify-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                Analyze Deal
+              </span>
             )}
           </button>
         </div>
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-8 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-            <p className="text-red-800 text-sm">{error}</p>
+          <div className="bg-red-500/10 border border-red-500/30 backdrop-blur-xl rounded-2xl p-4 mb-8 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-red-200 text-sm">{error}</p>
           </div>
         )}
 
         {/* Demo Mode Warning */}
         {isDemoMode && demoWarning && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+          <div className="bg-amber-500/10 border border-amber-500/30 backdrop-blur-xl rounded-2xl p-4 mb-8 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-amber-900 text-sm font-semibold mb-1">Demo Mode Active</p>
-              <p className="text-amber-800 text-sm">{demoWarning}</p>
+              <p className="text-amber-200 text-sm font-semibold mb-1">Demo Mode Active</p>
+              <p className="text-amber-300 text-sm">{demoWarning}</p>
             </div>
           </div>
         )}
@@ -257,14 +276,40 @@ export default function Home() {
 
         {/* Footer */}
         <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <p className="text-xs text-gray-600">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-sm rounded-full border border-white/10">
+            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+            <p className="text-xs text-purple-200">
               DealCheck provides structured guidance, not legal or pricing advice
             </p>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes blob {
+          0% {
+            transform: translate(0px, 0px) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+          100% {
+            transform: translate(0px, 0px) scale(1);
+          }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   );
 }
@@ -279,89 +324,95 @@ function AnalysisDisplay({ analysis }: { analysis: string }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const getVerdictColor = (verdict: string) => {
+    if (verdict.toLowerCase().includes('balanced')) return 'from-green-500 to-emerald-500';
+    if (verdict.toLowerCase().includes('vendor')) return 'from-amber-500 to-orange-500';
+    return 'from-red-500 to-pink-500';
+  };
+
   return (
     <div className="space-y-6">
       {/* Section 1: Reality Check */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+      <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl hover:shadow-purple-500/20 transition-all">
         <div className="flex items-start gap-4 mb-4">
-          <div className="p-3 bg-red-100 rounded-xl">
-            <ShieldAlert className="w-6 h-6 text-red-600" />
+          <div className={`p-3 bg-gradient-to-br ${getVerdictColor(parsed.realityCheck.verdict)} rounded-2xl shadow-lg`}>
+            <ShieldAlert className="w-7 h-7 text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Deal Reality Check</h3>
-            <div className="inline-block px-3 py-1 bg-red-50 border border-red-200 rounded-lg">
-              <span className="text-sm font-semibold text-red-700">{parsed.realityCheck.verdict}</span>
+            <h3 className="text-2xl font-bold text-white mb-3">Deal Reality Check</h3>
+            <div className={`inline-block px-4 py-2 bg-gradient-to-r ${getVerdictColor(parsed.realityCheck.verdict)} rounded-xl shadow-lg`}>
+              <span className="text-sm font-bold text-white uppercase tracking-wide">{parsed.realityCheck.verdict}</span>
             </div>
           </div>
         </div>
-        <ul className="space-y-2 ml-16">
+        <ul className="space-y-3 ml-16">
           {parsed.realityCheck.points.map((point, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-gray-700">
-              <span className="text-red-500 mt-1">•</span>
-              <span>{point}</span>
+            <li key={idx} className="flex items-start gap-3 text-purple-100">
+              <span className="text-purple-400 mt-1 text-lg">•</span>
+              <span className="leading-relaxed">{point}</span>
             </li>
           ))}
         </ul>
       </div>
 
       {/* Section 2: What Matters Most */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+      <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl hover:shadow-blue-500/20 transition-all">
         <div className="flex items-start gap-4 mb-4">
-          <div className="p-3 bg-blue-100 rounded-xl">
-            <Target className="w-6 h-6 text-blue-600" />
+          <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-lg">
+            <Target className="w-7 h-7 text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-900">What Matters Most</h3>
+            <h3 className="text-2xl font-bold text-white">What Matters Most</h3>
           </div>
         </div>
-        <ul className="space-y-3 ml-16">
+        <ul className="space-y-4 ml-16">
           {parsed.whatMatters.map((point, idx) => (
-            <li key={idx} className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+            <li key={idx} className="flex items-start gap-4">
+              <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl flex items-center justify-center text-sm font-bold shadow-lg">
                 {idx + 1}
               </span>
-              <span className="text-gray-700">{point}</span>
+              <span className="text-purple-100 leading-relaxed">{point}</span>
             </li>
           ))}
         </ul>
       </div>
 
       {/* Section 3: What to Ask For */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+      <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl hover:shadow-green-500/20 transition-all">
         <div className="flex items-start gap-4 mb-4">
-          <div className="p-3 bg-green-100 rounded-xl">
-            <MessageSquare className="w-6 h-6 text-green-600" />
+          <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl shadow-lg">
+            <MessageSquare className="w-7 h-7 text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-900">What to Ask For</h3>
+            <h3 className="text-2xl font-bold text-white">What to Ask For</h3>
           </div>
         </div>
-        <ul className="space-y-2 ml-16">
+        <ul className="space-y-3 ml-16">
           {parsed.whatToAsk.map((point, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-gray-700">
-              <ArrowRight className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-              <span>{point}</span>
+            <li key={idx} className="flex items-start gap-3 text-purple-100">
+              <ArrowRight className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{point}</span>
             </li>
           ))}
         </ul>
       </div>
 
       {/* Section 4: Suggested Reply */}
-      <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl shadow-lg border border-indigo-200 p-6 sm:p-8">
+      <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-3xl border border-purple-400/30 p-6 sm:p-8 shadow-2xl hover:shadow-purple-500/30 transition-all">
         <div className="flex items-start gap-4 mb-4">
-          <div className="p-3 bg-indigo-100 rounded-xl">
-            <Mail className="w-6 h-6 text-indigo-600" />
+          <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-lg">
+            <Mail className="w-7 h-7 text-white" />
           </div>
           <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-gray-900">Suggested Reply</h3>
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <h3 className="text-2xl font-bold text-white">Suggested Reply</h3>
               <button
                 onClick={() => copyToClipboard(parsed.suggestedReply)}
-                className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-xl text-sm font-semibold text-white transition-all shadow-lg"
               >
                 {copied ? (
                   <>
-                    <Check className="w-4 h-4 text-green-500" />
+                    <Check className="w-4 h-4 text-green-300" />
                     <span>Copied!</span>
                   </>
                 ) : (
@@ -374,25 +425,25 @@ function AnalysisDisplay({ analysis }: { analysis: string }) {
             </div>
           </div>
         </div>
-        <div className="ml-16 bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
-          <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed">
+        <div className="ml-16 bg-white/10 backdrop-blur-sm rounded-2xl p-5 sm:p-6 border border-white/20">
+          <pre className="whitespace-pre-wrap font-sans text-sm text-purple-100 leading-relaxed">
             {parsed.suggestedReply}
           </pre>
         </div>
       </div>
 
       {/* Section 5: If They Push Back */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+      <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-6 sm:p-8 shadow-2xl hover:shadow-pink-500/20 transition-all">
         <div className="flex items-start gap-4 mb-4">
-          <div className="p-3 bg-purple-100 rounded-xl">
-            <ArrowRight className="w-6 h-6 text-purple-600" />
+          <div className="p-3 bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl shadow-lg">
+            <ArrowRight className="w-7 h-7 text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-900">If They Push Back</h3>
+            <h3 className="text-2xl font-bold text-white">If They Push Back</h3>
           </div>
         </div>
         <div className="ml-16">
-          <p className="text-gray-700 leading-relaxed">{parsed.pushBack}</p>
+          <p className="text-purple-100 leading-relaxed">{parsed.pushBack}</p>
         </div>
       </div>
     </div>
