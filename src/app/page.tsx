@@ -10,6 +10,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [extracting, setExtracting] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [demoWarning, setDemoWarning] = useState<string | null>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -53,6 +55,8 @@ export default function Home() {
     setLoading(true);
     setError(null);
     setAnalysis(null);
+    setIsDemoMode(false);
+    setDemoWarning(null);
 
     try {
       const response = await fetch('/api/analyze', {
@@ -67,6 +71,13 @@ export default function Home() {
 
       const data = await response.json();
       setAnalysis(data.analysis);
+
+      if (data.demo) {
+        setIsDemoMode(true);
+        if (data.warning) {
+          setDemoWarning(data.warning);
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
