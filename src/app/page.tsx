@@ -1,7 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, FileText, Image as ImageIcon, File, X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Upload, FileText, Image as ImageIcon, File, X, CheckCircle2, AlertCircle, ShieldAlert, Target, MessageSquare, Mail, ArrowRight, Copy, Check } from 'lucide-react';
+
+interface AnalysisData {
+  realityCheck: { verdict: string; points: string[] };
+  whatMatters: string[];
+  whatToAsk: string[];
+  suggestedReply: string;
+  pushBack: string;
+}
 
 export default function Home() {
   const [input, setInput] = useState('');
@@ -225,18 +233,7 @@ export default function Home() {
         )}
 
         {/* Analysis Result */}
-        {analysis && (
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
-            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-200">
-              <CheckCircle2 className="w-6 h-6 text-green-500" />
-              <h3 className="text-xl font-bold text-gray-900">Analysis Complete</h3>
-            </div>
-            <div
-              className="prose prose-slate max-w-none prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-ul:text-gray-700 prose-li:my-1 prose-strong:text-gray-900 prose-strong:font-semibold"
-              dangerouslySetInnerHTML={{ __html: formatAnalysis(analysis) }}
-            />
-          </div>
-        )}
+        {analysis && <AnalysisDisplay analysis={analysis} />}
 
         {/* Footer */}
         <div className="mt-12 text-center">
@@ -252,26 +249,180 @@ export default function Home() {
   );
 }
 
-function formatAnalysis(text: string): string {
-  // Convert markdown-style headings and formatting to HTML
-  let html = text
-    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/^- (.*$)/gim, '<li>$1</li>')
-    .replace(/^(\d+)\. (.*$)/gim, '<li>$2</li>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/(<li>.*?<\/li>)/gs, (match) => {
-      const items = match.match(/<li>.*?<\/li>/g) || [];
-      return '<ul>' + items.join('') + '</ul>';
-    });
+function AnalysisDisplay({ analysis }: { analysis: string }) {
+  const [copied, setCopied] = useState(false);
+  const parsed = parseAnalysis(analysis);
 
-  // Wrap in paragraphs
-  if (!html.startsWith('<h1>') && !html.startsWith('<h2>')) {
-    html = '<p>' + html + '</p>';
-  }
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-  return html;
+  return (
+    <div className="space-y-6">
+      {/* Section 1: Reality Check */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="p-3 bg-red-100 rounded-xl">
+            <ShieldAlert className="w-6 h-6 text-red-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Deal Reality Check</h3>
+            <div className="inline-block px-3 py-1 bg-red-50 border border-red-200 rounded-lg">
+              <span className="text-sm font-semibold text-red-700">{parsed.realityCheck.verdict}</span>
+            </div>
+          </div>
+        </div>
+        <ul className="space-y-2 ml-16">
+          {parsed.realityCheck.points.map((point, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-gray-700">
+              <span className="text-red-500 mt-1">•</span>
+              <span>{point}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Section 2: What Matters Most */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="p-3 bg-blue-100 rounded-xl">
+            <Target className="w-6 h-6 text-blue-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-gray-900">What Matters Most</h3>
+          </div>
+        </div>
+        <ul className="space-y-3 ml-16">
+          {parsed.whatMatters.map((point, idx) => (
+            <li key={idx} className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                {idx + 1}
+              </span>
+              <span className="text-gray-700">{point}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Section 3: What to Ask For */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="p-3 bg-green-100 rounded-xl">
+            <MessageSquare className="w-6 h-6 text-green-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-gray-900">What to Ask For</h3>
+          </div>
+        </div>
+        <ul className="space-y-2 ml-16">
+          {parsed.whatToAsk.map((point, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-gray-700">
+              <ArrowRight className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span>{point}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Section 4: Suggested Reply */}
+      <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl shadow-lg border border-indigo-200 p-6 sm:p-8">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="p-3 bg-indigo-100 rounded-xl">
+            <Mail className="w-6 h-6 text-indigo-600" />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold text-gray-900">Suggested Reply</h3>
+              <button
+                onClick={() => copyToClipboard(parsed.suggestedReply)}
+                className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 transition-colors"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 text-green-500" />
+                    <span>Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="ml-16 bg-white rounded-xl p-4 sm:p-6 border border-gray-200">
+          <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed">
+            {parsed.suggestedReply}
+          </pre>
+        </div>
+      </div>
+
+      {/* Section 5: If They Push Back */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="p-3 bg-purple-100 rounded-xl">
+            <ArrowRight className="w-6 h-6 text-purple-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-gray-900">If They Push Back</h3>
+          </div>
+        </div>
+        <div className="ml-16">
+          <p className="text-gray-700 leading-relaxed">{parsed.pushBack}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function parseAnalysis(text: string): AnalysisData {
+  const sections = text.split(/##\s+/);
+
+  const result: AnalysisData = {
+    realityCheck: { verdict: '', points: [] },
+    whatMatters: [],
+    whatToAsk: [],
+    suggestedReply: '',
+    pushBack: '',
+  };
+
+  sections.forEach((section) => {
+    if (section.includes('Deal Reality Check')) {
+      const lines = section.split('\n').filter(l => l.trim());
+      const verdict = lines.find(l => l.includes('Verdict:'))?.replace(/.*Verdict:\s*\*?\*?/, '').replace(/\*?\*?/, '').trim() || 'Unknown';
+      result.realityCheck.verdict = verdict;
+      result.realityCheck.points = lines
+        .filter(l => l.trim().startsWith('-'))
+        .map(l => l.replace(/^-\s*/, '').trim());
+    } else if (section.includes('What Matters Most')) {
+      result.whatMatters = section
+        .split('\n')
+        .filter(l => l.trim().startsWith('-'))
+        .map(l => l.replace(/^-\s*/, '').replace(/\*\*/g, '').trim());
+    } else if (section.includes('What to Ask For')) {
+      result.whatToAsk = section
+        .split('\n')
+        .filter(l => l.trim().startsWith('-'))
+        .map(l => l.replace(/^-\s*/, '').trim());
+    } else if (section.includes('Suggested Reply')) {
+      const parts = section.split('---');
+      if (parts.length >= 2) {
+        result.suggestedReply = parts[1].trim();
+      } else {
+        result.suggestedReply = section.replace(/.*Suggested Reply\n+/, '').trim();
+      }
+    } else if (section.includes('If They Push Back')) {
+      result.pushBack = section
+        .replace(/.*If They Push Back\n+/, '')
+        .replace(/---.*$/, '')
+        .replace(/\*\*Note\*\*:.*$/, '')
+        .trim();
+    }
+  });
+
+  return result;
 }
