@@ -22,7 +22,7 @@ export async function POST(
       .from('profiles')
       .select('usage_count, plan, is_admin')
       .eq('id', user.id)
-      .single() as { data: { usage_count: number; plan: string; is_admin: boolean } | null }
+      .single()
 
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
@@ -46,7 +46,7 @@ export async function POST(
       .select('*')
       .eq('id', dealId)
       .eq('user_id', user.id)
-      .single() as { data: any | null }
+      .single()
 
     if (!deal) {
       return NextResponse.json({ error: 'Deal not found' }, { status: 404 })
@@ -58,7 +58,7 @@ export async function POST(
       .select('*')
       .eq('deal_id', dealId)
       .order('round_number', { ascending: false })
-      .limit(1) as { data: any[] | null }
+      .limit(1)
 
     const lastRound = previousRounds?.[0]
     const nextRoundNumber = lastRound ? lastRound.round_number + 1 : 1
