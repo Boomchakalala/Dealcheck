@@ -94,11 +94,13 @@ export async function POST(
       throw new Error('Failed to create round')
     }
 
-    // Increment usage count
-    await supabase
-      .from('profiles')
-      .update({ usage_count: profile.usage_count + 1 })
-      .eq('id', user.id)
+    // Increment usage count (skip for admins)
+    if (!profile.is_admin) {
+      await supabase
+        .from('profiles')
+        .update({ usage_count: profile.usage_count + 1 })
+        .eq('id', user.id)
+    }
 
     // Update deal's updated_at timestamp
     await supabase

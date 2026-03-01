@@ -9,6 +9,7 @@ export type Database = {
           created_at: string
           plan: 'free' | 'pro'
           usage_count: number
+          is_admin: boolean
         }
         Insert: {
           id: string
@@ -16,6 +17,7 @@ export type Database = {
           created_at?: string
           plan?: 'free' | 'pro'
           usage_count?: number
+          is_admin?: boolean
         }
         Update: {
           id?: string
@@ -23,6 +25,7 @@ export type Database = {
           created_at?: string
           plan?: 'free' | 'pro'
           usage_count?: number
+          is_admin?: boolean
         }
       }
       deals: {
