@@ -1,5 +1,4 @@
 import Tesseract from 'tesseract.js'
-import pdfParse from 'pdf-parse'
 
 // Set up canvas for Node.js environment
 if (typeof window === 'undefined') {
@@ -24,7 +23,10 @@ export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
     console.log('📄 Starting PDF extraction...')
 
-    // Use proper import to avoid pdf-parse debug mode triggering
+    // Use require() to load pdf-parse only when needed
+    // Next.js config excludes it from bundling to avoid test code execution
+    const pdfParse = require('pdf-parse')
+
     const data = await pdfParse(buffer, {
       max: 0, // Parse all pages
     })
