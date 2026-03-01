@@ -149,16 +149,16 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <header className="border-b border-slate-200 bg-white sticky top-0 z-10 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center shadow-sm">
               <CheckCircle className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">DealCheck</span>
+            <span className="text-xl font-bold text-slate-900">DealCheck</span>
           </div>
           <Link href="/login">
-            <Button size="sm" variant="ghost" className="text-gray-600 hover:text-gray-900">
+            <Button size="sm" variant="ghost" className="text-slate-600 hover:text-slate-900">
               Sign in
             </Button>
           </Link>
@@ -166,29 +166,29 @@ export default function ChatPage() {
       </header>
 
       <main className="flex-1 overflow-auto pb-40">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {rounds.length === 0 ? (
             <div className="text-center py-16 sm:py-24">
               <div className="mb-8">
-                <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
+                <h1 className="text-5xl sm:text-6xl font-bold text-slate-900 mb-6 tracking-tight leading-tight">
                   Clarity before<br />commitment
                 </h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-3">
+                <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-6 leading-relaxed">
                   Analyze supplier quotes and contracts with AI. Get instant insights, red flags, and ready-to-send negotiation emails.
                 </p>
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-50 border border-emerald-200">
                   <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span>{trialCount === 0 ? '2 free analyses, no sign up needed' : `${2 - trialCount} free ${2 - trialCount === 1 ? 'analysis' : 'analyses'} remaining`}</span>
+                  <span className="text-sm font-semibold text-emerald-900">{trialCount === 0 ? '2 free analyses, no sign up needed' : `${2 - trialCount} free ${2 - trialCount === 1 ? 'analysis' : 'analyses'} remaining`}</span>
                 </div>
               </div>
             </div>
           ) : (
             <>
               {/* Usage banner */}
-              <div className="mt-8 mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700">
+              <div className="mt-8 mb-8 p-5 bg-emerald-50 border border-emerald-200 rounded-2xl">
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  <div>
+                  <div className="text-sm text-emerald-900 leading-relaxed">
                     {hasTriedBefore
                       ? "Analysis complete! You've used your free tries. Sign up to save and get 2 more free rounds."
                       : `Round ${rounds.length} complete! You have ${2 - trialCount} more free ${2 - trialCount === 1 ? 'analysis' : 'analyses'} remaining.`}
@@ -199,11 +199,12 @@ export default function ChatPage() {
               {/* Stacked rounds */}
               <div className="space-y-12 py-8">
                 {rounds.map((round, index) => (
-                  <div key={index} className="border-b border-gray-200 pb-12 last:border-0">
-                    <div className="flex items-center gap-2 mb-6">
-                      <div className="px-4 py-1.5 bg-gray-900 text-white rounded-full text-sm font-semibold">
+                  <div key={index} className="pb-12 last:pb-0">
+                    <div className="flex items-center gap-3 mb-8">
+                      <div className="px-5 py-2 bg-emerald-600 text-white rounded-full text-sm font-bold shadow-sm">
                         Round {round.roundNumber}
                       </div>
+                      <div className="flex-1 h-px bg-slate-200" />
                     </div>
                     <OutputDisplay output={round.output} />
                   </div>
@@ -214,17 +215,17 @@ export default function ChatPage() {
 
               {hasTriedBefore && (
                 <div className="mt-12 mb-12 text-center">
-                  <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-                    <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                  <div className="bg-white border border-slate-200 rounded-2xl p-10 shadow-lg">
+                    <h3 className="text-3xl font-bold text-slate-900 mb-3">
                       Ready to save your work?
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-lg text-slate-600 mb-8 max-w-lg mx-auto leading-relaxed">
                       Sign up to save your analyses and get 2 more free rounds
                     </p>
                     <Link href="/login">
-                      <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+                      <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 shadow-md">
                         Sign Up Now
-                        <ArrowRight className="w-4 h-4 ml-2" />
+                        <ArrowRight className="w-5 h-5 ml-2" />
                       </Button>
                     </Link>
                   </div>
@@ -236,38 +237,38 @@ export default function ChatPage() {
       </main>
 
       {/* Fixed input at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-lg">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {hasTriedBefore ? (
             <div className="text-center py-4">
-              <p className="text-gray-600 mb-4">You&apos;ve used your free tries</p>
+              <p className="text-slate-600 mb-4">You&apos;ve used your free tries</p>
               <Link href="/login">
-                <Button className="bg-emerald-600 hover:bg-emerald-700">
+                <Button className="bg-emerald-600 hover:bg-emerald-700 shadow-md">
                   Sign Up to Continue
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl">
+            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl">
               <div className="p-5">
                 {error && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800 flex items-start gap-2">
-                    <X className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                    <span>{error}</span>
+                  <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-800 flex items-start gap-2">
+                    <X className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <span className="leading-relaxed">{error}</span>
                   </div>
                 )}
 
                 {uploadedFileName && (
-                  <div className="mb-3 flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                  <div className="mb-3 flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-sm">
                     <Paperclip className="w-4 h-4 text-emerald-600" />
-                    <span className="flex-1 text-gray-900 font-medium">{uploadedFileName}</span>
+                    <span className="flex-1 text-emerald-900 font-medium">{uploadedFileName}</span>
                     <button
                       onClick={() => {
                         setUploadedFileName(null)
                         setInput('')
                       }}
-                      className="text-gray-600 hover:text-gray-900"
+                      className="text-emerald-600 hover:text-emerald-700"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -282,11 +283,11 @@ export default function ChatPage() {
                   placeholder={rounds.length === 0 ? "Paste your quote, email, or contract here..." : "Add another analysis round..."}
                   rows={4}
                   disabled={uploading || analyzing}
-                  className="resize-none border-0 focus:ring-0 text-base p-0 placeholder:text-gray-400"
+                  className="resize-none border-0 focus:ring-0 text-base p-0 placeholder:text-slate-400"
                 />
               </div>
 
-              <div className="border-t border-gray-200 px-5 py-4 flex items-center justify-between bg-gray-50 rounded-b-2xl">
+              <div className="border-t border-slate-200 px-5 py-4 flex items-center justify-between bg-slate-50 rounded-b-2xl">
                 <div className="flex items-center gap-3">
                   <input
                     ref={fileInputRef}
@@ -302,7 +303,7 @@ export default function ChatPage() {
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading || analyzing}
-                    className="text-gray-700 hover:text-gray-900 hover:bg-gray-200"
+                    className="text-slate-700 hover:text-slate-900 hover:bg-slate-100"
                   >
                     {uploading ? (
                       <>
@@ -316,8 +317,8 @@ export default function ChatPage() {
                       </>
                     )}
                   </Button>
-                  <span className="text-xs text-gray-500">
-                    or press <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono shadow-sm">⌘↵</kbd>
+                  <span className="text-xs text-slate-500">
+                    or press <kbd className="px-2 py-1 bg-white border border-slate-300 rounded text-xs font-mono shadow-sm">⌘↵</kbd>
                   </span>
                 </div>
 
@@ -325,7 +326,7 @@ export default function ChatPage() {
                   onClick={() => handleSubmit()}
                   disabled={!input.trim() || uploading || analyzing}
                   size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-700 shadow-sm px-6"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md px-6"
                 >
                   {analyzing ? (
                     <>
@@ -347,11 +348,11 @@ export default function ChatPage() {
 
       {/* Footer */}
       {rounds.length === 0 && (
-        <footer className="border-t border-gray-200 py-6 text-center text-sm text-gray-500 bg-white">
-          <div className="max-w-5xl mx-auto px-4">
-            <Link href="/terms" className="hover:text-gray-900">Terms</Link>
+        <footer className="border-t border-slate-200 py-6 text-center text-sm text-slate-500 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <Link href="/terms" className="hover:text-slate-900 transition-colors">Terms</Link>
             <span className="mx-3">·</span>
-            <Link href="/privacy" className="hover:text-gray-900">Privacy</Link>
+            <Link href="/privacy" className="hover:text-slate-900 transition-colors">Privacy</Link>
           </div>
         </footer>
       )}
