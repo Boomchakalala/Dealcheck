@@ -114,24 +114,13 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Usage indicator */}
+      {/* Usage indicator - Unlimited for all users */}
       {profile && (
-        <div className={`p-4 border rounded-xl ${profile.is_admin ? 'bg-gray-50 border-gray-200' : 'bg-gray-50 border-gray-200'}`}>
-          {profile.is_admin ? (
-            <p className="text-sm text-gray-700 font-medium flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-emerald-600" />
-              <span className="font-bold">Admin Account:</span> Unlimited rounds
-            </p>
-          ) : (
-            <p className="text-sm text-gray-700">
-              <span className="font-semibold">Free Plan:</span> {profile.usage_count} / 2 rounds used
-              {profile.usage_count >= 2 && (
-                <span className="ml-2 text-gray-600">
-                  &middot; <Link href="/pricing" className="text-emerald-600 font-medium hover:underline">Upgrade to continue</Link>
-                </span>
-              )}
-            </p>
-          )}
+        <div className="p-4 border rounded-xl bg-emerald-50 border-emerald-200">
+          <p className="text-sm text-emerald-900 font-medium flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 text-emerald-600" />
+            <span className="font-bold">Free Plan:</span> Unlimited analysis rounds
+          </p>
         </div>
       )}
 
