@@ -32,7 +32,8 @@ export default function ChatPage() {
   useEffect(() => {
     const count = parseInt(localStorage.getItem('dealcheck_trial_count') || '0')
     setTrialCount(count)
-    if (count >= 2) {
+    // Set a high limit (100) so users can use freely without being prompted
+    if (count >= 100) {
       setHasTriedBefore(true)
     }
   }, [])
@@ -215,7 +216,7 @@ export default function ChatPage() {
                 </p>
                 <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-50 border border-emerald-200">
                   <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span className="text-sm font-semibold text-emerald-900">{trialCount === 0 ? '2 free analyses, no sign up needed' : `${2 - trialCount} free ${2 - trialCount === 1 ? 'analysis' : 'analyses'} remaining`}</span>
+                  <span className="text-sm font-semibold text-emerald-900">Free to use, no sign up required</span>
                 </div>
               </div>
             </div>
