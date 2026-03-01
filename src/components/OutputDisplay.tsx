@@ -4,17 +4,10 @@ import { type DealOutput } from '@/types'
 import { CopyButton } from './CopyButton'
 import { Card } from './ui/card'
 import { Badge } from './ui/badge'
-import { AlertTriangle, DollarSign, Calendar, FileText, TrendingUp } from 'lucide-react'
+import { AlertTriangle, Target, Mail, CheckCircle2, TrendingUp } from 'lucide-react'
 
 interface OutputDisplayProps {
   output: DealOutput
-}
-
-// Helper to determine severity
-function getSeverity(flagType: string): 'high' | 'medium' | 'low' {
-  if (flagType === 'Legal' || flagType === 'Security') return 'high'
-  if (flagType === 'Commercial') return 'medium'
-  return 'low'
 }
 
 // Helper to get category variant
@@ -38,44 +31,55 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Hero Section with KPIs */}
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">{output.title}</h1>
-          <p className="text-xl text-slate-600">{output.vendor}</p>
-        </div>
-
-        {/* KPI Chips */}
-        <div className="flex flex-wrap gap-3">
-          <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-50 border border-emerald-200">
-            <DollarSign className="w-4 h-4 text-emerald-700" />
-            <span className="text-sm font-semibold text-emerald-900">{output.quote_overview.pricing_summary}</span>
-          </div>
-          <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-50 border border-slate-200">
-            <Calendar className="w-4 h-4 text-slate-700" />
-            <span className="text-sm font-semibold text-slate-900">{output.quote_overview.term}</span>
-          </div>
-          {output.red_flags.length > 0 && (
-            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-amber-50 border border-amber-200">
-              <AlertTriangle className="w-4 h-4 text-amber-700" />
-              <span className="text-sm font-semibold text-amber-900">{output.red_flags.length} Red Flag{output.red_flags.length !== 1 ? 's' : ''}</span>
-            </div>
-          )}
-        </div>
+      {/* Hero Section */}
+      <div className="space-y-3">
+        <h1 className="text-4xl font-bold text-slate-900">{output.title}</h1>
+        <p className="text-xl text-slate-600">{output.vendor}</p>
       </div>
 
-      {/* Quote Overview */}
-      <Card className="p-6 md:p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Quote Overview</h2>
-          <FileText className="w-6 h-6 text-slate-400" />
+      {/* 1. Snapshot */}
+      <Card className="p-6 md:p-8 bg-gradient-to-br from-emerald-50 to-white border-2 border-emerald-100">
+        <h2 className="text-2xl font-bold text-slate-900 mb-6">Snapshot</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-1">Vendor / Product</p>
+            <p className="text-slate-900 font-medium">{output.snapshot.vendor_product}</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-1">Term</p>
+            <p className="text-slate-900 font-medium">{output.snapshot.term}</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-1">Total Commitment</p>
+            <p className="text-slate-900 font-medium">{output.snapshot.total_commitment}</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-1">Billing / Payment</p>
+            <p className="text-slate-900 font-medium">{output.snapshot.billing_payment}</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-1">Pricing Model</p>
+            <p className="text-slate-900 font-medium">{output.snapshot.pricing_model}</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-1">Deal Type</p>
+            <p className="text-slate-900 font-medium capitalize">{output.snapshot.deal_type}</p>
+          </div>
         </div>
+      </Card>
+
+      {/* 2. Quick Read */}
+      <Card className="p-6 md:p-8">
+        <h2 className="text-2xl font-bold text-slate-900 mb-6">Quick Read (30 seconds)</h2>
 
         <div className="space-y-6">
           <div>
-            <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Products & Services</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <h3 className="text-lg font-bold text-slate-900">What's Solid</h3>
+            </div>
             <ul className="space-y-2">
-              {output.quote_overview.products_services.map((item, idx) => (
+              {output.quick_read.whats_solid.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-600 flex-shrink-0" />
                   <span className="text-slate-700 leading-relaxed">{item}</span>
@@ -84,32 +88,29 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
             </ul>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">Contract Term</h3>
-              <p className="text-slate-900 font-medium">{output.quote_overview.term}</p>
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
+              <h3 className="text-lg font-bold text-slate-900">What's Concerning</h3>
             </div>
-
-            <div>
-              <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">Pricing</h3>
-              <p className="text-slate-900 font-medium">{output.quote_overview.pricing_summary}</p>
-            </div>
+            <ul className="space-y-2">
+              {output.quick_read.whats_concerning.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-3">
+                  <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-600 flex-shrink-0" />
+                  <span className="text-slate-700 leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {output.quote_overview.key_terms_found.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-3">Key Terms</h3>
-              <div className="flex flex-wrap gap-2">
-                {output.quote_overview.key_terms_found.map((term, idx) => (
-                  <Badge key={idx} variant="secondary">{term}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="pt-4 border-t border-slate-200">
+            <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-2">Conclusion</p>
+            <p className="text-lg font-bold text-slate-900">{output.quick_read.conclusion}</p>
+          </div>
         </div>
       </Card>
 
-      {/* Red Flags */}
+      {/* 3. Red Flags */}
       {output.red_flags.length > 0 && (
         <Card className="p-6 md:p-8">
           <div className="flex items-center justify-between mb-6">
@@ -118,7 +119,7 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
               <Badge variant="destructive">{output.red_flags.length}</Badge>
             </div>
             <CopyButton
-              text={output.red_flags.map(f => `${f.type}: ${f.issue}\nWhy: ${f.why_it_matters}\nFix: ${f.suggested_fix}`).join('\n\n')}
+              text={output.red_flags.map(f => `${f.type}: ${f.issue}\nWhy: ${f.why_it_matters}\nAsk: ${f.what_to_ask_for}\nFallback: ${f.if_they_push_back}`).join('\n\n')}
               label="Copy All"
             />
           </div>
@@ -131,38 +132,26 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
                   <div className="flex-1 h-px bg-slate-200" />
                 </div>
 
-                <div className="space-y-4">
-                  {flags.map((flag, idx) => {
-                    const severity = getSeverity(flag.type)
-                    return (
-                      <div
-                        key={idx}
-                        className={`relative pl-5 border-l-4 py-3 ${
-                          severity === 'high' ? 'border-red-500' :
-                          severity === 'medium' ? 'border-amber-500' :
-                          'border-blue-500'
-                        }`}
-                      >
-                        <div className="space-y-2">
-                          <div className="flex items-start justify-between gap-4">
-                            <h3 className="font-semibold text-slate-900 leading-tight">{flag.issue}</h3>
-                            <Badge
-                              variant={severity === 'high' ? 'destructive' : severity === 'medium' ? 'warning' : 'secondary'}
-                              className="text-xs"
-                            >
-                              {severity.toUpperCase()}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-slate-700 leading-relaxed">
-                            <span className="font-semibold text-slate-900">Why it matters:</span> {flag.why_it_matters}
-                          </p>
-                          <p className="text-sm text-slate-700 leading-relaxed">
-                            <span className="font-semibold text-slate-900">Suggested fix:</span> {flag.suggested_fix}
-                          </p>
+                <div className="space-y-6">
+                  {flags.map((flag, idx) => (
+                    <div key={idx} className="border-l-4 border-red-500 pl-5 py-2 space-y-3">
+                      <h3 className="font-bold text-slate-900 text-lg">{flag.issue}</h3>
+                      <div className="space-y-2">
+                        <div>
+                          <span className="text-sm font-semibold text-slate-600">Why it matters:</span>
+                          <p className="text-slate-700 leading-relaxed mt-1">{flag.why_it_matters}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-semibold text-slate-600">What to ask for:</span>
+                          <p className="text-slate-700 leading-relaxed mt-1">{flag.what_to_ask_for}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-semibold text-slate-600">If they push back:</span>
+                          <p className="text-slate-700 leading-relaxed mt-1">{flag.if_they_push_back}</p>
                         </div>
                       </div>
-                    )
-                  })}
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -170,11 +159,70 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
         </Card>
       )}
 
-      {/* What to Ask For */}
+      {/* 4. Negotiation Plan */}
+      <Card className="p-6 md:p-8 bg-slate-50">
+        <h2 className="text-2xl font-bold text-slate-900 mb-6">Negotiation Plan (Email-first)</h2>
+
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 mb-3">Leverage You Can Safely Use</h3>
+            <ul className="space-y-2">
+              {output.negotiation_plan.leverage_you_have.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-3">
+                  <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-600 flex-shrink-0" />
+                  <span className="text-slate-700 leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-bold text-emerald-900 mb-3">Must-Have Asks</h3>
+              <ul className="space-y-2">
+                {output.negotiation_plan.must_have_asks.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-600 flex-shrink-0" />
+                    <span className="text-slate-700 leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 mb-3">Nice-to-Have Asks</h3>
+              <ul className="space-y-2">
+                {output.negotiation_plan.nice_to_have_asks.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+                    <span className="text-slate-700 leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {output.negotiation_plan.trades_you_can_offer.length > 0 && (
+            <div>
+              <h3 className="text-lg font-bold text-blue-900 mb-3">Trades You Can Offer</h3>
+              <ul className="space-y-2">
+                {output.negotiation_plan.trades_you_can_offer.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-600 flex-shrink-0" />
+                    <span className="text-slate-700 leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* 5. What to Ask For */}
       <Card className="p-6 md:p-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">What to Ask For</h2>
-          <TrendingUp className="w-6 h-6 text-slate-400" />
+          <h2 className="text-2xl font-bold text-slate-900">What to Ask For (Copy/Paste)</h2>
+          <Target className="w-6 h-6 text-slate-400" />
         </div>
 
         <div className="space-y-6">
@@ -184,10 +232,10 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
                 <div className="w-2 h-2 rounded-full bg-emerald-600" />
                 <h3 className="text-lg font-bold text-slate-900">Must-Have</h3>
               </div>
-              <CopyButton text={output.asks.must_have.join('\n')} />
+              <CopyButton text={output.what_to_ask_for.must_have.join('\n')} />
             </div>
             <ul className="space-y-2.5">
-              {output.asks.must_have.map((ask, idx) => (
+              {output.what_to_ask_for.must_have.map((ask, idx) => (
                 <li key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-emerald-50/50 border border-emerald-100">
                   <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-600 flex-shrink-0" />
                   <span className="text-slate-700 leading-relaxed">{ask}</span>
@@ -196,17 +244,17 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
             </ul>
           </div>
 
-          {output.asks.nice_to_have.length > 0 && (
+          {output.what_to_ask_for.nice_to_have.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-slate-400" />
                   <h3 className="text-lg font-bold text-slate-900">Nice-to-Have</h3>
                 </div>
-                <CopyButton text={output.asks.nice_to_have.join('\n')} />
+                <CopyButton text={output.what_to_ask_for.nice_to_have.join('\n')} />
               </div>
               <ul className="space-y-2.5">
-                {output.asks.nice_to_have.map((ask, idx) => (
+                {output.what_to_ask_for.nice_to_have.map((ask, idx) => (
                   <li key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-slate-400 flex-shrink-0" />
                     <span className="text-slate-700 leading-relaxed">{ask}</span>
@@ -218,17 +266,20 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
         </div>
       </Card>
 
-      {/* Email Drafts */}
+      {/* 6. Email Drafts */}
       <Card className="p-6 md:p-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Email Drafts</h2>
+          <div className="flex items-center gap-3">
+            <Mail className="w-6 h-6 text-slate-700" />
+            <h2 className="text-2xl font-bold text-slate-900">Email Drafts (Copy/Paste)</h2>
+          </div>
         </div>
 
         <div className="space-y-6">
-          {/* Neutral */}
+          {/* Draft 1 - Neutral */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Badge variant="success">Neutral Approach</Badge>
+              <Badge variant="success">Draft 1 — Neutral but Firm</Badge>
               <CopyButton text={`Subject: ${output.email_drafts.neutral.subject}\n\n${output.email_drafts.neutral.body}`} />
             </div>
             <div className="rounded-xl border border-slate-200 overflow-hidden">
@@ -242,10 +293,10 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
             </div>
           </div>
 
-          {/* Firm */}
+          {/* Draft 2 - Firm */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Badge variant="warning">Firm Approach</Badge>
+              <Badge variant="warning">Draft 2 — Firm (if they dodge)</Badge>
               <CopyButton text={`Subject: ${output.email_drafts.firm.subject}\n\n${output.email_drafts.firm.body}`} />
             </div>
             <div className="rounded-xl border border-slate-200 overflow-hidden">
@@ -259,10 +310,10 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
             </div>
           </div>
 
-          {/* Final Push */}
+          {/* Draft 3 - Final Push */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Badge variant="destructive">Final Push</Badge>
+              <Badge variant="destructive">Draft 3 — Final Push</Badge>
               <CopyButton text={`Subject: ${output.email_drafts.final_push.subject}\n\n${output.email_drafts.final_push.body}`} />
             </div>
             <div className="rounded-xl border border-slate-200 overflow-hidden">
@@ -278,7 +329,7 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
         </div>
       </Card>
 
-      {/* Assumptions */}
+      {/* 7. Assumptions */}
       {output.assumptions.length > 0 && (
         <Card className="p-6 md:p-8 bg-slate-50">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Assumptions</h2>

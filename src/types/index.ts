@@ -110,10 +110,11 @@ export type Database = {
 
 // Deal output structure
 export type RedFlag = {
-  type: 'Commercial' | 'Legal' | 'Operational'
+  type: 'Commercial' | 'Legal' | 'Operational' | 'Security'
   issue: string
   why_it_matters: string
-  suggested_fix: string
+  what_to_ask_for: string
+  if_they_push_back: string
 }
 
 export type EmailDraft = {
@@ -124,14 +125,27 @@ export type EmailDraft = {
 export type DealOutput = {
   title: string
   vendor: string
-  quote_overview: {
-    products_services: string[]
+  snapshot: {
+    vendor_product: string
     term: string
-    pricing_summary: string
-    key_terms_found: string[]
+    total_commitment: string
+    billing_payment: string
+    pricing_model: string
+    deal_type: string
+  }
+  quick_read: {
+    whats_solid: string[]
+    whats_concerning: string[]
+    conclusion: string
   }
   red_flags: RedFlag[]
-  asks: {
+  negotiation_plan: {
+    leverage_you_have: string[]
+    must_have_asks: string[]
+    nice_to_have_asks: string[]
+    trades_you_can_offer: string[]
+  }
+  what_to_ask_for: {
     must_have: string[]
     nice_to_have: string[]
   }
