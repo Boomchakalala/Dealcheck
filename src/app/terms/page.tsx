@@ -1,210 +1,217 @@
 import Link from 'next/link'
-import { CheckCircle, ArrowLeft } from 'lucide-react'
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm">
-              <CheckCircle className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">DealCheck</span>
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 h-14 flex items-center justify-between">
+          <Link href="/" className="text-base font-semibold text-slate-900 tracking-tight hover:text-slate-700 transition-colors">
+            DealCheck
           </Link>
-          <Link href="/" className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
+          <Link href="/login" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
+            Sign in
           </Link>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="prose prose-gray max-w-none">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Terms of Service</h1>
-          <p className="text-gray-600 text-sm mb-12">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      <main className="flex-1">
+        <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-20 pb-20">
+          <p className="text-sm font-medium text-emerald-600 mb-5 tracking-wide">Legal</p>
+          <h1 className="text-[2.25rem] sm:text-[2.75rem] leading-[1.1] font-bold text-slate-900 tracking-tight mb-3">
+            Terms of Service
+          </h1>
+          <p className="text-sm text-slate-400 mb-16">Last updated: March 1, 2026</p>
 
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
-            <p className="text-gray-700 leading-relaxed">
-              By accessing and using DealCheck ("the Service"), you accept and agree to be bound by the
-              terms and provisions of this agreement. If you do not agree to these terms, please do not use
-              our Service.
-            </p>
-          </section>
+          <div className="space-y-14 text-sm text-slate-700 leading-relaxed">
 
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Description of Service</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              DealCheck is an AI-powered procurement analysis platform designed to help professionals
-              analyze supplier quotes, contracts, and commercial proposals. The Service provides automated
-              insights, risk analysis, negotiation guidance, and draft communications.
-            </p>
-          </section>
+            {/* 1. Acceptance */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">1. Acceptance of Terms</h2>
+              <p>
+                By accessing or using DealCheck (&ldquo;the Service&rdquo;), operated by DealCheck (&ldquo;we,&rdquo; &ldquo;us,&rdquo; &ldquo;our&rdquo;), you agree to these Terms of Service. If you do not agree, do not use the Service.
+              </p>
+            </section>
 
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Critical Disclaimers</h2>
-            <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 space-y-4">
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Not Legal, Financial, or Professional Advice</h3>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  DealCheck does not provide legal, financial, tax, or professional advice of any kind.
-                  All analysis, suggestions, and guidance are for informational and educational purposes only.
-                  Always consult with licensed attorneys, accountants, or other qualified professionals before
-                  making business decisions.
-                </p>
+            {/* 2. Description */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">2. Description of Service</h2>
+              <p>
+                DealCheck is an AI-powered procurement analysis tool. It accepts supplier quotes, contracts, and commercial proposals as text input and returns automated analysis including risk identification, negotiation guidance, and draft communications.
+              </p>
+            </section>
+
+            {/* 3. Critical Disclaimers */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">3. Critical Disclaimers</h2>
+              <div className="border-2 border-amber-200 bg-amber-50/50 rounded-xl p-6 space-y-5">
+                <div>
+                  <p className="font-semibold text-slate-900 mb-1">Not legal, financial, or professional advice</p>
+                  <p>DealCheck does not provide legal, financial, tax, or professional advice. All output is for informational purposes only. Consult licensed professionals before making business decisions based on our analysis.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900 mb-1">AI may be wrong</p>
+                  <p>Our Service uses artificial intelligence which can produce errors, miss important details, hallucinate facts, or provide incomplete analysis. You must independently verify all output before relying on it.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900 mb-1">No proprietary benchmark data</p>
+                  <p>We do not have access to proprietary pricing databases, market rate benchmarks, or confidential industry data. Analysis is based solely on the text you provide and the AI model&apos;s general training data.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900 mb-1">Your responsibility</p>
+                  <p>You are solely responsible for all business decisions, contract negotiations, pricing determinations, and legal compliance. DealCheck is a tool to assist your analysis — not a substitute for professional judgment.</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900 mb-1">Confidentiality warning</p>
+                  <p>Documents you submit are sent to third-party AI providers for processing. Do not upload documents you are contractually prohibited from sharing with third-party cloud services. You are responsible for ensuring you have the right to share any content you submit.</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">No Proprietary Benchmark Data</h3>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  We do not have access to proprietary pricing benchmarks, market rate databases, or
-                  confidential industry data. All analysis is based solely on the information you provide
-                  and general AI knowledge.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Your Responsibility</h3>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  You are solely responsible for all business decisions, contract negotiations, pricing
-                  determinations, and legal compliance. DealCheck is a tool to assist your analysis—not
-                  a substitute for professional judgment.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">AI-Generated Content</h3>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  Our Service uses artificial intelligence to generate analysis and recommendations.
-                  While we strive for accuracy, AI systems can make errors, miss important details, or
-                  provide incomplete information. Always verify all outputs independently.
-                </p>
-              </div>
+            </section>
+
+            {/* 4. Accounts */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">4. Accounts &amp; Registration</h2>
+              <p className="mb-3">You may use limited features without an account. To save deals and access your history, you must create an account with a valid email and password.</p>
+              <p>You are responsible for maintaining the security of your account credentials. Notify us immediately at <a href="mailto:support@dealcheck.app" className="text-slate-900 underline underline-offset-2 decoration-slate-300">support@dealcheck.app</a> if you suspect unauthorized access.</p>
+            </section>
+
+            {/* 5. User Responsibilities */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">5. User Responsibilities</h2>
+              <p className="mb-3">You agree to:</p>
+              <ul className="space-y-2 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Provide accurate, complete information</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Use the Service lawfully and ethically</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Only upload content you have the right to share</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Not share confidential documents without proper authorization</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Verify all AI-generated output before acting on it</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Not reverse engineer, scrape, or abuse the Service</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Comply with all applicable laws and regulations</li>
+              </ul>
+            </section>
+
+            {/* 6. Data & Files */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">6. Data &amp; File Handling</h2>
+              <p className="mb-3">
+                Uploaded files (PDFs, images) are processed for text extraction only and are not stored permanently on our servers after extraction. Extracted text and AI-generated analysis may be stored if you create an account and save a deal.
+              </p>
+              <p>See our <Link href="/privacy" className="text-slate-900 underline underline-offset-2 decoration-slate-300 hover:decoration-slate-500 transition-colors">Privacy Policy</Link> for full details on data handling, sub-processors, and your rights.</p>
+            </section>
+
+            {/* 7. Usage Limits */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">7. Usage Limits &amp; Plans</h2>
+              <p className="mb-3">
+                <span className="font-medium">Free:</span> 2 analysis rounds. 1 saved deal with an account.
+              </p>
+              <p className="mb-3">
+                <span className="font-medium">Pro:</span> Unlimited rounds and saved deals. Pricing and availability will be announced separately.
+              </p>
+              <p>We reserve the right to modify plan limits with reasonable notice.</p>
+            </section>
+
+            {/* 8. Subscription & Billing */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">8. Subscription &amp; Billing</h2>
+              <p className="mb-3">
+                Paid plans (when available) will be billed monthly. You may cancel at any time; cancellation takes effect at the end of the current billing period. No refunds for partial months.
+              </p>
+              <p className="mb-3">
+                We may change pricing with 30 days&apos; notice. Continued use after a price change constitutes acceptance. Payment processing is handled by third-party providers (e.g., Stripe); their terms apply to payment transactions.
+              </p>
+              <p className="text-xs text-slate-500">
+                {/* TODO: Update with actual billing provider and refund policy when Pro launches */}
+              </p>
+            </section>
+
+            {/* 9. Intellectual Property */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">9. Intellectual Property</h2>
+              <p className="mb-3">You retain all rights to content you upload. We retain all rights to the DealCheck platform, brand, software, and analysis frameworks.</p>
+              <p>By using the Service, you grant us a limited, non-exclusive license to process your content solely for the purpose of providing the Service. We do not claim ownership of your uploaded content.</p>
+            </section>
+
+            {/* 10. Limitation of Liability */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">10. Limitation of Liability</h2>
+              <p className="mb-3">
+                THE SERVICE IS PROVIDED &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. WE DISCLAIM ALL WARRANTIES INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+              </p>
+              <p className="mb-3">We are not liable for:</p>
+              <ul className="space-y-2 ml-1 mb-3">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Business decisions made based on our analysis</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Financial losses from negotiations or contracts</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Errors, omissions, or inaccuracies in AI-generated content</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Service interruptions or data loss</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Indirect, incidental, special, or consequential damages</li>
+              </ul>
+              <p>Our total aggregate liability for any claim shall not exceed the greater of (a) the amount you paid us in the 12 months preceding the claim, or (b) $100 USD.</p>
+            </section>
+
+            {/* 11. Indemnification */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">11. Indemnification</h2>
+              <p>You agree to indemnify and hold harmless DealCheck and its officers, directors, employees, and agents from any claims, damages, or expenses arising from your use of the Service, your violation of these Terms, or your violation of any third-party rights.</p>
+            </section>
+
+            {/* 12. Service Availability */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">12. Service Availability</h2>
+              <p>We strive for high availability but do not guarantee uninterrupted access. We may modify, suspend, or discontinue the Service (or any feature) at any time with reasonable notice where practicable.</p>
+            </section>
+
+            {/* 13. Termination */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">13. Termination</h2>
+              <p className="mb-3">You may close your account at any time by contacting us. We may suspend or terminate your access for violation of these Terms or harmful conduct, with or without notice.</p>
+              <p>Upon termination, your right to use the Service ceases. Sections 3, 10, 11, and 15 survive termination.</p>
+            </section>
+
+            {/* 14. Changes */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">14. Changes to These Terms</h2>
+              <p>We may update these Terms at any time. Material changes will be communicated via email or a notice in the Service at least 14 days before they take effect. Continued use after the effective date constitutes acceptance.</p>
+            </section>
+
+            {/* 15. Governing Law */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">15. Governing Law &amp; Disputes</h2>
+              <p>
+                {/* TODO: Insert specific jurisdiction when incorporated */}
+                These Terms are governed by the laws of the State of Delaware, United States, without regard to conflict-of-law provisions. Any disputes shall be resolved in the state or federal courts located in Delaware.
+              </p>
+            </section>
+
+            {/* 16. Contact */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">16. Contact</h2>
+              <p>
+                Questions about these Terms: <a href="mailto:legal@dealcheck.app" className="text-slate-900 underline underline-offset-2 decoration-slate-300">legal@dealcheck.app</a>
+              </p>
+            </section>
+
+            {/* Closing */}
+            <div className="pt-8 mt-8 border-t border-slate-200">
+              <p className="text-xs text-slate-500">
+                By using DealCheck, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
+              </p>
             </div>
-          </section>
 
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. User Responsibilities</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">You agree to:</p>
-            <ul className="space-y-2 text-gray-700">
-              <li>• Provide accurate, complete information</li>
-              <li>• Use the Service lawfully and ethically</li>
-              <li>• Only upload content you have the right to share</li>
-              <li>• Not share confidential information without proper authorization</li>
-              <li>• Verify all AI-generated suggestions before acting on them</li>
-              <li>• Comply with all applicable laws and regulations</li>
-              <li>• Not attempt to reverse engineer, hack, or abuse the Service</li>
-            </ul>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Data Privacy & File Handling</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              We take your privacy seriously. Uploaded files (PDFs, images) are processed for text
-              extraction only and are immediately deleted after processing. We do not store your raw files.
-              Analysis outputs and metadata are stored in accordance with our{' '}
-              <Link href="/privacy" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                Privacy Policy
-              </Link>.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Usage Limits</h2>
-            <p className="text-gray-700 leading-relaxed">
-              Free trial accounts are limited to 2 analysis rounds. Registered free accounts receive
-              an additional 2 rounds. Additional usage requires a paid subscription plan.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Intellectual Property</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              You retain all rights to your uploaded content and data. We retain all rights to the
-              DealCheck platform, brand, software, analysis frameworks, and AI model outputs. By using
-              the Service, you grant us a limited license to process your content to provide the Service.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Limitation of Liability</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              DealCheck is provided "as is" and "as available" without warranties of any kind, either
-              express or implied. We are not liable for:
-            </p>
-            <ul className="space-y-2 text-gray-700">
-              <li>• Business decisions made based on our analysis</li>
-              <li>• Financial losses from negotiations or contracts</li>
-              <li>• Errors, omissions, or inaccuracies in AI-generated content</li>
-              <li>• Service interruptions or data loss</li>
-              <li>• Indirect, incidental, or consequential damages</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed mt-4">
-              Our total liability to you for any claim shall not exceed the amount you paid us in the
-              12 months preceding the claim.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Service Availability</h2>
-            <p className="text-gray-700 leading-relaxed">
-              We strive to maintain high service availability but do not guarantee uninterrupted access.
-              We reserve the right to modify, suspend, or discontinue the Service at any time without notice.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Termination</h2>
-            <p className="text-gray-700 leading-relaxed">
-              We reserve the right to terminate or suspend your access immediately, without prior notice,
-              for conduct that we believe violates these Terms or is harmful to other users, us, or third parties.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Changes to Terms</h2>
-            <p className="text-gray-700 leading-relaxed">
-              We reserve the right to modify these terms at any time. We will notify users of material
-              changes via email or through the Service. Continued use after changes constitutes acceptance
-              of the modified terms.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Governing Law</h2>
-            <p className="text-gray-700 leading-relaxed">
-              These Terms shall be governed by and construed in accordance with applicable laws, without
-              regard to conflict of law provisions.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">13. Contact Information</h2>
-            <p className="text-gray-700 leading-relaxed">
-              If you have questions about these Terms, please contact us at{' '}
-              <a href="mailto:legal@dealcheck.ai" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                legal@dealcheck.ai
-              </a>
-            </p>
-          </section>
-
-          <div className="mt-16 p-6 bg-gray-50 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-600 leading-relaxed">
-              By using DealCheck, you acknowledge that you have read, understood, and agree to be bound
-              by these Terms of Service.
-            </p>
           </div>
         </div>
       </main>
 
-      <footer className="border-t border-gray-200 py-8 mt-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-600">
-          <div className="flex justify-center gap-6">
-            <Link href="/" className="hover:text-gray-900">Home</Link>
-            <Link href="/about" className="hover:text-gray-900">About</Link>
-            <Link href="/privacy" className="hover:text-gray-900">Privacy</Link>
-            <Link href="/terms" className="hover:text-gray-900">Terms</Link>
+      {/* Footer */}
+      <footer className="border-t border-slate-200">
+        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-slate-400">DealCheck</p>
+          <div className="flex items-center gap-6 text-xs text-slate-400">
+            <Link href="/pricing" className="hover:text-slate-600 transition-colors">Pricing</Link>
+            <Link href="/help" className="hover:text-slate-600 transition-colors">Help</Link>
+            <Link href="/terms" className="hover:text-slate-600 transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-slate-600 transition-colors">Privacy</Link>
           </div>
-          <p className="mt-4 text-gray-500">© {new Date().getFullYear()} DealCheck. All rights reserved.</p>
         </div>
       </footer>
     </div>

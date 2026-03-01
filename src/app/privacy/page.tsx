@@ -1,271 +1,256 @@
 import Link from 'next/link'
-import { CheckCircle, ArrowLeft, Shield, Lock, Eye, FileX } from 'lucide-react'
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm">
-              <CheckCircle className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">DealCheck</span>
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 h-14 flex items-center justify-between">
+          <Link href="/" className="text-base font-semibold text-slate-900 tracking-tight hover:text-slate-700 transition-colors">
+            DealCheck
           </Link>
-          <Link href="/" className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
+          <Link href="/login" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
+            Sign in
           </Link>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="prose prose-gray max-w-none">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-          <p className="text-gray-600 text-sm mb-12">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+      <main className="flex-1">
+        <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-20 pb-20">
+          <p className="text-sm font-medium text-emerald-600 mb-5 tracking-wide">Legal</p>
+          <h1 className="text-[2.25rem] sm:text-[2.75rem] leading-[1.1] font-bold text-slate-900 tracking-tight mb-3">
+            Privacy Policy
+          </h1>
+          <p className="text-sm text-slate-400 mb-16">Last updated: March 1, 2026</p>
 
-          {/* Key Privacy Highlights */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 not-prose">
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
-              <FileX className="w-8 h-8 text-emerald-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Files Never Stored</h3>
-              <p className="text-sm text-gray-700">
-                Uploaded PDFs and images are processed for text extraction only, then immediately deleted.
-                We never store your raw files.
+          <div className="space-y-14 text-sm text-slate-700 leading-relaxed">
+
+            {/* Summary box */}
+            <div className="border border-slate-200 rounded-xl p-6 space-y-3 bg-slate-50/50">
+              <p className="font-semibold text-slate-900">Summary</p>
+              <ul className="space-y-2">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Uploaded files are processed for text extraction only, then deleted. We do not store raw files.</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Data is encrypted in transit (TLS). We do not claim end-to-end encryption.</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> We do not sell your data or use it for advertising.</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Your text is sent to OpenAI for AI analysis. See &ldquo;Sub-processors&rdquo; below.</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> You can request deletion of your account and data at any time.</li>
+              </ul>
+            </div>
+
+            {/* 1. Controller */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">1. Data Controller</h2>
+              <p className="mb-3">
+                The data controller for DealCheck is:
+              </p>
+              <div className="border border-slate-200 rounded-lg p-4 text-xs text-slate-600 space-y-1">
+                <p className="font-medium text-slate-900">DealCheck</p>
+                {/* TODO: Insert registered business name, address, and registration number when incorporated */}
+                <p>Email: <a href="mailto:privacy@dealcheck.app" className="text-slate-900 underline underline-offset-2 decoration-slate-300">privacy@dealcheck.app</a></p>
+              </div>
+            </section>
+
+            {/* 2. Information We Collect */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">2. Information We Collect</h2>
+
+              <p className="font-medium text-slate-900 mb-2 mt-5">Account information</p>
+              <ul className="space-y-1.5 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Email address (for authentication)</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Password (hashed; never stored in plaintext)</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Account creation date and usage count</li>
+              </ul>
+
+              <p className="font-medium text-slate-900 mb-2 mt-5">Analysis data (stored only if you save a deal)</p>
+              <ul className="space-y-1.5 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Extracted text from uploaded documents</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> AI-generated analysis outputs</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Deal metadata (title, vendor, dates)</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Round history</li>
+              </ul>
+
+              <p className="font-medium text-slate-900 mb-2 mt-5">Uploaded files</p>
+              <p>PDF and image files are processed for text extraction only. <span className="font-medium">Raw files are not stored</span> on our servers after extraction completes.</p>
+
+              <p className="font-medium text-slate-900 mb-2 mt-5">Automatically collected</p>
+              <ul className="space-y-1.5 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> IP address (security and fraud prevention)</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Browser type, device, OS</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Error logs and performance metrics</li>
+              </ul>
+            </section>
+
+            {/* 3. Legal Basis */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">3. Legal Basis for Processing (GDPR)</h2>
+              <p className="mb-3">We process your data under the following legal bases:</p>
+              <ul className="space-y-2 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> <span><span className="font-medium">Contract performance:</span> Processing needed to provide the Service you requested (account management, analysis).</span></li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> <span><span className="font-medium">Legitimate interests:</span> Security, fraud prevention, service improvement, and analytics — balanced against your rights.</span></li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> <span><span className="font-medium">Consent:</span> Where required (e.g., marketing communications). You can withdraw consent at any time.</span></li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> <span><span className="font-medium">Legal obligation:</span> Where required by law (e.g., tax records, court orders).</span></li>
+              </ul>
+            </section>
+
+            {/* 4. How We Use */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">4. How We Use Your Information</h2>
+              <ul className="space-y-2 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Provide and operate the AI analysis service</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Authenticate your account and maintain security</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Store and retrieve your saved deal history</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Send service-related communications (account updates, security alerts)</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Monitor for fraud, abuse, and security threats</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Improve the Service based on aggregate usage patterns</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Comply with legal obligations</li>
+              </ul>
+              <p className="mt-3">We do not use your uploaded content to train AI models. We do not sell your data. We do not use your data for advertising.</p>
+            </section>
+
+            {/* 5. Sub-processors */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">5. Sub-processors &amp; Third Parties</h2>
+              <p className="mb-4">We share data with the following service providers, solely to operate the Service:</p>
+              <div className="border border-slate-200 rounded-xl overflow-hidden">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50/50">
+                      <th className="text-left px-4 py-3 font-medium text-slate-500">Provider</th>
+                      <th className="text-left px-4 py-3 font-medium text-slate-500">Purpose</th>
+                      <th className="text-left px-4 py-3 font-medium text-slate-500">Data shared</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-slate-700">
+                    <tr className="border-b border-slate-100">
+                      <td className="px-4 py-3 font-medium">Supabase</td>
+                      <td className="px-4 py-3">Database, authentication</td>
+                      <td className="px-4 py-3">Email, hashed password, deal data</td>
+                    </tr>
+                    <tr className="border-b border-slate-100">
+                      <td className="px-4 py-3 font-medium">OpenAI</td>
+                      <td className="px-4 py-3">AI analysis processing</td>
+                      <td className="px-4 py-3">Extracted text from documents</td>
+                    </tr>
+                    <tr>
+                      <td className="px-4 py-3 font-medium">Vercel</td>
+                      <td className="px-4 py-3">Hosting, edge functions</td>
+                      <td className="px-4 py-3">IP address, request metadata</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-4">We do not share data with advertisers, data brokers, social media platforms, or any entity for purposes unrelated to providing the Service.</p>
+              <p className="mt-3"><span className="font-medium">Legal disclosure:</span> We may disclose information if required by law, court order, or government regulation, or to protect our rights, safety, and property.</p>
+            </section>
+
+            {/* 6. Security */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">6. Data Security</h2>
+              <ul className="space-y-2 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> TLS encryption for all data in transit</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Hashed password storage (bcrypt)</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Row Level Security (RLS) on database</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Immediate file deletion after text extraction</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Access controls and authentication requirements</li>
+              </ul>
+              <p className="mt-3">No system is 100% secure. We implement industry-standard measures but cannot guarantee absolute security. You are responsible for keeping your account credentials confidential.</p>
+            </section>
+
+            {/* 7. Retention */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">7. Data Retention</h2>
+              <ul className="space-y-2 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> <span><span className="font-medium">Uploaded files:</span> Deleted immediately after text extraction.</span></li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> <span><span className="font-medium">Saved deal data:</span> Retained while your account is active, or until you delete it.</span></li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> <span><span className="font-medium">Account data:</span> Retained until you request deletion.</span></li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> <span><span className="font-medium">Server logs:</span> Retained for up to 90 days for security and debugging.</span></li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> <span><span className="font-medium">Anonymous analytics:</span> May be retained indefinitely in aggregate form.</span></li>
+              </ul>
+            </section>
+
+            {/* 8. International Transfers */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">8. International Data Transfers</h2>
+              <p className="mb-3">
+                Your data may be processed in the United States and other countries where our sub-processors operate. Where data is transferred outside the EEA/UK, we rely on:
+              </p>
+              <ul className="space-y-2 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Standard Contractual Clauses (SCCs) approved by the European Commission</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Adequacy decisions where applicable</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Sub-processor DPAs with appropriate safeguards</li>
+              </ul>
+              {/* TODO: Confirm specific transfer mechanisms with each sub-processor */}
+            </section>
+
+            {/* 9. Your Rights */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">9. Your Rights</h2>
+              <p className="mb-3">Depending on your jurisdiction, you may have the right to:</p>
+              <ul className="space-y-2 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Access your personal data</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Correct inaccurate information</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Request deletion of your data (&ldquo;right to be forgotten&rdquo;)</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Export your data in a portable format</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Restrict or object to certain processing</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Withdraw consent where processing is consent-based</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Lodge a complaint with your local data protection authority</li>
+              </ul>
+              <p className="mt-3">To exercise these rights, contact <a href="mailto:privacy@dealcheck.app" className="text-slate-900 underline underline-offset-2 decoration-slate-300">privacy@dealcheck.app</a>. We respond within 30 days.</p>
+            </section>
+
+            {/* 10. Cookies */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">10. Cookies &amp; Local Storage</h2>
+              <p className="mb-3">We use essential cookies and local storage for:</p>
+              <ul className="space-y-2 ml-1">
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Authentication and session management</li>
+                <li className="flex gap-2"><span className="text-slate-400">&ndash;</span> Security and fraud prevention</li>
+              </ul>
+              <p className="mt-3">We do not use third-party advertising, tracking, or analytics cookies.</p>
+            </section>
+
+            {/* 11. Children */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">11. Children&apos;s Privacy</h2>
+              <p>DealCheck is not intended for individuals under 18. We do not knowingly collect personal information from children. If you believe we have, contact us immediately for deletion.</p>
+            </section>
+
+            {/* 12. Changes */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">12. Changes to This Policy</h2>
+              <p>We may update this policy periodically. Material changes will be communicated via email or a notice in the Service at least 14 days before taking effect. Continued use constitutes acceptance.</p>
+            </section>
+
+            {/* 13. Contact */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">13. Contact</h2>
+              <div className="border border-slate-200 rounded-lg p-4 text-xs space-y-2">
+                <p><span className="font-medium text-slate-900">Privacy inquiries:</span> <a href="mailto:privacy@dealcheck.app" className="text-slate-700 underline underline-offset-2 decoration-slate-300">privacy@dealcheck.app</a></p>
+                <p><span className="font-medium text-slate-900">General support:</span> <a href="mailto:support@dealcheck.app" className="text-slate-700 underline underline-offset-2 decoration-slate-300">support@dealcheck.app</a></p>
+              </div>
+            </section>
+
+            {/* Closing */}
+            <div className="pt-8 mt-8 border-t border-slate-200">
+              <p className="text-xs text-slate-500">
+                This Privacy Policy is designed to be transparent about our practices. If anything is unclear, please reach out — we&apos;re happy to explain.
               </p>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-              <Lock className="w-8 h-8 text-blue-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">End-to-End Encryption</h3>
-              <p className="text-sm text-gray-700">
-                All data transmission is encrypted using industry-standard TLS/SSL protocols.
-              </p>
-            </div>
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
-              <Shield className="w-8 h-8 text-purple-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Your Data, Your Control</h3>
-              <p className="text-sm text-gray-700">
-                You can request deletion of your account and all associated data at any time.
-              </p>
-            </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-              <Eye className="w-8 h-8 text-amber-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">No Sale of Data</h3>
-              <p className="text-sm text-gray-700">
-                We never sell your personal information or analysis data to third parties.
-              </p>
-            </div>
-          </div>
 
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Information We Collect</h2>
-
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">Account Information</h3>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              When you create an account, we collect:
-            </p>
-            <ul className="space-y-2 text-gray-700 mb-4">
-              <li>• Email address (required for authentication)</li>
-              <li>• Password (encrypted and never stored in plain text)</li>
-              <li>• Account creation date</li>
-              <li>• Usage statistics (number of analyses performed)</li>
-            </ul>
-
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">Analysis Data</h3>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              When you use our Service, we store:
-            </p>
-            <ul className="space-y-2 text-gray-700 mb-4">
-              <li>• Extracted text from your uploaded documents (PDFs, images)</li>
-              <li>• AI-generated analysis outputs</li>
-              <li>• Deal metadata (title, vendor name, dates)</li>
-              <li>• Round history for each deal</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed">
-              <strong>Important:</strong> We do NOT store your original PDF or image files. Files are processed
-              for text extraction only and deleted immediately after processing.
-            </p>
-
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">Automatically Collected Information</h3>
-            <ul className="space-y-2 text-gray-700">
-              <li>• Browser type and version</li>
-              <li>• Device type and operating system</li>
-              <li>• IP address (for security and fraud prevention)</li>
-              <li>• Usage patterns and interaction data</li>
-              <li>• Error logs and performance metrics</li>
-            </ul>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. How We Use Your Information</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              We use your information to:
-            </p>
-            <ul className="space-y-2 text-gray-700">
-              <li>• Provide and improve our AI analysis services</li>
-              <li>• Authenticate your account and maintain security</li>
-              <li>• Store and retrieve your analysis history</li>
-              <li>• Send service-related communications (account updates, security alerts)</li>
-              <li>• Monitor and prevent fraud, abuse, and security threats</li>
-              <li>• Analyze usage patterns to improve the Service</li>
-              <li>• Comply with legal obligations</li>
-            </ul>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Data Sharing & Third Parties</h2>
-
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">Service Providers</h3>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              We share limited data with trusted third-party service providers:
-            </p>
-            <ul className="space-y-2 text-gray-700 mb-4">
-              <li>• <strong>Supabase:</strong> Database and authentication (data hosting)</li>
-              <li>• <strong>OpenAI:</strong> AI analysis processing (text is sent for analysis)</li>
-            </ul>
-
-            <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">We Do NOT Share With</h3>
-            <ul className="space-y-2 text-gray-700">
-              <li>• Advertisers or marketing companies</li>
-              <li>• Data brokers or aggregators</li>
-              <li>• Social media platforms</li>
-              <li>• Any entity for purposes unrelated to providing our Service</li>
-            </ul>
-
-            <p className="text-gray-700 leading-relaxed mt-4">
-              <strong>Legal Disclosure:</strong> We may disclose information if required by law, court order,
-              or government regulation, or to protect our rights and safety.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Data Security</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              We implement industry-standard security measures:
-            </p>
-            <ul className="space-y-2 text-gray-700">
-              <li>• TLS/SSL encryption for all data transmission</li>
-              <li>• Encrypted password storage (bcrypt hashing)</li>
-              <li>• Secure database with Row Level Security (RLS)</li>
-              <li>• Regular security audits and updates</li>
-              <li>• Access controls and authentication requirements</li>
-              <li>• Immediate file deletion after text extraction</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed mt-4">
-              While we take security seriously, no system is 100% secure. You are responsible for
-              keeping your account credentials confidential.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Data Retention</h2>
-            <ul className="space-y-2 text-gray-700">
-              <li>• <strong>Uploaded Files:</strong> Deleted immediately after text extraction</li>
-              <li>• <strong>Analysis Data:</strong> Retained while your account is active</li>
-              <li>• <strong>Account Data:</strong> Retained until you request deletion</li>
-              <li>• <strong>Usage Logs:</strong> Retained for up to 90 days for security purposes</li>
-            </ul>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Your Rights</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              You have the right to:
-            </p>
-            <ul className="space-y-2 text-gray-700">
-              <li>• Access your personal data and analysis history</li>
-              <li>• Correct inaccurate information</li>
-              <li>• Request deletion of your account and all associated data</li>
-              <li>• Export your data in a machine-readable format</li>
-              <li>• Opt out of non-essential communications</li>
-              <li>• Withdraw consent for data processing (where applicable)</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed mt-4">
-              To exercise these rights, contact us at{' '}
-              <a href="mailto:privacy@dealcheck.ai" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                privacy@dealcheck.ai
-              </a>
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Cookies & Tracking</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              We use essential cookies and local storage for:
-            </p>
-            <ul className="space-y-2 text-gray-700">
-              <li>• Authentication and session management</li>
-              <li>• Trial usage tracking (stored locally in your browser)</li>
-              <li>• Security and fraud prevention</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed mt-4">
-              We do not use third-party advertising or tracking cookies.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. International Data Transfers</h2>
-            <p className="text-gray-700 leading-relaxed">
-              Your data may be processed and stored in data centers located in various countries.
-              We ensure that all international transfers comply with applicable data protection laws
-              and maintain appropriate safeguards.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Children's Privacy</h2>
-            <p className="text-gray-700 leading-relaxed">
-              DealCheck is not intended for use by individuals under the age of 18. We do not knowingly
-              collect personal information from children. If you believe we have collected information
-              from a child, please contact us immediately.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Changes to This Policy</h2>
-            <p className="text-gray-700 leading-relaxed">
-              We may update this Privacy Policy from time to time. We will notify you of material changes
-              via email or through a prominent notice on our Service. Your continued use after changes
-              constitutes acceptance of the updated policy.
-            </p>
-          </section>
-
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Contact Us</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              For privacy-related questions, concerns, or data requests:
-            </p>
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-              <p className="text-gray-900 font-medium mb-2">Email:</p>
-              <a href="mailto:privacy@dealcheck.ai" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                privacy@dealcheck.ai
-              </a>
-              <p className="text-gray-900 font-medium mt-4 mb-2">General Inquiries:</p>
-              <a href="mailto:support@dealcheck.ai" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                support@dealcheck.ai
-              </a>
-            </div>
-          </section>
-
-          <div className="mt-16 p-6 bg-emerald-50 border border-emerald-200 rounded-xl">
-            <p className="text-sm text-emerald-900 leading-relaxed font-medium">
-              Your privacy matters. We're committed to protecting your data and being transparent about
-              our practices. If you have any questions, we're here to help.
-            </p>
           </div>
         </div>
       </main>
 
-      <footer className="border-t border-gray-200 py-8 mt-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-600">
-          <div className="flex justify-center gap-6">
-            <Link href="/" className="hover:text-gray-900">Home</Link>
-            <Link href="/about" className="hover:text-gray-900">About</Link>
-            <Link href="/privacy" className="hover:text-gray-900">Privacy</Link>
-            <Link href="/terms" className="hover:text-gray-900">Terms</Link>
+      {/* Footer */}
+      <footer className="border-t border-slate-200">
+        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-slate-400">DealCheck</p>
+          <div className="flex items-center gap-6 text-xs text-slate-400">
+            <Link href="/pricing" className="hover:text-slate-600 transition-colors">Pricing</Link>
+            <Link href="/help" className="hover:text-slate-600 transition-colors">Help</Link>
+            <Link href="/terms" className="hover:text-slate-600 transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-slate-600 transition-colors">Privacy</Link>
           </div>
-          <p className="mt-4 text-gray-500">© {new Date().getFullYear()} DealCheck. All rights reserved.</p>
         </div>
       </footer>
     </div>
