@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { OutputDisplay } from '@/components/OutputDisplay'
-import { Loader2, Paperclip, Send, CheckCircle, X } from 'lucide-react'
+import { Loader2, Paperclip, Send, CheckCircle, X, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import type { DealOutput } from '@/types'
 
@@ -147,17 +147,18 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <header className="border-b border-gray-100 bg-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 text-white" />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
+      {/* Header */}
+      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm">
+              <CheckCircle className="w-5 h-5 text-white" />
             </div>
-            <span className="font-semibold text-gray-900">DealCheck</span>
+            <span className="text-xl font-bold text-gray-900">DealCheck</span>
           </div>
           <Link href="/login">
-            <Button size="sm" variant="ghost" className="text-gray-600">
+            <Button size="sm" variant="ghost" className="text-gray-600 hover:text-gray-900">
               Sign in
             </Button>
           </Link>
@@ -165,34 +166,42 @@ export default function ChatPage() {
       </header>
 
       <main className="flex-1 overflow-auto pb-40">
-        <div className="max-w-4xl mx-auto px-4">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {rounds.length === 0 ? (
-            <div className="text-center py-20">
-              <h1 className="text-4xl font-semibold text-gray-900 mb-3">
-                Clarity before commitment
-              </h1>
-              <p className="text-lg text-gray-600 mb-2">
-                Analyze supplier quotes and contracts with AI
-              </p>
-              <p className="text-sm text-gray-500">
-                {trialCount === 0 ? '2 free tries, no sign up needed' : `${2 - trialCount} free ${2 - trialCount === 1 ? 'try' : 'tries'} remaining`}
-              </p>
+            <div className="text-center py-16 sm:py-24">
+              <div className="mb-8">
+                <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
+                  Clarity before<br />commitment
+                </h1>
+                <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-3">
+                  Analyze supplier quotes and contracts with AI. Get instant insights, red flags, and ready-to-send negotiation emails.
+                </p>
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span>{trialCount === 0 ? '2 free analyses, no sign up needed' : `${2 - trialCount} free ${2 - trialCount === 1 ? 'analysis' : 'analyses'} remaining`}</span>
+                </div>
+              </div>
             </div>
           ) : (
             <>
               {/* Usage banner */}
-              <div className="mt-6 mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-900">
-                {hasTriedBefore
-                  ? "Analysis complete! You've used your free tries. Sign up to save and get 2 more free rounds."
-                  : `Round ${rounds.length} complete! You have ${2 - trialCount} more free ${2 - trialCount === 1 ? 'try' : 'tries'}.`}
+              <div className="mt-8 mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-900">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    {hasTriedBefore
+                      ? "Analysis complete! You've used your free tries. Sign up to save and get 2 more free rounds."
+                      : `Round ${rounds.length} complete! You have ${2 - trialCount} more free ${2 - trialCount === 1 ? 'analysis' : 'analyses'} remaining.`}
+                  </div>
+                </div>
               </div>
 
               {/* Stacked rounds */}
-              <div className="space-y-8 py-6">
+              <div className="space-y-12 py-8">
                 {rounds.map((round, index) => (
-                  <div key={index} className="border-b border-gray-100 pb-8 last:border-0">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="px-3 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-700">
+                  <div key={index} className="border-b border-gray-200 pb-12 last:border-0">
+                    <div className="flex items-center gap-2 mb-6">
+                      <div className="px-4 py-1.5 bg-gray-900 text-white rounded-full text-sm font-semibold">
                         Round {round.roundNumber}
                       </div>
                     </div>
@@ -204,12 +213,21 @@ export default function ChatPage() {
               <div ref={roundsEndRef} />
 
               {hasTriedBefore && (
-                <div className="mt-8 mb-8 text-center">
-                  <Link href="/login">
-                    <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
-                      Sign Up to Continue
-                    </Button>
-                  </Link>
+                <div className="mt-12 mb-12 text-center">
+                  <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                    <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                      Ready to save your work?
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      Sign up to save your analyses and get 2 more free rounds
+                    </p>
+                    <Link href="/login">
+                      <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+                        Sign Up Now
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               )}
             </>
@@ -218,36 +236,38 @@ export default function ChatPage() {
       </main>
 
       {/* Fixed input at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 shadow-lg">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {hasTriedBefore ? (
-            <div className="text-center py-6">
+            <div className="text-center py-4">
               <p className="text-gray-600 mb-4">You&apos;ve used your free tries</p>
               <Link href="/login">
                 <Button className="bg-emerald-600 hover:bg-emerald-700">
                   Sign Up to Continue
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-              <div className="p-4">
+            <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-xl">
+              <div className="p-5">
                 {error && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-                    {error}
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800 flex items-start gap-2">
+                    <X className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <span>{error}</span>
                   </div>
                 )}
 
                 {uploadedFileName && (
-                  <div className="mb-3 flex items-center gap-2 p-2 bg-gray-50 rounded-lg text-sm">
-                    <Paperclip className="w-4 h-4 text-gray-500" />
-                    <span className="flex-1 text-gray-700">{uploadedFileName}</span>
+                  <div className="mb-3 flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm">
+                    <Paperclip className="w-4 h-4 text-emerald-600" />
+                    <span className="flex-1 text-emerald-900 font-medium">{uploadedFileName}</span>
                     <button
                       onClick={() => {
                         setUploadedFileName(null)
                         setInput('')
                       }}
-                      className="text-gray-400 hover:text-gray-600"
+                      className="text-emerald-600 hover:text-emerald-700"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -259,15 +279,15 @@ export default function ChatPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={rounds.length === 0 ? "Paste your quote, email, or contract here..." : "Add another round..."}
+                  placeholder={rounds.length === 0 ? "Paste your quote, email, or contract here..." : "Add another analysis round..."}
                   rows={4}
                   disabled={uploading || analyzing}
-                  className="resize-none border-0 focus:ring-0 text-base p-0"
+                  className="resize-none border-0 focus:ring-0 text-base p-0 placeholder:text-gray-400"
                 />
               </div>
 
-              <div className="border-t border-gray-100 px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="border-t border-gray-200 px-5 py-4 flex items-center justify-between bg-gray-50 rounded-b-2xl">
+                <div className="flex items-center gap-3">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -282,7 +302,7 @@ export default function ChatPage() {
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading || analyzing}
-                    className="text-gray-600"
+                    className="text-gray-700 hover:text-gray-900 hover:bg-gray-200"
                   >
                     {uploading ? (
                       <>
@@ -296,8 +316,8 @@ export default function ChatPage() {
                       </>
                     )}
                   </Button>
-                  <span className="text-xs text-gray-400">
-                    Press <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-xs">⌘ Enter</kbd>
+                  <span className="text-xs text-gray-500">
+                    or press <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs font-mono shadow-sm">⌘↵</kbd>
                   </span>
                 </div>
 
@@ -305,7 +325,7 @@ export default function ChatPage() {
                   onClick={() => handleSubmit()}
                   disabled={!input.trim() || uploading || analyzing}
                   size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-emerald-600 hover:bg-emerald-700 shadow-sm px-6"
                 >
                   {analyzing ? (
                     <>
@@ -324,6 +344,17 @@ export default function ChatPage() {
           )}
         </div>
       </div>
+
+      {/* Footer */}
+      {rounds.length === 0 && (
+        <footer className="border-t border-gray-200 py-6 text-center text-sm text-gray-500 bg-white">
+          <div className="max-w-5xl mx-auto px-4">
+            <Link href="/terms" className="hover:text-gray-900">Terms</Link>
+            <span className="mx-3">·</span>
+            <Link href="/privacy" className="hover:text-gray-900">Privacy</Link>
+          </div>
+        </footer>
+      )}
     </div>
   )
 }
