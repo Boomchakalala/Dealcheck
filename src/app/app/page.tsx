@@ -47,14 +47,20 @@ export default async function DashboardPage() {
       </div>
 
       {/* Usage indicator */}
-      {profile && profile.plan === 'free' && (
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-900">
-            <span className="font-semibold">Free Plan:</span> {profile.usage_count} / 2 rounds used
-            {profile.usage_count >= 2 && (
-              <span className="ml-2 text-blue-700">• Upgrade to continue analyzing deals</span>
-            )}
-          </p>
+      {profile && (
+        <div className={`p-4 border rounded-lg ${profile.is_admin ? 'bg-purple-50 border-purple-200' : 'bg-blue-50 border-blue-200'}`}>
+          {profile.is_admin ? (
+            <p className="text-sm text-purple-900">
+              <span className="font-semibold">👑 Admin Account:</span> Unlimited rounds
+            </p>
+          ) : (
+            <p className="text-sm text-blue-900">
+              <span className="font-semibold">Free Plan:</span> {profile.usage_count} / 2 rounds used
+              {profile.usage_count >= 2 && (
+                <span className="ml-2 text-blue-700">• Upgrade to continue analyzing deals</span>
+              )}
+            </p>
+          )}
         </div>
       )}
 

@@ -26,8 +26,8 @@ export default function TrialPage() {
 
   // Check if user has tried before
   useState(() => {
-    const tried = localStorage.getItem('dealcheck_trial_used')
-    if (tried === 'true') {
+    const trialCount = parseInt(localStorage.getItem('dealcheck_trial_count') || '0')
+    if (trialCount >= 2) {
       setHasTriedBefore(true)
     }
   })
@@ -70,8 +70,15 @@ export default function TrialPage() {
       }
 
       setOutput(data.output)
-      localStorage.setItem('dealcheck_trial_used', 'true')
-      setHasTriedBefore(true)
+
+      // Track trial usage (max 2 free tries)
+      const currentCount = parseInt(localStorage.getItem('dealcheck_trial_count') || '0')
+      const newCount = currentCount + 1
+      localStorage.setItem('dealcheck_trial_count', newCount.toString())
+
+      if (newCount >= 2) {
+        setHasTriedBefore(true)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
@@ -100,7 +107,9 @@ export default function TrialPage() {
         <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-blue-900 font-semibold">
-              🎉 Here's your free analysis! Sign up to save your results and track multiple negotiation rounds.
+              🎉 Here's your free analysis! {hasTriedBefore
+                ? 'Sign up to save your results and continue.'
+                : 'You have 1 more free try. Sign up to save and get more rounds!'}
             </p>
           </div>
 
@@ -131,9 +140,9 @@ export default function TrialPage() {
         <Card className="p-8">
           {hasTriedBefore ? (
             <div className="text-center py-12">
-              <h2 className="text-2xl font-bold mb-4">Ready for more?</h2>
+              <h2 className="text-2xl font-bold mb-4">You've used your free tries!</h2>
               <p className="text-gray-600 mb-6">
-                Sign up to save your analyses and get 2 more free rounds!
+                Sign up to save your analyses and get 2 more free rounds.
               </p>
               <Link href="/login">
                 <Button size="lg">Sign Up Now</Button>
