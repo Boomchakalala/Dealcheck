@@ -1,22 +1,27 @@
 import { cn } from '@/lib/utils';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'balanced' | 'vendor-favorable' | 'high-risk' | 'default';
+  variant?: 'default' | 'destructive' | 'secondary' | 'success' | 'warning' | 'commercial' | 'legal' | 'security' | 'operational';
   children: React.ReactNode;
 }
 
 export function Badge({ variant = 'default', children, className, ...props }: BadgeProps) {
   const variants = {
-    'balanced': 'bg-green-100 text-green-800 border-green-200',
-    'vendor-favorable': 'bg-amber-100 text-amber-800 border-amber-200',
-    'high-risk': 'bg-red-100 text-red-800 border-red-200',
-    'default': 'bg-gray-100 text-gray-800 border-gray-200',
+    'default': 'bg-slate-100 text-slate-800 border-slate-200',
+    'destructive': 'bg-red-50 text-red-700 border-red-200',
+    'secondary': 'bg-slate-100 text-slate-700 border-slate-200',
+    'success': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    'warning': 'bg-amber-50 text-amber-700 border-amber-200',
+    'commercial': 'bg-blue-50 text-blue-700 border-blue-200',
+    'legal': 'bg-purple-50 text-purple-700 border-purple-200',
+    'security': 'bg-orange-50 text-orange-700 border-orange-200',
+    'operational': 'bg-cyan-50 text-cyan-700 border-cyan-200',
   };
 
   return (
     <div
       className={cn(
-        'inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold border uppercase tracking-wide',
+        'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border',
         variants[variant],
         className
       )}

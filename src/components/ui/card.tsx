@@ -8,7 +8,7 @@ export function Card({ children, className, ...props }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-sm',
+        'rounded-2xl bg-white border border-slate-200 shadow-sm',
         className
       )}
       {...props}
@@ -36,7 +36,7 @@ export function CardContent({ children, className, ...props }: CardProps) {
 
 export function CardTitle({ children, className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3 className={cn('text-xl font-semibold text-slate-100', className)} {...props}>
+    <h3 className={cn('text-xl font-semibold text-slate-900', className)} {...props}>
       {children}
     </h3>
   );
