@@ -22,7 +22,7 @@ export async function POST(
       .from('profiles')
       .select('usage_count, plan, is_admin')
       .eq('id', user.id)
-      .single()
+      .single() as { data: { usage_count: number; plan: string; is_admin: boolean } | null }
 
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
