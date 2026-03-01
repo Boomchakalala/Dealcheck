@@ -2,10 +2,28 @@ import Tesseract from 'tesseract.js'
 
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
-    // Dynamic import of pdf-parse to handle ESM issues
-    const pdf = (await import('pdf-parse')).default
-    const data = await pdf(buffer)
-    const text = data.text.trim()
+    // Use pdfjs-dist which works better in Node.js/serverless environments
+    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
+
+    // Load the PDF document
+    const loadingTask = pdfjsLib.getDocument({
+      data: new Uint8Array(buffer),
+      useSystemFonts: true,
+      verbosity: 0
+    })
+
+    const pdf = await loadingTask.promise
+    let fullText = ''
+
+    // Extract text from each page
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i)
+      const textContent = await page.getTextContent()
+      const pageText = textContent.items.map((item: any) => item.str).join(' ')
+      fullText += pageText + '\n'
+    }
+
+    const text = fullText.trim()
 
     if (text.length < 50) {
       throw new Error('PDF extraction yielded insufficient text. Please try uploading a screenshot or pasting the text manually.')
