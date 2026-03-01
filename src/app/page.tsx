@@ -146,6 +146,23 @@ export default function ChatPage() {
     }
   }
 
+  // Handle paste events for images (ChatGPT-style)
+  const handlePaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault()
+        const file = item.getAsFile()
+        if (file) {
+          await handleFileUpload(file)
+        }
+        return
+      }
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
@@ -280,7 +297,8 @@ export default function ChatPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={rounds.length === 0 ? "Paste your quote, email, or contract here..." : "Add another analysis round..."}
+                  onPaste={handlePaste}
+                  placeholder={rounds.length === 0 ? "Paste your quote, email, contract, or screenshot here (Ctrl/Cmd+V)..." : "Add another analysis round or paste a screenshot..."}
                   rows={4}
                   disabled={uploading || analyzing}
                   className="resize-none border-0 focus:ring-0 text-base p-0 placeholder:text-slate-400"
@@ -318,7 +336,7 @@ export default function ChatPage() {
                     )}
                   </Button>
                   <span className="text-xs text-slate-500">
-                    or press <kbd className="px-2 py-1 bg-white border border-slate-300 rounded text-xs font-mono shadow-sm">⌘↵</kbd>
+                    or press <kbd className="px-2 py-1 bg-white border border-slate-300 rounded text-xs font-mono shadow-sm">⌘V</kbd> to paste screenshots
                   </span>
                 </div>
 
