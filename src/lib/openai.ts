@@ -147,14 +147,14 @@ export async function regenerateEmailDrafts(
 ): Promise<DealOutputType['email_drafts']> {
   const prompt = `Based on this deal overview and the original quote, generate 3 email draft variations (neutral, firm, final_push).
 
-Deal Overview:
-${JSON.stringify(currentOutput.quote_overview, null, 2)}
+Deal Snapshot:
+${JSON.stringify(currentOutput.snapshot, null, 2)}
 
 Must-Have Asks:
-${currentOutput.asks.must_have.join('\n')}
+${currentOutput.what_to_ask_for.must_have.join('\n')}
 
 Nice-to-Have Asks:
-${currentOutput.asks.nice_to_have.join('\n')}
+${currentOutput.what_to_ask_for.nice_to_have.join('\n')}
 
 Original Quote:
 ${extractedText}
