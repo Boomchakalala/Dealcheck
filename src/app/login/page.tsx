@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2 } from 'lucide-react'
+import { Loader2, CheckCircle } from 'lucide-react'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -58,17 +59,22 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-2xl p-8">
+        <div className="bg-white rounded-xl shadow-xl border border-gray-200 p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">DealCheck</h1>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900">DealCheck</h1>
+            </div>
             <p className="text-gray-600">Clarity before commitment</p>
           </div>
 
           <form onSubmit={handleAuth} className="space-y-4">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -77,11 +83,12 @@ export default function LoginPage() {
                 placeholder="you@example.com"
                 required
                 disabled={loading}
+                className="mt-1"
               />
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-gray-700 font-medium">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -91,24 +98,25 @@ export default function LoginPage() {
                 required
                 disabled={loading}
                 minLength={6}
+                className="mt-1"
               />
             </div>
 
             {error && (
-              <div className="p-3 text-sm text-red-800 bg-red-50 rounded-lg">
+              <div className="p-3 text-sm text-red-800 bg-red-50 rounded-lg border border-red-200">
                 {error}
               </div>
             )}
 
             {message && (
-              <div className="p-3 text-sm text-green-800 bg-green-50 rounded-lg">
+              <div className="p-3 text-sm text-emerald-800 bg-emerald-50 rounded-lg border border-emerald-200">
                 {message}
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-emerald-600 hover:bg-emerald-700"
               disabled={loading}
             >
               {loading ? (
@@ -129,7 +137,7 @@ export default function LoginPage() {
                 setError(null)
                 setMessage(null)
               }}
-              className="text-sm text-indigo-600 hover:text-indigo-500"
+              className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
               disabled={loading}
             >
               {isSignUp
@@ -141,15 +149,21 @@ export default function LoginPage() {
           <div className="mt-6 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
             <p>
               By signing in, you agree to our{' '}
-              <a href="/terms" className="text-indigo-600 hover:text-indigo-500">
+              <Link href="/terms" className="text-emerald-600 hover:text-emerald-700">
                 Terms
-              </a>{' '}
+              </Link>{' '}
               and{' '}
-              <a href="/privacy" className="text-indigo-600 hover:text-indigo-500">
+              <Link href="/privacy" className="text-emerald-600 hover:text-emerald-700">
                 Privacy Policy
-              </a>
+              </Link>
             </p>
           </div>
+        </div>
+
+        <div className="mt-6 text-center">
+          <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
+            ← Back to homepage
+          </Link>
         </div>
       </div>
     </div>
