@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { OutputDisplay } from '@/components/OutputDisplay'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Upload, FileText, ClipboardPaste, CheckCircle2, AlertTriangle, Target, Mail, Shield, Lock, Eye, Zap, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import type { DealOutput } from '@/types'
 
@@ -111,7 +111,7 @@ function SampleModal({ open, onClose }: { open: boolean; onClose: () => void }) 
         {/* Header */}
         <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-slate-100 px-8 py-5 flex items-center justify-between z-10 rounded-t-2xl">
           <div>
-            <p className="text-xs font-medium tracking-widest text-slate-400 uppercase mb-1">Sample analysis</p>
+            <p className="text-xs font-medium tracking-widest text-emerald-700 uppercase mb-1">Sample analysis</p>
             <h2 className="text-xl font-semibold text-slate-900 tracking-tight">CloudHost Pro — $324K Quote Review</h2>
           </div>
           <button
@@ -135,7 +135,7 @@ function SampleModal({ open, onClose }: { open: boolean; onClose: () => void }) 
           {/* Divider */}
           <div className="flex items-center gap-4">
             <div className="flex-1 h-px bg-slate-200" />
-            <span className="text-xs font-medium tracking-widest text-slate-400 uppercase">DealCheck output</span>
+            <span className="text-xs font-medium tracking-widest text-emerald-700 uppercase">DealCheck output</span>
             <div className="flex-1 h-px bg-slate-200" />
           </div>
 
@@ -158,7 +158,7 @@ function SampleModal({ open, onClose }: { open: boolean; onClose: () => void }) 
             <ol className="space-y-3">
               {SAMPLE_ASKS.map((ask, i) => (
                 <li key={i} className="flex gap-3 text-sm">
-                  <span className="text-slate-400 font-medium tabular-nums">{i + 1}.</span>
+                  <span className="text-emerald-600 font-medium tabular-nums">{i + 1}.</span>
                   <span className="text-slate-700 leading-relaxed">{ask}</span>
                 </li>
               ))}
@@ -233,6 +233,7 @@ export default function LandingPage() {
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [showSample, setShowSample] = useState(false)
+  const [activeTab, setActiveTab] = useState<'paste' | 'upload'>('paste')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const roundsEndRef = useRef<HTMLDivElement>(null)
@@ -255,6 +256,7 @@ export default function LandingPage() {
       if (!response.ok) throw new Error(data.error || 'Failed to process file')
       setInput(data.extractedText)
       setUploadedFileName(file.name)
+      setActiveTab('paste')
       setTimeout(() => textareaRef.current?.focus(), 100)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to process file')
@@ -401,7 +403,7 @@ export default function LandingPage() {
                 <button
                   onClick={() => handleSubmit()}
                   disabled={!input.trim() || uploading || analyzing}
-                  className="px-5 py-2 text-sm font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-700 text-white hover:bg-emerald-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   {analyzing ? 'Analyzing...' : 'Analyze'}
                 </button>
@@ -424,119 +426,196 @@ export default function LandingPage() {
         {/* ---------------------------------------------------------------- */}
         {/* HERO                                                              */}
         {/* ---------------------------------------------------------------- */}
-        <section className="max-w-3xl mx-auto px-5 sm:px-8 pt-20 sm:pt-28 pb-20">
-          {/* Eyebrow */}
-          <p className="text-sm font-medium text-emerald-600 mb-5 tracking-wide">Stop overpaying vendors</p>
+        <section className="relative overflow-hidden">
+          {/* Subtle green radial gradient */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.06)_0%,transparent_70%)] pointer-events-none" />
 
-          {/* Headline */}
-          <h1 className="text-[2.75rem] sm:text-[3.5rem] leading-[1.08] font-bold text-slate-900 tracking-tight mb-6 max-w-2xl">
-            Turn any supplier quote into a better deal
-          </h1>
+          <div className="relative max-w-3xl mx-auto px-5 sm:px-8 pt-20 sm:pt-28 pb-20">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="text-xs font-medium text-emerald-700 tracking-wide">Free — no sign-up required</span>
+            </div>
 
-          {/* Subhead */}
-          <p className="text-lg sm:text-xl text-slate-500 leading-relaxed max-w-xl mb-10">
-            Paste the email. Get back exactly where you&apos;re overpaying, what to ask for, and a reply you can send today.
-          </p>
+            {/* Headline */}
+            <h1 className="text-[2.75rem] sm:text-[3.5rem] leading-[1.08] font-bold text-slate-900 tracking-tight mb-6 max-w-2xl">
+              Turn any supplier quote into a better deal
+            </h1>
 
-          {/* Value bullets */}
-          <div className="flex flex-col sm:flex-row gap-x-10 gap-y-3 mb-12 text-sm text-slate-600">
-            <p>Find hidden cost drivers in seconds</p>
-            <p>Get a negotiation plan with specific asks</p>
-            <p>Copy-paste reply email, ready to send</p>
-          </div>
+            {/* Subhead */}
+            <p className="text-lg sm:text-xl text-slate-500 leading-relaxed max-w-xl mb-8">
+              Paste the email. Get back exactly where you&apos;re overpaying, what to ask for, and a reply you can send today.
+            </p>
 
-          {/* Input area */}
-          <div
-            className={`rounded-xl border transition-colors ${isDragging ? 'border-emerald-400 bg-emerald-50/30' : 'border-slate-200'} overflow-hidden shadow-sm`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            {error && (
-              <div className="px-5 pt-4">
-                <p className="text-sm text-red-600">{error}</p>
+            {/* Value bullets with check icons */}
+            <div className="flex flex-col gap-3 mb-12">
+              {[
+                'Find hidden cost drivers in seconds',
+                'Get a negotiation plan with specific asks',
+                'Copy-paste reply email, ready to send',
+              ].map((text) => (
+                <div key={text} className="flex items-center gap-3 text-sm text-slate-600">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <span>{text}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Input card */}
+            <div
+              className={`rounded-2xl border-2 transition-colors bg-white shadow-lg shadow-slate-200/50 ${isDragging ? 'border-emerald-400 bg-emerald-50/30' : 'border-slate-200'} overflow-hidden`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              {/* Segmented control tabs */}
+              <div className="px-5 pt-5 pb-0">
+                <div className="inline-flex rounded-lg bg-slate-100 p-1">
+                  <button
+                    onClick={() => setActiveTab('paste')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      activeTab === 'paste'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    <ClipboardPaste className="w-3.5 h-3.5" />
+                    Paste text
+                  </button>
+                  <button
+                    onClick={() => { setActiveTab('upload'); setTimeout(() => fileInputRef.current?.click(), 100) }}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      activeTab === 'upload'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    Upload file
+                  </button>
+                </div>
               </div>
-            )}
-            {uploadedFileName && (
-              <div className="px-5 pt-4 flex items-center gap-3 text-sm">
-                <span className="font-medium text-emerald-800">{uploadedFileName}</span>
-                <button onClick={() => { setUploadedFileName(null); setInput('') }} className="text-slate-400 hover:text-slate-600 transition-colors">&times;</button>
-              </div>
-            )}
-            {isDragging && (
-              <div className="px-5 pt-4 text-sm text-emerald-600 font-medium">Drop your file here</div>
-            )}
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onPaste={handlePaste}
-              placeholder="Paste a supplier email, quote, or contract text here..."
-              rows={5}
-              disabled={uploading || analyzing}
-              className="w-full resize-none border-0 focus:ring-0 focus:outline-none text-sm sm:text-base text-slate-800 placeholder:text-slate-400 p-5 pb-3 bg-transparent"
-            />
-            <div className="px-5 pb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={handleFileSelect} disabled={uploading || analyzing} />
-                <button
-                  type="button"
+
+              {error && (
+                <div className="px-5 pt-4">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+              {uploadedFileName && (
+                <div className="px-5 pt-4 flex items-center gap-3 text-sm">
+                  <FileText className="w-4 h-4 text-emerald-600" />
+                  <span className="font-medium text-emerald-800">{uploadedFileName}</span>
+                  <button onClick={() => { setUploadedFileName(null); setInput('') }} className="text-slate-400 hover:text-slate-600 transition-colors">&times;</button>
+                </div>
+              )}
+
+              {activeTab === 'paste' ? (
+                <>
+                  {isDragging && (
+                    <div className="px-5 pt-4 text-sm text-emerald-600 font-medium">Drop your file here</div>
+                  )}
+                  <textarea
+                    ref={textareaRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    onPaste={handlePaste}
+                    placeholder="Paste a supplier email, quote, or contract text here..."
+                    rows={5}
+                    disabled={uploading || analyzing}
+                    className="w-full resize-none border-0 focus:ring-0 focus:outline-none text-sm sm:text-base text-slate-800 placeholder:text-slate-400 p-5 pb-3 bg-transparent"
+                  />
+                </>
+              ) : (
+                <div
+                  className={`mx-5 mt-4 mb-2 rounded-xl border-2 border-dashed transition-colors py-12 flex flex-col items-center justify-center gap-3 cursor-pointer ${
+                    isDragging ? 'border-emerald-400 bg-emerald-50/50' : 'border-slate-200 hover:border-slate-300'
+                  }`}
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading || analyzing}
-                  className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
                 >
-                  {uploading ? 'Processing...' : 'or upload a file'}
+                  <Upload className="w-8 h-8 text-slate-300" />
+                  <p className="text-sm text-slate-500">{uploading ? 'Processing...' : 'Drop a file here or click to browse'}</p>
+                  <p className="text-xs text-slate-400">PDF, PNG, JPG, WEBP</p>
+                </div>
+              )}
+
+              <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={handleFileSelect} disabled={uploading || analyzing} />
+
+              <div className="px-5 pb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <span className="text-xs text-slate-400">
+                  {activeTab === 'paste' ? 'PDF, image, or screenshot — drag & drop works too' : ''}
+                </span>
+                <button
+                  onClick={() => handleSubmit()}
+                  disabled={!input.trim() || uploading || analyzing}
+                  className="w-full sm:w-auto px-7 py-2.5 text-sm font-semibold rounded-lg bg-emerald-700 text-white hover:bg-emerald-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                >
+                  {analyzing ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing...</>
+                  ) : (
+                    <>Analyze this quote <ArrowRight className="w-4 h-4" /></>
+                  )}
                 </button>
-                <span className="text-xs text-slate-400">PDF, image, or screenshot</span>
+              </div>
+            </div>
+
+            {/* Privacy micro-note + sample link */}
+            <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-xs text-slate-400">
+                <Lock className="w-3 h-3" />
+                <span>Your document is processed securely and never stored without your permission</span>
               </div>
               <button
-                onClick={() => handleSubmit()}
-                disabled={!input.trim() || uploading || analyzing}
-                className="w-full sm:w-auto px-7 py-2.5 text-sm font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                onClick={() => setShowSample(true)}
+                className="text-xs font-medium text-emerald-700 hover:text-emerald-800 transition-colors underline underline-offset-2 decoration-emerald-300 hover:decoration-emerald-500"
               >
-                {analyzing ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing...</>
-                ) : (
-                  'Analyze this quote'
-                )}
+                View sample output
               </button>
             </div>
-          </div>
-
-          {/* Microcopy + secondary CTA */}
-          <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <p className="text-xs text-slate-400">
-              2 free runs &middot; No signup required &middot; Your document is processed securely
-            </p>
-            <button
-              onClick={() => setShowSample(true)}
-              className="text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors underline underline-offset-2 decoration-slate-300 hover:decoration-slate-500"
-            >
-              View sample output
-            </button>
           </div>
         </section>
 
         {/* ---------------------------------------------------------------- */}
-        {/* 3-STEP STRIP                                                      */}
+        {/* HOW IT WORKS — 3 equal cards                                     */}
         {/* ---------------------------------------------------------------- */}
-        <section className="border-y border-slate-200 bg-slate-50/50">
-          <div className="max-w-3xl mx-auto px-5 sm:px-8 py-10 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12">
-            <div>
-              <p className="text-xs font-medium tracking-widest text-slate-400 uppercase mb-2">1</p>
-              <p className="text-sm font-semibold text-slate-900 mb-1">Paste or upload</p>
-              <p className="text-sm text-slate-500 leading-relaxed">Forward the vendor email or drop in the PDF.</p>
-            </div>
-            <div>
-              <p className="text-xs font-medium tracking-widest text-slate-400 uppercase mb-2">2</p>
-              <p className="text-sm font-semibold text-slate-900 mb-1">See where you&apos;re overpaying</p>
-              <p className="text-sm text-slate-500 leading-relaxed">Red flags, hidden terms, and pricing risks — surfaced instantly.</p>
-            </div>
-            <div>
-              <p className="text-xs font-medium tracking-widest text-slate-400 uppercase mb-2">3</p>
-              <p className="text-sm font-semibold text-slate-900 mb-1">Send the reply</p>
-              <p className="text-sm text-slate-500 leading-relaxed">Copy the drafted email. Push for better terms in writing.</p>
+        <section className="border-y border-slate-200">
+          <div className="max-w-4xl mx-auto px-5 sm:px-8 py-20">
+            <p className="text-xs font-medium tracking-widest text-emerald-700 uppercase mb-10 text-center">How it works</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                {
+                  step: '1',
+                  icon: <Upload className="w-5 h-5 text-emerald-700" />,
+                  title: 'Paste or upload',
+                  desc: 'Forward the vendor email, drop in the PDF, or paste quote text directly.',
+                },
+                {
+                  step: '2',
+                  icon: <Eye className="w-5 h-5 text-emerald-700" />,
+                  title: 'See where you\'re overpaying',
+                  desc: 'Red flags, hidden terms, and pricing risks — surfaced instantly by AI.',
+                },
+                {
+                  step: '3',
+                  icon: <Mail className="w-5 h-5 text-emerald-700" />,
+                  title: 'Send the reply',
+                  desc: 'Copy the drafted email with your negotiation asks already baked in.',
+                },
+              ].map((item) => (
+                <div key={item.step} className="rounded-xl border border-slate-200 bg-white p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">
+                      {item.step}
+                    </span>
+                    {item.icon}
+                  </div>
+                  <p className="text-sm font-semibold text-slate-900 mb-2">{item.title}</p>
+                  <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -569,31 +648,45 @@ export default function LandingPage() {
         </section>
 
         {/* ---------------------------------------------------------------- */}
-        {/* BENEFITS                                                          */}
+        {/* WHAT YOU GET — 4 feature cards with icons                        */}
         {/* ---------------------------------------------------------------- */}
         <section className="border-t border-slate-200">
-          <div className="max-w-3xl mx-auto px-5 sm:px-8 py-20 space-y-16">
-            <div>
-              <p className="text-xs font-medium tracking-widest text-slate-400 uppercase mb-6">What you get back</p>
-            </div>
+          <div className="max-w-4xl mx-auto px-5 sm:px-8 py-20">
+            <p className="text-xs font-medium tracking-widest text-emerald-700 uppercase mb-10 text-center">What you get back</p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 gap-y-12">
-              <div>
-                <p className="text-base font-semibold text-slate-900 mb-2">Where you&apos;re overpaying</p>
-                <p className="text-sm text-slate-500 leading-relaxed">Hidden escalators, punitive exit clauses, inflated overages, weak SLAs — flagged with the business impact of each.</p>
-              </div>
-              <div>
-                <p className="text-base font-semibold text-slate-900 mb-2">Exactly what to ask for</p>
-                <p className="text-sm text-slate-500 leading-relaxed">Must-have asks and nice-to-haves. Specific, written requests — not vague advice to &ldquo;negotiate harder.&rdquo;</p>
-              </div>
-              <div>
-                <p className="text-base font-semibold text-slate-900 mb-2">A reply you can send now</p>
-                <p className="text-sm text-slate-500 leading-relaxed">Three email drafts (neutral, firm, final push) with your asks baked in. Copy, paste, send.</p>
-              </div>
-              <div>
-                <p className="text-base font-semibold text-slate-900 mb-2">Multi-round deal tracking</p>
-                <p className="text-sm text-slate-500 leading-relaxed">Vendor countered? Paste the new offer. DealCheck picks up context from previous rounds and adjusts.</p>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {[
+                {
+                  icon: <AlertTriangle className="w-5 h-5 text-emerald-700" />,
+                  title: 'Where you\'re overpaying',
+                  desc: 'Hidden escalators, punitive exit clauses, inflated overages, weak SLAs — flagged with the business impact of each.',
+                },
+                {
+                  icon: <Target className="w-5 h-5 text-emerald-700" />,
+                  title: 'Exactly what to ask for',
+                  desc: 'Must-have asks and nice-to-haves. Specific, written requests — not vague advice to "negotiate harder."',
+                },
+                {
+                  icon: <Mail className="w-5 h-5 text-emerald-700" />,
+                  title: 'A reply you can send now',
+                  desc: 'Three email drafts (neutral, firm, final push) with your asks baked in. Copy, paste, send.',
+                },
+                {
+                  icon: <Zap className="w-5 h-5 text-emerald-700" />,
+                  title: 'Multi-round deal tracking',
+                  desc: 'Vendor countered? Paste the new offer. DealCheck picks up context from previous rounds and adjusts.',
+                },
+              ].map((item) => (
+                <div key={item.title} className="rounded-xl border border-slate-200 bg-white p-6">
+                  <div className="mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                      {item.icon}
+                    </div>
+                  </div>
+                  <p className="text-base font-semibold text-slate-900 mb-2">{item.title}</p>
+                  <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -601,9 +694,9 @@ export default function LandingPage() {
         {/* ---------------------------------------------------------------- */}
         {/* SAMPLE CTA                                                        */}
         {/* ---------------------------------------------------------------- */}
-        <section className="border-t border-slate-200 bg-gradient-to-b from-slate-50/80 to-white">
+        <section className="border-t border-slate-200">
           <div className="max-w-3xl mx-auto px-5 sm:px-8 py-20 text-center">
-            <p className="text-xs font-medium tracking-widest text-slate-400 uppercase mb-5">See it in action</p>
+            <p className="text-xs font-medium tracking-widest text-emerald-700 uppercase mb-5">See it in action</p>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-4">
               Supplier email in. Negotiation reply out.
             </h2>
@@ -612,10 +705,32 @@ export default function LandingPage() {
             </p>
             <button
               onClick={() => setShowSample(true)}
-              className="px-7 py-3 text-sm font-semibold rounded-lg border border-slate-300 text-slate-700 hover:border-slate-400 hover:text-slate-900 transition-colors"
+              className="px-7 py-3 text-sm font-semibold rounded-lg border-2 border-emerald-700 text-emerald-700 hover:bg-emerald-50 transition-colors"
             >
               View sample output
             </button>
+          </div>
+        </section>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* TRUST / SECURITY STRIP                                           */}
+        {/* ---------------------------------------------------------------- */}
+        <section className="border-t border-slate-200">
+          <div className="max-w-3xl mx-auto px-5 sm:px-8 py-10">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12">
+              <div className="flex items-center gap-2.5 text-sm text-slate-500">
+                <Shield className="w-4 h-4 text-emerald-600" />
+                <span>Encrypted in transit (TLS)</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-sm text-slate-500">
+                <Lock className="w-4 h-4 text-emerald-600" />
+                <span>Documents not stored unless you save</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-sm text-slate-500">
+                <Eye className="w-4 h-4 text-emerald-600" />
+                <span>No training on your data</span>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -624,7 +739,7 @@ export default function LandingPage() {
         {/* ---------------------------------------------------------------- */}
         <section className="border-t border-slate-200">
           <div className="max-w-3xl mx-auto px-5 sm:px-8 py-20">
-            <p className="text-xs font-medium tracking-widest text-slate-400 uppercase mb-6">For ongoing negotiations</p>
+            <p className="text-xs font-medium tracking-widest text-emerald-700 uppercase mb-6">For ongoing negotiations</p>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-4 max-w-lg">
               Save deals. Add rounds. Build leverage over time.
             </h2>
@@ -633,9 +748,9 @@ export default function LandingPage() {
             </p>
             <Link
               href="/login"
-              className="inline-block px-7 py-3 text-sm font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+              className="inline-flex items-center gap-2 px-7 py-3 text-sm font-semibold rounded-lg bg-emerald-700 text-white hover:bg-emerald-800 transition-colors"
             >
-              Sign in to save your deals
+              Sign in to save your deals <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </section>
@@ -645,7 +760,7 @@ export default function LandingPage() {
         {/* ---------------------------------------------------------------- */}
         <section className="border-t border-slate-200">
           <div className="max-w-3xl mx-auto px-5 sm:px-8 py-20">
-            <p className="text-xs font-medium tracking-widest text-slate-400 uppercase mb-8">Questions</p>
+            <p className="text-xs font-medium tracking-widest text-emerald-700 uppercase mb-8">Questions</p>
             <FAQ />
           </div>
         </section>
