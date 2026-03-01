@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DealCheck - Clarity before commitment",
-  description: "Procurement advisor for non-procurement professionals. Analyze supplier quotes and get structured guidance.",
+  title: "DealCheck — Turn supplier quotes into better deals",
+  description: "Paste a vendor email or upload a quote. Get back where you're overpaying, what to ask for, and a reply you can send today.",
 };
 
 export default function RootLayout({
