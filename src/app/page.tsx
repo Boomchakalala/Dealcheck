@@ -9,18 +9,25 @@ import { Loader2, Paperclip, Send, CheckCircle, X } from 'lucide-react'
 import Link from 'next/link'
 import type { DealOutput } from '@/types'
 
+interface ConversationRound {
+  input: string
+  output: DealOutput
+  fileName?: string
+}
+
 export default function ChatPage() {
   const router = useRouter()
   const [input, setInput] = useState('')
   const [uploading, setUploading] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [output, setOutput] = useState<DealOutput | null>(null)
+  const [conversation, setConversation] = useState<ConversationRound[]>([])
   const [hasTriedBefore, setHasTriedBefore] = useState(false)
   const [trialCount, setTrialCount] = useState(0)
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const conversationEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const count = parseInt(localStorage.getItem('dealcheck_trial_count') || '0')
@@ -29,6 +36,10 @@ export default function ChatPage() {
       setHasTriedBefore(true)
     }
   }, [])
+
+  useEffect(() => {
+    conversationEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [conversation])
 
   const handleFileUpload = async (file: File) => {
     setUploading(true)
