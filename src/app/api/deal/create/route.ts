@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     // Get user profile and check usage limit
     const { data: profile } = await supabase
       .from('profiles')
-      .select('usage_count, plan')
+      .select('usage_count, plan, is_admin')
       .eq('id', user.id)
       .single()
 
@@ -24,8 +24,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    // Check usage limit (2 free rounds)
-    if (profile.plan === 'free' && profile.usage_count >= 2) {
+    // Check usage limit (2 free rounds) - skip for admins
+    if (!profile.is_admin && profile.plan === 'free' && profile.usage_count >= 2) {
       return NextResponse.json(
         { error: 'Free usage limit reached. Upgrade to continue.' },
         { status: 403 }
@@ -85,11 +85,13 @@ export async function POST(request: Request) {
       throw new Error('Failed to create round')
     }
 
-    // Increment usage count
-    await supabase
-      .from('profiles')
-      .update({ usage_count: profile.usage_count + 1 })
-      .eq('id', user.id)
+    // Increment usage count (skip for admins)
+    if (!profile.is_admin) {
+      await supabase
+        .from('profiles')
+        .update({ usage_count: profile.usage_count + 1 })
+        .eq('id', user.id)
+    }
 
     return NextResponse.json({
       dealId: deal.id,
