@@ -1,4 +1,4 @@
-import pdf from 'pdf-parse/lib/pdf-parse.js'
+import pdf from 'pdf-parse'
 import Tesseract from 'tesseract.js'
 
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
