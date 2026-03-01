@@ -2,10 +2,11 @@ import { z } from 'zod'
 
 // Zod schema for strict validation of OpenAI output
 export const RedFlagSchema = z.object({
-  type: z.enum(['Commercial', 'Legal', 'Operational']),
+  type: z.enum(['Commercial', 'Legal', 'Operational', 'Security']),
   issue: z.string(),
   why_it_matters: z.string(),
-  suggested_fix: z.string(),
+  what_to_ask_for: z.string(),
+  if_they_push_back: z.string(),
 })
 
 export const EmailDraftSchema = z.object({
@@ -16,14 +17,27 @@ export const EmailDraftSchema = z.object({
 export const DealOutputSchema = z.object({
   title: z.string(),
   vendor: z.string(),
-  quote_overview: z.object({
-    products_services: z.array(z.string()),
+  snapshot: z.object({
+    vendor_product: z.string(),
     term: z.string(),
-    pricing_summary: z.string(),
-    key_terms_found: z.array(z.string()),
+    total_commitment: z.string(),
+    billing_payment: z.string(),
+    pricing_model: z.string(),
+    deal_type: z.string(),
+  }),
+  quick_read: z.object({
+    whats_solid: z.array(z.string()),
+    whats_concerning: z.array(z.string()),
+    conclusion: z.string(),
   }),
   red_flags: z.array(RedFlagSchema),
-  asks: z.object({
+  negotiation_plan: z.object({
+    leverage_you_have: z.array(z.string()),
+    must_have_asks: z.array(z.string()),
+    nice_to_have_asks: z.array(z.string()),
+    trades_you_can_offer: z.array(z.string()),
+  }),
+  what_to_ask_for: z.object({
     must_have: z.array(z.string()),
     nice_to_have: z.array(z.string()),
   }),
