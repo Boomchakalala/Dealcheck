@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -25,12 +25,12 @@ export default function TrialPage() {
   const [hasTriedBefore, setHasTriedBefore] = useState(false)
 
   // Check if user has tried before
-  useState(() => {
+  useEffect(() => {
     const trialCount = parseInt(localStorage.getItem('dealcheck_trial_count') || '0')
     if (trialCount >= 2) {
       setHasTriedBefore(true)
     }
-  })
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
