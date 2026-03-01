@@ -199,11 +199,6 @@ export default function ChatPage() {
             </div>
             <span className="text-xl font-bold text-slate-900">DealCheck</span>
           </div>
-          <Link href="/login">
-            <Button size="sm" variant="ghost" className="text-slate-600 hover:text-slate-900">
-              Sign in
-            </Button>
-          </Link>
         </div>
       </header>
 
