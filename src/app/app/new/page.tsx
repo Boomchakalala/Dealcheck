@@ -9,7 +9,7 @@ import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { FileUpload } from '@/components/FileUpload'
 import { Card } from '@/components/ui/card'
-import { Loader2, ArrowLeft } from 'lucide-react'
+import { Loader2, CheckCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 export default function NewDealPage() {
@@ -87,7 +87,7 @@ export default function NewDealPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Deal Information */}
-        <Card className="p-6">
+        <Card className="p-6 bg-white border-gray-200">
           <h2 className="text-lg font-semibold mb-4">Deal Information</h2>
 
           <div className="space-y-4">
@@ -146,7 +146,7 @@ export default function NewDealPage() {
         </Card>
 
         {/* Document Upload */}
-        <Card className="p-6">
+        <Card className="p-6 bg-white border-gray-200">
           <h2 className="text-lg font-semibold mb-4">Document</h2>
 
           <div className="space-y-4">
@@ -180,9 +180,10 @@ export default function NewDealPage() {
             </div>
 
             {currentText && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-800">
-                  ✓ Text ready ({currentText.length} characters)
+              <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                <p className="text-sm text-gray-700 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  Text ready ({currentText.length} characters)
                 </p>
               </div>
             )}

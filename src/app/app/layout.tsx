@@ -17,12 +17,12 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+    <div className="min-h-screen bg-white">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/app" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-xl font-bold text-gray-900">
@@ -37,7 +37,7 @@ export default async function AppLayout({
                   type="submit"
                   variant="outline"
                   size="sm"
-                  className="gap-2 border-gray-300"
+                  className="gap-2"
                 >
                   <LogOut className="h-4 w-4" />
                   Sign Out

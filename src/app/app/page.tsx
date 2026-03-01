@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { DealCard } from '@/components/DealCard'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { CheckCircle, Plus } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -48,10 +48,11 @@ export default async function DashboardPage() {
 
       {/* Usage indicator */}
       {profile && (
-        <div className={`p-4 border rounded-xl ${profile.is_admin ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200'}`}>
+        <div className={`p-4 border rounded-xl ${profile.is_admin ? 'bg-gray-50 border-gray-200' : 'bg-gray-50 border-gray-200'}`}>
           {profile.is_admin ? (
-            <p className="text-sm text-emerald-900 font-medium">
-              <span className="font-bold">👑 Admin Account:</span> Unlimited rounds
+            <p className="text-sm text-gray-700 font-medium flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-emerald-600" />
+              <span className="font-bold">Admin Account:</span> Unlimited rounds
             </p>
           ) : (
             <p className="text-sm text-gray-700">
