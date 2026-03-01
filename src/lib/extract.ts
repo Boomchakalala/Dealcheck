@@ -1,74 +1,42 @@
 import Tesseract from 'tesseract.js'
-import PDFParser from 'pdf2json'
 
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const pdfParser = new PDFParser()
-
-    pdfParser.on('pdfParser_dataError', (errData: any) => {
-      console.error('PDF parse error:', errData.parserError)
-      reject(new Error('Failed to read PDF. Please try taking a screenshot of the PDF instead.'))
-    })
-
-    pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
-      try {
-        // Extract text from all pages
-        let fullText = ''
-
-        if (pdfData.Pages) {
-          for (const page of pdfData.Pages) {
-            if (page.Texts) {
-              for (const text of page.Texts) {
-                if (text.R) {
-                  for (const r of text.R) {
-                    if (r.T) {
-                      // Decode URI component and add spaces
-                      fullText += decodeURIComponent(r.T) + ' '
-                    }
-                  }
-                }
-              }
-              fullText += '\n'
-            }
-          }
-        }
-
-        const cleanedText = fullText.trim()
-        console.log(`Extracted ${cleanedText.length} characters from PDF`)
-
-        if (cleanedText.length < 50) {
-          reject(new Error('PDF appears to be empty or contains mostly images. Please try:\n1. Taking a screenshot and pasting it\n2. Copying the text directly from the PDF'))
-          return
-        }
-
-        resolve(cleanedText)
-      } catch (error) {
-        console.error('PDF text extraction error:', error)
-        reject(new Error('Could not extract text from PDF. Please try a screenshot instead.'))
-      }
-    })
-
-    // Parse the buffer
-    pdfParser.parseBuffer(buffer)
-  })
+  // PDF libraries in serverless environments are problematic due to canvas/DOMMatrix dependencies
+  // Guide users to better alternatives
+  throw new Error(
+    '📄 PDF upload isn\'t supported yet.\n\n' +
+    '✅ Instead, please:\n' +
+    '1. Take a screenshot of your PDF (Shift+Cmd+4 on Mac, Win+Shift+S on Windows)\n' +
+    '2. Paste it here with Cmd/Ctrl+V\n' +
+    '3. Or copy and paste the text directly\n\n' +
+    'Screenshot paste works just like ChatGPT!'
+  )
 }
 
 export async function extractTextFromImage(buffer: Buffer): Promise<string> {
   try {
-    console.log('Starting OCR extraction...')
+    console.log('🔍 Starting OCR extraction...')
+
     const { data: { text } } = await Tesseract.recognize(buffer, 'eng', {
       logger: (m) => {
         if (m.status === 'recognizing text') {
-          console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`)
+          console.log(`📝 OCR Progress: ${Math.round(m.progress * 100)}%`)
         }
       }
     })
 
     const cleanedText = text.trim()
-    console.log(`Extracted ${cleanedText.length} characters from image`)
+    console.log(`✅ Extracted ${cleanedText.length} characters from image`)
 
-    if (cleanedText.length < 50) {
-      throw new Error('Could not extract enough text from image. Please ensure the image is clear and contains readable text.')
+    if (cleanedText.length < 30) {
+      throw new Error(
+        'Could not extract enough text from the image.\n\n' +
+        'Tips:\n' +
+        '• Make sure the image is clear and high resolution\n' +
+        '• Ensure the text is readable\n' +
+        '• Try a screenshot instead of a photo\n' +
+        '• Or paste the text directly'
+      )
     }
 
     return cleanedText
@@ -77,7 +45,13 @@ export async function extractTextFromImage(buffer: Buffer): Promise<string> {
       throw error
     }
     console.error('Image OCR error:', error)
-    throw new Error('Failed to read text from image. Please ensure the image is clear and try again.')
+    throw new Error(
+      'Failed to read text from image.\n\n' +
+      'Please ensure:\n' +
+      '• The image is clear and readable\n' +
+      '• Text is in English\n' +
+      '• The file isn\'t corrupted'
+    )
   }
 }
 
@@ -85,17 +59,22 @@ export async function extractText(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer())
   const fileType = file.type
 
-  console.log(`Processing file: ${file.name} (${fileType}, ${buffer.length} bytes)`)
+  console.log(`📎 Processing: ${file.name} (${fileType}, ${Math.round(buffer.length / 1024)}KB)`)
 
-  // Image extraction (OCR)
+  // Image extraction (OCR) - RECOMMENDED METHOD
   if (fileType.startsWith('image/')) {
     return extractTextFromImage(buffer)
   }
 
-  // PDF extraction
+  // PDF - guide to screenshot instead
   if (fileType === 'application/pdf') {
     return extractTextFromPDF(buffer)
   }
 
-  throw new Error('Unsupported file type. Please upload a PDF or image (PNG, JPG, WEBP).')
+  throw new Error(
+    'Unsupported file type.\n\n' +
+    'Supported formats:\n' +
+    '• Screenshots (PNG, JPG, WEBP) - paste with Cmd/Ctrl+V\n' +
+    '• Or paste text directly'
+  )
 }
