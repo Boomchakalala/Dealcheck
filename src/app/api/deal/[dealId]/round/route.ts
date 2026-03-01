@@ -46,7 +46,7 @@ export async function POST(
       .select('*')
       .eq('id', dealId)
       .eq('user_id', user.id)
-      .single()
+      .single() as { data: any | null }
 
     if (!deal) {
       return NextResponse.json({ error: 'Deal not found' }, { status: 404 })
@@ -58,7 +58,7 @@ export async function POST(
       .select('*')
       .eq('deal_id', dealId)
       .order('round_number', { ascending: false })
-      .limit(1)
+      .limit(1) as { data: any[] | null }
 
     const lastRound = previousRounds?.[0]
     const nextRoundNumber = lastRound ? lastRound.round_number + 1 : 1
