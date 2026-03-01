@@ -83,7 +83,10 @@ export default function ChatPage() {
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
 
-    // REMOVED: No more trial limit checks - app is free to use
+    if (hasTriedBefore) {
+      router.push('/login')
+      return
+    }
 
     if (!input.trim()) {
       setError('Please enter or upload a quote')
@@ -123,11 +126,15 @@ export default function ChatPage() {
       setInput('')
       setUploadedFileName(null)
 
-      // Update trial count (for analytics only, no limits)
+      // Update trial count
       const currentCount = parseInt(localStorage.getItem('dealcheck_trial_count') || '0')
       const newCount = currentCount + 1
       localStorage.setItem('dealcheck_trial_count', newCount.toString())
       setTrialCount(newCount)
+
+      if (newCount >= 2) {
+        setHasTriedBefore(true)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
@@ -215,17 +222,17 @@ export default function ChatPage() {
             </div>
           ) : (
             <>
-              {/* Usage banner - only show if over 100 analyses */}
-              {hasTriedBefore && (
-                <div className="mt-8 mb-8 p-5 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-emerald-900 leading-relaxed">
-                      You've done {trialCount} analyses! Want to save your work? <Link href="/login" className="underline font-semibold">Create a free account</Link>
-                    </div>
+              {/* Usage banner */}
+              <div className="mt-8 mb-8 p-5 bg-emerald-50 border border-emerald-200 rounded-2xl">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-emerald-900 leading-relaxed">
+                    {hasTriedBefore
+                      ? "Analysis complete! You've used your free tries. Sign up to save and get 2 more free rounds."
+                      : `Round ${rounds.length} complete! You have ${2 - trialCount} more free ${2 - trialCount === 1 ? 'analysis' : 'analyses'} remaining.`}
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* Stacked rounds */}
               <div className="space-y-12 py-8">
@@ -243,6 +250,25 @@ export default function ChatPage() {
               </div>
 
               <div ref={roundsEndRef} />
+
+              {hasTriedBefore && (
+                <div className="mt-12 mb-12 text-center">
+                  <div className="bg-white border border-slate-200 rounded-2xl p-10 shadow-lg">
+                    <h3 className="text-3xl font-bold text-slate-900 mb-3">
+                      Ready to save your work?
+                    </h3>
+                    <p className="text-lg text-slate-600 mb-8 max-w-lg mx-auto leading-relaxed">
+                      Sign up to save your analyses and get 2 more free rounds
+                    </p>
+                    <Link href="/login">
+                      <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 shadow-md">
+                        Sign Up Now
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -251,7 +277,18 @@ export default function ChatPage() {
       {/* Fixed input at bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl">
+          {hasTriedBefore ? (
+            <div className="text-center py-4">
+              <p className="text-slate-600 mb-4">You&apos;ve used your free tries</p>
+              <Link href="/login">
+                <Button className="bg-emerald-600 hover:bg-emerald-700 shadow-md">
+                  Sign Up to Continue
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl">
               <div
                 className="p-5"
                 onDragOver={handleDragOver}
@@ -355,7 +392,7 @@ export default function ChatPage() {
                 </Button>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
