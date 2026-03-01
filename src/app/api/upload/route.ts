@@ -16,14 +16,10 @@ export async function POST(request: Request) {
     }
 
     // Validate file type
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        {
-          error: file.type === 'application/pdf'
-            ? '📄 PDF upload isn\'t supported yet.\n\n✅ Please take a screenshot of your PDF and paste it here (Cmd/Ctrl+V) - works just like ChatGPT!'
-            : 'Only images are supported. Please paste a screenshot (Cmd/Ctrl+V) or upload PNG/JPG files.'
-        },
+        { error: 'Invalid file type. Only PDFs and images (PNG, JPG, WEBP) are supported.' },
         { status: 400 }
       )
     }

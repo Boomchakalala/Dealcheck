@@ -104,7 +104,7 @@ export function FileUpload({ onTextExtracted }: FileUploadProps) {
                 <span className="font-semibold">Click to upload</span> or drag and drop
               </p>
               <p className="text-xs text-gray-500">
-                PNG, JPG, or WEBP screenshots (max 10MB)
+                PDF, PNG, JPG, or WEBP (max 10MB)
               </p>
             </>
           )}
@@ -113,7 +113,7 @@ export function FileUpload({ onTextExtracted }: FileUploadProps) {
           ref={fileInputRef}
           type="file"
           className="hidden"
-          accept=".png,.jpg,.jpeg,.webp,image/*"
+          accept=".pdf,.png,.jpg,.jpeg,.webp,image/*,application/pdf"
           onChange={handleFileSelect}
           disabled={isProcessing}
         />
