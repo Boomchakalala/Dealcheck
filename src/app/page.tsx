@@ -222,7 +222,7 @@ export default function ChatPage() {
         <div className="max-w-4xl mx-auto px-4 py-4">
           {hasTriedBefore ? (
             <div className="text-center py-6">
-              <p className="text-gray-600 mb-4">You've used your free tries</p>
+              <p className="text-gray-600 mb-4">You&apos;ve used your free tries</p>
               <Link href="/login">
                 <Button className="bg-emerald-600 hover:bg-emerald-700">
                   Sign Up to Continue
