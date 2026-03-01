@@ -5,8 +5,9 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: '10mb',
     },
-    serverComponentsExternalPackages: ['pdf-parse', 'canvas'],
   },
+  // Exclude pdf-parse from bundling to prevent test code execution
+  serverExternalPackages: ['pdf-parse', 'canvas'],
 };
 
 export default nextConfig;
