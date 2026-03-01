@@ -28,13 +28,7 @@ export async function POST(
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    // Check usage limit (2 free rounds total) - skip for admins
-    if (!profile.is_admin && profile.plan === 'free' && profile.usage_count >= 2) {
-      return NextResponse.json(
-        { error: 'Free usage limit reached. Upgrade to continue.' },
-        { status: 403 }
-      )
-    }
+    // Usage limits removed — unlimited for all users
 
     // Parse request body
     const body = await request.json()
