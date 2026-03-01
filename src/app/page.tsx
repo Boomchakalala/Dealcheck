@@ -24,6 +24,7 @@ export default function ChatPage() {
   const [hasTriedBefore, setHasTriedBefore] = useState(false)
   const [trialCount, setTrialCount] = useState(0)
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const roundsEndRef = useRef<HTMLDivElement>(null)
@@ -163,6 +164,30 @@ export default function ChatPage() {
     }
   }
 
+  // Handle drag and drop
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+
+    const files = e.dataTransfer?.files
+    if (files && files.length > 0) {
+      await handleFileUpload(files[0])
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
@@ -268,7 +293,12 @@ export default function ChatPage() {
             </div>
           ) : (
             <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl">
-              <div className="p-5">
+              <div
+                className="p-5"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
                 {error && (
                   <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-800 flex items-start gap-2">
                     <X className="w-5 h-5 flex-shrink-0 mt-0.5" />
@@ -289,6 +319,12 @@ export default function ChatPage() {
                     >
                       <X className="w-4 h-4" />
                     </button>
+                  </div>
+                )}
+
+                {isDragging && (
+                  <div className="mb-3 p-4 bg-emerald-50 border-2 border-dashed border-emerald-400 rounded-xl text-center text-emerald-700">
+                    Drop your file here
                   </div>
                 )}
 
