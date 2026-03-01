@@ -243,25 +243,6 @@ export default function ChatPage() {
               </div>
 
               <div ref={roundsEndRef} />
-
-              {hasTriedBefore && (
-                <div className="mt-12 mb-12 text-center">
-                  <div className="bg-white border border-slate-200 rounded-2xl p-10 shadow-lg">
-                    <h3 className="text-3xl font-bold text-slate-900 mb-3">
-                      Ready to save your work?
-                    </h3>
-                    <p className="text-lg text-slate-600 mb-8 max-w-lg mx-auto leading-relaxed">
-                      Sign up to save your analyses and get 2 more free rounds
-                    </p>
-                    <Link href="/login">
-                      <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 shadow-md">
-                        Sign Up Now
-                        <ArrowRight className="w-5 h-5 ml-2" />
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              )}
             </>
           )}
         </div>
@@ -270,18 +251,7 @@ export default function ChatPage() {
       {/* Fixed input at bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {hasTriedBefore ? (
-            <div className="text-center py-4">
-              <p className="text-slate-600 mb-4">You&apos;ve used your free tries</p>
-              <Link href="/login">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 shadow-md">
-                  Sign Up to Continue
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl">
+          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl">
               <div
                 className="p-5"
                 onDragOver={handleDragOver}
@@ -385,7 +355,7 @@ export default function ChatPage() {
                 </Button>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
