@@ -83,10 +83,7 @@ export default function ChatPage() {
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault()
 
-    if (hasTriedBefore) {
-      router.push('/login')
-      return
-    }
+    // REMOVED: No more trial limit checks - app is free to use
 
     if (!input.trim()) {
       setError('Please enter or upload a quote')
@@ -126,15 +123,11 @@ export default function ChatPage() {
       setInput('')
       setUploadedFileName(null)
 
-      // Update trial count
+      // Update trial count (for analytics only, no limits)
       const currentCount = parseInt(localStorage.getItem('dealcheck_trial_count') || '0')
       const newCount = currentCount + 1
       localStorage.setItem('dealcheck_trial_count', newCount.toString())
       setTrialCount(newCount)
-
-      if (newCount >= 2) {
-        setHasTriedBefore(true)
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
@@ -222,17 +215,17 @@ export default function ChatPage() {
             </div>
           ) : (
             <>
-              {/* Usage banner */}
-              <div className="mt-8 mb-8 p-5 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-emerald-900 leading-relaxed">
-                    {hasTriedBefore
-                      ? "Analysis complete! You've used your free tries. Sign up to save and get 2 more free rounds."
-                      : `Round ${rounds.length} complete! You have ${2 - trialCount} more free ${2 - trialCount === 1 ? 'analysis' : 'analyses'} remaining.`}
+              {/* Usage banner - only show if over 100 analyses */}
+              {hasTriedBefore && (
+                <div className="mt-8 mb-8 p-5 bg-emerald-50 border border-emerald-200 rounded-2xl">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-emerald-900 leading-relaxed">
+                      You've done {trialCount} analyses! Want to save your work? <Link href="/login" className="underline font-semibold">Create a free account</Link>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Stacked rounds */}
               <div className="space-y-12 py-8">
