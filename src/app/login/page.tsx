@@ -3,10 +3,9 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2, CheckCircle } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
 export default function LoginPage() {
@@ -34,18 +33,11 @@ export default function LoginPage() {
             emailRedirectTo: `${window.location.origin}/app`,
           },
         })
-
         if (error) throw error
-
-        setMessage('Check your email for the confirmation link!')
+        setMessage('Check your email for the confirmation link.')
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
-
         router.push('/app')
         router.refresh()
       }
@@ -59,113 +51,113 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-xl shadow-xl border border-gray-200 p-8">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold text-gray-900">DealCheck</h1>
-            </div>
-            <p className="text-gray-600">Clarity before commitment</p>
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Header */}
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 h-14 flex items-center justify-between">
+          <Link href="/" className="text-base font-semibold text-slate-900 tracking-tight hover:text-slate-700 transition-colors">
+            DealCheck
+          </Link>
+          <Link href="/pricing" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
+            Pricing
+          </Link>
+        </div>
+      </header>
+
+      <main className="flex-1 flex items-center justify-center px-5 py-16">
+        <div className="w-full max-w-sm">
+          <div className="mb-10">
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">
+              {isSignUp ? 'Create your account' : 'Sign in to DealCheck'}
+            </h1>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              {isSignUp
+                ? 'Save your deal analyses and track negotiations over time.'
+                : 'Access your saved deals and continue where you left off.'}
+            </p>
           </div>
 
           <form onSubmit={handleAuth} className="space-y-4">
             <div>
-              <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium text-slate-700">Email</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder="you@company.com"
                 required
                 disabled={loading}
-                className="mt-1"
+                className="mt-1.5"
               />
             </div>
 
             <div>
-              <Label htmlFor="password" className="text-gray-700 font-medium">Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium text-slate-700">Password</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Min. 6 characters"
                 required
                 disabled={loading}
                 minLength={6}
-                className="mt-1"
+                className="mt-1.5"
               />
             </div>
 
             {error && (
-              <div className="p-3 text-sm text-red-800 bg-red-50 rounded-lg border border-red-200">
+              <div className="py-3 px-4 text-sm text-red-700 bg-red-50 rounded-lg border border-red-200">
                 {error}
               </div>
             )}
 
             {message && (
-              <div className="p-3 text-sm text-emerald-800 bg-emerald-50 rounded-lg border border-emerald-200">
+              <div className="py-3 px-4 text-sm text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200">
                 {message}
               </div>
             )}
 
-            <Button
+            <button
               type="submit"
-              className="w-full bg-emerald-600 hover:bg-emerald-700"
+              className="w-full px-6 py-3 text-sm font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               disabled={loading}
             >
               {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isSignUp ? 'Signing up...' : 'Signing in...'}
-                </>
+                <><Loader2 className="w-4 h-4 animate-spin" /> {isSignUp ? 'Creating account...' : 'Signing in...'}</>
               ) : (
-                <>{isSignUp ? 'Sign Up' : 'Sign In'}</>
+                <>{isSignUp ? 'Create account' : 'Sign in'}</>
               )}
-            </Button>
+            </button>
           </form>
 
-          <div className="mt-4 text-center">
+          <div className="mt-6 text-center">
             <button
-              onClick={() => {
-                setIsSignUp(!isSignUp)
-                setError(null)
-                setMessage(null)
-              }}
-              className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+              onClick={() => { setIsSignUp(!isSignUp); setError(null); setMessage(null) }}
+              className="text-sm text-slate-500 hover:text-slate-900 transition-colors"
               disabled={loading}
             >
-              {isSignUp
-                ? 'Already have an account? Sign in'
-                : "Don't have an account? Sign up"}
+              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             </button>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
-            <p>
+          <div className="mt-8 pt-6 border-t border-slate-200 text-center">
+            <p className="text-xs text-slate-400 leading-relaxed">
               By signing in, you agree to our{' '}
-              <Link href="/terms" className="text-emerald-600 hover:text-emerald-700">
-                Terms
-              </Link>{' '}
-              and{' '}
-              <Link href="/privacy" className="text-emerald-600 hover:text-emerald-700">
-                Privacy Policy
-              </Link>
+              <Link href="/terms" className="text-slate-500 underline underline-offset-2 decoration-slate-300 hover:text-slate-700 transition-colors">Terms</Link>
+              {' '}and{' '}
+              <Link href="/privacy" className="text-slate-500 underline underline-offset-2 decoration-slate-300 hover:text-slate-700 transition-colors">Privacy Policy</Link>.
             </p>
           </div>
-        </div>
 
-        <div className="mt-6 text-center">
-          <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
-            ← Back to homepage
-          </Link>
+          <div className="mt-6 text-center">
+            <Link href="/" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
+              Back to homepage
+            </Link>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
