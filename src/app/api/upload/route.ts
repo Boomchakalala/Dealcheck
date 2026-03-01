@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { extractText } from '@/lib/extract'
 
+// CRITICAL: pdf-parse requires Node.js runtime
+export const runtime = 'nodejs'
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData()
