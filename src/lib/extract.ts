@@ -1,8 +1,9 @@
-import pdf from 'pdf-parse'
 import Tesseract from 'tesseract.js'
 
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
+    // Dynamic import of pdf-parse to handle ESM issues
+    const pdf = (await import('pdf-parse')).default
     const data = await pdf(buffer)
     const text = data.text.trim()
 
