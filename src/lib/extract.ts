@@ -1,4 +1,4 @@
-import pdf from 'pdf-parse'
+import pdf from 'pdf-parse/lib/pdf-parse.js'
 import Tesseract from 'tesseract.js'
 
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
@@ -12,10 +12,11 @@ export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
 
     return text
   } catch (error) {
+    console.error('PDF extraction error:', error)
     if (error instanceof Error && error.message.includes('insufficient')) {
       throw error
     }
-    throw new Error('Failed to extract text from PDF. Please try uploading a screenshot or pasting the text manually.')
+    throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 
