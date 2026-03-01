@@ -193,11 +193,6 @@ export default function ChatPage() {
             </div>
             <span className="text-xl font-bold text-slate-900">DealCheck</span>
           </div>
-          <Link href="/login">
-            <Button size="sm" variant="ghost" className="text-slate-600 hover:text-slate-900">
-              Sign in
-            </Button>
-          </Link>
         </div>
       </header>
 
@@ -257,12 +252,12 @@ export default function ChatPage() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl">
-            <div
-              className="p-5"
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
+              <div
+                className="p-5"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
                 {error && (
                   <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-800 flex items-start gap-2">
                     <X className="w-5 h-5 flex-shrink-0 mt-0.5" />
