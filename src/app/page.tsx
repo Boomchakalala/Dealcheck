@@ -147,12 +147,12 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
               <CheckCircle className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">DealCheck</span>
@@ -185,7 +185,7 @@ export default function ChatPage() {
           ) : (
             <>
               {/* Usage banner */}
-              <div className="mt-8 mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-900">
+              <div className="mt-8 mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700">
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                   <div>
@@ -259,15 +259,15 @@ export default function ChatPage() {
                 )}
 
                 {uploadedFileName && (
-                  <div className="mb-3 flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm">
+                  <div className="mb-3 flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm">
                     <Paperclip className="w-4 h-4 text-emerald-600" />
-                    <span className="flex-1 text-emerald-900 font-medium">{uploadedFileName}</span>
+                    <span className="flex-1 text-gray-900 font-medium">{uploadedFileName}</span>
                     <button
                       onClick={() => {
                         setUploadedFileName(null)
                         setInput('')
                       }}
-                      className="text-emerald-600 hover:text-emerald-700"
+                      className="text-gray-600 hover:text-gray-900"
                     >
                       <X className="w-4 h-4" />
                     </button>
