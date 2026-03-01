@@ -183,8 +183,8 @@ export default function ChatPage() {
               {/* Usage banner */}
               <div className="mt-6 mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-900">
                 {hasTriedBefore
-                  ? "✓ You've used your free tries. Sign up to save and get 2 more free rounds."
-                  : `✓ Round ${rounds.length} complete! You have ${2 - trialCount} more free ${2 - trialCount === 1 ? 'try' : 'tries'}.`}
+                  ? "Analysis complete! You've used your free tries. Sign up to save and get 2 more free rounds."
+                  : `Round ${rounds.length} complete! You have ${2 - trialCount} more free ${2 - trialCount === 1 ? 'try' : 'tries'}.`}
               </div>
 
               {/* Stacked rounds */}
