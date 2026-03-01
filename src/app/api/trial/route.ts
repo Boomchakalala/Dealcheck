@@ -6,7 +6,7 @@ import { DealOutputSchema } from '@/lib/schemas'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { extractedText, dealType, goal, notes } = body
+    const { extractedText, dealType, goal, notes, previousOutput } = body
 
     if (!extractedText || extractedText.length < 10) {
       return NextResponse.json(
@@ -20,7 +20,8 @@ export async function POST(request: Request) {
       extractedText,
       dealType || 'New',
       goal,
-      notes
+      notes,
+      previousOutput // Pass previous round output for context
     )
 
     // Validate output
