@@ -1,15 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import Link from 'next/link'
-import { User, CreditCard, BarChart3 } from 'lucide-react'
+import { User, CreditCard, Shield } from 'lucide-react'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
-
   const { data: { user } } = await supabase.auth.getUser()
+
   if (!user) {
     redirect('/login')
   }
@@ -21,82 +17,96 @@ export default async function SettingsPage() {
     .single()
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your account and subscription</p>
+    <div className="max-w-2xl">
+      <div className="mb-10">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">Settings</h1>
+        <p className="text-sm text-slate-500">Manage your account and preferences.</p>
       </div>
 
-      {/* Profile Info */}
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <User className="w-5 h-5 text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Profile</h2>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Email</p>
-            <p className="text-gray-900">{user.email}</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Account created</p>
-            <p className="text-gray-900">{new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-          </div>
-        </div>
-      </Card>
-
-      {/* Plan */}
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <CreditCard className="w-5 h-5 text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Plan</h2>
-        </div>
-
-        <div className="flex items-center gap-3 mb-4">
-          <Badge variant={profile?.plan === 'pro' ? 'default' : 'secondary'}>
-            {profile?.plan === 'pro' ? 'Pro' : 'Free'}
-          </Badge>
-          {profile?.is_admin && (
-            <Badge variant="default">Admin</Badge>
-          )}
-        </div>
-
-        {profile?.plan !== 'pro' && !profile?.is_admin && (
-          <div className="mt-4">
-            <Link href="/pricing">
-              <Button className="bg-emerald-600 hover:bg-emerald-700">
-                Upgrade to Pro
-              </Button>
-            </Link>
-          </div>
-        )}
-      </Card>
-
-      {/* Usage */}
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <BarChart3 className="w-5 h-5 text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Usage</h2>
-        </div>
-
-        <div>
-          <p className="text-sm font-medium text-gray-500 mb-1">Analysis rounds used</p>
-          {profile?.is_admin ? (
-            <p className="text-gray-900">{profile.usage_count} rounds (unlimited)</p>
-          ) : (
+      <div className="space-y-6">
+        {/* Profile */}
+        <div className="rounded-2xl border border-slate-200/60 bg-white p-7 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-sm">
+              <User className="w-5 h-5 text-white" />
+            </div>
             <div>
-              <p className="text-gray-900">{profile?.usage_count || 0} / 2 rounds</p>
-              <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-emerald-600 h-2 rounded-full transition-all"
-                  style={{ width: `${Math.min(((profile?.usage_count || 0) / 2) * 100, 100)}%` }}
-                />
-              </div>
+              <h2 className="text-base font-semibold text-slate-900">Profile</h2>
+              <p className="text-xs text-slate-500">Your account details</p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between py-3 border-b border-slate-100">
+              <span className="text-sm text-slate-500">Email</span>
+              <span className="text-sm font-medium text-slate-900">{user.email}</span>
+            </div>
+            <div className="flex items-center justify-between py-3 border-b border-slate-100">
+              <span className="text-sm text-slate-500">Member since</span>
+              <span className="text-sm font-medium text-slate-900">
+                {new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-3">
+              <span className="text-sm text-slate-500">Analyses run</span>
+              <span className="text-sm font-medium text-slate-900">{profile?.usage_count || 0}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Plan */}
+        <div className="rounded-2xl border border-slate-200/60 bg-white p-7 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-sm">
+              <CreditCard className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-slate-900">Plan</h2>
+              <p className="text-xs text-slate-500">Your current subscription</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-between py-3 border-b border-slate-100">
+            <span className="text-sm text-slate-500">Current plan</span>
+            <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold">
+              {(profile?.plan || 'free').toUpperCase()}
+            </span>
+          </div>
+          <div className="flex items-center justify-between py-3">
+            <span className="text-sm text-slate-500">Analysis rounds</span>
+            <span className="text-sm font-medium text-emerald-700">Unlimited</span>
+          </div>
+          {profile?.plan === 'free' && (
+            <div className="mt-6 rounded-xl bg-gradient-to-br from-emerald-50/50 to-teal-50/30 border border-emerald-200/60 p-5">
+              <p className="text-sm text-slate-700 mb-3">
+                Pro features coming soon: PDF export, team seats, and priority analysis speed.
+              </p>
+              <a href="/pricing" className="inline-flex items-center text-sm font-semibold text-emerald-700 hover:text-emerald-800 transition-colors">
+                View pricing &rarr;
+              </a>
             </div>
           )}
         </div>
-      </Card>
+
+        {/* Security */}
+        <div className="rounded-2xl border border-slate-200/60 bg-white p-7 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+              <Shield className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-slate-900">Security</h2>
+              <p className="text-xs text-slate-500">Account security settings</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-between py-3 border-b border-slate-100">
+            <span className="text-sm text-slate-500">Authentication</span>
+            <span className="text-sm font-medium text-slate-900">Email + Password</span>
+          </div>
+          <div className="flex items-center justify-between py-3">
+            <span className="text-sm text-slate-500">Data protection</span>
+            <span className="text-sm font-medium text-slate-900">TLS + RLS</span>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
