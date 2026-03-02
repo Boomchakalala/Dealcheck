@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Header } from '@/components/Header'
+import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { HelpCircle, Mail } from 'lucide-react'
 
 export default function HelpPage() {
@@ -17,7 +17,7 @@ export default function HelpPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <Header variant="public" />
+      <UnifiedHeader variant="public" />
 
       <main className="flex-1">
         <div className="relative overflow-hidden">
