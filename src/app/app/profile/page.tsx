@@ -37,13 +37,7 @@ export default async function ProfilePage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/app">
-          <Button variant="outline" size="sm" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-        </Link>
+      <div>
         <h1 className="text-2xl font-bold text-slate-900">Profile</h1>
       </div>
 
