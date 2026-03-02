@@ -2,7 +2,7 @@
 
 import { type DealOutput } from '@/types'
 import { CopyButton } from './CopyButton'
-import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, X, Copy, Mail } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, X, Mail } from 'lucide-react'
 import { useState } from 'react'
 
 interface OutputDisplayProps {
@@ -116,108 +116,6 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
         </div>
       </div>
 
-      {/* EMAILS - Main Feature Section */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-4">
-          <Mail className="w-5 h-5 text-emerald-600" />
-          <h2 className="text-xl font-bold text-slate-900">Ready-to-Send Emails</h2>
-        </div>
-        <p className="text-sm text-slate-600 mb-6">Click to view full email and copy to your clipboard</p>
-
-        <div className="space-y-4">
-          {/* Draft 1 - Neutral */}
-          <button
-            onClick={() => setSelectedEmail('neutral')}
-            className="w-full bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-300 hover:shadow-md transition-all text-left group"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-bold text-blue-900">Draft 1 — Neutral</span>
-                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
-                    Start here
-                  </span>
-                </div>
-                <p className="text-sm font-semibold text-slate-900 mb-2">{output.email_drafts.neutral.subject}</p>
-                <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">{output.email_drafts.neutral.body.substring(0, 150)}...</p>
-              </div>
-              <div className="ml-4 flex items-center gap-2 text-blue-600">
-                <span className="text-sm font-medium">Read & Copy</span>
-                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </button>
-
-          {/* Draft 2 - Firm */}
-          <button
-            onClick={() => setSelectedEmail('firm')}
-            className="w-full bg-gradient-to-br from-amber-50 to-white border-2 border-amber-200 rounded-xl p-6 hover:border-amber-300 hover:shadow-md transition-all text-left group"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-bold text-amber-900">Draft 2 — Firm</span>
-                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
-                    Follow-up
-                  </span>
-                </div>
-                <p className="text-sm font-semibold text-slate-900 mb-2">{output.email_drafts.firm.subject}</p>
-                <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">{output.email_drafts.firm.body.substring(0, 150)}...</p>
-              </div>
-              <div className="ml-4 flex items-center gap-2 text-amber-600">
-                <span className="text-sm font-medium">Read & Copy</span>
-                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </button>
-
-          {/* Draft 3 - Final Push */}
-          <button
-            onClick={() => setSelectedEmail('final')}
-            className="w-full bg-gradient-to-br from-red-50 to-white border-2 border-red-200 rounded-xl p-6 hover:border-red-300 hover:shadow-md transition-all text-left group"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-bold text-red-900">Draft 3 — Final Push</span>
-                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
-                    Last resort
-                  </span>
-                </div>
-                <p className="text-sm font-semibold text-slate-900 mb-2">{output.email_drafts.final_push.subject}</p>
-                <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">{output.email_drafts.final_push.body.substring(0, 150)}...</p>
-              </div>
-              <div className="ml-4 flex items-center gap-2 text-red-600">
-                <span className="text-sm font-medium">Read & Copy</span>
-                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      {/* Priority Asks */}
-      <div className="mb-6 bg-white rounded-xl border-2 border-emerald-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-slate-900">Priority Asks</h2>
-          <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">Must-have</span>
-        </div>
-
-        <div className="space-y-3">
-          {output.what_to_ask_for.must_have.map((ask, idx) => (
-            <div key={idx} className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-              <p className="text-sm text-slate-700">{ask}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Summary & Leverage */}
       <div className="mb-6 bg-white rounded-xl border border-slate-200 overflow-hidden">
         <button
@@ -304,6 +202,108 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
           </div>
         </div>
       )}
+
+      {/* Priority Asks */}
+      <div className="mb-6 bg-white rounded-xl border-2 border-emerald-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-slate-900">Priority Asks</h2>
+          <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">Must-have</span>
+        </div>
+
+        <div className="space-y-3">
+          {output.what_to_ask_for.must_have.map((ask, idx) => (
+            <div key={idx} className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+              <p className="text-sm text-slate-700">{ask}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* EMAILS - Bigger and more prominent */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Mail className="w-5 h-5 text-emerald-600" />
+          <h2 className="text-xl font-bold text-slate-900">Ready-to-Send Emails</h2>
+        </div>
+        <p className="text-sm text-slate-600 mb-5">Click to view full email and copy to your clipboard</p>
+
+        <div className="space-y-4">
+          {/* Draft 1 - Neutral */}
+          <button
+            onClick={() => setSelectedEmail('neutral')}
+            className="w-full bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all text-left group"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-bold text-blue-900">Draft 1 — Neutral</span>
+                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                    Start here
+                  </span>
+                </div>
+                <p className="text-base font-semibold text-slate-900 mb-2">{output.email_drafts.neutral.subject}</p>
+                <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">{output.email_drafts.neutral.body.substring(0, 180)}...</p>
+              </div>
+              <div className="ml-4 flex items-center gap-2 text-blue-600 flex-shrink-0">
+                <span className="text-sm font-medium">View</span>
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </button>
+
+          {/* Draft 2 - Firm */}
+          <button
+            onClick={() => setSelectedEmail('firm')}
+            className="w-full bg-gradient-to-br from-amber-50 to-white border-2 border-amber-200 rounded-xl p-5 hover:border-amber-300 hover:shadow-md transition-all text-left group"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-bold text-amber-900">Draft 2 — Firm</span>
+                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
+                    Follow-up
+                  </span>
+                </div>
+                <p className="text-base font-semibold text-slate-900 mb-2">{output.email_drafts.firm.subject}</p>
+                <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">{output.email_drafts.firm.body.substring(0, 180)}...</p>
+              </div>
+              <div className="ml-4 flex items-center gap-2 text-amber-600 flex-shrink-0">
+                <span className="text-sm font-medium">View</span>
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </button>
+
+          {/* Draft 3 - Final Push */}
+          <button
+            onClick={() => setSelectedEmail('final')}
+            className="w-full bg-gradient-to-br from-red-50 to-white border-2 border-red-200 rounded-xl p-5 hover:border-red-300 hover:shadow-md transition-all text-left group"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-bold text-red-900">Draft 3 — Final Push</span>
+                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
+                    Last resort
+                  </span>
+                </div>
+                <p className="text-base font-semibold text-slate-900 mb-2">{output.email_drafts.final_push.subject}</p>
+                <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">{output.email_drafts.final_push.body.substring(0, 180)}...</p>
+              </div>
+              <div className="ml-4 flex items-center gap-2 text-red-600 flex-shrink-0">
+                <span className="text-sm font-medium">View</span>
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
 
       {/* Conclusion */}
       <div className="mb-6 bg-white rounded-xl border-2 border-emerald-200 p-6">
