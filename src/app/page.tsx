@@ -138,7 +138,7 @@ export default function LandingPage() {
           </p>
 
           {/* Savings Banner */}
-          <div className="max-w-2xl mx-auto mb-12">
+          <div className="max-w-2xl mx-auto">
             <div className="bg-gradient-to-r from-emerald-50 via-emerald-100/50 to-emerald-50 border-2 border-emerald-300 rounded-2xl p-8 text-center">
               <div className="flex items-center justify-center gap-3 mb-3">
                 <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,14 +150,6 @@ export default function LandingPage() {
                 Depending on category and negotiation leverage
               </p>
             </div>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-12 opacity-50">
-            {['Acme', 'Nexis', 'Pioneer', 'Globex'].map((company) => (
-              <div key={company} className="text-xl font-bold text-slate-400">
-                {company}
-              </div>
-            ))}
           </div>
         </div>
       </section>
