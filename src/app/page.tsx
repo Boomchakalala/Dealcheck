@@ -227,7 +227,11 @@ export default function LandingPage() {
                 {/* Better visual: Price comparison bars */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="text-3xl">💰</div>
+                    <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs text-slate-600">Their quote</span>
@@ -239,10 +243,14 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="text-3xl">📊</div>
+                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-slate-600">Market rate</span>
+                        <span className="text-xs text-slate-600">Fair range</span>
                         <span className="text-xs font-bold text-emerald-600">$120K</span>
                       </div>
                       <div className="h-3 bg-emerald-100 rounded-full overflow-hidden">
@@ -263,19 +271,26 @@ export default function LandingPage() {
                 {/* Better visual: Document with highlights */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="text-3xl">📄</div>
+                    <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    </div>
                     <div className="flex-1 space-y-2">
                       <div className="bg-yellow-100 border-l-4 border-yellow-500 px-3 py-2 rounded">
                         <div className="h-2 bg-yellow-400 rounded w-3/4"></div>
                       </div>
                       <div className="text-xs text-slate-600 flex items-start gap-2">
-                        <span className="text-yellow-600">⚠️</span>
                         <span>Auto-renewal clause needs attention</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="text-3xl">✅</div>
+                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
                     <div className="flex-1 space-y-2">
                       <div className="bg-emerald-100 border-l-4 border-emerald-500 px-3 py-2 rounded">
                         <div className="h-2 bg-emerald-400 rounded w-2/3"></div>
@@ -295,11 +310,19 @@ export default function LandingPage() {
                 {/* Better visual: Email preview */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="text-3xl">✉️</div>
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
                     <div className="flex-1">
                       <div className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs">📧</div>
+                          <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center">
+                            <svg className="w-3 h-3 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
                           <div className="flex-1 space-y-1">
                             <div className="h-2 bg-slate-300 rounded w-2/3"></div>
                             <div className="h-1.5 bg-slate-200 rounded w-1/2"></div>
@@ -329,21 +352,33 @@ export default function LandingPage() {
                 {/* Better visual: Email tone options */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl">😊</div>
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
                     <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
                       <div className="text-xs font-medium text-blue-700">Neutral approach</div>
                       <div className="text-[10px] text-blue-600 mt-0.5">Professional & friendly</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl">💪</div>
+                    <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
                     <div className="flex-1 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
                       <div className="text-xs font-medium text-orange-700">Firm response</div>
                       <div className="text-[10px] text-orange-600 mt-0.5">Direct & assertive</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl">🎯</div>
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
                     <div className="flex-1 bg-emerald-50 border border-emerald-300 rounded-lg px-3 py-2">
                       <div className="text-xs font-medium text-emerald-700">Final push</div>
                       <div className="text-[10px] text-emerald-600 mt-0.5">Time-sensitive & compelling</div>
@@ -358,13 +393,13 @@ export default function LandingPage() {
 
       {/* See DealCheck in Action */}
       <section className="py-20 bg-white border-y border-slate-200">
-        <div className="max-w-4xl mx-auto px-5 sm:px-8">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-12">
             See DealCheck in Action
           </h2>
-          <div className="flex flex-col md:flex-row items-start justify-center gap-12">
-            {/* Left: Data encrypted */}
-            <div className="flex items-start gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Data encrypted */}
+            <div className="flex flex-col items-center text-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
                 <svg className="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -376,16 +411,29 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right: No training on your data */}
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center flex-shrink-0">
-                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            {/* No training on your data */}
+            <div className="flex flex-col items-center text-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-7 h-7 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
               <div>
                 <p className="text-lg font-semibold text-slate-900 mb-1">No AI training on your data</p>
                 <p className="text-sm text-slate-600">Your confidential quotes stay private and are never used for training</p>
+              </div>
+            </div>
+
+            {/* EU hosting & GDPR */}
+            <div className="flex flex-col items-center text-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-7 h-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-lg font-semibold text-slate-900 mb-1">EU hosting & GDPR compliant</p>
+                <p className="text-sm text-slate-600">Data processed in EU-based infrastructure with full GDPR compliance</p>
               </div>
             </div>
           </div>
