@@ -2,8 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { ArrowLeft, Mail, Calendar, Shield } from 'lucide-react'
+import { Mail, Calendar, Shield } from 'lucide-react'
 
 export default async function ProfilePage() {
   const supabase = await createClient()

@@ -1,9 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { ArrowLeft, TrendingUp, Target, CheckCircle2 } from 'lucide-react'
+import { TrendingUp, Target, CheckCircle2 } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
