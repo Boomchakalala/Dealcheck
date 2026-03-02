@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Upload, Loader2, HelpCircle, Lock, X } from 'lucide-react'
+import { Upload, Loader2, HelpCircle, Lock, X, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 type RoundData = {
@@ -41,6 +41,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [showHelpModal, setShowHelpModal] = useState(false)
+  const [closingDealId, setClosingDealId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
