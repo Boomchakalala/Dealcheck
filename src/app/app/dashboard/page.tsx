@@ -53,7 +53,7 @@ export default async function DashboardPage() {
               Back
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900">All Deals</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
         </div>
       </div>
 

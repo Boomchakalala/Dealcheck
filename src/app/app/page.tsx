@@ -392,8 +392,8 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-slate-900">Recent Analysis</h2>
           {deals.length > 0 && (
-            <Link href="/app/all" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
-              See all details →
+            <Link href="/app/dashboard" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+              Dashboard →
             </Link>
           )}
         </div>
