@@ -157,116 +157,131 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Welcome + Upload Section */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">
-          Welcome back! Upload a new quote or contract to start another analysis
-        </h1>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-8">
+          <h1 className="text-2xl font-bold text-slate-900 mb-1">
+            Welcome back!
+          </h1>
+          <p className="text-sm text-slate-600 mb-6">
+            Upload a quote or paste text to start analysis
+          </p>
 
-        <div className="mt-6 space-y-4">
-          {/* Upload Button */}
-          <div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="hidden"
-              accept=".pdf,.png,.jpg,.jpeg,.webp"
-              onChange={handleFileSelect}
+          <div className="space-y-3">
+            {/* Upload Button */}
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                accept=".pdf,.png,.jpg,.jpeg,.webp"
+                onChange={handleFileSelect}
+                disabled={uploading || analyzing}
+              />
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || analyzing}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-11"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    Upload File
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {uploadedFileName && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
+                <span className="text-sm font-medium text-emerald-800">📄 {uploadedFileName}</span>
+                <button
+                  onClick={() => {
+                    setUploadedFileName(null)
+                    setInput('')
+                  }}
+                  className="text-emerald-600 hover:text-emerald-800 text-sm font-medium"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Paste text */}
+            <button
+              onClick={() => textareaRef.current?.focus()}
+              className="w-full py-2.5 text-sm font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
+            >
+              Paste text
+            </button>
+
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Or paste supplier quote text here..."
+              className="w-full p-4 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              rows={3}
               disabled={uploading || analyzing}
             />
+
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+                {error}
+              </div>
+            )}
+
+            {/* Analyze Button */}
             <Button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading || analyzing}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+              onClick={handleAnalyze}
+              disabled={!input.trim() || uploading || analyzing}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-11"
             >
-              {uploading ? (
+              {analyzing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Processing...
+                  Analyzing...
                 </>
               ) : (
-                <>
-                  <Upload className="w-4 h-4" />
-                  Upload File
-                </>
+                'Analyze'
               )}
             </Button>
           </div>
-
-          {uploadedFileName && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
-              <span className="text-sm font-medium text-emerald-800">📄 {uploadedFileName}</span>
-              <button
-                onClick={() => {
-                  setUploadedFileName(null)
-                  setInput('')
-                }}
-                className="text-emerald-600 hover:text-emerald-800 text-sm"
-              >
-                ✕
-              </button>
-            </div>
-          )}
-
-          {/* Paste text */}
-          <button
-            onClick={() => textareaRef.current?.focus()}
-            className="w-full py-2.5 text-sm font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
-          >
-            Paste text
-          </button>
-
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Or paste quote/contract text here..."
-            className="w-full p-4 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            rows={4}
-            disabled={uploading || analyzing}
-          />
-
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-              {error}
-            </div>
-          )}
-
-          {/* Analyze Button */}
-          <Button
-            onClick={handleAnalyze}
-            disabled={!input.trim() || uploading || analyzing}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
-          >
-            {analyzing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Analyzing...
-              </>
-            ) : (
-              'Analyze'
-            )}
-          </Button>
         </div>
 
-        {/* What you'll get - compact */}
-        <div className="mt-6 pt-6 border-t border-slate-200">
-          <p className="text-sm font-semibold text-slate-900 mb-3">What you get</p>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-slate-600">
-            {[
-              'Pricing breakdown',
-              'Red flags & hidden costs',
-              'Key terms',
-              'Negotiation strategy',
-              'Email drafts',
-              'Quick wins',
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-                <span>{item}</span>
-              </div>
-            ))}
+        {/* What you get - footer style */}
+        <div className="bg-slate-50 border-t border-slate-200 px-8 py-4">
+          <div className="flex items-center justify-between text-xs text-slate-600">
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Pricing & terms</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>Red flags</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span>Strategy</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <span>Email drafts</span>
+            </div>
           </div>
         </div>
       </div>
@@ -274,18 +289,28 @@ export default function DashboardPage() {
       {/* Your Quote Analysis */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-slate-900">Your Quote Analysis</h2>
-          <Link href="/app/new" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
-            View all →
-          </Link>
+          <h2 className="text-lg font-bold text-slate-900">Recent Analysis</h2>
+          {deals.length > 0 && (
+            <Link href="/app/new" className="text-sm text-slate-500 hover:text-slate-700">
+              See all
+            </Link>
+          )}
         </div>
 
         {!deals || deals.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
-            <p className="text-sm text-slate-600 mb-4">No deals yet. Upload your first quote above.</p>
+          <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
+            <div className="max-w-xs mx-auto">
+              <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <p className="text-sm text-slate-600">No deals yet</p>
+              <p className="text-xs text-slate-500 mt-1">Upload a quote above to get started</p>
+            </div>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {deals.slice(0, 10).map((deal) => {
               const status = getDealStatus(deal)
               const amount = getAmount(deal)
@@ -295,31 +320,33 @@ export default function DashboardPage() {
 
               return (
                 <Link key={deal.id} href={`/app/deal/${deal.id}`}>
-                  <div className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="bg-white rounded-xl border border-slate-200 p-4 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className={`text-xs font-semibold px-2 py-1 rounded border ${status.color}`}>
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${status.color}`}>
                             {status.label}
                           </span>
                         </div>
-                        <h3 className="font-bold text-slate-900 mb-1 truncate">
+                        <h3 className="font-semibold text-slate-900 mb-1 truncate">
                           {deal.vendor || deal.title}
                         </h3>
                         {conclusion && (
-                          <p className="text-sm text-slate-600 mb-2 line-clamp-1">{conclusion}</p>
+                          <p className="text-xs text-slate-600 mb-1.5 line-clamp-1">{conclusion}</p>
                         )}
-                        <p className="text-xs text-slate-500">Updated {timeAgo}</p>
+                        <p className="text-xs text-slate-400">{timeAgo}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         {amount && (
-                          <p className="text-base font-bold text-slate-900">{amount}</p>
-                        )}
-                        {status.label === 'Pending' && (
-                          <p className="text-xs text-yellow-600 mt-1">pending</p>
-                        )}
-                        {status.label === 'Completed' && (
-                          <p className="text-xs text-emerald-600 mt-1">saved</p>
+                          <>
+                            <p className="text-sm font-bold text-slate-900">{amount}</p>
+                            {status.label === 'Pending' && (
+                              <p className="text-xs text-yellow-600 mt-0.5">pending</p>
+                            )}
+                            {status.label === 'Completed' && (
+                              <p className="text-xs text-emerald-600 mt-0.5">saved</p>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
