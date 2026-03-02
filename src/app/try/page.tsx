@@ -272,18 +272,22 @@ export default function TryPage() {
 
         {/* What you'll get - Full width */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-8">
-          <h3 className="text-xl font-bold text-slate-900 mb-6 text-center">What you&apos;ll get in your analysis</h3>
+          <h3 className="text-xl font-bold text-slate-900 mb-6 text-center">What you get</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: '💰', title: 'Pricing Breakdown', desc: 'Total cost, line items, and 3-year projections' },
-              { icon: '📋', title: 'Terms Overview', desc: 'Key contract terms and conditions highlighted' },
-              { icon: '🚩', title: 'Red Flags', desc: 'Hidden costs and unfavorable clauses identified' },
-              { icon: '🎯', title: 'Negotiation Strategy', desc: 'Top priority asks and leverage points' },
-              { icon: '✉️', title: 'Ready-to-Send Emails', desc: 'Pre-written negotiation emails you can use' },
-              { icon: '⚡', title: 'Quick Wins', desc: 'Immediate savings opportunities flagged' },
+              { title: 'Pricing breakdown', desc: 'Total cost, line items, 3-year view' },
+              { title: 'Key terms', desc: 'Contract conditions flagged' },
+              { title: 'Red flags', desc: 'Hidden costs and bad clauses' },
+              { title: 'Negotiation strategy', desc: 'Priority asks with leverage' },
+              { title: 'Email drafts', desc: 'Copy/paste into your inbox' },
+              { title: 'Quick wins', desc: 'Easy savings to capture now' },
             ].map((item, i) => (
-              <div key={i} className="flex items-start gap-4">
-                <div className="text-3xl flex-shrink-0">{item.icon}</div>
+              <div key={i} className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
                 <div>
                   <h4 className="text-sm font-semibold text-slate-900 mb-1">{item.title}</h4>
                   <p className="text-xs text-slate-600 leading-relaxed">{item.desc}</p>
@@ -298,9 +302,9 @@ export default function TryPage() {
           <h3 className="text-xl font-bold text-slate-900 mb-8 text-center">How it works</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { num: 1, label: 'Upload your quote', desc: 'Drop a PDF, image, or paste text from email', icon: '📤', active: step === 1 },
-              { num: 2, label: 'AI analyzes in ~30s', desc: 'We extract pricing, terms, and leverage points', icon: '🤖', active: step === 2 },
-              { num: 3, label: 'Get results + emails', desc: 'Copy negotiation emails and start saving', icon: '🎉', active: step === 3 },
+              { num: 1, label: 'Upload', desc: 'PDF, image, or paste text', active: step === 1 },
+              { num: 2, label: 'Analyze', desc: 'Extract pricing, terms, leverage', active: step === 2 },
+              { num: 3, label: 'Negotiate', desc: 'Get emails and start saving', active: step === 3 },
             ].map((s, idx) => (
               <div key={s.num} className="relative">
                 <div className={`bg-white rounded-xl border-2 p-6 transition-all ${
@@ -308,15 +312,12 @@ export default function TryPage() {
                     ? 'border-emerald-500 shadow-md'
                     : 'border-slate-200'
                 }`}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
-                      s.active
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-slate-100 text-slate-500'
-                    }`}>
-                      {s.num}
-                    </div>
-                    <div className="text-2xl">{s.icon}</div>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold mb-3 ${
+                    s.active
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-slate-100 text-slate-500'
+                  }`}>
+                    {s.num}
                   </div>
                   <h4 className={`text-base font-semibold mb-2 ${s.active ? 'text-slate-900' : 'text-slate-700'}`}>
                     {s.label}
@@ -325,11 +326,9 @@ export default function TryPage() {
                 </div>
                 {idx < 2 && (
                   <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10">
-                    <div className="w-6 h-6 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center">
-                      <svg className="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
+                    <svg className="w-6 h-6 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
                 )}
               </div>
@@ -337,42 +336,25 @@ export default function TryPage() {
           </div>
         </div>
 
-        {/* Trust badges */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <div className="grid sm:grid-cols-3 gap-6">
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
-                <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-slate-900 mb-0.5">Encrypted & Secure</h4>
-                <p className="text-xs text-slate-600">All uploads protected in transit</p>
-              </div>
-            </div>
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-slate-900 mb-0.5">Fast Analysis</h4>
-                <p className="text-xs text-slate-600">Results in ~30 seconds</p>
-              </div>
-            </div>
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-slate-900 mb-0.5">Private & Confidential</h4>
-                <p className="text-xs text-slate-600">Never used for AI training</p>
-              </div>
-            </div>
+        {/* Trust line */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-slate-600 border-t border-slate-200 pt-8">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span>Encrypted in transit</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span>~30 second analysis</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span>Never used for training</span>
           </div>
         </div>
       </main>
