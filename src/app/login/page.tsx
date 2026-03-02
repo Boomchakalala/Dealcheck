@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Header } from '@/components/Header'
 import { Loader2, ArrowRight, Shield } from 'lucide-react'
 import Link from 'next/link'
 
@@ -53,16 +54,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <header className="border-b border-slate-200/60 bg-white/80 backdrop-blur-md sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="text-base font-bold text-slate-900 tracking-tight hover:text-slate-700 transition-colors">
-            DealCheck
-          </Link>
-          <Link href="/pricing" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
-            Pricing
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1 flex items-center justify-center px-5 py-16 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/30 via-white to-white pointer-events-none" />
@@ -157,12 +149,6 @@ export default function LoginPage() {
               {' '}and{' '}
               <Link href="/privacy" className="text-slate-500 underline underline-offset-2 decoration-slate-300 hover:text-slate-700 transition-colors">Privacy Policy</Link>.
             </p>
-          </div>
-
-          <div className="mt-6 text-center">
-            <Link href="/" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
-              Back to homepage
-            </Link>
           </div>
         </div>
       </main>
