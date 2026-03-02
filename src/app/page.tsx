@@ -216,28 +216,38 @@ export default function LandingPage() {
             ))}
           </div>
 
-          {/* 4 Feature Cards with Mockups */}
+          {/* 4 Feature Cards with Better Visuals */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Card 1: Spot overpriced items */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <div className="p-4 bg-slate-50 border-b border-slate-200">
                 <p className="text-sm font-semibold text-slate-700">Spot overpriced items & hidden costs</p>
               </div>
-              <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
-                {/* Mockup: Chart/Table */}
-                <div className="space-y-3">
+              <div className="p-6 bg-gradient-to-br from-slate-50 to-white min-h-[180px] flex flex-col justify-center">
+                {/* Better visual: Price comparison bars */}
+                <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-16 bg-slate-200 rounded"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-2 bg-slate-300 rounded w-3/4"></div>
-                      <div className="h-2 bg-slate-200 rounded w-1/2"></div>
+                    <div className="text-3xl">💰</div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-slate-600">Their quote</span>
+                        <span className="text-xs font-bold text-red-600">$150K</span>
+                      </div>
+                      <div className="h-3 bg-red-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-red-500 w-full"></div>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-16 bg-slate-200 rounded"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-2 bg-slate-300 rounded w-3/4"></div>
-                      <div className="h-2 bg-slate-200 rounded w-1/2"></div>
+                    <div className="text-3xl">📊</div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-slate-600">Market rate</span>
+                        <span className="text-xs font-bold text-emerald-600">$120K</span>
+                      </div>
+                      <div className="h-3 bg-emerald-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-emerald-500 w-4/5"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -245,29 +255,30 @@ export default function LandingPage() {
             </div>
 
             {/* Card 2: Highlight better terms */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <div className="p-4 bg-slate-50 border-b border-slate-200">
                 <p className="text-sm font-semibold text-slate-700">Highlight better terms & clauses</p>
               </div>
-              <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
-                {/* Mockup: Highlighted text */}
+              <div className="p-6 bg-gradient-to-br from-slate-50 to-white min-h-[180px] flex flex-col justify-center">
+                {/* Better visual: Document with highlights */}
                 <div className="space-y-3">
-                  <div className="bg-slate-700 text-white p-3 rounded-lg text-xs font-mono space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Section 4.2</span>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="bg-emerald-500/20 px-1 py-0.5 inline-block">
-                        <span className="text-emerald-300">Pricing terms</span>
+                  <div className="flex items-center gap-3">
+                    <div className="text-3xl">📄</div>
+                    <div className="flex-1 space-y-2">
+                      <div className="bg-yellow-100 border-l-4 border-yellow-500 px-3 py-2 rounded">
+                        <div className="h-2 bg-yellow-400 rounded w-3/4"></div>
+                      </div>
+                      <div className="text-xs text-slate-600 flex items-start gap-2">
+                        <span className="text-yellow-600">⚠️</span>
+                        <span>Auto-renewal clause needs attention</span>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      <div className="w-1 h-4 bg-emerald-500 rounded mt-0.5"></div>
-                      <div className="flex-1 space-y-1">
-                        <div className="h-2 bg-slate-300 rounded"></div>
-                        <div className="h-2 bg-slate-200 rounded w-4/5"></div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-3xl">✅</div>
+                    <div className="flex-1 space-y-2">
+                      <div className="bg-emerald-100 border-l-4 border-emerald-500 px-3 py-2 rounded">
+                        <div className="h-2 bg-emerald-400 rounded w-2/3"></div>
                       </div>
                     </div>
                   </div>
@@ -276,49 +287,66 @@ export default function LandingPage() {
             </div>
 
             {/* Card 3: Ready-made emails */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <div className="p-4 bg-slate-50 border-b border-slate-200">
                 <p className="text-sm font-semibold text-slate-700">Get ready-made negotiation emails</p>
               </div>
-              <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
-                {/* Mockup: Email */}
+              <div className="p-6 bg-gradient-to-br from-slate-50 to-white min-h-[180px] flex flex-col justify-center">
+                {/* Better visual: Email preview */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-emerald-100 rounded-full"></div>
-                    <div className="flex-1 space-y-1.5">
-                      <div className="h-2 bg-slate-300 rounded w-1/3"></div>
-                      <div className="h-1.5 bg-slate-200 rounded w-1/2"></div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-3xl">✉️</div>
+                    <div className="flex-1">
+                      <div className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs">📧</div>
+                          <div className="flex-1 space-y-1">
+                            <div className="h-2 bg-slate-300 rounded w-2/3"></div>
+                            <div className="h-1.5 bg-slate-200 rounded w-1/2"></div>
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="h-1.5 bg-slate-200 rounded"></div>
+                          <div className="h-1.5 bg-slate-200 rounded w-5/6"></div>
+                          <div className="h-1.5 bg-slate-200 rounded w-4/6"></div>
+                        </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <div className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded">Ready to send</div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="space-y-1.5 pt-2">
-                    <div className="h-2 bg-slate-200 rounded"></div>
-                    <div className="h-2 bg-slate-200 rounded w-5/6"></div>
-                    <div className="h-2 bg-slate-200 rounded w-4/6"></div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Card 4: Three email varieties */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <div className="p-4 bg-slate-50 border-b border-slate-200">
                 <p className="text-sm font-semibold text-slate-700">Three email varieties for leverage</p>
               </div>
-              <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
-                {/* Mockup: Email options */}
+              <div className="p-6 bg-gradient-to-br from-slate-50 to-white min-h-[180px] flex flex-col justify-center">
+                {/* Better visual: Email tone options */}
                 <div className="space-y-3">
-                  <div className="bg-slate-100 rounded p-2 text-xs text-slate-600 flex items-center justify-between">
-                    <span>Neutral approach</span>
-                    <div className="w-4 h-4 bg-slate-300 rounded"></div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">😊</div>
+                    <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+                      <div className="text-xs font-medium text-blue-700">Neutral approach</div>
+                      <div className="text-[10px] text-blue-600 mt-0.5">Professional & friendly</div>
+                    </div>
                   </div>
-                  <div className="bg-slate-100 rounded p-2 text-xs text-slate-600 flex items-center justify-between">
-                    <span>Firm response</span>
-                    <div className="w-4 h-4 bg-slate-300 rounded"></div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">💪</div>
+                    <div className="flex-1 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
+                      <div className="text-xs font-medium text-orange-700">Firm response</div>
+                      <div className="text-[10px] text-orange-600 mt-0.5">Direct & assertive</div>
+                    </div>
                   </div>
-                  <div className="bg-emerald-100 rounded p-2 text-xs text-emerald-700 flex items-center justify-between font-medium">
-                    <span>Final push</span>
-                    <div className="w-4 h-4 bg-emerald-400 rounded flex items-center justify-center">
-                      <span className="text-white text-[8px]">✓</span>
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">🎯</div>
+                    <div className="flex-1 bg-emerald-50 border border-emerald-300 rounded-lg px-3 py-2">
+                      <div className="text-xs font-medium text-emerald-700">Final push</div>
+                      <div className="text-[10px] text-emerald-600 mt-0.5">Time-sensitive & compelling</div>
                     </div>
                   </div>
                 </div>
@@ -329,34 +357,35 @@ export default function LandingPage() {
       </section>
 
       {/* See DealCheck in Action */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white border-y border-slate-200">
         <div className="max-w-4xl mx-auto px-5 sm:px-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-12">
             See DealCheck in Action
           </h2>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-12">
+          <div className="flex flex-col md:flex-row items-start justify-center gap-12">
             {/* Left: Data encrypted */}
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
               <div>
-                <p className="text-base font-semibold text-slate-900 mb-1">Data encrypted & stored in a real</p>
+                <p className="text-lg font-semibold text-slate-900 mb-1">Data encrypted & secure</p>
+                <p className="text-sm text-slate-600">Your quotes are processed securely and never stored without permission</p>
               </div>
             </div>
 
-            {/* Right: Passes added + No training */}
+            {/* Right: No training on your data */}
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center flex-shrink-0">
+                <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
               <div>
-                <p className="text-base font-semibold text-slate-900 mb-1">Passes added after analysis</p>
-                <p className="text-base font-semibold text-slate-900">No training w GDPR contact</p>
+                <p className="text-lg font-semibold text-slate-900 mb-1">No AI training on your data</p>
+                <p className="text-sm text-slate-600">Your confidential quotes stay private and are never used for training</p>
               </div>
             </div>
           </div>
