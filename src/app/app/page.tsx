@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
-import { DealCard } from '@/components/DealCard'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { CheckCircle, Plus, Search, ArrowUpDown } from 'lucide-react'
+import { Upload, Loader2, CheckCircle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 type RoundData = {
   id: string
@@ -26,14 +26,18 @@ type DealWithRounds = {
   rounds: RoundData[]
 }
 
-type SortOption = 'updated' | 'created' | 'vendor'
-
 export default function DashboardPage() {
+  const router = useRouter()
   const [deals, setDeals] = useState<DealWithRounds[]>([])
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-  const [sort, setSort] = useState<SortOption>('updated')
+  const [input, setInput] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -61,33 +65,88 @@ export default function DashboardPage() {
     load()
   }, [])
 
-  const filteredAndSorted = useMemo(() => {
-    let result = deals
-
-    if (search.trim()) {
-      const q = search.toLowerCase()
-      result = result.filter(
-        (d) =>
-          d.title.toLowerCase().includes(q) ||
-          (d.vendor && d.vendor.toLowerCase().includes(q))
-      )
+  const handleFileUpload = async (file: File) => {
+    setUploading(true)
+    setError(null)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const response = await fetch('/api/upload', { method: 'POST', body: formData })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Failed to process file')
+      setInput(data.extractedText)
+      setUploadedFileName(file.name)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to process file')
+    } finally {
+      setUploading(false)
     }
+  }
 
-    result = [...result].sort((a, b) => {
-      if (sort === 'updated') {
-        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-      }
-      if (sort === 'created') {
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      }
-      // vendor a-z
-      const va = (a.vendor || '').toLowerCase()
-      const vb = (b.vendor || '').toLowerCase()
-      return va.localeCompare(vb)
-    })
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) handleFileUpload(file)
+  }
 
-    return result
-  }, [deals, search, sort])
+  const handleAnalyze = async () => {
+    if (!input.trim()) {
+      setError('Please upload a file or paste text first.')
+      return
+    }
+    setAnalyzing(true)
+    setError(null)
+    try {
+      const response = await fetch('/api/deals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: uploadedFileName || 'New Deal',
+          vendor: null,
+          dealType: 'New',
+          goal: null,
+          extractedText: input,
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Failed to create deal')
+
+      // Redirect to the new deal
+      router.push(`/app/deal/${data.deal.id}`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setAnalyzing(false)
+    }
+  }
+
+  function getTimeAgo(date: string): string {
+    const now = new Date()
+    const past = new Date(date)
+    const diffMs = now.getTime() - past.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? 's' : ''} ago`
+    if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
+    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
+    return past.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+
+  function getDealStatus(deal: DealWithRounds): { label: string; color: string } {
+    const latestRound = deal.rounds?.[0]
+    if (!latestRound) return { label: 'Pending', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' }
+    if (latestRound.status === 'completed') {
+      return { label: 'Completed', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' }
+    }
+    return { label: 'In progress', color: 'bg-blue-100 text-blue-700 border-blue-200' }
+  }
+
+  function getAmount(deal: DealWithRounds): string | null {
+    const latestRound = deal.rounds?.[0]
+    if (!latestRound?.output_json?.snapshot?.total_commitment) return null
+    return latestRound.output_json.snapshot.total_commitment
+  }
 
   if (loading) {
     return (
@@ -98,87 +157,179 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Deals</h1>
-          <p className="text-gray-600 mt-1">
-            Track your procurement negotiations and quotes
-          </p>
-        </div>
-        <Link href="/app/new">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            New Deal
+    <div className="max-w-4xl mx-auto space-y-8">
+      {/* Welcome + Upload Section */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">
+          Welcome back! Upload a new quote or contract to start another analysis
+        </h1>
+
+        <div className="mt-6 space-y-4">
+          {/* Upload Button */}
+          <div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept=".pdf,.png,.jpg,.jpeg,.webp"
+              onChange={handleFileSelect}
+              disabled={uploading || analyzing}
+            />
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading || analyzing}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  Upload File
+                </>
+              )}
+            </Button>
+          </div>
+
+          {uploadedFileName && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
+              <span className="text-sm font-medium text-emerald-800">📄 {uploadedFileName}</span>
+              <button
+                onClick={() => {
+                  setUploadedFileName(null)
+                  setInput('')
+                }}
+                className="text-emerald-600 hover:text-emerald-800 text-sm"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {/* Paste text */}
+          <button
+            onClick={() => textareaRef.current?.focus()}
+            className="w-full py-2.5 text-sm font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
+          >
+            Paste text
+          </button>
+
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Or paste quote/contract text here..."
+            className="w-full p-4 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            rows={4}
+            disabled={uploading || analyzing}
+          />
+
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+              {error}
+            </div>
+          )}
+
+          {/* Analyze Button */}
+          <Button
+            onClick={handleAnalyze}
+            disabled={!input.trim() || uploading || analyzing}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+          >
+            {analyzing ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              'Analyze'
+            )}
           </Button>
-        </Link>
+        </div>
+
+        {/* What you'll get - compact */}
+        <div className="mt-6 pt-6 border-t border-slate-200">
+          <p className="text-sm font-semibold text-slate-900 mb-3">What you get</p>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-slate-600">
+            {[
+              'Pricing breakdown',
+              'Red flags & hidden costs',
+              'Key terms',
+              'Negotiation strategy',
+              'Email drafts',
+              'Quick wins',
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Usage indicator - Unlimited for all users */}
-      {profile && (
-        <div className="p-4 border rounded-xl bg-emerald-50 border-emerald-200">
-          <p className="text-sm text-emerald-900 font-medium flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-emerald-600" />
-            <span className="font-bold">Free Plan:</span> Unlimited analysis rounds
-          </p>
+      {/* Your Quote Analysis */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-slate-900">Your Quote Analysis</h2>
+          <Link href="/app/new" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+            View all →
+          </Link>
         </div>
-      )}
 
-      {/* Search & Sort */}
-      {deals.length > 0 && (
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by title or vendor..."
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            />
+        {!deals || deals.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
+            <p className="text-sm text-slate-600 mb-4">No deals yet. Upload your first quote above.</p>
           </div>
-          <div className="relative">
-            <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortOption)}
-              className="pl-10 pr-8 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent appearance-none cursor-pointer"
-            >
-              <option value="updated">Last updated</option>
-              <option value="created">Created</option>
-              <option value="vendor">Vendor A-Z</option>
-            </select>
-          </div>
-        </div>
-      )}
+        ) : (
+          <div className="space-y-3">
+            {deals.slice(0, 10).map((deal) => {
+              const status = getDealStatus(deal)
+              const amount = getAmount(deal)
+              const timeAgo = getTimeAgo(deal.updated_at)
+              const latestRound = deal.rounds?.[0]
+              const conclusion = latestRound?.output_json?.quick_read?.conclusion
 
-      {/* Deals list */}
-      {!deals || deals.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-lg border border-gray-200">
-          <div className="max-w-md mx-auto">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No deals yet</h3>
-            <p className="text-gray-600 mb-6">
-              Create your first deal to start analyzing supplier quotes and contracts
-            </p>
-            <Link href="/app/new">
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                Create Your First Deal
-              </Button>
-            </Link>
+              return (
+                <Link key={deal.id} href={`/app/deal/${deal.id}`}>
+                  <div className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md transition-shadow cursor-pointer">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`text-xs font-semibold px-2 py-1 rounded border ${status.color}`}>
+                            {status.label}
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-slate-900 mb-1 truncate">
+                          {deal.vendor || deal.title}
+                        </h3>
+                        {conclusion && (
+                          <p className="text-sm text-slate-600 mb-2 line-clamp-1">{conclusion}</p>
+                        )}
+                        <p className="text-xs text-slate-500">Updated {timeAgo}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        {amount && (
+                          <p className="text-base font-bold text-slate-900">{amount}</p>
+                        )}
+                        {status.label === 'Pending' && (
+                          <p className="text-xs text-yellow-600 mt-1">pending</p>
+                        )}
+                        {status.label === 'Completed' && (
+                          <p className="text-xs text-emerald-600 mt-1">saved</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
-        </div>
-      ) : filteredAndSorted.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-          <p className="text-gray-500">No deals match &ldquo;{search}&rdquo;</p>
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {filteredAndSorted.map((deal) => (
-            <DealCard key={deal.id} deal={deal} />
-          ))}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
