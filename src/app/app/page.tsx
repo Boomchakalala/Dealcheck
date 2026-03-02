@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Upload, Loader2, HelpCircle, Lock, X, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { CloseDealModal } from '@/components/CloseDealModal'
 
 type RoundData = {
   id: string
@@ -41,7 +42,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [showHelpModal, setShowHelpModal] = useState(false)
-  const [closingDealId, setClosingDealId] = useState<string | null>(null)
+  const [dealToClose, setDealToClose] = useState<{id: string, total?: string} | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -125,40 +126,10 @@ export default function DashboardPage() {
     }
   }
 
-  const handleQuickClose = async (e: React.MouseEvent, dealId: string) => {
+  const handleQuickClose = (e: React.MouseEvent, dealId: string, currentTotal?: string) => {
     e.preventDefault()
     e.stopPropagation()
-
-    if (!confirm('Close this deal as won?')) return
-
-    setClosingDealId(dealId)
-    try {
-      const response = await fetch(`/api/deal/${dealId}/close`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          outcome: 'won',
-          finalTotal: null,
-          notes: null,
-        }),
-      })
-      if (!response.ok) throw new Error('Failed to close deal')
-
-      // Refresh deals list
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data } = await supabase
-          .from('deals')
-          .select(`*, rounds (id, output_json, round_number, status)`)
-          .eq('user_id', user.id)
-          .order('updated_at', { ascending: false })
-        setDeals((data as DealWithRounds[]) || [])
-      }
-    } catch (err) {
-      alert('Failed to close deal')
-    } finally {
-      setClosingDealId(null)
-    }
+    setDealToClose({ id: dealId, total: currentTotal })
   }
 
   function getTimeAgo(date: string): string {
@@ -453,11 +424,10 @@ export default function DashboardPage() {
                           </span>
                           {!isClosed && (
                             <button
-                              onClick={(e) => handleQuickClose(e, deal.id)}
-                              disabled={closingDealId === deal.id}
-                              className="text-xs font-medium px-2.5 py-1 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                              onClick={(e) => handleQuickClose(e, deal.id, amount || undefined)}
+                              className="text-xs font-medium px-2.5 py-1 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
                             >
-                              {closingDealId === deal.id ? 'Closing...' : 'Close'}
+                              Close
                             </button>
                           )}
                         </div>
