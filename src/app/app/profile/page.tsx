@@ -104,18 +104,42 @@ export default async function ProfilePage() {
 
       {/* Account Actions */}
       <Card className="p-6">
-        <h3 className="text-lg font-bold text-slate-900 mb-4">Account Settings</h3>
-        <div className="space-y-3">
-          <form action="/auth/signout" method="post">
-            <Button
-              type="submit"
-              variant="outline"
-              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-            >
-              Sign Out
+        <h3 className="text-lg font-bold text-slate-900 mb-4">Subscription</h3>
+        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg mb-4">
+          <div>
+            <p className="text-sm font-semibold text-slate-900 mb-1">Current Plan: {currentPlan}</p>
+            <p className="text-xs text-slate-600">
+              {isFreePlan ? 'Limited to 10 deals per month' : 'Unlimited deals'}
+            </p>
+          </div>
+          {isFreePlan && (
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
+              <Sparkles className="w-4 h-4" />
+              Upgrade to Pro
             </Button>
-          </form>
+          )}
         </div>
+
+        {!isFreePlan && (
+          <div className="flex items-center gap-3 p-4 bg-white rounded-lg border border-slate-200">
+            <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+              <CreditCard className="w-5 h-5 text-slate-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-slate-900">Payment Method</p>
+              <p className="text-xs text-slate-600">Visa ending in 4242</p>
+            </div>
+            <Button variant="outline" size="sm">
+              Update
+            </Button>
+          </div>
+        )}
+      </Card>
+
+      {/* Account Actions */}
+      <Card className="p-6">
+        <h3 className="text-lg font-bold text-slate-900 mb-4">Account Actions</h3>
+        <ProfileActions userId={user.id} userEmail={user.email || ''} />
       </Card>
 
       {/* Privacy Note */}
