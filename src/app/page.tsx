@@ -15,7 +15,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left: Content */}
             <div>
-              <h1 className="text-[3.5rem] sm:text-[4rem] font-bold text-slate-900 tracking-tight mb-6 leading-[1.1]">
+              <h1 className="text-[3rem] sm:text-[3.5rem] font-bold text-slate-900 tracking-tight mb-6 leading-[1.1]">
                 Turn quotes into savings<br />in minutes.
               </h1>
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
