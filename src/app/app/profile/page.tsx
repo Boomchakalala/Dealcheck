@@ -2,7 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Mail, Calendar, Shield } from 'lucide-react'
+import { Mail, Calendar, Shield, CreditCard, Trash2, Sparkles } from 'lucide-react'
+import { ProfileActions } from '@/components/ProfileActions'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -32,6 +33,10 @@ export default async function ProfilePage() {
     month: 'long',
     year: 'numeric'
   })
+
+  // For now, everyone is on Free plan - can be enhanced later with Stripe
+  const currentPlan = 'Free'
+  const isFreePlan = currentPlan === 'Free'
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
