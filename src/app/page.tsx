@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { CheckCircle2, Upload, CheckCircle, Send, ArrowRight, Shield } from 'lucide-react'
+import { CheckCircle2, ArrowRight } from 'lucide-react'
 
 export default function LandingPage() {
   return (
@@ -122,116 +121,213 @@ export default function LandingPage() {
       </section>
 
       {/* How DealCheck Works */}
-      <section className="py-24">
+      <section className="py-24 bg-slate-50/30">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-16">
             How DealCheck Works
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* 3 Steps */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-20">
             {[
               {
-                icon: <Upload className="w-6 h-6" />,
                 title: 'Upload a quote or contract',
-                desc: 'Drop in your PDF, paste an email, or screenshot a pricing page.',
-                color: 'bg-emerald-100 text-emerald-600',
               },
               {
-                icon: <CheckCircle className="w-6 h-6" />,
                 title: 'Analyze pricing & terms',
-                desc: 'AI reviews the deal, spots red flags, and finds negotiation leverage.',
-                color: 'bg-blue-100 text-blue-600',
               },
               {
-                icon: <Send className="w-6 h-6" />,
                 title: 'Send & negotiate with suppliers',
-                desc: 'Get pre-written emails ready to copy and send to your vendor.',
-                color: 'bg-purple-100 text-purple-600',
               },
             ].map((step, index) => (
-              <div key={index} className="relative">
-                <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-md transition-shadow h-full">
-                  <div className={`w-14 h-14 rounded-xl ${step.color} flex items-center justify-center mb-6`}>
-                    {step.icon}
+              <div key={index} className="relative flex flex-col items-center text-center">
+                {/* Simple Document Icon */}
+                <div className="w-20 h-20 mb-4 relative">
+                  <div className="w-full h-full bg-emerald-100 rounded-xl flex items-center justify-center">
+                    <div className="relative">
+                      {/* Document shape */}
+                      <div className="w-10 h-12 bg-emerald-600 rounded-sm relative">
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-100"></div>
+                        {/* Lines inside document */}
+                        <div className="absolute top-4 left-2 right-2 space-y-1.5">
+                          <div className="h-0.5 bg-emerald-200 rounded"></div>
+                          <div className="h-0.5 bg-emerald-200 rounded w-3/4"></div>
+                          <div className="h-0.5 bg-emerald-200 rounded w-1/2"></div>
+                        </div>
+                        {/* Different icon details for each step */}
+                        {index === 0 && (
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-700 rounded-full flex items-center justify-center">
+                            <div className="text-white text-xs font-bold">↑</div>
+                          </div>
+                        )}
+                        {index === 1 && (
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-700 rounded-full flex items-center justify-center">
+                            <div className="text-white text-xs font-bold">✓</div>
+                          </div>
+                        )}
+                        {index === 2 && (
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-700 rounded-full flex items-center justify-center">
+                            <div className="text-white text-xs font-bold">→</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-3">
-                    {step.title}
-                  </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">
-                    {step.desc}
-                  </p>
                 </div>
+                <p className="text-base font-medium text-slate-900">
+                  {step.title}
+                </p>
+                {/* Arrow between steps */}
                 {index < 2 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                    <ArrowRight className="w-6 h-6 text-slate-300" />
+                  <div className="hidden md:block absolute top-10 -right-8 text-slate-300 text-2xl">
+                    ›
                   </div>
                 )}
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Feature Showcase */}
-      <section className="bg-slate-50 py-24">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[
-              {
-                title: 'Spot overpriced items & hidden costs',
-                image: '📊',
-                desc: 'Instantly see where pricing looks inflated or terms are unfavorable.',
-              },
-              {
-                title: 'Highlight better terms & clauses',
-                image: '✅',
-                desc: 'Get specific recommendations for what to negotiate and why.',
-              },
-              {
-                title: 'Get ready-made negotiation emails',
-                image: '✉️',
-                desc: 'Copy and send professional emails with your asks already written.',
-              },
-              {
-                title: 'Three email varieties for leverage',
-                image: '📧',
-                desc: 'Choose from neutral, firm, or final push approach based on your situation.',
-              },
-            ].map((feature, index) => (
-              <div key={index} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="bg-gradient-to-br from-slate-100 to-slate-50 h-48 flex items-center justify-center text-6xl">
-                  {feature.image}
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-600 text-sm">
-                    {feature.desc}
-                  </p>
+          {/* 4 Feature Cards with Mockups */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Card 1: Spot overpriced items */}
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+              <div className="p-4 bg-slate-50 border-b border-slate-200">
+                <p className="text-sm font-semibold text-slate-700">Spot overpriced items & hidden costs</p>
+              </div>
+              <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
+                {/* Mockup: Chart/Table */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 bg-slate-200 rounded"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-2 bg-slate-300 rounded w-3/4"></div>
+                      <div className="h-2 bg-slate-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 bg-slate-200 rounded"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-2 bg-slate-300 rounded w-3/4"></div>
+                      <div className="h-2 bg-slate-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Card 2: Highlight better terms */}
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+              <div className="p-4 bg-slate-50 border-b border-slate-200">
+                <p className="text-sm font-semibold text-slate-700">Highlight better terms & clauses</p>
+              </div>
+              <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
+                {/* Mockup: Highlighted text */}
+                <div className="space-y-3">
+                  <div className="bg-slate-700 text-white p-3 rounded-lg text-xs font-mono space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Section 4.2</span>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="bg-emerald-500/20 px-1 py-0.5 inline-block">
+                        <span className="text-emerald-300">Pricing terms</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <div className="w-1 h-4 bg-emerald-500 rounded mt-0.5"></div>
+                      <div className="flex-1 space-y-1">
+                        <div className="h-2 bg-slate-300 rounded"></div>
+                        <div className="h-2 bg-slate-200 rounded w-4/5"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: Ready-made emails */}
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+              <div className="p-4 bg-slate-50 border-b border-slate-200">
+                <p className="text-sm font-semibold text-slate-700">Get ready-made negotiation emails</p>
+              </div>
+              <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
+                {/* Mockup: Email */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-emerald-100 rounded-full"></div>
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-2 bg-slate-300 rounded w-1/3"></div>
+                      <div className="h-1.5 bg-slate-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 pt-2">
+                    <div className="h-2 bg-slate-200 rounded"></div>
+                    <div className="h-2 bg-slate-200 rounded w-5/6"></div>
+                    <div className="h-2 bg-slate-200 rounded w-4/6"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 4: Three email varieties */}
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+              <div className="p-4 bg-slate-50 border-b border-slate-200">
+                <p className="text-sm font-semibold text-slate-700">Three email varieties for leverage</p>
+              </div>
+              <div className="p-6 bg-gradient-to-br from-slate-50 to-white">
+                {/* Mockup: Email options */}
+                <div className="space-y-3">
+                  <div className="bg-slate-100 rounded p-2 text-xs text-slate-600 flex items-center justify-between">
+                    <span>Neutral approach</span>
+                    <div className="w-4 h-4 bg-slate-300 rounded"></div>
+                  </div>
+                  <div className="bg-slate-100 rounded p-2 text-xs text-slate-600 flex items-center justify-between">
+                    <span>Firm response</span>
+                    <div className="w-4 h-4 bg-slate-300 rounded"></div>
+                  </div>
+                  <div className="bg-emerald-100 rounded p-2 text-xs text-emerald-700 flex items-center justify-between font-medium">
+                    <span>Final push</span>
+                    <div className="w-4 h-4 bg-emerald-400 rounded flex items-center justify-center">
+                      <span className="text-white text-[8px]">✓</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="py-16 border-y border-slate-200">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex items-center gap-3">
-              <Shield className="w-10 h-10 text-emerald-600" />
+      {/* See DealCheck in Action */}
+      <section className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-12">
+            See DealCheck in Action
+          </h2>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-12">
+            {/* Left: Data encrypted */}
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
               <div>
-                <p className="font-semibold text-slate-900">Data encrypted & sent in real time</p>
-                <p className="text-sm text-slate-500">EU hosting with GDPR contract</p>
+                <p className="text-base font-semibold text-slate-900 mb-1">Data encrypted & stored in a real</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Shield className="w-10 h-10 text-blue-600" />
+
+            {/* Right: Passes added + No training */}
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
               <div>
-                <p className="font-semibold text-slate-900">No training on GDPR contact</p>
-                <p className="text-sm text-slate-500">Your data stays private</p>
+                <p className="text-base font-semibold text-slate-900 mb-1">Passes added after analysis</p>
+                <p className="text-base font-semibold text-slate-900">No training w GDPR contact</p>
               </div>
             </div>
           </div>
