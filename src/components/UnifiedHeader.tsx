@@ -8,9 +8,10 @@ import { Lock, HelpCircle, ChevronDown, User, LogOut, Menu, X } from 'lucide-rea
 interface UnifiedHeaderProps {
   variant: 'landing' | 'public' | 'app'
   userEmail?: string
+  isUpgraded?: boolean
 }
 
-export function UnifiedHeader({ variant, userEmail }: UnifiedHeaderProps) {
+export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: UnifiedHeaderProps) {
   const pathname = usePathname()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
@@ -172,7 +173,7 @@ export function UnifiedHeader({ variant, userEmail }: UnifiedHeaderProps) {
             ))}
           </nav>
 
-          {/* Right: Private pill + Help + User dropdown (desktop) */}
+          {/* Right: Private pill + Help + Upgrade (if not upgraded) + User dropdown (desktop) */}
           <div className="hidden md:flex items-center gap-3">
             {/* Private pill */}
             <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 rounded-full border border-emerald-200">
@@ -188,6 +189,16 @@ export function UnifiedHeader({ variant, userEmail }: UnifiedHeaderProps) {
               <HelpCircle className="w-4 h-4" />
               <span className="hidden lg:inline">Help</span>
             </Link>
+
+            {/* Upgrade button (if not upgraded) */}
+            {!isUpgraded && (
+              <Link
+                href="/app/profile"
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
+              >
+                Upgrade
+              </Link>
+            )}
 
             {/* User dropdown */}
             <div className="relative">
