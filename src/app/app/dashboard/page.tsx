@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { TrendingUp, Target, CheckCircle2 } from 'lucide-react'
+import { DealListClient } from '@/components/DealListClient'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -27,19 +27,6 @@ export default async function DashboardPage() {
   const wonDeals = closedDeals.filter(d => d.status === 'closed_won')
   const totalSavings = closedDeals.reduce((sum, d) => sum + (d.savings_amount || 0), 0)
   const winRate = closedDeals.length > 0 ? (wonDeals.length / closedDeals.length) * 100 : 0
-
-  function getTimeAgo(date: string): string {
-    const now = new Date()
-    const past = new Date(date)
-    const diffMs = now.getTime() - past.getTime()
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffDays === 0) return 'Today'
-    if (diffDays === 1) return 'Yesterday'
-    if (diffDays < 7) return `${diffDays} days ago`
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
-    return past.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-  }
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
