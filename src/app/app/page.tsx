@@ -125,6 +125,42 @@ export default function DashboardPage() {
     }
   }
 
+  const handleQuickClose = async (e: React.MouseEvent, dealId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!confirm('Close this deal as won?')) return
+
+    setClosingDealId(dealId)
+    try {
+      const response = await fetch(`/api/deal/${dealId}/close`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          outcome: 'won',
+          finalTotal: null,
+          notes: null,
+        }),
+      })
+      if (!response.ok) throw new Error('Failed to close deal')
+
+      // Refresh deals list
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data } = await supabase
+          .from('deals')
+          .select(`*, rounds (id, output_json, round_number, status)`)
+          .eq('user_id', user.id)
+          .order('updated_at', { ascending: false })
+        setDeals((data as DealWithRounds[]) || [])
+      }
+    } catch (err) {
+      alert('Failed to close deal')
+    } finally {
+      setClosingDealId(null)
+    }
+  }
+
   function getTimeAgo(date: string): string {
     const now = new Date()
     const past = new Date(date)
@@ -404,6 +440,7 @@ export default function DashboardPage() {
               const latestRound = deal.rounds?.[0]
               const conclusion = latestRound?.output_json?.quick_read?.conclusion
               const vendorName = deal.vendor || latestRound?.output_json?.vendor || deal.title
+              const isClosed = deal.status?.startsWith('closed_')
 
               return (
                 <Link key={deal.id} href={`/app/deal/${deal.id}`}>
@@ -414,6 +451,15 @@ export default function DashboardPage() {
                           <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border ${status.color}`}>
                             {status.label}
                           </span>
+                          {!isClosed && (
+                            <button
+                              onClick={(e) => handleQuickClose(e, deal.id)}
+                              disabled={closingDealId === deal.id}
+                              className="text-xs font-medium px-2.5 py-1 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                            >
+                              {closingDealId === deal.id ? 'Closing...' : 'Close'}
+                            </button>
+                          )}
                         </div>
                         <h3 className="text-base font-bold text-slate-900 mb-1 truncate group-hover:text-emerald-700 transition-colors">
                           {vendorName}
