@@ -7,8 +7,7 @@ import { Card } from '@/components/ui/card'
 import { OutputDisplay } from '@/components/OutputDisplay'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { Breadcrumb } from '@/components/Breadcrumb'
-import Link from 'next/link'
-import { ArrowLeft, CheckSquare, Mail, Plus, AlertTriangle } from 'lucide-react'
+import { CheckSquare, Mail, Plus } from 'lucide-react'
 import { AddRoundForm } from './AddRoundForm'
 
 export default async function DealPage({
