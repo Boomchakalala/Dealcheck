@@ -457,6 +457,19 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Close Deal Modal */}
+      {dealToClose && (
+        <CloseDealModal
+          dealId={dealToClose.id}
+          currentTotal={dealToClose.total}
+          onClose={() => setDealToClose(null)}
+          onSuccess={() => {
+            setDealToClose(null)
+            router.refresh()
+          }}
+        />
+      )}
     </div>
   )
 }
