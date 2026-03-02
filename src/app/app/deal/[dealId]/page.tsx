@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { OutputDisplay } from '@/components/OutputDisplay'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
+import { Breadcrumb } from '@/components/Breadcrumb'
 import Link from 'next/link'
 import { ArrowLeft, CheckSquare, Mail, Plus, AlertTriangle } from 'lucide-react'
 import { AddRoundForm } from './AddRoundForm'
@@ -42,17 +43,17 @@ export default async function DealPage({
   const sortedRounds = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number) || []
   const latestRound = sortedRounds[0]
   const latestOutput = latestRound?.output_json
+  const dealName = deal.vendor || latestOutput?.vendor || deal.title || 'Deal'
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/app">
-          <Button variant="outline" size="sm" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-        </Link>
-      </div>
+      {/* Breadcrumb */}
+      <Breadcrumb
+        items={[
+          { label: 'Dashboard', href: '/app/dashboard' },
+          { label: dealName },
+        ]}
+      />
 
       {/* Deal Header */}
       <Card className="p-6">
