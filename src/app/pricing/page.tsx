@@ -66,7 +66,7 @@ export default function PricingPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/"
+                  href="/try"
                   className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl border border-slate-200 text-slate-700 hover:border-slate-300 hover:text-slate-900 hover:shadow-sm transition-all"
                 >
                   Analyze a quote free

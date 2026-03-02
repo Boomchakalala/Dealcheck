@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { Header } from '@/components/Header'
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Header */}
-      <Header />
+      <Header variant="default" />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-20 pb-24">
@@ -155,7 +156,7 @@ export default function LandingPage() {
       </section>
 
       {/* How DealCheck Works */}
-      <section className="py-24 bg-slate-50/30">
+      <section id="how-it-works" className="py-24 bg-slate-50/30">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-16">
             How DealCheck Works
@@ -397,7 +398,7 @@ export default function LandingPage() {
       </section>
 
       {/* See DealCheck in Action */}
-      <section className="py-20 bg-white border-y border-slate-200">
+      <section id="security" className="py-20 bg-white border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-12">
             See DealCheck in Action
@@ -446,91 +447,80 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section className="py-24">
+      <section id="pricing" className="py-24">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
               Simple, Transparent Pricing
             </h2>
+            <p className="text-lg text-slate-600">Start free. Upgrade when you need more.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {[
-              {
-                name: 'Free',
-                price: '$0',
-                features: [
-                  'Unlimited access/month',
-                  'Two allowed for all analysis',
-                  'Premium report view',
-                ],
-                cta: 'Get Started',
-                highlight: false,
-              },
-              {
-                name: 'Pro',
-                price: '$29',
-                features: [
-                  'Premium upload/everything',
-                  'High-priority',
-                  'Enumerate to negotiation+',
-                ],
-                cta: 'Get Started',
-                highlight: true,
-              },
-              {
-                name: 'Team',
-                price: '$99',
-                features: [
-                  'Premium sharing & messaging',
-                  'Migrate users',
-                  'Processor dilaton process',
-                ],
-                cta: 'Get Started',
-                highlight: false,
-              },
-            ].map((plan) => (
-              <div
-                key={plan.name}
-                className={`rounded-2xl border-2 ${
-                  plan.highlight
-                    ? 'border-emerald-500 bg-emerald-50/30 shadow-lg'
-                    : 'border-slate-200 bg-white'
-                } p-8 relative`}
-              >
-                {plan.highlight && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-emerald-500 text-white text-xs font-semibold px-4 py-1 rounded-full">
-                      MOST POPULAR
-                    </span>
-                  </div>
-                )}
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-slate-900">{plan.price}</span>
-                  <span className="text-slate-500">/month</span>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                      <svg className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  className={`w-full py-3 rounded-xl font-semibold transition-all ${
-                    plan.highlight
-                      ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md'
-                      : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
-                  }`}
-                >
-                  {plan.cta}
-                </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Free</h3>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-slate-900">$0</span>
               </div>
-            ))}
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Unlimited analysis rounds',
+                  'Red flags + negotiation plan',
+                  '3 email draft variations',
+                  'Copy-paste output',
+                  'Save deals (with account)',
+                ].map((feature, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                    <svg className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/try"
+                className="block w-full text-center py-3 rounded-xl font-semibold bg-slate-100 text-slate-900 hover:bg-slate-200 transition-all"
+              >
+                Get Started
+              </Link>
+            </div>
+
+            <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50/30 shadow-lg p-8 relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <span className="bg-emerald-500 text-white text-xs font-semibold px-4 py-1 rounded-full">
+                  COMING SOON
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Pro</h3>
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-slate-900">$29</span>
+                <span className="text-slate-500">/month</span>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Everything in Free',
+                  'Unlimited saved deals',
+                  'Multi-round deal tracking',
+                  'Priority analysis speed',
+                  'Export to PDF',
+                  'Team features',
+                ].map((feature, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                    <svg className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/pricing"
+                className="block w-full text-center py-3 rounded-xl font-semibold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md transition-all"
+              >
+                Join Waitlist
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -558,64 +548,23 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-500">&copy; 2024 DealCheck. All rights reserved.</p>
-            <Link href="/contact" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-              Contact Sales →
-            </Link>
+            <div className="flex items-center gap-6">
+              <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
+                Pricing
+              </Link>
+              <Link href="/help" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
+                Help
+              </Link>
+              <Link href="/terms" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
+                Terms
+              </Link>
+              <Link href="/privacy" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
+                Privacy
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
     </div>
-  )
-}
-
-function Header() {
-  return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
-      <div className="max-w-6xl mx-auto px-5 sm:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold text-slate-900">DealCheck</span>
-          </Link>
-
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="#pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-              Pricing
-            </Link>
-            <Link href="#how-it-works" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-              How it works
-            </Link>
-            <Link href="#security" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-              Security
-            </Link>
-            <Link href="#faq" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-              FAQ
-            </Link>
-          </nav>
-
-          {/* Right side - Sign in + CTA */}
-          <div className="flex items-center gap-4">
-            <Link
-              href="/login"
-              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/try"
-              className="px-6 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
-            >
-              Try DealCheck
-            </Link>
-          </div>
-        </div>
-      </div>
-    </header>
   )
 }
