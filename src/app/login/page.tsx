@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Header } from '@/components/Header'
+import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { Loader2, ArrowRight, Shield } from 'lucide-react'
 import Link from 'next/link'
 

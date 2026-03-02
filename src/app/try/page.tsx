@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Upload, Loader2, Copy, Check } from 'lucide-react'
 import { OutputDisplay } from '@/components/OutputDisplay'
-import { Header } from '@/components/Header'
+import { UnifiedHeader } from '@/components/UnifiedHeader'
 import type { DealOutput } from '@/types'
 
 export default function TryPage() {
@@ -95,7 +95,7 @@ export default function TryPage() {
     return (
       <div className="min-h-screen bg-white">
         {/* Header */}
-        <Header variant="public" />
+        <UnifiedHeader variant="public" />
 
         <main className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
           <div className="mb-6">
