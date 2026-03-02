@@ -47,9 +47,12 @@ export default function LandingPage() {
                 >
                   Try DealCheck
                 </Link>
-                <button className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border border-slate-300">
+                <Link
+                  href="/example"
+                  className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border border-slate-300"
+                >
                   View example analysis <ArrowRight className="w-4 h-4 ml-2" />
-                </button>
+                </Link>
               </div>
             </div>
 
