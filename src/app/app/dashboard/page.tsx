@@ -45,16 +45,8 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/app">
-            <Button variant="outline" size="sm" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
       </div>
 
       {/* KPI Cards */}
