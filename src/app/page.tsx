@@ -15,8 +15,8 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left: Content */}
             <div>
-              <h1 className="text-5xl sm:text-6xl font-bold text-slate-900 tracking-tight mb-6 leading-tight">
-                Turn quotes into savings in minutes.
+              <h1 className="text-[3.5rem] sm:text-[4rem] font-bold text-slate-900 tracking-tight mb-6 leading-[1.1]">
+                Turn quotes into savings<br />in minutes.
               </h1>
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
                 Upload a quote. Get a negotiation strategy, pre-made emails to reduce price, improve terms, and lock better conditions.
