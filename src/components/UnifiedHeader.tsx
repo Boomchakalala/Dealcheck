@@ -286,6 +286,15 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
               <HelpCircle className="w-4 h-4" />
               Help
             </Link>
+            {!isUpgraded && (
+              <Link
+                href="/app/profile"
+                className="mx-4 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Upgrade
+              </Link>
+            )}
             <div className="border-t border-slate-200 my-2" />
             <div className="px-4 py-2 text-sm text-slate-600 truncate">{userEmail || 'User'}</div>
             <form action="/auth/signout" method="post">

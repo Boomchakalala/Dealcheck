@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { Header } from '@/components/Header'
+import { UnifiedHeader } from '@/components/UnifiedHeader'
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<'price' | 'terms' | 'emails'>('price')
@@ -11,7 +11,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <Header variant="default" />
+      <UnifiedHeader variant="landing" />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-20 pb-24">
