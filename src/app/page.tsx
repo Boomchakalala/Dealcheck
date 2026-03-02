@@ -131,21 +131,34 @@ export default function LandingPage() {
       </section>
 
       {/* Social Proof */}
-      <section className="bg-white border-y border-slate-200 py-12">
+      <section className="bg-white border-y border-slate-200 py-16">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <p className="text-center text-sm text-slate-500 mb-8 font-medium">
+          <p className="text-center text-sm text-slate-600 mb-10 font-semibold uppercase tracking-wide">
             Used by operators, founders, and procurement teams
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-12 opacity-60">
+
+          {/* Savings Banner */}
+          <div className="max-w-2xl mx-auto mb-12">
+            <div className="bg-gradient-to-r from-emerald-50 via-emerald-100/50 to-emerald-50 border-2 border-emerald-300 rounded-2xl p-8 text-center">
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                <h3 className="text-3xl font-bold text-slate-900">Typical savings: 5-20%</h3>
+              </div>
+              <p className="text-sm text-emerald-800 font-medium">
+                Depending on category and negotiation leverage
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-12 opacity-50">
             {['Acme', 'Nexis', 'Pioneer', 'Globex'].map((company) => (
-              <div key={company} className="text-2xl font-bold text-slate-400">
+              <div key={company} className="text-xl font-bold text-slate-400">
                 {company}
               </div>
             ))}
           </div>
-          <p className="text-center text-sm text-slate-400 mt-8">
-            Typical savings: 5-20% depending on category
-          </p>
         </div>
       </section>
 
