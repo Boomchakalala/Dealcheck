@@ -93,7 +93,7 @@ export default function TryPage() {
   // If we have output, show results
   if (output) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <div className="min-h-screen bg-white">
         {/* Header */}
         <Header variant="public" />
 
@@ -119,12 +119,12 @@ export default function TryPage() {
 
   // Upload interface
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <Header variant="public" />
 
-      <main className="max-w-4xl mx-auto px-5 sm:px-8 py-16">
-        <div className="text-center mb-12">
+      <main className="max-w-4xl mx-auto px-5 sm:px-8 py-12">
+        <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
             Upload a quote or contract
           </h1>
@@ -134,7 +134,7 @@ export default function TryPage() {
         </div>
 
         {/* Main upload area */}
-        <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-8 mb-8">
+        <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-8 mb-6">
           {/* Upload box */}
           <div
             className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-all ${
@@ -246,29 +246,61 @@ export default function TryPage() {
               'Analyze'
             )}
           </button>
+
+          {/* Trust badges - moved here */}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-600">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-200">
+              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span>Encrypted in transit</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-200">
+              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              <span>Deleted after analysis</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-200">
+              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span>Not used for training</span>
+            </div>
+          </div>
         </div>
 
         {/* What you'll get - Full width */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-8">
-          <h3 className="text-xl font-bold text-slate-900 mb-6 text-center">What you get</h3>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-6">
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-bold text-slate-900 mb-2">What you get</h3>
+            <p className="text-sm text-slate-600">Everything you need to negotiate confidently in one pass.</p>
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Primary outcomes - emphasized */}
             {[
-              { title: 'Pricing breakdown', desc: 'Total cost, line items, 3-year view' },
-              { title: 'Key terms', desc: 'Contract conditions flagged' },
-              { title: 'Red flags', desc: 'Hidden costs and bad clauses' },
-              { title: 'Negotiation strategy', desc: 'Priority asks with leverage' },
-              { title: 'Email drafts', desc: 'Copy/paste into your inbox' },
-              { title: 'Quick wins', desc: 'Easy savings to capture now' },
+              { title: 'Pricing breakdown', desc: 'Total cost, line items, 3-year view', primary: true },
+              { title: 'Key terms', desc: 'Contract conditions flagged', primary: true },
+              { title: 'Email drafts', desc: 'Copy/paste into your inbox', primary: true },
+              { title: 'Red flags', desc: 'Hidden costs and bad clauses', primary: false },
+              { title: 'Negotiation strategy', desc: 'Priority asks with leverage', primary: false },
+              { title: 'Quick wins', desc: 'Easy savings to capture now', primary: false },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                  item.primary ? 'bg-emerald-600' : 'bg-slate-300'
+                }`}>
                   <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-slate-900 mb-1">{item.title}</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">{item.desc}</p>
+                  <h4 className={`text-sm font-semibold mb-0.5 ${
+                    item.primary ? 'text-slate-900' : 'text-slate-700'
+                  }`}>{item.title}</h4>
+                  <p className={`text-xs leading-relaxed ${
+                    item.primary ? 'text-slate-600' : 'text-slate-500'
+                  }`}>{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -276,63 +308,67 @@ export default function TryPage() {
         </div>
 
         {/* How it works - Horizontal stepper */}
-        <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl border border-emerald-200 shadow-sm p-8 mb-8">
-          <h3 className="text-xl font-bold text-slate-900 mb-8 text-center">How it works</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { num: 1, label: 'Upload', desc: 'PDF, image, or paste text', active: step === 1 },
-              { num: 2, label: 'Analyze', desc: 'Extract pricing, terms, leverage', active: step === 2 },
-              { num: 3, label: 'Negotiate', desc: 'Get emails and start saving', active: step === 3 },
-            ].map((s, idx) => (
-              <div key={s.num} className="relative">
-                <div className={`bg-white rounded-xl border-2 p-6 transition-all ${
-                  s.active
-                    ? 'border-emerald-500 shadow-md'
-                    : 'border-slate-200'
-                }`}>
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold mb-3 ${
-                    s.active
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-100 text-slate-500'
-                  }`}>
-                    {s.num}
-                  </div>
-                  <h4 className={`text-base font-semibold mb-2 ${s.active ? 'text-slate-900' : 'text-slate-700'}`}>
-                    {s.label}
-                  </h4>
-                  <p className="text-sm text-slate-600">{s.desc}</p>
-                </div>
-                {idx < 2 && (
-                  <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10">
-                    <svg className="w-6 h-6 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-8 relative overflow-hidden">
+          {/* Subtle green wash */}
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/30 to-transparent pointer-events-none" />
 
-        {/* Trust line */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-slate-600 border-t border-slate-200 pt-8">
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            <span>Encrypted in transit</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            <span>~30 second analysis</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            <span>Never used for training</span>
+          <div className="relative">
+            <h3 className="text-xl font-bold text-slate-900 mb-6 text-center">How it works</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {[
+                {
+                  num: 1,
+                  label: 'Upload',
+                  desc: 'PDF, image, or paste text',
+                  bullets: ['PDF / image / paste text', 'Secure processing'],
+                  active: step === 1
+                },
+                {
+                  num: 2,
+                  label: 'Analyze',
+                  desc: 'Extract pricing, terms, leverage',
+                  bullets: ['Pricing + terms extracted', 'Leverage & red flags highlighted'],
+                  active: step === 2
+                },
+                {
+                  num: 3,
+                  label: 'Negotiate',
+                  desc: 'Get ready-to-send emails and a clear ask list',
+                  bullets: ['3 email drafts (neutral/firm/final)', 'Clear ask list (price, terms, renewal)'],
+                  active: step === 3
+                },
+              ].map((s) => (
+                <div key={s.num}>
+                  <div className={`bg-white rounded-xl p-5 transition-all ${
+                    s.active
+                      ? 'ring-2 ring-emerald-500/40 shadow-lg shadow-emerald-100/50'
+                      : 'border border-slate-200 hover:border-slate-300'
+                  }`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
+                        s.active
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        {s.num}
+                      </div>
+                      <h4 className="text-base font-semibold text-slate-900">
+                        {s.label}
+                      </h4>
+                    </div>
+                    <p className="text-sm text-slate-600 leading-snug mb-3">{s.desc}</p>
+                    <ul className="space-y-1.5">
+                      {s.bullets.map((bullet, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs text-slate-500">
+                          <span className="text-emerald-600 mt-0.5">•</span>
+                          <span className="leading-tight">{bullet}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </main>
