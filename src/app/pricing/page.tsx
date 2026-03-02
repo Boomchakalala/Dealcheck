@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { Header } from '@/components/Header'
 import { CheckCircle2, Sparkles, ArrowRight } from 'lucide-react'
 
 export default function PricingPage() {
@@ -18,16 +19,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <header className="border-b border-slate-200/60 bg-white/80 backdrop-blur-md sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="text-base font-bold text-slate-900 tracking-tight hover:text-slate-700 transition-colors">
-            DealCheck
-          </Link>
-          <Link href="/login" className="text-sm font-medium text-emerald-700 hover:text-emerald-800 transition-colors">
-            Sign in
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1">
         {/* Hero */}
