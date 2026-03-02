@@ -56,7 +56,7 @@ export default function LandingPage() {
             <div className="relative">
               {/* Savings Badge */}
               <div className="absolute -top-3 -right-3 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg z-10">
-                <p className="text-xs font-bold">Potential savings: $24K</p>
+                <p className="text-xs font-bold">Buy smarter</p>
               </div>
 
               <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
