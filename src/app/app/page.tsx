@@ -21,6 +21,10 @@ type DealWithRounds = {
   title: string
   deal_type: 'New' | 'Renewal'
   goal: string | null
+  status?: string
+  savings_amount?: number | null
+  savings_percent?: number | null
+  closed_at?: string | null
   created_at: string
   updated_at: string
   rounds: RoundData[]
@@ -135,6 +139,11 @@ export default function DashboardPage() {
   }
 
   function getDealStatus(deal: DealWithRounds): { label: string; color: string } {
+    // Check if deal is closed
+    if (deal.status?.startsWith('closed_')) {
+      return { label: 'Closed', color: 'bg-slate-100 text-slate-700 border-slate-200' }
+    }
+
     const latestRound = deal.rounds?.[0]
     if (!latestRound) return { label: 'Pending', color: 'bg-slate-100 text-slate-600 border-slate-200' }
     if (latestRound.status === 'completed') {
@@ -410,6 +419,11 @@ export default function DashboardPage() {
                         </h3>
                         {conclusion && (
                           <p className="text-sm text-slate-600 mb-2 line-clamp-1">{conclusion}</p>
+                        )}
+                        {deal.savings_amount !== null && deal.savings_amount !== undefined && deal.savings_amount > 0 && (
+                          <p className="text-xs font-medium text-emerald-700 mb-1">
+                            Saved: ${deal.savings_amount.toFixed(2)} ({deal.savings_percent?.toFixed(1)}%)
+                          </p>
                         )}
                         <p className="text-xs text-slate-400">Last updated {timeAgo}</p>
                       </div>
