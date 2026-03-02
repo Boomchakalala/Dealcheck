@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Upload, Loader2, Copy, Check } from 'lucide-react'
 import { OutputDisplay } from '@/components/OutputDisplay'
+import { Header } from '@/components/Header'
 import type { DealOutput } from '@/types'
 
 export default function TryPage() {
@@ -94,16 +95,10 @@ export default function TryPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
         {/* Header */}
-        <header className="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-10">
-          <div className="max-w-5xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="text-lg font-bold text-slate-900">DealCheck</span>
-            </Link>
+        <Header />
+
+        <main className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
+          <div className="mb-6">
             <button
               onClick={() => {
                 setOutput(null)
@@ -111,14 +106,11 @@ export default function TryPage() {
                 setUploadedFileName(null)
                 setStep(1)
               }}
-              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors inline-flex items-center gap-2"
             >
-              Analyze another quote
+              ← Analyze another quote
             </button>
           </div>
-        </header>
-
-        <main className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
           <OutputDisplay output={output} />
         </main>
       </div>
@@ -129,21 +121,7 @@ export default function TryPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold text-slate-900">DealCheck</span>
-          </Link>
-          <Link href="/login" className="text-sm font-medium text-emerald-700 hover:text-emerald-800 transition-colors">
-            Sign in
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       <main className="max-w-4xl mx-auto px-5 sm:px-8 py-16">
         <div className="text-center mb-12">
