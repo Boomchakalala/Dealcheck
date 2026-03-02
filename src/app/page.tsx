@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { CheckCircle2, ArrowRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 export default function LandingPage() {
   return (
@@ -30,7 +30,9 @@ export default function LandingPage() {
                   'Saves time vs doing it manually',
                 ].map((text) => (
                   <div key={text} className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                    <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
                     <span className="text-slate-700">{text}</span>
                   </div>
                 ))}
