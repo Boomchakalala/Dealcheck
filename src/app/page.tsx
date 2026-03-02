@@ -55,7 +55,10 @@ export default function LandingPage() {
             {/* Right: Product Preview */}
             <div className="relative">
               {/* Savings Badge */}
-              <div className="absolute -top-3 -right-3 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg z-10">
+              <div className="absolute -top-3 -right-3 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg z-10 flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
                 <p className="text-xs font-bold">Buy smarter</p>
               </div>
 
