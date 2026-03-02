@@ -546,13 +546,21 @@ function Header() {
             </Link>
           </nav>
 
-          {/* CTA */}
-          <Link
-            href="/try"
-            className="px-6 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
-          >
-            Try DealCheck
-          </Link>
+          {/* Right side - Sign in + CTA */}
+          <div className="flex items-center gap-4">
+            <Link
+              href="/login"
+              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/try"
+              className="px-6 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
+            >
+              Try DealCheck
+            </Link>
+          </div>
         </div>
       </div>
     </header>
