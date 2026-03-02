@@ -106,19 +106,19 @@ export default function LandingPage() {
                   </div>
 
                   {/* Emails Ready to Send */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-slate-700 uppercase mb-2">Emails ready to send in minutes</p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-xs font-semibold text-blue-700 uppercase mb-2">Emails ready to send in minutes</p>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-1 h-4 bg-emerald-500 rounded" />
+                        <div className="w-1 h-4 bg-blue-500 rounded" />
                         <div className="h-2 bg-slate-300 rounded flex-1" />
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-1 h-4 bg-emerald-500 rounded" />
+                        <div className="w-1 h-4 bg-blue-500 rounded" />
                         <div className="h-2 bg-slate-300 rounded flex-1" />
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-1 h-4 bg-emerald-500 rounded" />
+                        <div className="w-1 h-4 bg-blue-500 rounded" />
                         <div className="h-2 bg-slate-300 rounded flex-1" />
                       </div>
                     </div>
