@@ -89,19 +89,6 @@ export default async function DealPage({
         </div>
       </Card>
 
-      {/* Outcome Card */}
-      {deal.status?.startsWith('closed_') && deal.close_summary && (
-        <DealHeaderClient
-          dealId={dealId}
-          dealStatus={deal.status}
-          closeSummary={deal.close_summary}
-          savingsAmount={deal.savings_amount}
-          savingsPercent={deal.savings_percent}
-          closedAt={deal.closed_at}
-          currentTotal={latestOutput?.snapshot?.total_commitment}
-        />
-      )}
-
       {/* Next Actions Panel */}
       {latestOutput && (
         <Card className="p-6 bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200">
