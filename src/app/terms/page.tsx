@@ -6,7 +6,7 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <Header />
+      <Header variant="public" />
 
       <main className="flex-1">
         <div className="relative overflow-hidden">

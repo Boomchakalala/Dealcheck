@@ -54,7 +54,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <Header />
+      <Header variant="public" />
 
       <main className="flex-1 flex items-center justify-center px-5 py-16 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/30 via-white to-white pointer-events-none" />

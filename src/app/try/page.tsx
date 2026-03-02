@@ -95,7 +95,7 @@ export default function TryPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
         {/* Header */}
-        <Header />
+        <Header variant="public" />
 
         <main className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
           <div className="mb-6">
@@ -121,7 +121,7 @@ export default function TryPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Header */}
-      <Header />
+      <Header variant="public" />
 
       <main className="max-w-4xl mx-auto px-5 sm:px-8 py-16">
         <div className="text-center mb-12">

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 interface HeaderProps {
-  variant?: 'default' | 'app'
+  variant?: 'default' | 'app' | 'public'
   userEmail?: string
 }
 
@@ -41,6 +41,36 @@ export function Header({ variant = 'default', userEmail }: HeaderProps) {
     )
   }
 
+  // Public pages (login, pricing, help, etc.) - show Sign in link
+  if (variant === 'public') {
+    return (
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="text-lg font-bold text-slate-900">DealCheck</span>
+            </Link>
+
+            {/* Sign in link */}
+            <Link
+              href="/login"
+              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </header>
+    )
+  }
+
+  // Landing page - show navigation + Try DealCheck button
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-5 sm:px-8">
