@@ -548,7 +548,7 @@ function Header() {
 
           {/* CTA */}
           <Link
-            href="/login"
+            href="/try"
             className="px-6 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
           >
             Try DealCheck
