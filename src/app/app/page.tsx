@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Upload, Loader2 } from 'lucide-react'
+import { Upload, Loader2, HelpCircle, Lock, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 type RoundData = {
@@ -36,6 +36,7 @@ export default function DashboardPage() {
   const [analyzing, setAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const [showHelpModal, setShowHelpModal] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -135,9 +136,10 @@ export default function DashboardPage() {
 
   function getDealStatus(deal: DealWithRounds): { label: string; color: string } {
     const latestRound = deal.rounds?.[0]
-    if (!latestRound) return { label: 'Pending', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' }
+    if (!latestRound) return { label: 'Pending', color: 'bg-slate-100 text-slate-600 border-slate-200' }
     if (latestRound.status === 'completed') {
-      return { label: 'Completed', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' }
+      // Simple heuristic: if there's output, it's analyzed
+      return { label: 'Analyzed', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' }
     }
     return { label: 'In progress', color: 'bg-blue-100 text-blue-700 border-blue-200' }
   }
@@ -158,6 +160,59 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Help Modal */}
+      {showHelpModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowHelpModal(false)}>
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-slate-900">What can I upload?</h3>
+              <button onClick={() => setShowHelpModal(false)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+            <div className="space-y-4 text-sm text-slate-700">
+              <div>
+                <p className="font-semibold text-slate-900 mb-1.5">Supported formats:</p>
+                <ul className="space-y-1.5 ml-1">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 mt-0.5">•</span>
+                    <span>PDF documents (quotes, contracts, proposals)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 mt-0.5">•</span>
+                    <span>Images (PNG, JPG, WEBP) with text</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-600 mt-0.5">•</span>
+                    <span>Plain text (paste supplier emails or quotes)</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="pt-3 border-t border-slate-200">
+                <p className="font-semibold text-slate-900 mb-1.5">Privacy:</p>
+                <p className="text-slate-600 text-xs leading-relaxed">
+                  Files are processed securely over encrypted connections. Extracted text is deleted immediately after analysis unless you explicitly save the deal. We never use your data for AI training.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Top-right indicators */}
+      <div className="flex items-center justify-end gap-4 text-xs">
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 rounded-full border border-emerald-200">
+          <Lock className="w-3 h-3 text-emerald-600" />
+          <span className="text-emerald-700 font-medium">Private mode: ON</span>
+        </div>
+        <button
+          onClick={() => setShowHelpModal(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-full border border-slate-200 hover:bg-slate-150 transition-colors"
+        >
+          <HelpCircle className="w-3 h-3 text-slate-500" />
+          <span className="text-slate-600 font-medium">What can I upload?</span>
+        </button>
+      </div>
       {/* Welcome + Upload Section */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-8">
@@ -298,15 +353,36 @@ export default function DashboardPage() {
         </div>
 
         {!deals || deals.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
-            <div className="max-w-xs mx-auto">
-              <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <div className="text-center py-20 bg-white rounded-2xl border border-slate-200">
+            <div className="max-w-md mx-auto px-6">
+              <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
               </div>
-              <p className="text-sm text-slate-600">No deals yet</p>
-              <p className="text-xs text-slate-500 mt-1">Upload a quote above to get started</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Upload your first quote</h3>
+              <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                Get leverage, key terms, and ready-to-send emails in one pass.
+              </p>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg mb-3"
+              >
+                <Upload className="w-4 h-4" />
+                Upload a quote
+              </button>
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <span className="text-slate-400 text-xs">or</span>
+              </div>
+              <Link
+                href="/example"
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                See an example →
+              </Link>
+              <p className="text-xs text-slate-500 mt-6 leading-relaxed">
+                Processed securely. Deleted after analysis unless you save.
+              </p>
             </div>
           </div>
         ) : (
@@ -317,36 +393,29 @@ export default function DashboardPage() {
               const timeAgo = getTimeAgo(deal.updated_at)
               const latestRound = deal.rounds?.[0]
               const conclusion = latestRound?.output_json?.quick_read?.conclusion
+              const vendorName = deal.vendor || latestRound?.output_json?.vendor || deal.title
 
               return (
                 <Link key={deal.id} href={`/app/deal/${deal.id}`}>
-                  <div className="bg-white rounded-xl border border-slate-200 p-4 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer">
+                  <div className="bg-white rounded-xl border border-slate-200 p-5 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${status.color}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border ${status.color}`}>
                             {status.label}
                           </span>
                         </div>
-                        <h3 className="font-semibold text-slate-900 mb-1 truncate">
-                          {deal.vendor || deal.title}
+                        <h3 className="text-base font-bold text-slate-900 mb-1 truncate group-hover:text-emerald-700 transition-colors">
+                          {vendorName}
                         </h3>
                         {conclusion && (
-                          <p className="text-xs text-slate-600 mb-1.5 line-clamp-1">{conclusion}</p>
+                          <p className="text-sm text-slate-600 mb-2 line-clamp-1">{conclusion}</p>
                         )}
-                        <p className="text-xs text-slate-400">{timeAgo}</p>
+                        <p className="text-xs text-slate-400">Last updated {timeAgo}</p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         {amount && (
-                          <>
-                            <p className="text-sm font-bold text-slate-900">{amount}</p>
-                            {status.label === 'Pending' && (
-                              <p className="text-xs text-yellow-600 mt-0.5">pending</p>
-                            )}
-                            {status.label === 'Completed' && (
-                              <p className="text-xs text-emerald-600 mt-0.5">saved</p>
-                            )}
-                          </>
+                          <p className="text-base font-bold text-slate-900">{amount}</p>
                         )}
                       </div>
                     </div>
