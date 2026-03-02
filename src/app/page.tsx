@@ -17,10 +17,10 @@ export default function LandingPage() {
             {/* Left: Content */}
             <div>
               <h1 className="text-[2.75rem] sm:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-6 leading-[1.15]">
-                Turn quotes into savings in minutes.
+                Turn quotes into leverage in minutes.
               </h1>
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                Upload a quote. Get a negotiation strategy, pre-made emails to reduce price, improve terms, and lock better conditions.
+                Upload a quote. Get negotiation levers and ready-to-send emails to improve price, terms, and risk.
               </p>
 
               {/* Benefits */}
@@ -28,7 +28,7 @@ export default function LandingPage() {
                 {[
                   'Finds leverage & quick wins',
                   'Generates supplier emails you can actually send',
-                  'Saves time vs doing it manually',
+                  'Save hours per negotiation',
                 ].map((text) => (
                   <div key={text} className="flex items-center gap-3">
                     <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,7 +51,7 @@ export default function LandingPage() {
                   href="/example"
                   className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border border-slate-300"
                 >
-                  View example analysis <ArrowRight className="w-4 h-4 ml-2" />
+                  See an example <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </div>
             </div>
@@ -134,27 +134,45 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="bg-white border-y border-slate-200 py-16">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <p className="text-center text-sm text-slate-600 mb-10 font-semibold uppercase tracking-wide">
+      {/* Typical Outcomes */}
+      <section className="bg-white border-y border-slate-200 py-14">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
+          <p className="text-center text-sm text-slate-600 mb-8 font-semibold uppercase tracking-wide">
             Used by operators, founders, and procurement teams
           </p>
 
-          {/* Savings Banner */}
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-gradient-to-r from-emerald-50 via-emerald-100/50 to-emerald-50 border-2 border-emerald-300 rounded-2xl p-8 text-center">
-              <div className="flex items-center justify-center gap-3 mb-3">
-                <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          <h3 className="text-2xl font-bold text-slate-900 text-center mb-8">Typical outcomes</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
+                <svg className="w-6 h-6 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
-                <h3 className="text-3xl font-bold text-slate-900">Typical savings: 5-20%</h3>
               </div>
-              <p className="text-sm text-emerald-800 font-medium">
-                Depending on category and negotiation leverage
-              </p>
+              <p className="text-base font-semibold text-slate-900">Find 3–7 negotiation levers</p>
+            </div>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
+                <svg className="w-6 h-6 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p className="text-base font-semibold text-slate-900">Improve terms (payment, renewal, scope)</p>
+            </div>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
+                <svg className="w-6 h-6 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <p className="text-base font-semibold text-slate-900">Generate 3 ready-to-send email drafts</p>
             </div>
           </div>
+
+          <p className="text-xs text-slate-500 text-center mt-6">Results vary by supplier, category and leverage.</p>
         </div>
       </section>
 
