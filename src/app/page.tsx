@@ -41,7 +41,7 @@ export default function LandingPage() {
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/login"
+                  href="/try"
                   className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 transition-all shadow-md hover:shadow-lg"
                 >
                   Try DealCheck
@@ -492,7 +492,7 @@ export default function LandingPage() {
             Start analyzing your vendor quotes in seconds
           </p>
           <Link
-            href="/login"
+            href="/try"
             className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-white text-emerald-700 hover:bg-slate-50 transition-all shadow-lg hover:shadow-xl"
           >
             Try DealCheck
