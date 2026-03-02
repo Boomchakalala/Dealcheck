@@ -475,32 +475,91 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
         </div>
       </div>
 
-      {/* Bottom Section - Conclusion & Disclaimer */}
-      <div className="mt-8 space-y-4">
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
-          <p className="text-sm font-semibold text-emerald-900 mb-2">Conclusion</p>
-          <p className="text-sm text-emerald-800 leading-relaxed">{output.quick_read.conclusion}</p>
-        </div>
-
-        {/* Assumptions Line */}
-        <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg">
-          <p className="text-xs text-slate-600 leading-relaxed">
-            <span className="font-semibold text-slate-700">Assumptions:</span> Standard terms and typical vendor positioning. Add context to refine.
-          </p>
-        </div>
-
-        {output.assumptions.length > 0 && (
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
-            <p className="text-xs font-semibold text-slate-700 mb-2">Additional Assumptions</p>
-            <ul className="space-y-1">
-              {output.assumptions.map((assumption, idx) => (
-                <li key={idx} className="text-xs text-slate-600">• {assumption}</li>
-              ))}
-            </ul>
+      {/* Single-column wrap-up section */}
+      <div className="mt-8 space-y-6 max-w-4xl">
+        {/* Conclusion - Decision Banner */}
+        <div className="bg-white rounded-xl border-2 border-emerald-200 p-6 shadow-sm">
+          <div className="flex items-start gap-4 mb-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                  {output.quick_read.conclusion.toLowerCase().includes('risk') || output.quick_read.conclusion.toLowerCase().includes('concern')
+                    ? 'Needs tightening'
+                    : output.quick_read.conclusion.toLowerCase().includes('strong') || output.quick_read.conclusion.toLowerCase().includes('solid')
+                    ? 'Solid'
+                    : 'Review carefully'}
+                </span>
+              </div>
+              <p className="text-base font-semibold text-slate-900 mb-3">{output.quick_read.conclusion}</p>
+              <div className="space-y-2">
+                <div className="flex items-start gap-2">
+                  <span className="text-emerald-600 mt-1 flex-shrink-0">•</span>
+                  <div>
+                    <span className="text-xs font-semibold text-slate-700">Why this matters: </span>
+                    <span className="text-xs text-slate-600">
+                      {output.red_flags.length > 0
+                        ? `${output.red_flags.length} red flag${output.red_flags.length > 1 ? 's' : ''} identified that could impact cost or flexibility`
+                        : 'Strong foundation for negotiation with clear leverage points'}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-emerald-600 mt-1 flex-shrink-0">•</span>
+                  <div>
+                    <span className="text-xs font-semibold text-slate-700">Recommended action: </span>
+                    <span className="text-xs text-slate-600">
+                      {output.what_to_ask_for.must_have.length > 0
+                        ? 'Send Draft 1 (Neutral) with your must-have asks'
+                        : 'Review terms and prepare counter-offer'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-5">
+        {/* Notes & Assumptions - Accordion */}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <details className="group">
+            <summary className="flex items-center justify-between cursor-pointer px-6 py-4 hover:bg-slate-50 transition-colors">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-slate-900">Notes & assumptions</h3>
+                <span className="text-xs font-medium px-2 py-1 rounded bg-slate-100 text-slate-600">
+                  {output.assumptions.length || 0}
+                </span>
+              </div>
+              <ChevronDown className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" />
+            </summary>
+            <div className="px-6 pb-6 space-y-4 border-t border-slate-100">
+              <div className="pt-4">
+                <p className="text-xs font-semibold text-slate-700 mb-2">Standard Assumptions</p>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Analysis based on standard terms and typical vendor positioning. Add context to refine.
+                </p>
+              </div>
+              {output.assumptions.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-slate-700 mb-2">Additional Assumptions</p>
+                  <ul className="space-y-1.5">
+                    {output.assumptions.map((assumption, idx) => (
+                      <li key={idx} className="text-xs text-slate-600 flex items-start gap-2">
+                        <span className="text-slate-400 mt-0.5">•</span>
+                        <span>{assumption}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </details>
+        </div>
+
+        {/* Legal Note - Muted Callout */}
+        <div className="flex items-start gap-3 px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg">
+          <svg className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           <p className="text-xs text-slate-600 leading-relaxed">{output.disclaimer}</p>
         </div>
       </div>

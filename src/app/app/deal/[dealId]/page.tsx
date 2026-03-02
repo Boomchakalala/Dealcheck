@@ -135,7 +135,7 @@ export default async function DealPage({
 
       {/* Add Round Form */}
       <div id="add-round">
-        <AddRoundForm dealId={dealId} />
+        <AddRoundForm dealId={dealId} roundNumber={sortedRounds.length + 1} />
       </div>
 
       {/* Rounds List */}
