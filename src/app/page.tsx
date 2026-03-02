@@ -54,6 +54,11 @@ export default function LandingPage() {
 
             {/* Right: Product Preview */}
             <div className="relative">
+              {/* Savings Badge */}
+              <div className="absolute -top-3 -right-3 bg-emerald-600 text-white px-4 py-2 rounded-full shadow-lg z-10">
+                <p className="text-xs font-bold">Potential savings: $24K</p>
+              </div>
+
               <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
                 {/* Mock product screenshot */}
                 <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-6 border-b border-slate-200">
@@ -81,6 +86,25 @@ export default function LandingPage() {
                   {/* Negotiation Levers */}
                   <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
                     <p className="text-xs font-semibold text-slate-700 uppercase mb-2">Negotiation Levers</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1 h-4 bg-emerald-500 rounded" />
+                        <div className="h-2 bg-slate-300 rounded flex-1" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-1 h-4 bg-emerald-500 rounded" />
+                        <div className="h-2 bg-slate-300 rounded flex-1" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-1 h-4 bg-emerald-500 rounded" />
+                        <div className="h-2 bg-slate-300 rounded flex-1" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Emails Ready to Send */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                    <p className="text-xs font-semibold text-slate-700 uppercase mb-2">Emails ready to send in minutes</p>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="w-1 h-4 bg-emerald-500 rounded" />
