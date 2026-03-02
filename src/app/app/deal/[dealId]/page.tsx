@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { OutputDisplay } from '@/components/OutputDisplay'
+import { DealHeaderClient } from '@/components/DealHeaderClient'
 import Link from 'next/link'
 import { ArrowLeft, CheckSquare, Mail, Plus, AlertTriangle } from 'lucide-react'
 import { AddRoundForm } from './AddRoundForm'
@@ -70,6 +71,15 @@ export default async function DealPage({
               )}
             </div>
           </div>
+          <DealHeaderClient
+            dealId={dealId}
+            dealStatus={deal.status || 'in_progress'}
+            closeSummary={deal.close_summary}
+            savingsAmount={deal.savings_amount}
+            savingsPercent={deal.savings_percent}
+            closedAt={deal.closed_at}
+            currentTotal={latestOutput?.snapshot?.total_commitment}
+          />
         </div>
 
         <div className="text-sm text-gray-500">
@@ -78,6 +88,19 @@ export default async function DealPage({
           <p className="font-semibold mt-2">{sortedRounds.length} round{sortedRounds.length !== 1 ? 's' : ''}</p>
         </div>
       </Card>
+
+      {/* Outcome Card */}
+      {deal.status?.startsWith('closed_') && deal.close_summary && (
+        <DealHeaderClient
+          dealId={dealId}
+          dealStatus={deal.status}
+          closeSummary={deal.close_summary}
+          savingsAmount={deal.savings_amount}
+          savingsPercent={deal.savings_percent}
+          closedAt={deal.closed_at}
+          currentTotal={latestOutput?.snapshot?.total_commitment}
+        />
+      )}
 
       {/* Next Actions Panel */}
       {latestOutput && (
