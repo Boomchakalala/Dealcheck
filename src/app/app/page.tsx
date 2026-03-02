@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Upload, Loader2, CheckCircle } from 'lucide-react'
+import { Upload, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 type RoundData = {
