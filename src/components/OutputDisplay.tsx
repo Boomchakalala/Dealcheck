@@ -2,7 +2,7 @@
 
 import { type DealOutput } from '@/types'
 import { CopyButton } from './CopyButton'
-import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, X } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, X, Copy } from 'lucide-react'
 import { useState } from 'react'
 
 interface OutputDisplayProps {
@@ -12,6 +12,8 @@ interface OutputDisplayProps {
 export function OutputDisplay({ output }: OutputDisplayProps) {
   const [summaryExpanded, setSummaryExpanded] = useState(true)
   const [selectedEmail, setSelectedEmail] = useState<'neutral' | 'firm' | 'final' | null>(null)
+  const [emailChannel, setEmailChannel] = useState<'email' | 'slack'>('email')
+  const [emailLength, setEmailLength] = useState<'short' | 'standard'>('standard')
 
   const emailDrafts = {
     neutral: { title: 'Draft 1 — Neutral', ...output.email_drafts.neutral },
@@ -24,13 +26,60 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
       {/* Email Modal */}
       {selectedEmail && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedEmail(null)}>
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
               <h3 className="font-bold text-slate-900">{emailDrafts[selectedEmail].title}</h3>
               <button onClick={() => setSelectedEmail(null)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
                 <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
+
+            {/* Email Controls */}
+            <div className="px-6 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Channel:</span>
+                <div className="flex rounded-lg border border-slate-200 bg-white">
+                  <button
+                    onClick={() => setEmailChannel('email')}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-l-lg transition-colors ${
+                      emailChannel === 'email' ? 'bg-emerald-600 text-white' : 'text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    Email
+                  </button>
+                  <button
+                    onClick={() => setEmailChannel('slack')}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-r-lg transition-colors ${
+                      emailChannel === 'slack' ? 'bg-emerald-600 text-white' : 'text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    Slack
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Length:</span>
+                <div className="flex rounded-lg border border-slate-200 bg-white">
+                  <button
+                    onClick={() => setEmailLength('short')}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-l-lg transition-colors ${
+                      emailLength === 'short' ? 'bg-emerald-600 text-white' : 'text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    Short
+                  </button>
+                  <button
+                    onClick={() => setEmailLength('standard')}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-r-lg transition-colors ${
+                      emailLength === 'standard' ? 'bg-emerald-600 text-white' : 'text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    Standard
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div className="flex-1 overflow-y-auto p-6">
               <div className="mb-4">
                 <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">Subject</p>
@@ -52,19 +101,49 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
       )}
 
       {/* Header */}
-      <div className="mb-6 flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200">
-              Analysis Complete
-            </span>
+      <div className="mb-6">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200">
+                Analysis Complete
+              </span>
+            </div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-1">{output.title}</h1>
+            <p className="text-lg text-slate-600">{output.vendor}</p>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-1">{output.title}</h1>
-          <p className="text-lg text-slate-600">{output.vendor}</p>
+          <div className="text-right">
+            <p className="text-sm text-slate-600 mb-1">Total Commitment</p>
+            <p className="text-2xl font-bold text-slate-900">{output.snapshot.total_commitment}</p>
+          </div>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-slate-600 mb-1">Total Commitment</p>
-          <p className="text-2xl font-bold text-slate-900">{output.snapshot.total_commitment}</p>
+
+        {/* Key Facts Chips */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {output.vendor && (
+            <div className="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs">
+              <span className="font-semibold text-slate-600">Vendor:</span>{' '}
+              <span className="text-slate-900">{output.vendor}</span>
+            </div>
+          )}
+          {output.snapshot.total_commitment && (
+            <div className="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs">
+              <span className="font-semibold text-slate-600">Total:</span>{' '}
+              <span className="text-slate-900">{output.snapshot.total_commitment}</span>
+            </div>
+          )}
+          {output.snapshot.term && (
+            <div className="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs">
+              <span className="font-semibold text-slate-600">Term:</span>{' '}
+              <span className="text-slate-900">{output.snapshot.term}</span>
+            </div>
+          )}
+          {output.snapshot.billing_payment && (
+            <div className="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs">
+              <span className="font-semibold text-slate-600">Payment:</span>{' '}
+              <span className="text-slate-900">{output.snapshot.billing_payment}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -187,6 +266,118 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
 
         {/* Right Sidebar */}
         <div className="space-y-6">
+          {/* Your Ask (Copy/Paste) */}
+          <div className="bg-emerald-50 border-2 border-emerald-300 rounded-xl p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-slate-900">Your Ask (copy/paste)</h3>
+              <button className="text-emerald-700 hover:text-emerald-800">
+                <Copy className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="space-y-3 text-xs">
+              {/* Price Ask */}
+              {output.what_to_ask_for.must_have.filter(ask =>
+                ask.toLowerCase().includes('price') ||
+                ask.toLowerCase().includes('discount') ||
+                ask.toLowerCase().includes('cost')
+              ).length > 0 && (
+                <div>
+                  <p className="font-semibold text-emerald-900 mb-1">Price:</p>
+                  {output.what_to_ask_for.must_have
+                    .filter(ask =>
+                      ask.toLowerCase().includes('price') ||
+                      ask.toLowerCase().includes('discount') ||
+                      ask.toLowerCase().includes('cost')
+                    )
+                    .map((ask, idx) => (
+                      <p key={idx} className="text-slate-700 leading-relaxed">• {ask}</p>
+                    ))}
+                </div>
+              )}
+
+              {/* Terms Ask */}
+              {output.what_to_ask_for.must_have.filter(ask =>
+                ask.toLowerCase().includes('payment') ||
+                ask.toLowerCase().includes('term') ||
+                ask.toLowerCase().includes('month')
+              ).length > 0 && (
+                <div>
+                  <p className="font-semibold text-emerald-900 mb-1">Terms:</p>
+                  {output.what_to_ask_for.must_have
+                    .filter(ask =>
+                      ask.toLowerCase().includes('payment') ||
+                      ask.toLowerCase().includes('term') ||
+                      ask.toLowerCase().includes('month')
+                    )
+                    .map((ask, idx) => (
+                      <p key={idx} className="text-slate-700 leading-relaxed">• {ask}</p>
+                    ))}
+                </div>
+              )}
+
+              {/* Clause Ask */}
+              {output.what_to_ask_for.must_have.filter(ask =>
+                ask.toLowerCase().includes('renewal') ||
+                ask.toLowerCase().includes('cap') ||
+                ask.toLowerCase().includes('clause') ||
+                ask.toLowerCase().includes('scope')
+              ).length > 0 && (
+                <div>
+                  <p className="font-semibold text-emerald-900 mb-1">Clauses:</p>
+                  {output.what_to_ask_for.must_have
+                    .filter(ask =>
+                      ask.toLowerCase().includes('renewal') ||
+                      ask.toLowerCase().includes('cap') ||
+                      ask.toLowerCase().includes('clause') ||
+                      ask.toLowerCase().includes('scope')
+                    )
+                    .map((ask, idx) => (
+                      <p key={idx} className="text-slate-700 leading-relaxed">• {ask}</p>
+                    ))}
+                </div>
+              )}
+
+              {/* General asks if no specific categories matched */}
+              {output.what_to_ask_for.must_have.filter(ask =>
+                !(ask.toLowerCase().includes('price') ||
+                  ask.toLowerCase().includes('discount') ||
+                  ask.toLowerCase().includes('cost') ||
+                  ask.toLowerCase().includes('payment') ||
+                  ask.toLowerCase().includes('term') ||
+                  ask.toLowerCase().includes('month') ||
+                  ask.toLowerCase().includes('renewal') ||
+                  ask.toLowerCase().includes('cap') ||
+                  ask.toLowerCase().includes('clause') ||
+                  ask.toLowerCase().includes('scope'))
+              ).length > 0 && (
+                <div>
+                  <p className="font-semibold text-emerald-900 mb-1">Other:</p>
+                  {output.what_to_ask_for.must_have
+                    .filter(ask =>
+                      !(ask.toLowerCase().includes('price') ||
+                        ask.toLowerCase().includes('discount') ||
+                        ask.toLowerCase().includes('cost') ||
+                        ask.toLowerCase().includes('payment') ||
+                        ask.toLowerCase().includes('term') ||
+                        ask.toLowerCase().includes('month') ||
+                        ask.toLowerCase().includes('renewal') ||
+                        ask.toLowerCase().includes('cap') ||
+                        ask.toLowerCase().includes('clause') ||
+                        ask.toLowerCase().includes('scope'))
+                    )
+                    .map((ask, idx) => (
+                      <p key={idx} className="text-slate-700 leading-relaxed">• {ask}</p>
+                    ))}
+                </div>
+              )}
+            </div>
+            <div className="mt-3 pt-3 border-t border-emerald-200">
+              <p className="text-xs text-emerald-800">
+                <span className="font-semibold">Next step:</span> Send Draft 1 below
+              </p>
+            </div>
+          </div>
+
           {/* Quick Concerns */}
           <div className="bg-gradient-to-br from-amber-50 to-white rounded-xl border-2 border-amber-200 p-5">
             <div className="flex items-center gap-2 mb-3">
@@ -291,9 +482,16 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
           <p className="text-sm text-emerald-800 leading-relaxed">{output.quick_read.conclusion}</p>
         </div>
 
+        {/* Assumptions Line */}
+        <div className="px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg">
+          <p className="text-xs text-slate-600 leading-relaxed">
+            <span className="font-semibold text-slate-700">Assumptions:</span> Standard terms and typical vendor positioning. Add context to refine.
+          </p>
+        </div>
+
         {output.assumptions.length > 0 && (
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
-            <p className="text-xs font-semibold text-slate-700 mb-2">Assumptions</p>
+            <p className="text-xs font-semibold text-slate-700 mb-2">Additional Assumptions</p>
             <ul className="space-y-1">
               {output.assumptions.map((assumption, idx) => (
                 <li key={idx} className="text-xs text-slate-600">• {assumption}</li>
