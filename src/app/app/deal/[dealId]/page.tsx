@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card'
 import { OutputDisplay } from '@/components/OutputDisplay'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { Breadcrumb } from '@/components/Breadcrumb'
+import { DealActionBar } from '@/components/DealActionBar'
 import { CheckSquare, Mail, Plus } from 'lucide-react'
 import { AddRoundForm } from './AddRoundForm'
 
@@ -165,6 +166,13 @@ export default async function DealPage({
           <p className="text-gray-600">No rounds yet. Add a round above to start.</p>
         </Card>
       )}
+
+      {/* Sticky Action Bar */}
+      <DealActionBar
+        dealId={dealId}
+        currentTotal={latestOutput?.snapshot?.total_commitment}
+        dealStatus={deal.status}
+      />
     </div>
   )
 }
