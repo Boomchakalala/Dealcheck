@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -87,11 +87,6 @@ export default function DashboardPage() {
     } finally {
       setUploading(false)
     }
-  }
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) handleFileUpload(file)
   }
 
   const handleAnalyze = async () => {
@@ -277,13 +272,9 @@ export default function DashboardPage() {
               <p className="text-sm text-slate-600 mb-6 leading-relaxed">
                 Get leverage, key terms, and ready-to-send emails in one pass.
               </p>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg mb-3"
-              >
-                <Upload className="w-4 h-4" />
-                Upload a quote
-              </button>
+              <p className="text-sm font-medium text-slate-600 mb-3">
+                Scroll up to upload a file or paste text to get started.
+              </p>
               <div className="flex items-center justify-center gap-2 mb-6">
                 <span className="text-slate-400 text-xs">or</span>
               </div>
