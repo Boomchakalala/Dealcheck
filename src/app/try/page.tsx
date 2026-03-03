@@ -14,6 +14,33 @@ export default function TryPage() {
   const [output, setOutput] = useState<DealOutput | null>(null)
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [dealType, setDealType] = useState<'New' | 'Renewal'>('New')
+  const [goal, setGoal] = useState('')
+
+  const demoText = `QUOTE - CloudStore Enterprise Plan
+
+Annual Subscription: $45,000/year
+Setup Fee: $5,000 (one-time)
+User Licenses: 50 users included
+Additional users: $50/user/month
+
+Contract Terms:
+- 3-year commitment required
+- Auto-renewal for 3 years unless 90 days notice
+- Price increase up to 8% annually
+- Payment: Annual in advance
+- Termination: Requires 180 days notice
+
+Support:
+- Standard support included
+- Premium support: +$12,000/year
+
+This quote expires in 14 days.`
+
+  const handleUseDemoText = () => {
+    setInput(demoText)
+    setUploadedFileName(null)
+  }
 
   const handleFileUpload = async (file: File) => {
     setUploading(true)
@@ -51,7 +78,11 @@ export default function TryPage() {
       const response = await fetch('/api/trial', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ extractedText: input, dealType: 'New' }),
+        body: JSON.stringify({
+          extractedText: input,
+          dealType,
+          goal: goal || null
+        }),
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to analyze')
@@ -106,6 +137,64 @@ export default function TryPage() {
           <p className="text-lg text-slate-600">
             Drop a file or paste text. We&apos;ll extract pricing + terms and generate a negotiation strategy.
           </p>
+        </div>
+
+        {/* Optional context chips */}
+        <div className="mb-6 space-y-4">
+          <div>
+            <label className="text-sm font-medium text-slate-700 mb-2 block">
+              Deal type <span className="text-slate-500 font-normal">(optional)</span>
+            </label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setDealType('New')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
+                  dealType === 'New'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                }`}
+              >
+                New purchase
+              </button>
+              <button
+                type="button"
+                onClick={() => setDealType('Renewal')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
+                  dealType === 'Renewal'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                }`}
+              >
+                Renewal
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="goal" className="text-sm font-medium text-slate-700 mb-2 block">
+              Your goal <span className="text-slate-500 font-normal">(optional)</span>
+            </label>
+            <input
+              id="goal"
+              type="text"
+              value={goal}
+              onChange={(e) => setGoal(e.target.value)}
+              placeholder="e.g., Reduce cost by 15%, Remove auto-renewal"
+              className="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+        </div>
+
+        {/* Demo text button */}
+        <div className="mb-4 flex justify-end">
+          <button
+            onClick={handleUseDemoText}
+            disabled={uploading || analyzing}
+            className="text-sm font-medium text-emerald-600 hover:text-emerald-700 disabled:opacity-50 transition-colors"
+          >
+            Use demo text →
+          </button>
         </div>
 
         {/* Uploader */}
