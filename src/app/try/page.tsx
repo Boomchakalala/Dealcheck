@@ -121,7 +121,7 @@ export default function TryPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <Header variant="public" />
+      <UnifiedHeader variant="public" />
 
       <main className="max-w-4xl mx-auto px-5 sm:px-8 py-12">
         <div className="text-center mb-10">
