@@ -44,8 +44,6 @@ export default function DashboardPage() {
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [showHelpModal, setShowHelpModal] = useState(false)
   const [dealToClose, setDealToClose] = useState<{id: string, total?: string} | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
