@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Upload, Loader2, HelpCircle, Lock, X, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { CloseDealModal } from '@/components/CloseDealModal'
+import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
 
 type RoundData = {
   id: string
@@ -218,10 +219,6 @@ export default function DashboardPage() {
 
       {/* Top-right indicators */}
       <div className="flex items-center justify-end gap-4 text-xs">
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 rounded-full border border-emerald-200">
-          <Lock className="w-3 h-3 text-emerald-600" />
-          <span className="text-emerald-700 font-medium">Private mode: ON</span>
-        </div>
         <button
           onClick={() => setShowHelpModal(true)}
           className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-full border border-slate-200 hover:bg-slate-150 transition-colors"
@@ -230,132 +227,33 @@ export default function DashboardPage() {
           <span className="text-slate-600 font-medium">What can I upload?</span>
         </button>
       </div>
+
       {/* Welcome + Upload Section */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-8">
-          <h1 className="text-2xl font-bold text-slate-900 mb-1">
-            Welcome back!
-          </h1>
-          <p className="text-sm text-slate-600 mb-6">
-            Upload a quote or paste text to start analysis
-          </p>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 mb-1">
+          Welcome back!
+        </h1>
+        <p className="text-sm text-slate-600 mb-6">
+          Upload a quote or paste text to start analysis
+        </p>
 
-          <div className="space-y-3">
-            {/* Upload Button */}
-            <div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                className="hidden"
-                accept=".pdf,.png,.jpg,.jpeg,.webp"
-                onChange={handleFileSelect}
-                disabled={uploading || analyzing}
-              />
-              <Button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading || analyzing}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-11"
-              >
-                {uploading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4" />
-                    Upload File
-                  </>
-                )}
-              </Button>
-            </div>
-
-            {uploadedFileName && (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
-                <span className="text-sm font-medium text-emerald-800">📄 {uploadedFileName}</span>
-                <button
-                  onClick={() => {
-                    setUploadedFileName(null)
-                    setInput('')
-                  }}
-                  className="text-emerald-600 hover:text-emerald-800 text-sm font-medium"
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-
-            {/* Paste text */}
-            <button
-              onClick={() => textareaRef.current?.focus()}
-              className="w-full py-2.5 text-sm font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
-            >
-              Paste text
-            </button>
-
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Or paste supplier quote text here..."
-              className="w-full p-4 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              rows={3}
-              disabled={uploading || analyzing}
-            />
-
-            {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-                {error}
-              </div>
-            )}
-
-            {/* Analyze Button */}
-            <Button
-              onClick={handleAnalyze}
-              disabled={!input.trim() || uploading || analyzing}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-11"
-            >
-              {analyzing ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                'Analyze'
-              )}
-            </Button>
-          </div>
-        </div>
-
-        {/* What you get - footer style */}
-        <div className="bg-slate-50 border-t border-slate-200 px-8 py-4">
-          <div className="flex items-center justify-between text-xs text-slate-600">
-            <div className="flex items-center gap-1.5">
-              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Pricing & terms</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <span>Red flags</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              <span>Strategy</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              <span>Email drafts</span>
-            </div>
-          </div>
-        </div>
+        <QuoteUploaderCard
+          variant="app"
+          input={input}
+          setInput={setInput}
+          uploading={uploading}
+          analyzing={analyzing}
+          error={error}
+          uploadedFileName={uploadedFileName}
+          onFileUpload={handleFileUpload}
+          onAnalyze={handleAnalyze}
+          onClearFile={() => {
+            setUploadedFileName(null)
+            setInput('')
+          }}
+          showTrustBadges={false}
+          showWhatYouGet={true}
+        />
       </div>
 
       {/* Your Quote Analysis */}
