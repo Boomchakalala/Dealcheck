@@ -43,20 +43,37 @@ export default function LandingPage() {
               </div>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <Link
                   href="/try"
-                  className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 transition-all shadow-md hover:shadow-lg"
+                  className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg"
                 >
                   Try DealCheck
                 </Link>
                 <Link
                   href="/example"
-                  className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border border-slate-300"
+                  className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border-2 border-slate-300"
                 >
                   See an example <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </div>
+
+              {/* Mini input */}
+              <Link href="/try">
+                <div className="group cursor-pointer p-4 bg-gradient-to-br from-slate-50 to-slate-100/50 border-2 border-dashed border-slate-300 hover:border-emerald-400 hover:bg-emerald-50/30 rounded-xl transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200 group-hover:border-emerald-500 transition-colors">
+                      <svg className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-slate-700 group-hover:text-emerald-700 transition-colors">Drop a quote or paste text to start</p>
+                      <p className="text-xs text-slate-500">Click to upload • PDF, PNG, JPG</p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
             </div>
 
             {/* Right: Product Preview */}
