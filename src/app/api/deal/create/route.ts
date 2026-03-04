@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
     // Analyze the deal with AI (with optional vision support)
     const output = await analyzeDeal(
-      validated.extractedText,
+      validated.extractedText || '',
       validated.dealType,
       validated.goal,
       validated.notes,
