@@ -97,7 +97,7 @@ export default function DashboardPage() {
     setAnalyzing(true)
     setError(null)
     try {
-      const response = await fetch('/api/deals', {
+      const response = await fetch('/api/deal/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -106,13 +106,14 @@ export default function DashboardPage() {
           dealType: 'New',
           goal: null,
           extractedText: input,
+          saveExtractedText: false,
         }),
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to create deal')
 
       // Redirect to the new deal
-      router.push(`/app/deal/${data.deal.id}`)
+      router.push(`/app/deal/${data.dealId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
