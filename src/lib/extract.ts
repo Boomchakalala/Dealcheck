@@ -3,19 +3,26 @@ import Tesseract from 'tesseract.js'
 // Canvas is optional - not needed for Vercel deployment
 if (typeof window === 'undefined') {
   try {
-    // Try to load canvas if available (local dev only)
+    // @ts-ignore - Canvas is optional for production
     const canvas = require('canvas')
     if (canvas) {
+      // @ts-ignore - DOMMatrix polyfill for pdf-parse
       global.DOMMatrix = class DOMMatrix {
         constructor() {
+          // @ts-ignore
           this.a = 1
+          // @ts-ignore
           this.b = 0
+          // @ts-ignore
           this.c = 0
+          // @ts-ignore
           this.d = 1
+          // @ts-ignore
           this.e = 0
+          // @ts-ignore
           this.f = 0
         }
-      } as any
+      }
     }
   } catch (e) {
     // Canvas not available - this is fine for production
