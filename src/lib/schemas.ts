@@ -56,9 +56,16 @@ export const CreateDealSchema = z.object({
   dealType: z.enum(['New', 'Renewal']),
   goal: z.string().optional(),
   notes: z.string().optional(),
-  extractedText: z.string().min(10, 'Extracted text is too short'),
+  extractedText: z.string().optional(),
+  imageData: z.object({
+    base64: z.string(),
+    mimeType: z.string(),
+  }).optional(),
   saveExtractedText: z.boolean().default(false),
-})
+}).refine(
+  (data) => (data.extractedText && data.extractedText.length >= 10) || data.imageData,
+  { message: 'Either extractedText (min 10 chars) or imageData must be provided' }
+)
 
 export const AddRoundSchema = z.object({
   dealId: z.string().uuid(),

@@ -30,12 +30,14 @@ export async function POST(request: Request) {
     const body = await request.json()
     const validated = CreateDealSchema.parse(body)
 
-    // Analyze the deal with AI
+    // Analyze the deal with AI (with optional vision support)
     const output = await analyzeDeal(
       validated.extractedText,
       validated.dealType,
       validated.goal,
-      validated.notes
+      validated.notes,
+      undefined,
+      validated.imageData
     )
 
     // Auto-detect vendor from output if not provided
