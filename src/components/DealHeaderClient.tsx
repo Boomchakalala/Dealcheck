@@ -106,7 +106,7 @@ export function DealHeaderClient({
                   </span>
                 )}
               </div>
-              {savingsAmount !== null && savingsAmount > 0 && (
+              {savingsAmount !== null && savingsAmount !== undefined && savingsAmount > 0 && (
                 <div className="mb-3 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
                   <p className="text-sm font-semibold text-emerald-900">
                     Saved: ${savingsAmount.toFixed(2)} ({savingsPercent?.toFixed(1)}%)
