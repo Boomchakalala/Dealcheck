@@ -27,12 +27,26 @@ export async function POST(request: Request) {
       )
     }
 
-    // Extract text from file
+    // For images, return as base64 to use OpenAI vision API
+    if (file.type.startsWith('image/')) {
+      const buffer = Buffer.from(await file.arrayBuffer())
+      const base64 = buffer.toString('base64')
+
+      return NextResponse.json({
+        useVision: true,
+        imageData: {
+          base64,
+          mimeType: file.type,
+        },
+      })
+    }
+
+    // For PDFs, still extract text (PDFs aren't well supported by vision API yet)
     const extractedText = await extractText(file)
 
     // File is NOT stored - we only return the extracted text
     // This ensures no raw files are retained
-    return NextResponse.json({ extractedText })
+    return NextResponse.json({ extractedText, useVision: false })
   } catch (error) {
     console.error('Upload error:', error)
     if (error instanceof Error) {

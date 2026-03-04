@@ -101,25 +101,46 @@ export async function analyzeDeal(
   dealType: 'New' | 'Renewal',
   goal?: string,
   notes?: string,
-  previousRoundOutput?: DealOutput
+  previousRoundOutput?: DealOutput,
+  imageData?: { base64: string; mimeType: string }
 ): Promise<DealOutputType> {
   const contextParts = [
     `Deal Type: ${dealType}`,
     goal && `User Goal: ${goal}`,
     notes && `User Notes: ${notes}`,
     previousRoundOutput && `Previous Round Context: ${JSON.stringify(previousRoundOutput, null, 2)}`,
-    `\nSupplier Document/Quote:\n${extractedText}`,
   ].filter(Boolean)
 
-  const userPrompt = contextParts.join('\n\n')
+  const userPrompt = imageData
+    ? contextParts.join('\n\n') + '\n\nPlease analyze the quote/contract shown in the image.'
+    : contextParts.join('\n\n') + `\n\nSupplier Document/Quote:\n${extractedText}`
 
   try {
+    const messages: any[] = [
+      { role: 'system', content: SYSTEM_PROMPT },
+    ]
+
+    // If we have image data, use vision API
+    if (imageData) {
+      messages.push({
+        role: 'user',
+        content: [
+          { type: 'text', text: userPrompt },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:${imageData.mimeType};base64,${imageData.base64}`,
+            },
+          },
+        ],
+      })
+    } else {
+      messages.push({ role: 'user', content: userPrompt })
+    }
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt },
-      ],
+      messages,
       response_format: { type: 'json_object' },
       temperature: 0.7,
       max_tokens: 3000,

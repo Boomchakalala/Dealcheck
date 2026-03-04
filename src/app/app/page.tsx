@@ -42,6 +42,7 @@ export default function DashboardPage() {
   const [analyzing, setAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const [imageData, setImageData] = useState<{ base64: string; mimeType: string } | null>(null)
   const [showHelpModal, setShowHelpModal] = useState(false)
   const [dealToClose, setDealToClose] = useState<{id: string, total?: string} | null>(null)
 
