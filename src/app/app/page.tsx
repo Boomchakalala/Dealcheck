@@ -81,7 +81,16 @@ export default function DashboardPage() {
       const response = await fetch('/api/upload', { method: 'POST', body: formData })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to process file')
-      setInput(data.extractedText)
+
+      // Handle vision API response (images)
+      if (data.useVision && data.imageData) {
+        setImageData(data.imageData)
+        setInput('[Image uploaded - will be analyzed directly by AI]')
+      } else {
+        // Handle text extraction (PDFs, or fallback)
+        setInput(data.extractedText)
+        setImageData(null)
+      }
       setUploadedFileName(file.name)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to process file')
@@ -91,24 +100,33 @@ export default function DashboardPage() {
   }
 
   const handleAnalyze = async () => {
-    if (!input.trim()) {
+    if (!input.trim() && !imageData) {
       setError('Please upload a file or paste text first.')
       return
     }
     setAnalyzing(true)
     setError(null)
     try {
+      const payload: any = {
+        title: uploadedFileName || 'New Deal',
+        vendor: null,
+        dealType: 'New',
+        goal: null,
+        saveExtractedText: false,
+      }
+
+      // Send either imageData or extractedText
+      if (imageData) {
+        payload.imageData = imageData
+        payload.extractedText = '' // Empty for images
+      } else {
+        payload.extractedText = input
+      }
+
       const response = await fetch('/api/deal/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: uploadedFileName || 'New Deal',
-          vendor: null,
-          dealType: 'New',
-          goal: null,
-          extractedText: input,
-          saveExtractedText: false,
-        }),
+        body: JSON.stringify(payload),
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to create deal')
@@ -245,6 +263,7 @@ export default function DashboardPage() {
           onClearFile={() => {
             setUploadedFileName(null)
             setInput('')
+            setImageData(null)
           }}
           showTrustBadges={false}
           showWhatYouGet={true}
