@@ -1,21 +1,25 @@
 import Tesseract from 'tesseract.js'
 
-// Set up canvas for Node.js environment
+// Canvas is optional - not needed for Vercel deployment
 if (typeof window === 'undefined') {
   try {
-    const { Canvas } = require('canvas')
-    global.DOMMatrix = class DOMMatrix {
-      constructor() {
-        this.a = 1
-        this.b = 0
-        this.c = 0
-        this.d = 1
-        this.e = 0
-        this.f = 0
-      }
-    } as any
+    // Try to load canvas if available (local dev only)
+    const canvas = require('canvas')
+    if (canvas) {
+      global.DOMMatrix = class DOMMatrix {
+        constructor() {
+          this.a = 1
+          this.b = 0
+          this.c = 0
+          this.d = 1
+          this.e = 0
+          this.f = 0
+        }
+      } as any
+    }
   } catch (e) {
-    console.warn('Canvas not available, PDF parsing may fail')
+    // Canvas not available - this is fine for production
+    console.log('Canvas not available (expected in production)')
   }
 }
 

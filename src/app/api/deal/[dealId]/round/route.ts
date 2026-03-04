@@ -62,8 +62,8 @@ export async function POST(
     const output = await analyzeDeal(
       validated.extractedText,
       deal.deal_type,
-      deal.goal,
-      validated.note,
+      deal.goal || undefined,
+      validated.note || undefined,
       previousOutput
     )
 
