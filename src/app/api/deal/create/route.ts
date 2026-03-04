@@ -34,8 +34,8 @@ export async function POST(request: Request) {
     const output = await analyzeDeal(
       validated.extractedText || '',
       validated.dealType,
-      validated.goal,
-      validated.notes,
+      validated.goal || undefined,
+      validated.notes || undefined,
       undefined,
       validated.imageData
     )
