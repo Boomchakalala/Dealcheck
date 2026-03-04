@@ -52,11 +52,11 @@ export const DealOutputSchema = z.object({
 
 // API request schemas
 export const CreateDealSchema = z.object({
-  vendor: z.string().optional(),
+  vendor: z.string().nullable().optional(),
   dealType: z.enum(['New', 'Renewal']),
-  goal: z.string().optional(),
-  notes: z.string().optional(),
-  extractedText: z.string().optional(),
+  goal: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  extractedText: z.string().nullable().optional(),
   imageData: z.object({
     base64: z.string(),
     mimeType: z.string(),
@@ -69,7 +69,7 @@ export const CreateDealSchema = z.object({
 
 export const AddRoundSchema = z.object({
   dealId: z.string().uuid(),
-  note: z.string().optional(),
+  note: z.string().nullable().optional(),
   extractedText: z.string().min(10, 'Extracted text is too short'),
   saveExtractedText: z.boolean().default(false),
 })
