@@ -24,83 +24,56 @@ export default function SecurityPage() {
         </div>
 
 
-        <div className="max-w-4xl mx-auto px-5 sm:px-8 py-20">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8 py-16">
 
           {/* Key principle */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <p className="text-xl text-slate-700 font-medium max-w-2xl mx-auto">
               We don&apos;t store your uploaded files. Only the AI-generated analysis is saved if you choose to keep it.
             </p>
           </div>
 
           {/* What happens to your data - Visual flow */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">What Happens to Your Files</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               {/* Step 1: Upload */}
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl border border-blue-200/60 p-8 text-center">
-                <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <FileText className="w-7 h-7 text-white" />
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl border border-blue-200/60 p-6 text-center">
+                <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <FileText className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">1. You Upload</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Your PDF or image is uploaded and we extract the text from it
+                <h3 className="text-base font-semibold text-slate-900 mb-2">1. You Upload</h3>
+                <p className="text-sm text-slate-600">
+                  We extract text from your PDF or image
                 </p>
               </div>
 
               {/* Step 2: Process */}
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-2xl border border-purple-200/60 p-8 text-center">
-                <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Lock className="w-7 h-7 text-white" />
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-2xl border border-purple-200/60 p-6 text-center">
+                <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Lock className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">2. AI Analyzes</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Text is sent to OpenAI for analysis. They process it and return insights
+                <h3 className="text-base font-semibold text-slate-900 mb-2">2. AI Analyzes</h3>
+                <p className="text-sm text-slate-600">
+                  Text sent to OpenAI for analysis
                 </p>
               </div>
 
               {/* Step 3: Delete */}
-              <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-2xl border border-emerald-200/60 p-8 text-center">
-                <div className="w-14 h-14 bg-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Trash2 className="w-7 h-7 text-white" />
+              <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-2xl border border-emerald-200/60 p-6 text-center">
+                <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Trash2 className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">3. File Deleted</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  Your original file is deleted immediately after processing. Only AI outputs remain if you save
+                <h3 className="text-base font-semibold text-slate-900 mb-2">3. File Deleted</h3>
+                <p className="text-sm text-slate-600">
+                  Original file deleted immediately
                 </p>
               </div>
             </div>
 
-            <div className="mt-8 p-5 bg-slate-50 border border-slate-200 rounded-xl">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
               <p className="text-sm text-slate-600 text-center">
-                <span className="font-semibold text-slate-900">Important:</span> We do not store your uploaded PDFs or images. The extracted text is sent to OpenAI for analysis, and only the AI-generated insights are saved in your account if you choose to save the deal.
+                <span className="font-semibold text-slate-900">Bottom line:</span> We don&apos;t store your files. Only AI outputs are saved if you choose to save the deal.
               </p>
-            </div>
-          </div>
-
-          {/* What we store */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">What We Store</h2>
-
-            <div className="space-y-4">
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="text-base font-semibold text-slate-900 mb-2">If you save a deal:</h3>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  <li className="flex gap-2"><span className="text-emerald-600">•</span> AI-generated analysis and recommendations</li>
-                  <li className="flex gap-2"><span className="text-emerald-600">•</span> Extracted text from your document (not the file itself)</li>
-                  <li className="flex gap-2"><span className="text-emerald-600">•</span> Deal metadata you enter (title, vendor name, etc.)</li>
-                </ul>
-              </div>
-
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="text-base font-semibold text-slate-900 mb-2">Your account information:</h3>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  <li className="flex gap-2"><span className="text-emerald-600">•</span> Email address (for login)</li>
-                  <li className="flex gap-2"><span className="text-emerald-600">•</span> Password (hashed with bcrypt, never plaintext)</li>
-                  <li className="flex gap-2"><span className="text-emerald-600">•</span> Usage count and account creation date</li>
-                </ul>
-              </div>
             </div>
           </div>
 
