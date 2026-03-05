@@ -115,11 +115,11 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {/* All Deals List */}
-      <Card className="p-6">
+      {/* All Deals */}
+      <div>
         <h2 className="text-lg font-bold text-slate-900 mb-4">All Deals</h2>
         <DealListClient deals={allDeals} />
-      </Card>
+      </div>
     </div>
   )
 }
