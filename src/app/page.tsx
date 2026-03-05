@@ -251,7 +251,7 @@ export default function LandingPage() {
                       <p className="text-xs text-slate-600">If usage grows beyond 10TB, every additional TB costs 50% more with no advance warning. 3TB of growth adds ~$15,750 in surprise charges.</p>
                     </div>
                     <p className="text-sm text-slate-500 mt-6 italic">
-                      Each flag includes what to ask for and a fallback if they push back.
+                      Every flag comes with exactly what to say — and a fallback if they push back.
                     </p>
                   </div>
                 )}
@@ -294,7 +294,7 @@ export default function LandingPage() {
                       </div>
                     </div>
                     <p className="text-sm text-slate-500 italic">
-                      Includes nice-to-have asks and trades you can offer the vendor.
+                      Plus nice-to-have asks and trades you can offer to close faster.
                     </p>
                   </div>
                 )}
