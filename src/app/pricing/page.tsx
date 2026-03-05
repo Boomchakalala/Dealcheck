@@ -24,7 +24,7 @@ export default function PricingPage() {
                 Try free. Pay when you&apos;re ready.
               </h1>
               <p className="text-lg text-slate-500 leading-relaxed max-w-xl mx-auto">
-                Get 5 free analyses to see if DealCheck works for you.
+                Get 2 free analyses to see if DealCheck works for you.
               </p>
             </div>
 

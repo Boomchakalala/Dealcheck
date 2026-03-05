@@ -468,7 +468,7 @@ export default function LandingPage() {
               </div>
               <ul className="space-y-3 mb-8">
                 {[
-                  '5 full AI analyses',
+                  '2 free AI analyses',
                   'Red flags + negotiation plan',
                   '3 email draft variations',
                   'Copy-paste output',
@@ -486,7 +486,7 @@ export default function LandingPage() {
                 href="/try"
                 className="block w-full text-center py-3 rounded-xl font-semibold bg-slate-100 text-slate-900 hover:bg-slate-200 transition-all"
               >
-                Get Started
+                Try it free
               </Link>
             </div>
 
@@ -542,7 +542,7 @@ export default function LandingPage() {
             href="/try"
             className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-white text-emerald-700 hover:bg-slate-50 transition-all shadow-lg hover:shadow-xl"
           >
-            Try DealCheck
+            Analyze your first quote
           </Link>
         </div>
       </section>
