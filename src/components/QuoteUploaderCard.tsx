@@ -174,7 +174,9 @@ export function QuoteUploaderCard({
 
       {error && (
         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-          {error}
+          {error.toLowerCase().includes('too short') || error.toLowerCase().includes('insufficient')
+            ? 'We need a bit more to work with. Try pasting the full quote or uploading the original document.'
+            : error}
         </div>
       )}
 
