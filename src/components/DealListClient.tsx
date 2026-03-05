@@ -75,9 +75,9 @@ export function DealListClient({ deals }: DealListClientProps) {
                           </span>
                           <button
                             onClick={(e) => handleQuickClose(e, deal.id, amount || undefined)}
-                            className="text-xs font-medium px-2.5 py-1 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+                            className="text-xs font-medium px-2.5 py-1 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors"
                           >
-                            Close
+                            Close deal
                           </button>
                         </>
                       )}
