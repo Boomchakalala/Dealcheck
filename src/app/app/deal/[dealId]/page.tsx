@@ -8,7 +8,8 @@ import { OutputDisplay } from '@/components/OutputDisplay'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { DealActionBar } from '@/components/DealActionBar'
-import { CheckSquare, Mail, Plus } from 'lucide-react'
+import { CheckSquare, Mail, Plus, FileText } from 'lucide-react'
+import Link from 'next/link'
 import { AddRoundForm } from './AddRoundForm'
 
 export default async function DealPage({
@@ -47,13 +48,22 @@ export default async function DealPage({
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Breadcrumb */}
-      <Breadcrumb
-        items={[
-          { label: 'Dashboard', href: '/app/dashboard' },
-          { label: dealName },
-        ]}
-      />
+      {/* Breadcrumb + New Analysis */}
+      <div className="flex items-center justify-between">
+        <Breadcrumb
+          items={[
+            { label: 'Dashboard', href: '/app/dashboard' },
+            { label: dealName },
+          ]}
+        />
+        <Link
+          href="/app"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all"
+        >
+          <FileText className="w-3.5 h-3.5" />
+          New analysis
+        </Link>
+      </div>
 
       {/* Deal Header */}
       <Card className="p-6">

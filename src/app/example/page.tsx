@@ -7,6 +7,9 @@ import Link from 'next/link'
 const exampleOutput: DealOutput = {
   title: "Cloud Storage Platform - Annual Enterprise Plan",
   vendor: "CloudVault Solutions",
+  verdict: "Several terms create vendor lock-in and cost risk. Pricing is 15-20% above typical market rates. Strong leverage exists to negotiate better terms given this commitment size.",
+  verdict_type: "negotiate",
+  price_insight: "Pricing is 15-20% above comparable storage platforms. A $42K commitment should qualify for volume discounts of 15-20%, saving $6-8K annually.",
   snapshot: {
     vendor_product: "CloudVault Enterprise Storage Platform",
     term: "12 months (auto-renewal unless 60 days notice)",
@@ -199,15 +202,23 @@ export default function ExamplePage() {
               <p className="text-sm text-blue-800 mb-3">
                 This is an example analysis showing how DealCheck evaluates vendor quotes. The data below is fictional but representative of a typical cloud storage procurement.
               </p>
-              <Link
-                href="/try"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Analyze Your Own Quote
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/try"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Analyze Your Own Quote
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-2 px-4 py-2 border border-blue-300 text-blue-700 text-sm font-semibold rounded-lg hover:bg-blue-50 transition-colors"
+                >
+                  Create account
+                </Link>
+              </div>
             </div>
           </div>
         </div>

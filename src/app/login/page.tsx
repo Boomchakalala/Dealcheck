@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
+import { MarketingFooter } from '@/components/MarketingFooter'
 import { Loader2, ArrowRight, Shield } from 'lucide-react'
 import Link from 'next/link'
 
@@ -156,6 +157,8 @@ function LoginForm() {
           </div>
         </div>
       </main>
+
+      <MarketingFooter />
     </div>
   )
 }
