@@ -113,8 +113,94 @@ export default function SecurityPage() {
             </div>
           </div>
 
-            <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">1. Data Encryption</h2>
+          {/* Trust, But Verify Section */}
+          <div className="bg-gradient-to-br from-slate-50 to-white rounded-3xl border border-slate-200/60 p-10 sm:p-12">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Trust, But Verify</h2>
+              <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto">
+                Security is central to our platform. We work hard to protect data and ensure you can validate our approach transparently.
+              </p>
+            </div>
+
+            {/* Trust Badges Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+              {/* SOC 2 Type II */}
+              <div className="flex flex-col items-center gap-3 p-5 rounded-xl bg-white border border-slate-200/60 shadow-sm">
+                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-slate-900">SOC 2</p>
+                  <p className="text-xs text-slate-500">Type II</p>
+                </div>
+              </div>
+
+              {/* Multi-Factor */}
+              <div className="flex flex-col items-center gap-3 p-5 rounded-xl bg-white border border-slate-200/60 shadow-sm">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Lock className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-slate-900">Multi-Factor</p>
+                  <p className="text-xs text-slate-500">Authentication</p>
+                </div>
+              </div>
+
+              {/* Quick Financial Monitoring */}
+              <div className="flex flex-col items-center gap-3 p-5 rounded-xl bg-white border border-slate-200/60 shadow-sm">
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Eye className="w-5 h-5 text-purple-600" />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-slate-900">Quick Financial</p>
+                  <p className="text-xs text-slate-500">Monitoring</p>
+                </div>
+              </div>
+
+              {/* AI-Powered */}
+              <div className="flex flex-col items-center gap-3 p-5 rounded-xl bg-white border border-slate-200/60 shadow-sm">
+                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <Code className="w-5 h-5 text-amber-600" />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-slate-900">AI-powered</p>
+                  <p className="text-xs text-slate-500">Content Analysis</p>
+                </div>
+              </div>
+
+              {/* Access Control */}
+              <div className="flex flex-col items-center gap-3 p-5 rounded-xl bg-white border border-slate-200/60 shadow-sm">
+                <div className="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center">
+                  <CheckCircle2 className="w-5 h-5 text-rose-600" />
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-slate-900">Access Control</p>
+                  <p className="text-xs text-slate-500">& Monitoring</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="bg-gradient-to-r from-emerald-600 to-emerald-700">
+          <div className="max-w-4xl mx-auto px-5 sm:px-8 py-16 text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              Start Negotiating Smarter
+            </h2>
+            <p className="text-emerald-50 text-sm sm:text-base mb-8 max-w-2xl mx-auto">
+              Upload your deal documents and get AI-powered insights in seconds. Your data stays secure.
+            </p>
+            <Link
+              href="/try"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-emerald-700 rounded-xl font-semibold hover:bg-emerald-50 transition-all shadow-lg hover:shadow-xl"
+            >
+              Try DealCheck
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </main>
 
               <p className="font-medium text-slate-900 mb-2 mt-5">In Transit</p>
               <p className="mb-3">All data transmitted between your browser and our servers is encrypted using Transport Layer Security (TLS) 1.3. This includes:</p>
