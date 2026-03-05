@@ -282,7 +282,23 @@ export default function SecurityPage() {
           </div>
         </div>
       </main>
-            {/* Encrypting Your Data */}
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200/60 bg-slate-50/50">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm font-semibold text-slate-400">DealCheck</p>
+          <div className="flex items-center gap-8 text-sm text-slate-400">
+            <Link href="/pricing" className="hover:text-slate-600 transition-colors">Pricing</Link>
+            <Link href="/help" className="hover:text-slate-600 transition-colors">Help</Link>
+            <Link href="/terms" className="hover:text-slate-600 transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-slate-600 transition-colors">Privacy</Link>
+            <Link href="/security" className="hover:text-slate-600 transition-colors">Security</Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}
             <div className="bg-white rounded-2xl border border-slate-200/60 p-8 shadow-sm hover:shadow-md transition-shadow">
               <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-5">
                 <Lock className="w-6 h-6 text-emerald-600" />
