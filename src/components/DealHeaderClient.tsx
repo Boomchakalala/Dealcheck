@@ -140,6 +140,7 @@ export function DealHeaderClient({
         <CloseDealModal
           dealId={dealId}
           currentTotal={currentTotal}
+          roundCount={roundCount || 0}
           onClose={() => setShowCloseModal(false)}
           onSuccess={() => {
             setShowCloseModal(false)

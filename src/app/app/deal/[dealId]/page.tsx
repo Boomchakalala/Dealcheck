@@ -90,6 +90,8 @@ export default async function DealPage({
             savingsPercent={deal.savings_percent}
             closedAt={deal.closed_at}
             currentTotal={latestOutput?.snapshot?.total_commitment}
+            roundCount={sortedRounds.length}
+            whatChanged={deal.what_changed}
           />
         </div>
 
@@ -182,6 +184,7 @@ export default async function DealPage({
         dealId={dealId}
         currentTotal={latestOutput?.snapshot?.total_commitment}
         dealStatus={deal.status}
+        roundCount={sortedRounds.length}
       />
     </div>
   )
