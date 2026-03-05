@@ -127,6 +127,21 @@ This quote expires in 14 days.`
             </button>
           </div>
 
+          {/* Result context banner */}
+          {output.verdict_type === 'competitive' ? (
+            <div className="mb-6 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+              <p className="text-sm font-semibold text-emerald-900">This quote is already competitive.</p>
+              <p className="text-xs text-emerald-700 mt-1">A few minor tweaks and you&apos;re good to go. See the asks below.</p>
+            </div>
+          ) : output.negotiation_plan?.leverage_you_have?.length >= 3 ? (
+            <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <p className="text-sm font-semibold text-amber-900">
+                We found {output.negotiation_plan.leverage_you_have.length} strong levers in this deal.
+              </p>
+              <p className="text-xs text-amber-700 mt-1">Scroll down for your negotiation plan and ready-to-send emails.</p>
+            </div>
+          ) : null}
+
           {/* Save CTA */}
           <div className="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-6 text-center">
             <h3 className="text-lg font-bold text-slate-900 mb-2">Save this analysis & track rounds</h3>
