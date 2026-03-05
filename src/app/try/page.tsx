@@ -145,6 +145,7 @@ This quote expires in 14 days.`
 
           {/* Save CTA */}
           <div className="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-6 text-center">
+            <p className="text-xs font-medium text-emerald-700 mb-3">This was 1 of your 2 free analyses</p>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Save this analysis & track rounds</h3>
             <p className="text-sm text-slate-600 mb-4">Create a free account to keep this analysis, add negotiation rounds, and close the deal.</p>
             <Link
