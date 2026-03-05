@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { TrendingUp, Target, CheckCircle2 } from 'lucide-react'
 import { DealListClient } from '@/components/DealListClient'
+import Link from 'next/link'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
