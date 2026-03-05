@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Loader2 } from 'lucide-react'
 
 const analyzingMessages = [
@@ -40,8 +40,21 @@ export function QuoteUploaderCard({
   showWhatYouGet = false,
 }: QuoteUploaderCardProps) {
   const [isDragging, setIsDragging] = useState(false)
+  const [analyzingMsgIdx, setAnalyzingMsgIdx] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Rotate analyzing messages
+  useEffect(() => {
+    if (!analyzing) {
+      setAnalyzingMsgIdx(0)
+      return
+    }
+    const interval = setInterval(() => {
+      setAnalyzingMsgIdx(prev => (prev + 1) % analyzingMessages.length)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [analyzing])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -174,7 +187,7 @@ export function QuoteUploaderCard({
         {analyzing ? (
           <>
             <Loader2 className="w-5 h-5 animate-spin" />
-            Analyzing...
+            {analyzingMessages[analyzingMsgIdx]}
           </>
         ) : (
           'Analyze'
