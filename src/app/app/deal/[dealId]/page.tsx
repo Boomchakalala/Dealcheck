@@ -152,7 +152,7 @@ export default async function DealPage({
       {/* Rounds List */}
       {sortedRounds.length > 1 && (
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Previous Rounds</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Previous Rounds</h2>
           <div className="space-y-3">
             {sortedRounds.slice(1).map((round: any) => (
               <RoundCard key={round.id} round={round} dealId={dealId} />
@@ -163,7 +163,7 @@ export default async function DealPage({
 
       {sortedRounds.length === 0 && (
         <Card className="p-12 text-center">
-          <p className="text-gray-600">No rounds yet. Add a round above to start.</p>
+          <p className="text-slate-600">No rounds yet. Add a round above to start.</p>
         </Card>
       )}
 
