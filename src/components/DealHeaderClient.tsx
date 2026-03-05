@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { CloseDealModal } from '@/components/CloseDealModal'
 import { CheckCircle2, TrendingDown, Minus, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface DealHeaderClientProps {
   dealId: string
@@ -44,7 +45,7 @@ export function DealHeaderClient({
       router.refresh()
     } catch (err) {
       console.error(err)
-      alert('Failed to reopen deal')
+      toast.error('Failed to reopen deal')
     } finally {
       setReopening(false)
     }
