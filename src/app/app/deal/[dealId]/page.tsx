@@ -49,28 +49,31 @@ export default async function DealPage({
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Breadcrumb + New Analysis */}
-      <div className="flex items-center justify-between">
-        <Breadcrumb
-          items={[
-            { label: 'Dashboard', href: '/app/dashboard' },
-            { label: dealName },
-          ]}
-        />
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <Breadcrumb
+            items={[
+              { label: 'Dashboard', href: '/app/dashboard' },
+              { label: dealName },
+            ]}
+          />
+        </div>
         <Link
           href="/app"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all flex-shrink-0"
         >
           <FileText className="w-3.5 h-3.5" />
-          New analysis
+          <span className="hidden sm:inline">New analysis</span>
+          <span className="sm:hidden">New</span>
         </Link>
       </div>
 
       {/* Deal Header */}
-      <Card className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">{deal.title}</h1>
-            <div className="flex items-center gap-3 flex-wrap">
+      <Card className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-3xl font-bold text-slate-900 mb-2">{deal.title}</h1>
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               {deal.vendor && (
                 <span className="text-slate-600">{deal.vendor}</span>
               )}
@@ -104,8 +107,8 @@ export default async function DealPage({
 
       {/* Next Actions Panel */}
       {latestOutput && (
-        <Card className="p-6 bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200">
-          <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <Card className="p-4 sm:p-6 bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
             <CheckSquare className="w-5 h-5 text-emerald-600" />
             Next Actions
           </h2>
