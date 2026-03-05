@@ -1,8 +1,17 @@
 // Shared helper to render markdown from deal output JSON
 export function renderMarkdown(output: any): string {
+  const verdictLabel = output.verdict_type === 'competitive'
+    ? 'Competitive deal'
+    : output.verdict_type === 'overpay_risk'
+      ? 'Overpay risk'
+      : 'Negotiate before signing'
+
   return `# ${output.title}
 
-## Snapshot
+**Verdict:** ${verdictLabel} — ${output.verdict || output.quick_read?.conclusion || 'Review this deal.'}
+${output.price_insight ? `\n**Price insight:** ${output.price_insight}\n` : ''}
+
+## Deal Snapshot
 
 **Vendor / Product:** ${output.snapshot?.vendor_product || output.vendor}
 
@@ -16,15 +25,13 @@ export function renderMarkdown(output: any): string {
 
 **Deal Type:** ${output.snapshot?.deal_type || 'N/A'}
 
-## Quick Read
+## What's Working
 
-**What's Solid:**
 ${(output.quick_read?.whats_solid || []).map((s: string) => `- ${s}`).join('\n')}
 
-**What's Concerning:**
-${(output.quick_read?.whats_concerning || []).map((s: string) => `- ${s}`).join('\n')}
+## Watch Out
 
-**Conclusion:** ${output.quick_read?.conclusion || 'N/A'}
+${(output.quick_read?.whats_concerning || []).map((s: string) => `- ${s}`).join('\n')}
 
 ## Red Flags
 
@@ -33,46 +40,38 @@ ${(output.red_flags || []).map((flag: any) => `
 
 **Why it matters:** ${flag.why_it_matters}
 
-**What to ask for:** ${flag.what_to_ask_for}
+**What to ask:** ${flag.what_to_ask_for}
 
 **If they push back:** ${flag.if_they_push_back}
 `).join('\n')}
 
-## Negotiation Plan
+## Your Negotiation Plan
 
 **Leverage You Have:**
 ${(output.negotiation_plan?.leverage_you_have || []).map((l: string) => `- ${l}`).join('\n')}
 
 **Must-Have Asks:**
-${(output.negotiation_plan?.must_have_asks || []).map((a: string) => `- ${a}`).join('\n')}
+${(output.what_to_ask_for?.must_have || []).map((a: string) => `- ${a}`).join('\n')}
 
 **Nice-to-Have Asks:**
-${(output.negotiation_plan?.nice_to_have_asks || []).map((a: string) => `- ${a}`).join('\n')}
+${(output.what_to_ask_for?.nice_to_have || []).map((a: string) => `- ${a}`).join('\n')}
 
 **Trades You Can Offer:**
 ${(output.negotiation_plan?.trades_you_can_offer || []).map((t: string) => `- ${t}`).join('\n')}
 
-## What to Ask For
-
-### Must-Have
-${(output.what_to_ask_for?.must_have || []).map((ask: string) => `- ${ask}`).join('\n')}
-
-### Nice-to-Have
-${(output.what_to_ask_for?.nice_to_have || []).map((ask: string) => `- ${ask}`).join('\n')}
-
 ## Email Drafts
 
-### Neutral
+### Friendly
 **Subject:** ${output.email_drafts.neutral.subject}
 
 ${output.email_drafts.neutral.body}
 
-### Firm
+### Direct
 **Subject:** ${output.email_drafts.firm.subject}
 
 ${output.email_drafts.firm.body}
 
-### Final Push
+### Urgent
 **Subject:** ${output.email_drafts.final_push.subject}
 
 ${output.email_drafts.final_push.body}
