@@ -157,48 +157,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Typical Outcomes */}
-      <section className="bg-white py-14">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8">
-          <p className="text-center text-sm text-slate-600 mb-8 font-semibold uppercase tracking-wide">
-            Used by operators, founders, and procurement teams
-          </p>
-
-          <h3 className="text-2xl font-bold text-slate-900 text-center mb-8">Typical outcomes</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-              </div>
-              <p className="text-base font-semibold text-slate-900">Find 3-7 negotiation levers</p>
-            </div>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <p className="text-base font-semibold text-slate-900">Improve terms (payment, renewal, scope)</p>
-            </div>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <p className="text-base font-semibold text-slate-900">Generate 3 ready-to-send email drafts</p>
-            </div>
-          </div>
-
-          <p className="text-xs text-slate-500 text-center mt-6">Results vary by supplier, category and leverage.</p>
-        </div>
-      </section>
-
       {/* How DealCheck Works */}
       <section id="how-it-works" className="py-20 bg-white border-t border-slate-200">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
