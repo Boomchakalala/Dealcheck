@@ -150,23 +150,23 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* ── Section 1: Verdict Header ── */}
-      <div className={`rounded-xl border-2 ${vc.border} ${vc.bg} p-6`}>
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
+      <div className={`rounded-xl border-2 ${vc.border} ${vc.bg} p-4 sm:p-6`}>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-3">
               <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border ${vc.badge}`}>
                 {vc.icon}
                 {vc.label}
               </span>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 mb-1">{output.title}</h1>
-            <p className={`text-base font-medium ${vc.text} leading-relaxed`}>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1">{output.title}</h1>
+            <p className={`text-sm sm:text-base font-medium ${vc.text} leading-relaxed`}>
               {output.verdict || output.quick_read.conclusion}
             </p>
           </div>
-          <div className="text-right flex-shrink-0">
+          <div className="sm:text-right flex-shrink-0">
             <p className="text-xs font-medium text-slate-500 mb-1">Total commitment</p>
-            <p className="text-2xl font-bold text-slate-900">{output.snapshot.total_commitment}</p>
+            <p className="text-xl sm:text-2xl font-bold text-slate-900">{output.snapshot.total_commitment}</p>
           </div>
         </div>
 
@@ -182,9 +182,9 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
       </div>
 
       {/* ── Section 2: Deal Snapshot ── */}
-      <div className="bg-slate-50/50 rounded-xl border border-slate-100 px-6 py-5">
+      <div className="bg-slate-50/50 rounded-xl border border-slate-100 px-4 sm:px-6 py-5">
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Deal snapshot</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
           {[
             { label: 'Vendor', value: output.snapshot.vendor_product },
             { label: 'Term', value: output.snapshot.term },
@@ -195,14 +195,14 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
           ].map((item) => (
             <div key={item.label}>
               <p className="text-xs font-medium text-slate-400 mb-1">{item.label}</p>
-              <p className="text-sm font-semibold text-slate-900">{item.value || 'N/A'}</p>
+              <p className="text-sm font-semibold text-slate-900 break-words">{item.value || 'N/A'}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* ── Section 3: What's Working ── */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
+      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-1">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <h2 className="text-base font-bold text-slate-900">What's working</h2>
