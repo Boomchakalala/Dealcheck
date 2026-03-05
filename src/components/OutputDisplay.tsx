@@ -43,9 +43,9 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
   }
 
   const riskLabels: Record<RiskLevel, { label: string; desc: string }> = {
-    safe: { label: 'Relationship-safe', desc: 'Must-have asks only' },
+    safe: { label: 'Safe', desc: 'Must-have asks only' },
     balanced: { label: 'Balanced', desc: 'Must-have + key nice-to-haves' },
-    aggressive: { label: 'Push for savings', desc: 'All asks included' },
+    aggressive: { label: 'Push more', desc: 'All asks included' },
   }
 
   // Build email body with variable substitution and risk-adjusted asks
@@ -477,17 +477,17 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
             <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
               Asks in this email ({visibleAsks.length})
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {visibleAsks.map((ask, idx) => (
                 <span
                   key={idx}
-                  className={`inline-block px-3 py-1.5 rounded-lg text-xs font-medium border ${
+                  className={`inline-block px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium border max-w-full break-words ${
                     idx < output.what_to_ask_for.must_have.length
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
                       : 'bg-slate-50 border-slate-200 text-slate-700'
                   }`}
                 >
-                  {ask.length > 60 ? ask.substring(0, 57) + '...' : ask}
+                  {ask.length > 45 ? ask.substring(0, 42) + '...' : ask}
                 </span>
               ))}
             </div>
