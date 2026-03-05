@@ -77,159 +77,85 @@ export default function SecurityPage() {
             </div>
           </div>
 
+
           {/* Where data goes */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Where Your Data Goes</h2>
+          <div className="mb-16">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Where Your Data Goes</h2>
 
-            <div className="space-y-4">
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-5 h-5 text-slate-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-base font-semibold text-slate-900 mb-2">OpenAI</h3>
-                    <p className="text-sm text-slate-600 mb-2">
-                      Your extracted text is sent to OpenAI&apos;s API for analysis. They process it and return negotiation insights.
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      OpenAI states they don&apos;t use API data to train models. See their <a href="https://openai.com/policies/api-data-usage-policies" target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:underline">data usage policy</a>.
-                    </p>
-                  </div>
+            <div className="space-y-3">
+              <div className="bg-white rounded-xl border border-slate-200 p-5">
+                <div className="flex items-center gap-3 mb-2">
+                  <Shield className="w-5 h-5 text-slate-600" />
+                  <h3 className="text-base font-semibold text-slate-900">OpenAI</h3>
                 </div>
-              </div>
-
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-5 h-5 text-slate-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-base font-semibold text-slate-900 mb-2">Supabase (Database)</h3>
-                    <p className="text-sm text-slate-600 mb-2">
-                      If you save a deal, the AI outputs and extracted text are stored in our database hosted by Supabase.
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Supabase is SOC 2 Type II certified and encrypts data at rest. Row Level Security ensures you only see your own data.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-5 h-5 text-slate-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-base font-semibold text-slate-900 mb-2">Vercel (Hosting)</h3>
-                    <p className="text-sm text-slate-600 mb-2">
-                      Our application is hosted on Vercel. They handle the infrastructure and see request metadata (IP addresses, etc.).
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Vercel is SOC 2 Type II certified and provides DDoS protection.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Basic security measures */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Basic Security Measures</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="text-base font-semibold text-slate-900 mb-3">✓ TLS Encryption</h3>
                 <p className="text-sm text-slate-600">
-                  All data is encrypted in transit using HTTPS/TLS when communicating between your browser and our servers.
+                  Extracted text sent for AI analysis. OpenAI doesn&apos;t use API data to train models.
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="text-base font-semibold text-slate-900 mb-3">✓ Password Hashing</h3>
+              <div className="bg-white rounded-xl border border-slate-200 p-5">
+                <div className="flex items-center gap-3 mb-2">
+                  <Shield className="w-5 h-5 text-slate-600" />
+                  <h3 className="text-base font-semibold text-slate-900">Supabase</h3>
+                </div>
                 <p className="text-sm text-slate-600">
-                  Passwords are hashed with bcrypt before storage. We never store passwords in plaintext.
+                  Database for saved deals. SOC 2 Type II certified, data encrypted at rest.
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="text-base font-semibold text-slate-900 mb-3">✓ File Deletion</h3>
+              <div className="bg-white rounded-xl border border-slate-200 p-5">
+                <div className="flex items-center gap-3 mb-2">
+                  <Shield className="w-5 h-5 text-slate-600" />
+                  <h3 className="text-base font-semibold text-slate-900">Vercel</h3>
+                </div>
                 <p className="text-sm text-slate-600">
-                  Uploaded files (PDFs, images) are deleted immediately after text extraction. No raw files persist.
-                </p>
-              </div>
-
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h3 className="text-base font-semibold text-slate-900 mb-3">✓ Database Access Control</h3>
-                <p className="text-sm text-slate-600">
-                  Row Level Security (RLS) in Supabase ensures users can only access their own data.
+                  Application hosting. SOC 2 Type II certified with DDoS protection.
                 </p>
               </div>
             </div>
           </div>
 
           {/* What we don't do */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">What We Don&apos;t Do</h2>
+          <div className="mb-16">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">What We Don&apos;t Do</h2>
 
-            <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl border border-emerald-200/60 p-8">
-              <ul className="space-y-3 text-sm text-slate-700">
-                <li className="flex gap-3"><span className="text-emerald-600 font-bold">✗</span> <span><span className="font-semibold">We don&apos;t sell your data</span> to advertisers, brokers, or anyone else.</span></li>
-                <li className="flex gap-3"><span className="text-emerald-600 font-bold">✗</span> <span><span className="font-semibold">We don&apos;t train AI models</span> on your data.</span></li>
-                <li className="flex gap-3"><span className="text-emerald-600 font-bold">✗</span> <span><span className="font-semibold">We don&apos;t store your uploaded files</span> after processing.</span></li>
-                <li className="flex gap-3"><span className="text-emerald-600 font-bold">✗</span> <span><span className="font-semibold">We don&apos;t share data</span> with anyone except the services listed above (OpenAI, Supabase, Vercel).</span></li>
+            <div className="bg-gradient-to-br from-emerald-50 to-white rounded-xl border border-emerald-200/60 p-6">
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li className="flex gap-2"><span className="text-emerald-600 font-bold">✗</span> Sell your data</li>
+                <li className="flex gap-2"><span className="text-emerald-600 font-bold">✗</span> Train AI models on your data</li>
+                <li className="flex gap-2"><span className="text-emerald-600 font-bold">✗</span> Store uploaded files after processing</li>
+                <li className="flex gap-2"><span className="text-emerald-600 font-bold">✗</span> Share data beyond services listed above</li>
               </ul>
             </div>
           </div>
 
-          {/* Limitations & honesty */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Limitations & Being Honest</h2>
+          {/* Limitations */}
+          <div className="mb-16">
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Being Honest: Limitations</h2>
 
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8">
-              <p className="text-sm text-slate-700 mb-4">We&apos;re a startup, not an enterprise-certified platform. Here&apos;s what we <span className="font-semibold">don&apos;t</span> have yet:</p>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+              <p className="text-sm text-slate-700 mb-3">We&apos;re a startup, not enterprise-certified. What we don&apos;t have yet:</p>
               <ul className="space-y-2 text-sm text-slate-600">
-                <li className="flex gap-2"><span className="text-amber-600">•</span> We are <span className="font-semibold">not</span> SOC 2 certified (though our infrastructure providers are)</li>
-                <li className="flex gap-2"><span className="text-amber-600">•</span> We do <span className="font-semibold">not</span> offer end-to-end encryption</li>
-                <li className="flex gap-2"><span className="text-amber-600">•</span> Your data is processed by third parties (OpenAI)</li>
-                <li className="flex gap-2"><span className="text-amber-600">•</span> We don&apos;t have penetration testing or security audits yet</li>
-                <li className="flex gap-2"><span className="text-amber-600">•</span> We don&apos;t have formal incident response procedures documented</li>
+                <li className="flex gap-2"><span>•</span> Not SOC 2 certified (our providers are)</li>
+                <li className="flex gap-2"><span>•</span> Not end-to-end encrypted</li>
+                <li className="flex gap-2"><span>•</span> No pen testing or security audits yet</li>
+                <li className="flex gap-2"><span>•</span> No formal incident response plan</li>
               </ul>
-              <p className="text-sm text-slate-700 mt-4">
-                We&apos;re continuously improving our security posture as we grow. If you have specific security requirements, please <a href="mailto:security@dealcheck.app" className="text-emerald-600 hover:underline font-medium">reach out</a>.
+              <p className="text-sm text-slate-700 mt-3">
+                We&apos;re continuously improving. Questions? Email <a href="mailto:security@dealcheck.app" className="text-emerald-600 hover:underline font-medium">security@dealcheck.app</a>
               </p>
-            </div>
-          </div>
-
-          {/* Your rights */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Your Rights & Data Control</h2>
-
-            <div className="bg-white rounded-xl border border-slate-200 p-8">
-              <p className="text-sm text-slate-700 mb-4">You have full control over your data:</p>
-              <ul className="space-y-3 text-sm text-slate-600">
-                <li className="flex gap-3"><span className="text-emerald-600">→</span> <span><span className="font-semibold">Delete deals:</span> You can delete saved deals anytime from your dashboard.</span></li>
-                <li className="flex gap-3"><span className="text-emerald-600">→</span> <span><span className="font-semibold">Delete account:</span> Request account deletion at <a href="mailto:privacy@dealcheck.app" className="text-emerald-600 hover:underline">privacy@dealcheck.app</a></span></li>
-                <li className="flex gap-3"><span className="text-emerald-600">→</span> <span><span className="font-semibold">Export data:</span> Request a copy of your data at any time.</span></li>
-                <li className="flex gap-3"><span className="text-emerald-600">→</span> <span><span className="font-semibold">Questions:</span> Ask us anything about how we handle your data.</span></li>
-              </ul>
             </div>
           </div>
 
           {/* Contact */}
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Questions or Concerns?</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-4">Questions?</h2>
 
-            <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl border border-slate-200 p-8">
-              <p className="text-sm text-slate-700 mb-6">
-                We believe in transparency. If you have questions about how we handle your data, or if you discover a security issue, please reach out:
-              </p>
-              <div className="space-y-3 text-sm">
-                <p><span className="font-semibold text-slate-900">Security concerns:</span> <a href="mailto:security@dealcheck.app" className="text-emerald-600 hover:underline">security@dealcheck.app</a></p>
-                <p><span className="font-semibold text-slate-900">Privacy questions:</span> <a href="mailto:privacy@dealcheck.app" className="text-emerald-600 hover:underline">privacy@dealcheck.app</a></p>
-                <p><span className="font-semibold text-slate-900">General support:</span> <a href="mailto:support@dealcheck.app" className="text-emerald-600 hover:underline">support@dealcheck.app</a></p>
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <div className="space-y-2 text-sm">
+                <p><span className="font-semibold text-slate-900">Security:</span> <a href="mailto:security@dealcheck.app" className="text-emerald-600 hover:underline">security@dealcheck.app</a></p>
+                <p><span className="font-semibold text-slate-900">Privacy:</span> <a href="mailto:privacy@dealcheck.app" className="text-emerald-600 hover:underline">privacy@dealcheck.app</a></p>
+                <p><span className="font-semibold text-slate-900">Support:</span> <a href="mailto:support@dealcheck.app" className="text-emerald-600 hover:underline">support@dealcheck.app</a></p>
               </div>
             </div>
           </div>
