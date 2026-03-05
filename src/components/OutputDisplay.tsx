@@ -65,14 +65,16 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
 
   // Determine which asks to show based on risk level
   const visibleAsks = useMemo(() => {
-    if (emailRisk === 'safe') return output.what_to_ask_for.must_have
+    const mustHave = output.what_to_ask_for?.must_have || []
+    const niceToHave = output.what_to_ask_for?.nice_to_have || []
+    if (emailRisk === 'safe') return mustHave
     if (emailRisk === 'balanced') return [
-      ...output.what_to_ask_for.must_have,
-      ...output.what_to_ask_for.nice_to_have.slice(0, 1),
+      ...mustHave,
+      ...niceToHave.slice(0, 1),
     ]
     return [
-      ...output.what_to_ask_for.must_have,
-      ...output.what_to_ask_for.nice_to_have,
+      ...mustHave,
+      ...niceToHave,
     ]
   }, [emailRisk, output])
 
