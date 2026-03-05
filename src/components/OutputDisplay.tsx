@@ -291,7 +291,7 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
       )}
 
       {/* ── Section 5: Your Negotiation Plan ── */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
+      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 space-y-5">
         <div>
           <h2 className="text-base font-bold text-slate-900 mb-1">Your negotiation plan</h2>
           <p className="text-xs text-slate-500">Your leverage, what to ask for, and what you can trade.</p>
@@ -365,7 +365,7 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
 
       {/* ── Section 6: Email Builder ── */}
       <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden" id="email-builder">
-        <div className="px-6 py-5 border-b border-slate-200 bg-slate-50/50">
+        <div className="px-4 sm:px-6 py-5 border-b border-slate-200 bg-slate-50/50">
           <div className="flex items-center gap-2 mb-1">
             <Mail className="w-5 h-5 text-emerald-600" />
             <h2 className="text-base font-bold text-slate-900">Email builder</h2>
@@ -373,7 +373,7 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
           <p className="text-xs text-slate-500">Adjust tone and risk level, then copy the email to send.</p>
         </div>
 
-        <div className="p-6 space-y-5">
+        <div className="p-4 sm:p-6 space-y-5">
           {/* Controls row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Tone toggle */}
