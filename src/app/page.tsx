@@ -208,7 +208,7 @@ export default function LandingPage() {
               </div>
 
               {/* Tab Content */}
-              <div className="p-8">
+              <div className="p-4 sm:p-8">
                 {activeTab === 'price' && (
                   <div>
                     {/* Styled to match real red flag cards in OutputDisplay */}
@@ -403,7 +403,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-500">&copy; 2026 DealCheck. All rights reserved.</p>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
               <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
                 Pricing
               </Link>
