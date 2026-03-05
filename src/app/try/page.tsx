@@ -237,57 +237,6 @@ This quote expires in 14 days.`
           </Link>
         </div>
 
-        {/* Deal type + goal in collapsible details */}
-        <details className="mb-6">
-          <summary className="cursor-pointer text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors py-2">
-            Advanced options (deal type & goal)
-          </summary>
-          <div className="mt-3 space-y-4 pl-1">
-            <div>
-              <label className="text-sm font-medium text-slate-700 mb-2 block">
-                Deal type <span className="text-slate-500 font-normal">(optional)</span>
-              </label>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setDealType('New')}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
-                    dealType === 'New'
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
-                      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                  }`}
-                >
-                  New purchase
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDealType('Renewal')}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
-                    dealType === 'Renewal'
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
-                      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                  }`}
-                >
-                  Renewal
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="goal" className="text-sm font-medium text-slate-700 mb-2 block">
-                Your goal <span className="text-slate-500 font-normal">(optional)</span>
-              </label>
-              <input
-                id="goal"
-                type="text"
-                value={goal}
-                onChange={(e) => setGoal(e.target.value)}
-                placeholder="e.g., Reduce cost by 15%, Remove auto-renewal"
-                className="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-          </div>
-        </details>
       </main>
 
       <MarketingFooter />
