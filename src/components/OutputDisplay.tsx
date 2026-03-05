@@ -2,7 +2,7 @@
 
 import { type DealOutput } from '@/types'
 import { CopyButton } from './CopyButton'
-import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, Shield, TrendingDown, Zap } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, Shield, TrendingDown, Zap, RefreshCw, Loader2, Sparkles } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
 interface OutputDisplayProps {
@@ -23,6 +23,12 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
   const [renewalTerm, setRenewalTerm] = useState('1-year')
   const [paymentTerms, setPaymentTerms] = useState('net-30')
   const [deadline, setDeadline] = useState('[DATE]')
+
+  // Regenerated emails state
+  const [regenerating, setRegenerating] = useState(false)
+  const [regeneratedEmails, setRegeneratedEmails] = useState<{label: string; subject: string; body: string}[] | null>(null)
+  const [regenTab, setRegenTab] = useState(0)
+  const [regenError, setRegenError] = useState<string | null>(null)
 
   const emailDrafts = {
     neutral: output.email_drafts.neutral,
