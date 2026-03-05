@@ -10,12 +10,12 @@ import { X, Loader2, Sparkles } from 'lucide-react'
 interface CloseDealModalProps {
   dealId: string
   currentTotal?: string
-  roundCount: number
+  roundCount?: number
   onClose: () => void
   onSuccess: () => void
 }
 
-export function CloseDealModal({ dealId, currentTotal, roundCount, onClose, onSuccess }: CloseDealModalProps) {
+export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, onSuccess }: CloseDealModalProps) {
   const [outcome, setOutcome] = useState<'won' | 'lost' | 'paused'>('won')
   const [savingsAmount, setSavingsAmount] = useState('')
   const [savingsPercent, setSavingsPercent] = useState('')
