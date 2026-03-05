@@ -213,7 +213,31 @@ export default function ExamplePage() {
         </div>
 
         <OutputDisplay output={exampleOutput} />
+
+        {/* Bottom CTA */}
+        <div className="mt-12 text-center">
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-8">
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Ready to analyze your own quote?</h3>
+            <p className="text-sm text-slate-600 mb-5">Upload a PDF, image, or paste text. Get your analysis in under a minute.</p>
+            <div className="flex items-center justify-center gap-4">
+              <Link
+                href="/try"
+                className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+              >
+                Try with your own quote
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all"
+              >
+                Create account
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <MarketingFooter />
     </div>
   )
 }
