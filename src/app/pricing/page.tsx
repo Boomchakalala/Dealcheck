@@ -19,7 +19,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <Header variant="public" />
+      <UnifiedHeader variant="public" />
 
       <main className="flex-1">
         {/* Hero */}

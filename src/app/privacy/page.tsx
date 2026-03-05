@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Header } from '@/components/Header'
+import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { Shield } from 'lucide-react'
 
 export default function PrivacyPage() {
