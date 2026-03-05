@@ -76,6 +76,40 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
     ]
   }, [emailRisk, output])
 
+  const handleRegenerateEmails = async () => {
+    setRegenerating(true)
+    setRegenError(null)
+    try {
+      const res = await fetch('/api/deal/regenerate-emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tone: emailTone,
+          riskLevel: emailRisk,
+          targetDiscount,
+          renewalTerm,
+          paymentTerms,
+          deadline,
+          vendor: output.vendor || output.snapshot.vendor_product,
+          totalCommitment: output.snapshot.total_commitment,
+          mustHaveAsks: output.what_to_ask_for.must_have,
+          niceToHaveAsks: output.what_to_ask_for.nice_to_have,
+          redFlags: output.red_flags.map(f => f.issue),
+          leverage: output.negotiation_plan.leverage_you_have,
+          conclusion: output.quick_read.conclusion,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to regenerate')
+      setRegeneratedEmails(data.emails)
+      setRegenTab(0)
+    } catch (err) {
+      setRegenError(err instanceof Error ? err.message : 'Failed to regenerate emails')
+    } finally {
+      setRegenerating(false)
+    }
+  }
+
   const toggleFlag = (idx: number) => {
     setExpandedFlags(prev =>
       prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
