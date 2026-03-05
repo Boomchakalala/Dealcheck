@@ -142,8 +142,8 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
       </div>
 
       {/* ── Section 2: Deal Snapshot ── */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
-        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">Deal snapshot</h2>
+      <div className="bg-slate-50/50 rounded-xl border border-slate-100 px-6 py-5">
+        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Deal snapshot</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[
             { label: 'Vendor', value: output.snapshot.vendor_product },
