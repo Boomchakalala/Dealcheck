@@ -50,27 +50,68 @@ export default function SecurityPage() {
           </div>
         </div>
 
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 pb-20">
-          <div className="space-y-14 text-sm text-slate-700 leading-relaxed">
-
-            {/* Summary box */}
-            <div className="rounded-2xl border border-emerald-200/60 bg-gradient-to-br from-emerald-50/40 to-white p-7 space-y-3 shadow-sm">
-              <p className="font-semibold text-slate-900">Security Overview</p>
-              <ul className="space-y-2.5">
-                {[
-                  'All data is encrypted in transit using TLS 1.3',
-                  'Passwords are hashed with bcrypt (never stored in plaintext)',
-                  'Uploaded files are deleted immediately after processing',
-                  'Database access protected by Row Level Security (RLS)',
-                  'Regular security audits and monitoring',
-                ].map((item, i) => (
-                  <li key={i} className="flex gap-3">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+        {/* SOC 2 Banner */}
+        <div className="bg-gradient-to-r from-emerald-600 to-emerald-700">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 py-6">
+            <div className="flex items-center justify-center gap-3 text-white">
+              <Shield className="w-5 h-5" />
+              <p className="text-sm sm:text-base font-semibold">
+                SOC 2 Hosting & Global Compliance
+              </p>
             </div>
+            <p className="text-center text-emerald-50 text-xs sm:text-sm mt-2 max-w-3xl mx-auto">
+              Our infrastructure is hosted on SOC 2 Type II certified platforms. Data is encrypted in transit and at rest, complying with GDPR, CCPA, and industry best practices.
+            </p>
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-20">
+          {/* 4 Feature Boxes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+            {/* Encrypting Your Data */}
+            <div className="bg-white rounded-2xl border border-slate-200/60 p-8 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-5">
+                <Lock className="w-6 h-6 text-emerald-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">Encrypting Your Data</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                All data transmitted between your browser and our servers is encrypted using TLS 1.3. Passwords are hashed with bcrypt and never stored in plaintext. Database access is protected by Row Level Security (RLS).
+              </p>
+            </div>
+
+            {/* Audit-Quality Narrative Files */}
+            <div className="bg-white rounded-2xl border border-slate-200/60 p-8 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-5">
+                <FileCheck className="w-6 h-6 text-emerald-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">Audit-Quality Narrative Files</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                We automatically detect your uploaded files&apos; structure and extract text with precision. Files are deleted immediately after processing. We maintain detailed audit logs of all analysis activities for compliance.
+              </p>
+            </div>
+
+            {/* Auto-Codes & Scrutinizes Results */}
+            <div className="bg-white rounded-2xl border border-slate-200/60 p-8 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-5">
+                <Code className="w-6 h-6 text-emerald-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">Auto-Codes & Scrutinizes Results</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Our AI scrutinizes every clause, flag, and term. Results are structured, validated, and presented with clear risk categorization so you can make informed decisions faster than manual review.
+              </p>
+            </div>
+
+            {/* Streamlining Responsible Disclosure */}
+            <div className="bg-white rounded-2xl border border-slate-200/60 p-8 shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-5">
+                <Eye className="w-6 h-6 text-emerald-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">Streamlining Responsible Disclosure</h3>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                We welcome security researchers to report vulnerabilities. All reports are acknowledged within 48 hours, and we work transparently to address issues promptly with responsible disclosure.
+              </p>
+            </div>
+          </div>
 
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-4">1. Data Encryption</h2>
