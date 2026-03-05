@@ -93,7 +93,7 @@ export default async function DealPage({
       {/* Next Actions Panel */}
       {latestOutput && (
         <Card className="p-6 bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
             <CheckSquare className="w-5 h-5 text-emerald-600" />
             Next Actions
           </h2>
@@ -101,12 +101,12 @@ export default async function DealPage({
           {/* Must-have asks as checklist */}
           {latestOutput.what_to_ask_for?.must_have?.length > 0 && (
             <div className="mb-5">
-              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">Must-Have Asks</h3>
+              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">Must-Have Asks</h3>
               <ul className="space-y-2">
                 {latestOutput.what_to_ask_for.must_have.map((ask: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <div className="mt-1 w-4 h-4 rounded border-2 border-gray-300 flex-shrink-0" />
-                    <span className="text-sm text-gray-700 leading-relaxed">{ask}</span>
+                    <div className="mt-1 w-4 h-4 rounded border-2 border-slate-300 flex-shrink-0" />
+                    <span className="text-sm text-slate-700 leading-relaxed">{ask}</span>
                   </li>
                 ))}
               </ul>
@@ -137,8 +137,8 @@ export default async function DealPage({
             <div className="px-4 py-1.5 bg-emerald-600 text-white rounded-full text-sm font-bold">
               Round {latestRound.round_number}
             </div>
-            <span className="text-sm text-gray-500">Latest analysis</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-sm text-slate-500">Latest analysis</span>
+            <div className="flex-1 h-px bg-slate-200" />
           </div>
           <OutputDisplay output={latestOutput} />
         </div>
