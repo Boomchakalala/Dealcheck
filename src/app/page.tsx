@@ -402,10 +402,10 @@ export default function LandingPage() {
       </section>
 
       {/* See DealCheck in Action */}
-      <section id="security" className="py-20 bg-white border-y border-slate-200">
+      <section id="data-privacy" className="py-20 bg-white border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-12">
-            See DealCheck in Action
+            Your data stays private
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Data encrypted */}
@@ -468,7 +468,7 @@ export default function LandingPage() {
               </div>
               <ul className="space-y-3 mb-8">
                 {[
-                  'Unlimited analysis rounds',
+                  '5 full AI analyses',
                   'Red flags + negotiation plan',
                   '3 email draft variations',
                   'Copy-paste output',
@@ -551,7 +551,7 @@ export default function LandingPage() {
       <footer className="border-t border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-slate-500">&copy; 2024 DealCheck. All rights reserved.</p>
+            <p className="text-sm text-slate-500">&copy; 2025 DealCheck. All rights reserved.</p>
             <div className="flex items-center gap-6">
               <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
                 Pricing
