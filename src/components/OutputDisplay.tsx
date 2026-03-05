@@ -238,7 +238,7 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
 
           {/* Quick concerns */}
           {output.quick_read.whats_concerning.length > 0 && (
-            <div className="bg-amber-50/50 rounded-xl border border-amber-200 p-5">
+            <div className="bg-amber-50/50 rounded-xl border border-amber-200 p-4 sm:p-5">
               <ul className="space-y-2">
                 {output.quick_read.whats_concerning.map((concern, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-sm text-slate-700 leading-relaxed">
