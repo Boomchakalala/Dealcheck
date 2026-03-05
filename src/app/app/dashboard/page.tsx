@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
-import { TrendingUp, Target, CheckCircle2 } from 'lucide-react'
+import { TrendingUp, Target, CheckCircle2, Plus } from 'lucide-react'
 import { DealListClient } from '@/components/DealListClient'
 import Link from 'next/link'
 
@@ -57,8 +57,15 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div>
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+        <Link
+          href="/app"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+        >
+          <Plus className="w-4 h-4" />
+          New analysis
+        </Link>
       </div>
 
       {/* KPI Cards */}
