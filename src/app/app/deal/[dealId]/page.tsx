@@ -59,16 +59,16 @@ export default async function DealPage({
       <Card className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{deal.title}</h1>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">{deal.title}</h1>
             <div className="flex items-center gap-3 flex-wrap">
               {deal.vendor && (
-                <span className="text-gray-600">{deal.vendor}</span>
+                <span className="text-slate-600">{deal.vendor}</span>
               )}
               <Badge variant={deal.deal_type === 'New' ? 'default' : 'secondary'}>
                 {deal.deal_type}
               </Badge>
               {deal.goal && (
-                <span className="text-sm text-gray-500">Goal: {deal.goal}</span>
+                <span className="text-sm text-slate-500">Goal: {deal.goal}</span>
               )}
             </div>
           </div>
@@ -83,7 +83,7 @@ export default async function DealPage({
           />
         </div>
 
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-slate-500">
           <p>Created: {new Date(deal.created_at).toLocaleDateString()}</p>
           <p>Last updated: {new Date(deal.updated_at).toLocaleDateString()}</p>
           <p className="font-semibold mt-2">{sortedRounds.length} round{sortedRounds.length !== 1 ? 's' : ''}</p>
