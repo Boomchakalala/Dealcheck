@@ -36,11 +36,11 @@ export default function PricingPage() {
                   <span className="text-5xl font-bold text-slate-900 tracking-tight">$0</span>
                 </div>
                 <p className="text-sm text-slate-500 mb-8 leading-relaxed">
-                  5 full analyses to try DealCheck risk-free. No credit card needed.
+                  2 free analyses to try DealCheck risk-free. No credit card needed.
                 </p>
                 <ul className="space-y-3.5 mb-8">
                   {[
-                    '5 full AI analyses',
+                    '2 free AI analyses',
                     'Red flags + negotiation plan',
                     '3 email draft variations',
                     'Multi-round deal tracking',
@@ -107,7 +107,7 @@ export default function PricingPage() {
           <div className="space-y-0 border-t border-slate-200/60">
             {[
               { q: 'Can I use DealCheck without signing up?', a: 'Yes. You can try a one-off analysis on the homepage without creating an account. To save deals and track rounds, you\'ll need to sign up (free).' },
-              { q: 'What do I get for free?', a: '5 full AI analyses including red flags, negotiation plan, and email drafts. After that, you\'ll need a Pro plan to continue.' },
+              { q: 'What do I get for free?', a: '2 free AI analyses including red flags, negotiation plan, and email drafts. After that, you\'ll need a Pro plan to continue.' },
               { q: 'What counts as an "analysis"?', a: 'Each time you submit a quote or document for AI analysis counts as one. This includes initial analyses and follow-up rounds on existing deals.' },
               { q: 'When will Pro launch?', a: 'Soon. Contact us at hello@dealcheck.app and we\'ll notify you. Pro will include unlimited analyses and priority processing.' },
             ].map((item, i) => (
