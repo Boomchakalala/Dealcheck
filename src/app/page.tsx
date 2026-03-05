@@ -48,7 +48,7 @@ export default function LandingPage() {
                   href="/try"
                   className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg"
                 >
-                  Try DealCheck
+                  Analyze a quote free
                 </Link>
                 <Link
                   href="/example"
@@ -68,8 +68,8 @@ export default function LandingPage() {
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-slate-700 group-hover:text-emerald-700 transition-colors">Drop a quote or paste text to start</p>
-                      <p className="text-xs text-slate-500">Click to upload • PDF, PNG, JPG</p>
+                      <p className="text-sm font-semibold text-slate-700 group-hover:text-emerald-700 transition-colors">Drop a quote to start — no signup needed</p>
+                      <p className="text-xs text-slate-500">No signup needed • PDF, PNG, JPG</p>
                     </div>
                   </div>
                 </div>

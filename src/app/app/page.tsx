@@ -68,6 +68,27 @@ export default function DashboardPage() {
       setProfile(profileRes.data)
       setDeals((dealsRes.data as DealWithRounds[]) || [])
       setLoading(false)
+
+      // Check for pending trial import
+      const pendingTrial = sessionStorage.getItem('dealcheck_trial')
+      if (pendingTrial) {
+        sessionStorage.removeItem('dealcheck_trial')
+        try {
+          const trialData = JSON.parse(pendingTrial)
+          const importRes = await fetch('/api/deal/import-trial', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(trialData),
+          })
+          const importData = await importRes.json()
+          if (importRes.ok && importData.dealId) {
+            router.push(`/app/deal/${importData.dealId}`)
+            return
+          }
+        } catch (e) {
+          console.error('Failed to import trial:', e)
+        }
+      }
     }
     load()
   }, [])
