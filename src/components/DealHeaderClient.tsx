@@ -17,6 +17,8 @@ interface DealHeaderClientProps {
   savingsPercent?: number | null
   closedAt?: string | null
   currentTotal?: string
+  roundCount?: number
+  whatChanged?: string[] | null
 }
 
 export function DealHeaderClient({
@@ -27,6 +29,8 @@ export function DealHeaderClient({
   savingsPercent,
   closedAt,
   currentTotal,
+  roundCount,
+  whatChanged,
 }: DealHeaderClientProps) {
   const router = useRouter()
   const [showCloseModal, setShowCloseModal] = useState(false)
@@ -82,10 +86,10 @@ export function DealHeaderClient({
           </>
         ) : (
           <Button
-            size="sm"
             onClick={() => setShowCloseModal(true)}
-            className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-500/20"
           >
+            <CheckCircle2 className="w-4 h-4" />
             Close deal
           </Button>
         )}
