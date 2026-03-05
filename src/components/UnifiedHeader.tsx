@@ -56,6 +56,48 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
     </Link>
   )
 
+  // Marketing mobile menu (shared between landing and public)
+  const marketingMobileMenu = showMobileMenu && (
+    <div className="md:hidden border-t border-slate-200 py-3 space-y-1">
+      <Link
+        href="/pricing"
+        className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+        onClick={() => setShowMobileMenu(false)}
+      >
+        Pricing
+      </Link>
+      <Link
+        href="/#how-it-works"
+        className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+        onClick={() => setShowMobileMenu(false)}
+      >
+        How it works
+      </Link>
+      <Link
+        href="/example"
+        className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+        onClick={() => setShowMobileMenu(false)}
+      >
+        Example
+      </Link>
+      <div className="border-t border-slate-200 my-2" />
+      <Link
+        href="/login"
+        className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+        onClick={() => setShowMobileMenu(false)}
+      >
+        Sign in
+      </Link>
+      <Link
+        href="/try"
+        className="block mx-4 mt-2 px-4 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center"
+        onClick={() => setShowMobileMenu(false)}
+      >
+        Try free
+      </Link>
+    </div>
+  )
+
   // Landing page header
   if (variant === 'landing') {
     return (
@@ -69,8 +111,8 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
               {marketingNavLinks}
             </nav>
 
-            {/* Right side */}
-            <div className="flex items-center gap-4">
+            {/* Right side (desktop) */}
+            <div className="hidden md:flex items-center gap-4">
               <Link
                 href="/login"
                 className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
@@ -79,12 +121,31 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
               </Link>
               <Link
                 href="/try"
-                className="px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
+                className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
               >
                 Try free
               </Link>
             </div>
+
+            {/* Mobile: CTA + Hamburger */}
+            <div className="flex md:hidden items-center gap-2">
+              <Link
+                href="/try"
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
+              >
+                Try free
+              </Link>
+              <button
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
+
+          {/* Mobile menu */}
+          {marketingMobileMenu}
         </div>
       </header>
     )
@@ -103,8 +164,8 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
               {marketingNavLinks}
             </nav>
 
-            {/* Right side */}
-            <div className="flex items-center gap-4">
+            {/* Right side (desktop) */}
+            <div className="hidden md:flex items-center gap-4">
               <Link
                 href="/login"
                 className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
@@ -113,12 +174,23 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
               </Link>
               <Link
                 href="/try"
-                className="hidden sm:inline-flex px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
+                className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
               >
                 Try free
               </Link>
             </div>
+
+            {/* Mobile: Hamburger */}
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="md:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
+
+          {/* Mobile menu */}
+          {marketingMobileMenu}
         </div>
       </header>
     )
@@ -225,7 +297,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
           {/* Mobile: Hamburger menu */}
           <button
             onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="md:hidden p-2 text-slate-600 hover:text-slate-900"
+            className="md:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
           >
             {showMobileMenu ? (
               <X className="w-6 h-6" />
@@ -242,7 +314,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
               <Link
                 key={item.href}
                 href={item.href}
-                className={`block px-4 py-2 text-sm font-medium transition-colors ${
+                className={`block px-4 py-2.5 text-sm font-medium transition-colors ${
                   isActive(item.href)
                     ? 'text-emerald-600 bg-emerald-50'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
