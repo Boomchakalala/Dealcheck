@@ -17,6 +17,9 @@ export const EmailDraftSchema = z.object({
 export const DealOutputSchema = z.object({
   title: z.string(),
   vendor: z.string(),
+  verdict: z.string().optional().default('Review this deal before signing.'),
+  verdict_type: z.enum(['negotiate', 'competitive', 'overpay_risk']).optional().default('negotiate'),
+  price_insight: z.string().optional(),
   snapshot: z.object({
     vendor_product: z.string(),
     term: z.string(),

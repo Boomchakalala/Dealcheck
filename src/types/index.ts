@@ -125,6 +125,9 @@ export type EmailDraft = {
 export type DealOutput = {
   title: string
   vendor: string
+  verdict: string
+  verdict_type: 'negotiate' | 'competitive' | 'overpay_risk'
+  price_insight?: string
   snapshot: {
     vendor_product: string
     term: string
