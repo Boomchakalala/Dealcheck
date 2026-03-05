@@ -251,24 +251,19 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Top-right indicators */}
-      <div className="flex items-center justify-end gap-4 text-xs">
-        <button
-          onClick={() => setShowHelpModal(true)}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-full border border-slate-200 hover:bg-slate-150 transition-colors"
-        >
-          <HelpCircle className="w-3 h-3 text-slate-500" />
-          <span className="text-slate-600 font-medium">What can I upload?</span>
-        </button>
-      </div>
-
       {/* Welcome + Upload Section */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900 mb-1">
           Welcome back!
         </h1>
         <p className="text-sm text-slate-600 mb-6">
-          Upload a quote or paste text to start analysis
+          Upload a quote or paste text to start analysis.{' '}
+          <button
+            onClick={() => setShowHelpModal(true)}
+            className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+          >
+            What can I upload?
+          </button>
         </p>
 
         <QuoteUploaderCard

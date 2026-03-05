@@ -454,7 +454,13 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
           </div>
 
           {/* Email preview */}
-          <div className="rounded-xl border border-slate-200 overflow-hidden">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex-1 h-px bg-slate-200" />
+              <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Preview</span>
+              <div className="flex-1 h-px bg-slate-200" />
+            </div>
+            <div className="rounded-xl border border-slate-200 overflow-hidden">
             <div className="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-slate-500">Subject</p>
@@ -468,6 +474,7 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
             <div className="p-5">
               <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{emailBody}</p>
             </div>
+          </div>
           </div>
         </div>
       </div>
