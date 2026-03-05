@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
-import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Upload, Loader2, HelpCircle, Lock, X, CheckCircle2 } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { DealListClient } from '@/components/DealListClient'
 import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
