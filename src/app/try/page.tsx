@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { OutputDisplay } from '@/components/OutputDisplay'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
