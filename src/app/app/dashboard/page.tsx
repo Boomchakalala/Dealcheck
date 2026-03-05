@@ -29,6 +29,31 @@ export default async function DashboardPage() {
   const totalSavings = closedDeals.reduce((sum, d) => sum + (d.savings_amount || 0), 0)
   const winRate = closedDeals.length > 0 ? (wonDeals.length / closedDeals.length) * 100 : 0
 
+  if (totalDeals === 0) {
+    return (
+      <div className="max-w-5xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+        </div>
+        <Card className="p-12 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">No deals yet</h2>
+          <p className="text-sm text-slate-600 mb-6 max-w-md mx-auto">
+            Upload your first quote to get negotiation levers, red flags, and ready-to-send emails.
+          </p>
+          <Link
+            href="/app"
+            className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+          >
+            Analyze your first quote
+          </Link>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Header */}
