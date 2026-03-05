@@ -88,6 +88,13 @@ This quote expires in 14 days.`
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to analyze')
       setOutput(data.output)
+      // Store trial result for post-auth import
+      sessionStorage.setItem('dealcheck_trial', JSON.stringify({
+        output: data.output,
+        dealType,
+        goal: goal || null,
+        extractedText: input,
+      }))
       setStep(3)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -112,12 +119,26 @@ This quote expires in 14 days.`
                 setInput('')
                 setUploadedFileName(null)
                 setStep(1)
+                sessionStorage.removeItem('dealcheck_trial')
               }}
               className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors inline-flex items-center gap-2"
             >
               ← Analyze another quote
             </button>
           </div>
+
+          {/* Save CTA */}
+          <div className="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-6 text-center">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Save this analysis & track rounds</h3>
+            <p className="text-sm text-slate-600 mb-4">Create a free account to keep this analysis, add negotiation rounds, and close the deal.</p>
+            <Link
+              href="/login?from=trial"
+              className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+            >
+              Save analysis — sign up free
+            </Link>
+          </div>
+
           <OutputDisplay output={output} />
         </main>
       </div>
@@ -133,7 +154,7 @@ This quote expires in 14 days.`
       <main className="max-w-4xl mx-auto px-5 sm:px-8 py-12">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-slate-900 mb-2">
-            Upload a quote or contract
+            Analyze a quote — free, no signup
           </h1>
           <p className="text-base text-slate-600">
             Drop a file or paste text. We&apos;ll extract pricing + terms and generate a negotiation strategy.
