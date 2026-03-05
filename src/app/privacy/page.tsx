@@ -46,7 +46,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">1. Who We Are</h2>
-              <p className="mb-2">DealCheck is operated by [Company Name - to be registered].</p>
+              <p className="mb-2">DealCheck is operated by its founding team. Company registration is in progress.</p>
               <p className="text-xs text-slate-600">Contact: <a href="mailto:privacy@dealcheck.app" className="text-emerald-600 hover:underline">privacy@dealcheck.app</a></p>
             </section>
 

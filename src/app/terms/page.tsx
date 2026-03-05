@@ -172,7 +172,7 @@ export default function TermsPage() {
                 <li>• Contact us first to resolve it informally</li>
                 <li>• If needed, disputes go to binding arbitration (not court)</li>
                 <li>• No class actions</li>
-                <li>• Governed by [Your Jurisdiction] law</li>
+                <li>• Governed by the laws of Ireland</li>
               </ul>
 
               <p className="text-xs text-slate-600">Note: Some jurisdictions don&apos;t allow arbitration waivers. If yours doesn&apos;t, this clause doesn&apos;t apply to you.</p>
