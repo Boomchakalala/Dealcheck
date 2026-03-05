@@ -134,29 +134,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Trust strip — privacy signals, right below hero */}
-      <section className="border-y border-slate-200 bg-slate-50/50 py-4">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Lock className="w-4 h-4 text-slate-400" />
-              <span>Encrypted in transit</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <ShieldCheck className="w-4 h-4 text-slate-400" />
-              <span>Not used for AI training</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-slate-600">
-              <Globe className="w-4 h-4 text-slate-400" />
-              <span>GDPR compliant</span>
-            </div>
-            <Link href="/security" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
-              Learn more
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* How DealCheck Works */}
       <section id="how-it-works" className="py-20 bg-white border-t border-slate-200">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
@@ -170,16 +147,19 @@ export default function LandingPage() {
           {/* 3 Steps — Lucide icons */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
             {[
-              { title: 'Drop in your quote', icon: Upload },
-              { title: 'See where you can save', icon: Search },
-              { title: 'Send a stronger reply', icon: Send },
+              { title: 'Drop in your quote', desc: 'Upload a PDF, paste an email, or snap a screenshot. Any format works.', icon: Upload },
+              { title: 'See where you can save', desc: 'Get a breakdown of hidden fees, inflated rates, and terms worth pushing on.', icon: Search },
+              { title: 'Send a stronger reply', desc: 'Copy a ready-made email with your asks baked in — pick your tone and go.', icon: Send },
             ].map((step, index) => (
               <div key={index} className="relative flex flex-col items-center text-center">
                 <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center">
                   <step.icon className="w-7 h-7 text-emerald-700" />
                 </div>
-                <p className="text-base font-medium text-slate-900">
+                <p className="text-base font-semibold text-slate-900 mb-1.5">
                   {step.title}
+                </p>
+                <p className="text-sm text-slate-600 max-w-[250px]">
+                  {step.desc}
                 </p>
                 {index < 2 && (
                   <div className="hidden md:block absolute top-8 -right-6 text-slate-300 text-2xl">
