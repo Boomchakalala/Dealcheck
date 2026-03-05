@@ -164,47 +164,6 @@ export default function DashboardPage() {
     }
   }
 
-  const handleQuickClose = (e: React.MouseEvent, dealId: string, currentTotal?: string) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDealToClose({ id: dealId, total: currentTotal })
-  }
-
-  function getTimeAgo(date: string): string {
-    const now = new Date()
-    const past = new Date(date)
-    const diffMs = now.getTime() - past.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? 's' : ''} ago`
-    if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
-    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`
-    return past.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  }
-
-  function getDealStatus(deal: DealWithRounds): { label: string; color: string } {
-    // Check if deal is closed
-    if (deal.status?.startsWith('closed_')) {
-      return { label: 'Closed', color: 'bg-slate-100 text-slate-700 border-slate-200' }
-    }
-
-    const latestRound = deal.rounds?.[0]
-    if (!latestRound) return { label: 'Pending', color: 'bg-slate-100 text-slate-600 border-slate-200' }
-    if (latestRound.status === 'completed') {
-      // Simple heuristic: if there's output, it's analyzed
-      return { label: 'Analyzed', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' }
-    }
-    return { label: 'In progress', color: 'bg-blue-100 text-blue-700 border-blue-200' }
-  }
-
-  function getAmount(deal: DealWithRounds): string | null {
-    const latestRound = deal.rounds?.[0]
-    if (!latestRound?.output_json?.snapshot?.total_commitment) return null
-    return latestRound.output_json.snapshot.total_commitment
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -330,73 +289,9 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            {deals.slice(0, 10).map((deal) => {
-              const status = getDealStatus(deal)
-              const amount = getAmount(deal)
-              const timeAgo = getTimeAgo(deal.updated_at)
-              const latestRound = deal.rounds?.[0]
-              const conclusion = latestRound?.output_json?.quick_read?.conclusion
-              const vendorName = deal.vendor || latestRound?.output_json?.vendor || deal.title
-              const isClosed = deal.status?.startsWith('closed_')
-
-              return (
-                <Link key={deal.id} href={`/app/deal/${deal.id}`}>
-                  <div className="bg-white rounded-xl border border-slate-200 p-5 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border ${status.color}`}>
-                            {status.label}
-                          </span>
-                          {!isClosed && (
-                            <button
-                              onClick={(e) => handleQuickClose(e, deal.id, amount || undefined)}
-                              className="text-xs font-medium px-2.5 py-1 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors"
-                            >
-                              Close deal
-                            </button>
-                          )}
-                        </div>
-                        <h3 className="text-base font-bold text-slate-900 mb-1 truncate group-hover:text-emerald-700 transition-colors">
-                          {vendorName}
-                        </h3>
-                        {conclusion && (
-                          <p className="text-sm text-slate-600 mb-2 line-clamp-1">{conclusion}</p>
-                        )}
-                        {deal.savings_amount !== null && deal.savings_amount !== undefined && deal.savings_amount > 0 && (
-                          <p className="text-xs font-medium text-emerald-700 mb-1">
-                            Saved: ${deal.savings_amount.toFixed(2)} ({deal.savings_percent?.toFixed(1)}%)
-                          </p>
-                        )}
-                        <p className="text-xs text-slate-400">Last updated {timeAgo}</p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        {amount && (
-                          <p className="text-base font-bold text-slate-900">{amount}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
+          <DealListClient deals={deals.slice(0, 10)} />
         )}
       </div>
-
-      {/* Close Deal Modal */}
-      {dealToClose && (
-        <CloseDealModal
-          dealId={dealToClose.id}
-          currentTotal={dealToClose.total}
-          onClose={() => setDealToClose(null)}
-          onSuccess={() => {
-            setDealToClose(null)
-            router.refresh()
-          }}
-        />
-      )}
     </div>
   )
 }
