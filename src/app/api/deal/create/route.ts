@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { CreateDealSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/openai'
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
+
+const FREE_ANALYSIS_LIMIT = 5
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +27,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    // Usage limits removed — unlimited for all users
+    // Rate limiting (admins bypass)
+    if (!profile.is_admin) {
+      const rl = rateLimit(`analysis:${user.id}`, RATE_LIMITS.analysis)
+      if (!rl.allowed) {
+        return NextResponse.json(
+          { error: 'Too many requests. Please try again later.' },
+          { status: 429 }
+        )
+      }
+
+      // Usage limits (admins bypass)
+      if (profile.plan !== 'pro' && profile.usage_count >= FREE_ANALYSIS_LIMIT) {
+        return NextResponse.json(
+          { error: `Free plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to continue.` },
+          { status: 403 }
+        )
+      }
+    }
 
     // Parse request body
     const body = await request.json()
