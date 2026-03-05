@@ -1,12 +1,12 @@
 import Link from 'next/link'
-import { Header } from '@/components/Header'
+import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { Trash2, FileText, Lock, Shield, ArrowRight } from 'lucide-react'
 
 export default function SecurityPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <Header variant="public" />
+      <UnifiedHeader variant="public" />
 
       <main className="flex-1">
         {/* Hero Section */}

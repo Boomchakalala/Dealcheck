@@ -1,12 +1,12 @@
 import Link from 'next/link'
-import { Header } from '@/components/Header'
+import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { Scale } from 'lucide-react'
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <Header variant="public" />
+      <UnifiedHeader variant="public" />
 
       <main className="flex-1">
         <div className="relative overflow-hidden bg-gradient-to-b from-slate-50/60 to-white">

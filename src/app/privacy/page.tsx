@@ -6,7 +6,7 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <Header variant="public" />
+      <UnifiedHeader variant="public" />
 
       <main className="flex-1">
         <div className="relative overflow-hidden bg-gradient-to-b from-slate-50/60 to-white">
