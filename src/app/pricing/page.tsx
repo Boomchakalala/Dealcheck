@@ -34,30 +34,30 @@ export default function PricingPage() {
                 <span className="text-xs font-semibold text-emerald-700 tracking-wide">Simple pricing</span>
               </div>
               <h1 className="text-[2.25rem] sm:text-[3rem] leading-[1.08] font-bold text-slate-900 tracking-tight mb-4 max-w-xl mx-auto">
-                Start free. Upgrade when you need more.
+                Try free. Pay when you&apos;re ready.
               </h1>
               <p className="text-lg text-slate-500 leading-relaxed max-w-xl mx-auto">
-                Every plan includes red flags, negotiation asks, and ready-to-send reply emails.
+                Get 5 free analyses to see if DealCheck works for you.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
               {/* Free */}
               <div className="rounded-2xl border border-slate-200/60 bg-white p-8 shadow-sm hover:shadow-md transition-shadow">
-                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">Free</p>
+                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">Try it out</p>
                 <div className="mb-6">
                   <span className="text-5xl font-bold text-slate-900 tracking-tight">$0</span>
                 </div>
                 <p className="text-sm text-slate-500 mb-8 leading-relaxed">
-                  Full-powered analysis on every vendor quote. No signup required.
+                  5 full analyses to try DealCheck risk-free. No credit card needed.
                 </p>
                 <ul className="space-y-3.5 mb-8">
                   {[
-                    'Unlimited analysis rounds',
+                    '5 full AI analyses',
                     'Red flags + negotiation plan',
                     '3 email draft variations',
-                    'Copy-paste output',
-                    'Save deals (with account)',
+                    'Multi-round deal tracking',
+                    'Save & revisit deals',
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -69,7 +69,7 @@ export default function PricingPage() {
                   href="/try"
                   className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl border border-slate-200 text-slate-700 hover:border-slate-300 hover:text-slate-900 hover:shadow-sm transition-all"
                 >
-                  Analyze a quote free
+                  Try it free
                 </Link>
               </div>
 
@@ -77,7 +77,7 @@ export default function PricingPage() {
               <div className="rounded-2xl border-2 border-emerald-500/60 p-8 relative bg-gradient-to-b from-emerald-50/40 to-white shadow-md shadow-emerald-100/40">
                 <div className="absolute -top-3 left-6">
                   <span className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold rounded-full tracking-wide shadow-sm">
-                    PRO
+                    COMING SOON
                   </span>
                 </div>
                 <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">Pro plan</p>
@@ -86,16 +86,14 @@ export default function PricingPage() {
                   <span className="text-slate-500 ml-1.5 text-lg">/mo</span>
                 </div>
                 <p className="text-sm text-slate-500 mb-8 leading-relaxed">
-                  For teams that negotiate multiple vendor deals per month.
+                  Unlimited analyses for teams that negotiate regularly.
                 </p>
                 <ul className="space-y-3.5 mb-8">
                   {[
-                    'Everything in Free',
-                    'Unlimited saved deals',
-                    'Multi-round deal tracking',
+                    'Unlimited AI analyses',
+                    'Everything in free tier',
                     'Priority analysis speed',
-                    'Export to PDF (coming)',
-                    'Team features (coming)',
+                    'Unlimited saved deals',
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -122,7 +120,7 @@ export default function PricingPage() {
                       type="submit"
                       className="px-6 py-3.5 text-sm font-semibold rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 transition-all shadow-sm hover:shadow-md whitespace-nowrap flex items-center gap-2"
                     >
-                      Join waitlist <ArrowRight className="w-3.5 h-3.5" />
+                      Notify me <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </form>
                 )}
@@ -137,10 +135,10 @@ export default function PricingPage() {
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-12 text-center">Pricing FAQ</h2>
           <div className="space-y-0 border-t border-slate-200/60">
             {[
-              { q: 'Can I use DealCheck without signing up?', a: 'Yes. The homepage lets you paste or upload a quote and get a full analysis — no account needed. Unlimited runs.' },
-              { q: 'What counts as a "round"?', a: 'Each time you submit text for analysis (an initial quote, a counter-offer, a revised proposal), that\'s one round. Multi-round tracking preserves context between submissions.' },
-              { q: 'How does billing work for Pro?', a: 'Pro will be billed monthly. You can cancel anytime — no long-term commitment. We\'ll announce pricing details when Pro launches.' },
-              { q: 'Do you offer team plans?', a: 'Not yet. If you need multiple seats, join the waitlist and let us know — we\'re shaping team features based on demand.' },
+              { q: 'Can I use DealCheck without signing up?', a: 'Yes. You can try a one-off analysis on the homepage without creating an account. To save deals and track rounds, you\'ll need to sign up (free).' },
+              { q: 'What do I get for free?', a: '5 full AI analyses including red flags, negotiation plan, and email drafts. After that, you\'ll need a Pro plan to continue.' },
+              { q: 'What counts as an "analysis"?', a: 'Each time you submit a quote or document for AI analysis counts as one. This includes initial analyses and follow-up rounds on existing deals.' },
+              { q: 'When will Pro launch?', a: 'Soon. Join the waitlist above and we\'ll notify you. Pro will include unlimited analyses and priority processing.' },
             ].map((item, i) => (
               <details key={i} className="group border-b border-slate-200/60">
                 <summary className="flex items-center justify-between cursor-pointer py-6 text-left">
@@ -163,6 +161,7 @@ export default function PricingPage() {
             <Link href="/help" className="hover:text-slate-600 transition-colors">Help</Link>
             <Link href="/terms" className="hover:text-slate-600 transition-colors">Terms</Link>
             <Link href="/privacy" className="hover:text-slate-600 transition-colors">Privacy</Link>
+            <Link href="/security" className="hover:text-slate-600 transition-colors">Security</Link>
           </div>
         </div>
       </footer>
