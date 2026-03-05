@@ -1,10 +1,23 @@
 import { NextResponse } from 'next/server'
 import { analyzeDeal } from '@/lib/openai'
 import { DealOutputSchema } from '@/lib/schemas'
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
+import { headers } from 'next/headers'
 
-// Guest trial - no auth required, one free try
+// Guest trial - no auth required, rate limited per IP
 export async function POST(request: Request) {
   try {
+    // Rate limit by IP
+    const headersList = await headers()
+    const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const rl = rateLimit(`trial:${ip}`, RATE_LIMITS.trial)
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Trial limit reached. Sign up for more analyses.' },
+        { status: 429 }
+      )
+    }
+
     const body = await request.json()
     const { extractedText, dealType, goal, notes, previousOutput } = body
 
