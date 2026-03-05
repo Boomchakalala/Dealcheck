@@ -1,5 +1,6 @@
 import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { OutputDisplay } from '@/components/OutputDisplay'
+import { MarketingFooter } from '@/components/MarketingFooter'
 import { type DealOutput } from '@/types'
 import Link from 'next/link'
 
