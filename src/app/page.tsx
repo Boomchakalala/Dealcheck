@@ -324,7 +324,7 @@ export default function LandingPage() {
                       </div>
                     </div>
                     <p className="text-sm text-slate-500 mt-6 italic">
-                      Adjust tone, risk level, and variables. Copy and send in seconds.
+                      Pick your tone, adjust the asks, and send. Done in 30 seconds.
                     </p>
                   </div>
                 )}
@@ -376,10 +376,10 @@ export default function LandingPage() {
       <section id="pricing" className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-5 sm:px-8 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-3">
-            Start free. No credit card needed.
+            Your first savings are free.
           </h2>
           <p className="text-base text-slate-600 mb-6">
-            Get 2 free analyses with full output: red flags, negotiation plan, and email drafts. Upgrade to Pro for unlimited access.
+            Get 2 full analyses — red flags, negotiation plan, and email drafts included. See what you've been leaving on the table.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -402,10 +402,10 @@ export default function LandingPage() {
       <section className="bg-gradient-to-br from-emerald-600 to-emerald-700 py-20">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Still have a quote sitting in your inbox?
+            That quote in your inbox? You're probably overpaying.
           </h2>
           <p className="text-emerald-100 text-lg mb-8">
-            Drop it in — 60 seconds to your first insight. No signup, no commitment.
+            Find out in 60 seconds. No signup, no commitment — just clarity.
           </p>
           <Link
             href="/try"
