@@ -75,20 +75,19 @@ export default function DashboardPage() {
         localStorage.removeItem('dealcheck_trial')
         try {
           const trialData = JSON.parse(pendingTrial)
-          // Check 24h TTL
           const savedAt = trialData._savedAt || 0
-          if (Date.now() - savedAt > 24 * 60 * 60 * 1000) {
-            // Expired — skip import
-          } else {
+          const isExpired = Date.now() - savedAt > 24 * 60 * 60 * 1000
+          if (!isExpired) {
             const importRes = await fetch('/api/deal/import-trial', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(trialData),
-          })
-          const importData = await importRes.json()
-          if (importRes.ok && importData.dealId) {
-            router.push(`/app/deal/${importData.dealId}`)
-            return
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(trialData),
+            })
+            const importData = await importRes.json()
+            if (importRes.ok && importData.dealId) {
+              router.push(`/app/deal/${importData.dealId}`)
+              return
+            }
           }
         } catch (e) {
           console.error('Failed to import trial:', e)
