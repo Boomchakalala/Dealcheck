@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Lock, HelpCircle, ChevronDown, User, LogOut, Menu, X } from 'lucide-react'
+import { HelpCircle, ChevronDown, User, LogOut, Menu, X, Settings } from 'lucide-react'
 
 interface UnifiedHeaderProps {
   variant: 'landing' | 'public' | 'app'
@@ -18,9 +18,8 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
 
   // App navigation items
   const appNavItems = [
-    { href: '/app', label: 'Analyze' },
+    { href: '/app', label: 'Deals' },
     { href: '/app/dashboard', label: 'Dashboard' },
-    { href: '/app/profile', label: 'Profile' },
   ]
 
   const isActive = (href: string) => {
@@ -30,39 +29,47 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
     return pathname.startsWith(href)
   }
 
+  // Marketing nav links (shared between landing and public)
+  const marketingNavLinks = (
+    <>
+      <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
+        Pricing
+      </Link>
+      <Link href="/#how-it-works" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
+        How it works
+      </Link>
+      <Link href="/example" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
+        Example
+      </Link>
+    </>
+  )
+
+  // Logo component
+  const logo = (
+    <Link href={variant === 'app' ? '/app' : '/'} className="flex items-center gap-2">
+      <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <span className="text-lg font-bold text-slate-900">DealCheck</span>
+    </Link>
+  )
+
   // Landing page header
   if (variant === 'landing') {
     return (
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="text-lg font-bold text-slate-900">DealCheck</span>
-            </Link>
+            {logo}
 
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-8">
-              <Link href="/#pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                Pricing
-              </Link>
-              <Link href="/#how-it-works" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                How it works
-              </Link>
-              <Link href="/security" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                Security
-              </Link>
-              <Link href="/help" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                FAQ
-              </Link>
+              {marketingNavLinks}
             </nav>
 
-            {/* Right side - Sign in + CTA */}
+            {/* Right side */}
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
@@ -72,9 +79,9 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
               </Link>
               <Link
                 href="/try"
-                className="px-6 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
+                className="px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
               >
-                Try DealCheck
+                Try free
               </Link>
             </div>
           </div>
@@ -89,48 +96,27 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="text-lg font-bold text-slate-900">DealCheck</span>
-            </Link>
+            {logo}
+
+            {/* Navigation - same marketing links */}
+            <nav className="hidden md:flex items-center gap-8">
+              {marketingNavLinks}
+            </nav>
 
             {/* Right side */}
             <div className="flex items-center gap-4">
-              {pathname === '/login' ? (
-                <Link
-                  href="/"
-                  className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-                >
-                  ← Back to home
-                </Link>
-              ) : pathname === '/try' ? (
-                <>
-                  <Link
-                    href="/"
-                    className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors hidden sm:inline"
-                  >
-                    ← Back
-                  </Link>
-                  <Link
-                    href="/login"
-                    className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-                  >
-                    Sign in
-                  </Link>
-                </>
-              ) : (
-                <Link
-                  href="/login"
-                  className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-                >
-                  Sign in
-                </Link>
-              )}
+              <Link
+                href="/login"
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/try"
+                className="hidden sm:inline-flex px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
+              >
+                Try free
+              </Link>
             </div>
           </div>
         </div>
@@ -144,14 +130,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left: Logo */}
-          <Link href="/app" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold text-slate-900">DealCheck</span>
-          </Link>
+          {logo}
 
           {/* Center: Nav items (desktop) */}
           <nav className="hidden md:flex items-center gap-1">
@@ -173,14 +152,8 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
             ))}
           </nav>
 
-          {/* Right: Private pill + Help + Upgrade (if not upgraded) + User dropdown (desktop) */}
+          {/* Right: Help + Upgrade (if not upgraded) + User dropdown (desktop) */}
           <div className="hidden md:flex items-center gap-3">
-            {/* Private pill */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 rounded-full border border-emerald-200">
-              <Lock className="w-3 h-3 text-emerald-600" />
-              <span className="text-xs font-medium text-emerald-700">Private: ON</span>
-            </div>
-
             {/* Help link */}
             <Link
               href="/help"
@@ -193,7 +166,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
             {/* Upgrade button (if not upgraded) */}
             {!isUpgraded && (
               <Link
-                href="/app/profile"
+                href="/pricing"
                 className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
               >
                 Upgrade
@@ -224,6 +197,14 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
                     >
                       <User className="w-4 h-4" />
                       Profile
+                    </Link>
+                    <Link
+                      href="/app/settings"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      <Settings className="w-4 h-4" />
+                      Settings
                     </Link>
                     <div className="border-t border-slate-200 my-1" />
                     <form action="/auth/signout" method="post">
@@ -272,12 +253,6 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
               </Link>
             ))}
             <div className="border-t border-slate-200 my-2" />
-            <div className="px-4 py-2">
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 rounded-full border border-emerald-200 inline-flex">
-                <Lock className="w-3 h-3 text-emerald-600" />
-                <span className="text-xs font-medium text-emerald-700">Private: ON</span>
-              </div>
-            </div>
             <Link
               href="/help"
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
@@ -288,15 +263,23 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
             </Link>
             {!isUpgraded && (
               <Link
-                href="/app/profile"
-                className="mx-4 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center"
+                href="/pricing"
+                className="mx-4 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center block"
                 onClick={() => setShowMobileMenu(false)}
               >
                 Upgrade
               </Link>
             )}
             <div className="border-t border-slate-200 my-2" />
-            <div className="px-4 py-2 text-sm text-slate-600 truncate">{userEmail || 'User'}</div>
+            <Link
+              href="/app/profile"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+              onClick={() => setShowMobileMenu(false)}
+            >
+              <User className="w-4 h-4" />
+              Profile
+            </Link>
+            <div className="px-4 py-2 text-sm text-slate-500 truncate">{userEmail || 'User'}</div>
             <form action="/auth/signout" method="post">
               <button
                 type="submit"

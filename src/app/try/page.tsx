@@ -199,7 +199,7 @@ This quote expires in 14 days.`
         />
 
         {/* Small demo text link */}
-        <div className="my-4 text-center">
+        <div className="my-4 text-center flex items-center justify-center gap-4">
           <button
             onClick={handleUseDemoText}
             disabled={uploading || analyzing}
@@ -207,6 +207,13 @@ This quote expires in 14 days.`
           >
             or try with demo text
           </button>
+          <span className="text-slate-300">|</span>
+          <Link
+            href="/example"
+            className="text-sm text-slate-500 hover:text-emerald-600 transition-colors underline underline-offset-2"
+          >
+            see a demo first
+          </Link>
         </div>
 
         {/* Deal type + goal in collapsible details */}
