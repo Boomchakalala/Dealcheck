@@ -10,11 +10,12 @@ import { X, Loader2, Sparkles } from 'lucide-react'
 interface CloseDealModalProps {
   dealId: string
   currentTotal?: string
+  roundCount: number
   onClose: () => void
   onSuccess: () => void
 }
 
-export function CloseDealModal({ dealId, currentTotal, onClose, onSuccess }: CloseDealModalProps) {
+export function CloseDealModal({ dealId, currentTotal, roundCount, onClose, onSuccess }: CloseDealModalProps) {
   const [outcome, setOutcome] = useState<'won' | 'lost' | 'paused'>('won')
   const [savingsAmount, setSavingsAmount] = useState('')
   const [savingsPercent, setSavingsPercent] = useState('')
@@ -22,6 +23,8 @@ export function CloseDealModal({ dealId, currentTotal, onClose, onSuccess }: Clo
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [estimating, setEstimating] = useState(false)
+  const [aiEstimated, setAiEstimated] = useState(false)
 
   const changeOptions = [
     'Price',
@@ -41,8 +44,23 @@ export function CloseDealModal({ dealId, currentTotal, onClose, onSuccess }: Clo
   }
 
   const handleEstimateSavings = async () => {
-    // TODO: Call API to estimate savings from rounds
-    setError('AI savings estimation coming soon')
+    setEstimating(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/deal/${dealId}/estimate-close`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to estimate')
+
+      if (data.savings_amount) setSavingsAmount(String(data.savings_amount))
+      if (data.savings_percent) setSavingsPercent(String(data.savings_percent))
+      if (data.what_changed?.length) setWhatChanged(data.what_changed)
+      if (data.summary) setNotes(data.summary)
+      setAiEstimated(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to estimate')
+    } finally {
+      setEstimating(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -127,12 +145,45 @@ export function CloseDealModal({ dealId, currentTotal, onClose, onSuccess }: Clo
             </div>
           </div>
 
+          {/* AI Estimation Button */}
+          {outcome === 'won' && !aiEstimated && roundCount >= 1 && (
+            <button
+              type="button"
+              onClick={handleEstimateSavings}
+              disabled={estimating}
+              className="w-full p-4 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/50
+                         hover:border-emerald-400 hover:bg-emerald-50 transition-all text-left flex items-center gap-3"
+            >
+              {estimating ? (
+                <Loader2 className="w-5 h-5 text-emerald-600 animate-spin flex-shrink-0" />
+              ) : (
+                <Sparkles className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+              )}
+              <div>
+                <p className="text-sm font-semibold text-emerald-900">
+                  {estimating ? 'Analyzing your rounds...' : 'Let AI analyze what you won'}
+                </p>
+                <p className="text-xs text-emerald-700 mt-0.5">
+                  Pre-fills savings, changes, and notes from your negotiation rounds
+                </p>
+              </div>
+            </button>
+          )}
+
           {/* Savings */}
           {outcome === 'won' && (
             <div>
-              <Label className="text-sm font-semibold text-slate-900 mb-3 block">
-                Savings <span className="text-slate-500 font-normal">(optional)</span>
-              </Label>
+              <div className="flex items-center justify-between mb-3">
+                <Label className="text-sm font-semibold text-slate-900">
+                  Savings <span className="text-slate-500 font-normal">(optional)</span>
+                </Label>
+                {aiEstimated && (
+                  <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                    <Sparkles className="w-3 h-3" />
+                    Pre-filled by AI — edit as needed
+                  </div>
+                )}
+              </div>
               <div className="flex gap-2">
                 <div className="flex-1">
                   <Input
@@ -155,17 +206,6 @@ export function CloseDealModal({ dealId, currentTotal, onClose, onSuccess }: Clo
                   <p className="text-xs text-slate-500 mt-1">Percent saved</p>
                 </div>
               </div>
-              {currentTotal && (!savingsAmount && !savingsPercent) && (
-                <button
-                  type="button"
-                  onClick={handleEstimateSavings}
-                  disabled={loading}
-                  className="mt-3 text-sm font-medium text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Let AI estimate savings from rounds
-                </button>
-              )}
             </div>
           )}
 

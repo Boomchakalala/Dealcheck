@@ -8,10 +8,11 @@ interface DealActionBarProps {
   dealId: string
   currentTotal?: string
   dealStatus?: string
+  roundCount?: number
   onDealClosed?: () => void
 }
 
-export function DealActionBar({ dealId, currentTotal, dealStatus, onDealClosed }: DealActionBarProps) {
+export function DealActionBar({ dealId, currentTotal, dealStatus, roundCount, onDealClosed }: DealActionBarProps) {
   const [showCloseModal, setShowCloseModal] = useState(false)
   const isClosed = dealStatus?.startsWith('closed_')
 
