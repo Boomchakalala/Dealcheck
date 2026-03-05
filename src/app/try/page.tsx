@@ -130,74 +130,16 @@ This quote expires in 14 days.`
       <UnifiedHeader variant="public" />
 
       <main className="max-w-4xl mx-auto px-5 sm:px-8 py-12">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">
             Upload a quote or contract
           </h1>
-          <p className="text-lg text-slate-600">
+          <p className="text-base text-slate-600">
             Drop a file or paste text. We&apos;ll extract pricing + terms and generate a negotiation strategy.
           </p>
         </div>
 
-        {/* Optional context chips */}
-        <div className="mb-6 space-y-4">
-          <div>
-            <label className="text-sm font-medium text-slate-700 mb-2 block">
-              Deal type <span className="text-slate-500 font-normal">(optional)</span>
-            </label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setDealType('New')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
-                  dealType === 'New'
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                New purchase
-              </button>
-              <button
-                type="button"
-                onClick={() => setDealType('Renewal')}
-                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
-                  dealType === 'Renewal'
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                Renewal
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="goal" className="text-sm font-medium text-slate-700 mb-2 block">
-              Your goal <span className="text-slate-500 font-normal">(optional)</span>
-            </label>
-            <input
-              id="goal"
-              type="text"
-              value={goal}
-              onChange={(e) => setGoal(e.target.value)}
-              placeholder="e.g., Reduce cost by 15%, Remove auto-renewal"
-              className="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-          </div>
-        </div>
-
-        {/* Demo text button */}
-        <div className="mb-4 flex justify-end">
-          <button
-            onClick={handleUseDemoText}
-            disabled={uploading || analyzing}
-            className="text-sm font-medium text-emerald-600 hover:text-emerald-700 disabled:opacity-50 transition-colors"
-          >
-            Use demo text →
-          </button>
-        </div>
-
-        {/* Uploader */}
+        {/* Uploader - first prominent element */}
         <QuoteUploaderCard
           variant="public"
           input={input}
@@ -215,6 +157,69 @@ This quote expires in 14 days.`
           showTrustBadges={true}
           showWhatYouGet={false}
         />
+
+        {/* Small demo text link */}
+        <div className="my-4 text-center">
+          <button
+            onClick={handleUseDemoText}
+            disabled={uploading || analyzing}
+            className="text-sm text-slate-500 hover:text-emerald-600 disabled:opacity-50 transition-colors underline underline-offset-2"
+          >
+            or try with demo text
+          </button>
+        </div>
+
+        {/* Deal type + goal in collapsible details */}
+        <details className="mb-6">
+          <summary className="cursor-pointer text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors py-2">
+            Advanced options (deal type &amp; goal)
+          </summary>
+          <div className="mt-3 space-y-4 pl-1">
+            <div>
+              <label className="text-sm font-medium text-slate-700 mb-2 block">
+                Deal type <span className="text-slate-500 font-normal">(optional)</span>
+              </label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDealType('New')}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
+                    dealType === 'New'
+                      ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
+                      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                  }`}
+                >
+                  New purchase
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDealType('Renewal')}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
+                    dealType === 'Renewal'
+                      ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
+                      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                  }`}
+                >
+                  Renewal
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="goal" className="text-sm font-medium text-slate-700 mb-2 block">
+                Your goal <span className="text-slate-500 font-normal">(optional)</span>
+              </label>
+              <input
+                id="goal"
+                type="text"
+                value={goal}
+                onChange={(e) => setGoal(e.target.value)}
+                placeholder="e.g., Reduce cost by 15%, Remove auto-renewal"
+                className="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+          </div>
+        </details>
 
         {/* What you'll get - Full width */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-6">
