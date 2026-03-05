@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Upload, Loader2, HelpCircle, Lock, X, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { CloseDealModal } from '@/components/CloseDealModal'
+import { DealListClient } from '@/components/DealListClient'
 import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
 
 type RoundData = {
@@ -44,7 +44,6 @@ export default function DashboardPage() {
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [imageData, setImageData] = useState<{ base64: string; mimeType: string } | null>(null)
   const [showHelpModal, setShowHelpModal] = useState(false)
-  const [dealToClose, setDealToClose] = useState<{id: string, total?: string} | null>(null)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
