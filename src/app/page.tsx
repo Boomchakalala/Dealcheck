@@ -93,7 +93,7 @@ export default function LandingPage() {
                   {/* Watch out */}
                   <div className="bg-white border border-red-200 rounded-xl p-4">
                     <p className="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
-                      <span className="text-amber-600">&#9888;</span> Watch out
+                      <span className="text-amber-600">&#9888;</span> What's costing you
                       <span className="text-[10px] font-bold text-red-700 bg-red-100 px-1.5 py-0.5 rounded-full border border-red-200 ml-1">4 flags</span>
                     </p>
                     <div className="space-y-2">
@@ -183,7 +183,7 @@ export default function LandingPage() {
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  Watch out
+                  What's costing you
                 </button>
                 <button
                   onClick={() => setActiveTab('terms')}

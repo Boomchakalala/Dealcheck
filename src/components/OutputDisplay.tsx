@@ -227,7 +227,7 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-600" />
-            <h2 className="text-base font-bold text-slate-900">Watch out</h2>
+            <h2 className="text-base font-bold text-slate-900">What's costing you</h2>
             {output.red_flags.length > 0 && (
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
                 {output.red_flags.length} flag{output.red_flags.length !== 1 ? 's' : ''}
