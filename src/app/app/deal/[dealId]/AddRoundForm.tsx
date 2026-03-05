@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { FileUpload } from '@/components/FileUpload'
 import { Card } from '@/components/ui/card'
 import { Loader2, Plus, ChevronDown, ChevronUp, Upload, X } from 'lucide-react'
 

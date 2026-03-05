@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Header } from '@/components/Header'
+import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { CheckCircle2, Sparkles, ArrowRight } from 'lucide-react'
 
 export default function PricingPage() {

@@ -1,4 +1,4 @@
-import { Header } from '@/components/Header'
+import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { OutputDisplay } from '@/components/OutputDisplay'
 import { type DealOutput } from '@/types'
 import Link from 'next/link'
@@ -182,7 +182,7 @@ P.S. - If quarterly prepayment or an 18-month term helps you get to these number
 export default function ExamplePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <Header variant="public" />
+      <UnifiedHeader variant="public" />
 
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-12">
         {/* Demo Banner */}
