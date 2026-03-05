@@ -314,51 +314,53 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Data Privacy — compact section */}
-      <section id="data-privacy" className="py-16 bg-slate-50 border-y border-slate-200">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8">
-          <h2 className="text-2xl font-bold text-slate-900 text-center mb-10">
+      {/* Data Privacy */}
+      <section id="data-privacy" className="py-20 bg-white border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-4">
             Your quotes stay yours
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                <Lock className="w-6 h-6 text-emerald-600" />
+          <p className="text-base text-slate-600 text-center mb-16 max-w-2xl mx-auto">
+            Confidential pricing deserves confidential handling. Your data is encrypted, never trained on, and deleted when you say so.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative flex flex-col items-center text-center">
+              <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                <Lock className="w-7 h-7 text-emerald-700" />
               </div>
-              <div>
-                <p className="text-base font-semibold text-slate-900 mb-1">Encrypted end-to-end</p>
-                <p className="text-sm text-slate-600">Your data is processed securely and deleted after analysis unless you save it</p>
-              </div>
+              <p className="text-base font-semibold text-slate-900 mb-1.5">Encrypted end-to-end</p>
+              <p className="text-sm text-slate-600 max-w-[250px]">Processed securely and deleted after analysis unless you choose to save it.</p>
             </div>
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                <ShieldCheck className="w-6 h-6 text-emerald-600" />
+            <div className="relative flex flex-col items-center text-center">
+              <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                <ShieldCheck className="w-7 h-7 text-emerald-700" />
               </div>
-              <div>
-                <p className="text-base font-semibold text-slate-900 mb-1">Never used for AI training</p>
-                <p className="text-sm text-slate-600">Your confidential pricing and terms are never fed back into any model</p>
-              </div>
+              <p className="text-base font-semibold text-slate-900 mb-1.5">Never used for AI training</p>
+              <p className="text-sm text-slate-600 max-w-[250px]">Your pricing, terms, and vendor details are never fed back into any model.</p>
             </div>
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                <Globe className="w-6 h-6 text-emerald-600" />
+            <div className="relative flex flex-col items-center text-center">
+              <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center">
+                <Globe className="w-7 h-7 text-emerald-700" />
               </div>
-              <div>
-                <p className="text-base font-semibold text-slate-900 mb-1">GDPR compliant</p>
-                <p className="text-sm text-slate-600">EU-hosted infrastructure with full compliance out of the box</p>
-              </div>
+              <p className="text-base font-semibold text-slate-900 mb-1.5">GDPR compliant</p>
+              <p className="text-sm text-slate-600 max-w-[250px]">EU-hosted infrastructure with full compliance built in from day one.</p>
             </div>
+          </div>
+          <div className="text-center mt-10">
+            <Link href="/security" className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors">
+              Learn more about our security practices →
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Start free strip — replaces full pricing section */}
-      <section id="pricing" className="py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-3">
-            Your first savings are free.
+      {/* Start free */}
+      <section id="pricing" className="py-20 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+            Your first savings are free
           </h2>
-          <p className="text-base text-slate-600 mb-6">
+          <p className="text-base text-slate-600 mb-10 max-w-2xl mx-auto">
             Get 2 full analyses — red flags, negotiation plan, and email drafts included. See what you've been leaving on the table.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -370,9 +372,9 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/pricing"
-              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors underline underline-offset-2"
+              className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
             >
-              View pricing details
+              View pricing details →
             </Link>
           </div>
         </div>
