@@ -20,18 +20,18 @@ export default function LandingPage() {
             {/* Left: Content */}
             <div>
               <h1 className="text-[2.75rem] sm:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-6 leading-[1.15]">
-                Know what to push back on before you reply.
+                Better terms in minutes, not weeks.
               </h1>
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                Upload a vendor quote. Get a risk assessment, negotiation plan, and ready-to-send response in under a minute.
+                Drop in a vendor quote. Get back exactly where you're overpaying, what to push for, and a ready-to-send email — before your next call.
               </p>
 
               {/* Benefits */}
               <div className="space-y-3 mb-10">
                 {[
-                  'Spots hidden costs and unfavorable clauses',
-                  'Builds a prioritized negotiation ask list',
-                  'Drafts 3 supplier emails you can send today',
+                  'See exactly where you can save — hidden fees, inflated rates, unfavorable clauses',
+                  'Get a negotiation playbook with the asks that actually move the needle',
+                  'Send a polished supplier email in your tone, ready to copy and go',
                 ].map((text) => (
                   <div key={text} className="flex items-center gap-3">
                     <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,11 +54,11 @@ export default function LandingPage() {
                   href="/example"
                   className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border-2 border-slate-300"
                 >
-                  See an example <ArrowRight className="w-4 h-4 ml-2" />
+                  See a real example <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </div>
 
-              <p className="text-xs text-slate-500 mt-4">No signup needed. Free to try.</p>
+              <p className="text-xs text-slate-500 mt-4">No signup needed. Results in under 60 seconds.</p>
             </div>
 
             {/* Right: Product Preview */}
@@ -160,16 +160,19 @@ export default function LandingPage() {
       {/* How DealCheck Works */}
       <section id="how-it-works" className="py-20 bg-white border-t border-slate-200">
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-16">
-            How DealCheck Works
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-4">
+            From quote to savings in 3 steps
           </h2>
+          <p className="text-base text-slate-600 text-center mb-16 max-w-2xl mx-auto">
+            No spreadsheets, no back-and-forth with legal. Just clarity on what to ask for and the words to say it.
+          </p>
 
           {/* 3 Steps — Lucide icons */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
             {[
-              { title: 'Upload a quote or contract', icon: Upload },
-              { title: 'Analyze pricing & terms', icon: Search },
-              { title: 'Send & negotiate with suppliers', icon: Send },
+              { title: 'Drop in your quote', icon: Upload },
+              { title: 'See where you can save', icon: Search },
+              { title: 'Send a stronger reply', icon: Send },
             ].map((step, index) => (
               <div key={index} className="relative flex flex-col items-center text-center">
                 <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center">
