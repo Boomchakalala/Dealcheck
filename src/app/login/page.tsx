@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
@@ -17,6 +17,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const fromTrial = searchParams.get('from') === 'trial'
   const supabase = createClient()
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -69,9 +71,11 @@ export default function LoginPage() {
               {isSignUp ? 'Create your account' : 'Sign in to DealCheck'}
             </h1>
             <p className="text-sm text-slate-500 leading-relaxed">
-              {isSignUp
-                ? 'Save your deal analyses and track negotiations over time.'
-                : 'Access your saved deals and continue where you left off.'}
+              {fromTrial
+                ? 'Sign up to save your analysis and track negotiation rounds.'
+                : isSignUp
+                  ? 'Save your deal analyses and track negotiations over time.'
+                  : 'Access your saved deals and continue where you left off.'}
             </p>
           </div>
 
