@@ -30,22 +30,22 @@ export function DealActionBar({ dealId, currentTotal, dealStatus, roundCount, on
   return (
     <>
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-lg">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="text-sm text-slate-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm text-slate-600 hidden sm:block">
               Keep the momentum going
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-none">
               <button
                 onClick={handleAddRound}
-                className="px-4 py-2.5 text-sm font-semibold rounded-lg border-2 border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-all flex items-center gap-2"
+                className="flex-1 sm:flex-none px-3 sm:px-4 py-3 text-sm font-semibold rounded-lg border-2 border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Add New Round
+                <span className="hidden sm:inline">Add New</span> Round
               </button>
               <button
                 onClick={() => setShowCloseModal(true)}
-                className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center gap-2 shadow-md hover:shadow-lg"
+                className="flex-1 sm:flex-none px-4 sm:px-5 py-3 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
               >
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
