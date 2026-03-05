@@ -527,17 +527,17 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
                 </div>
 
                 <div className="rounded-xl border border-slate-200 overflow-hidden">
-                  <div className="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                    <div>
+                  <div className="px-4 sm:px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-start sm:items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
                       <p className="text-xs font-medium text-slate-500">Subject</p>
-                      <p className="text-sm font-semibold text-slate-900">{regeneratedEmails[regenTab].subject}</p>
+                      <p className="text-sm font-semibold text-slate-900 break-words">{regeneratedEmails[regenTab].subject}</p>
                     </div>
                     <CopyButton
                       text={`Subject: ${regeneratedEmails[regenTab].subject}\n\n${regeneratedEmails[regenTab].body}`}
                       label="Copy email"
                     />
                   </div>
-                  <div className="p-5">
+                  <div className="p-4 sm:p-5">
                     <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{regeneratedEmails[regenTab].body}</p>
                   </div>
                 </div>
@@ -545,17 +545,17 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
             ) : (
               /* Default email preview from original analysis */
               <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <div className="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                  <div>
+                <div className="px-4 sm:px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-start sm:items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium text-slate-500">Subject</p>
-                    <p className="text-sm font-semibold text-slate-900">{emailSubject}</p>
+                    <p className="text-sm font-semibold text-slate-900 break-words">{emailSubject}</p>
                   </div>
                   <CopyButton
                     text={`Subject: ${emailSubject}\n\n${emailBody}`}
                     label="Copy email"
                   />
                 </div>
-                <div className="p-5">
+                <div className="p-4 sm:p-5">
                   <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{emailBody}</p>
                 </div>
               </div>
