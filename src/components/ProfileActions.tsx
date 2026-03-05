@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface ProfileActionsProps {
   userId: string
@@ -34,7 +35,7 @@ export function ProfileActions({ userId, userEmail }: ProfileActionsProps) {
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== 'DELETE') {
-      alert('Please type DELETE to confirm')
+      toast.error('Please type DELETE to confirm')
       return
     }
 
@@ -52,7 +53,7 @@ export function ProfileActions({ userId, userEmail }: ProfileActionsProps) {
       await fetch('/auth/signout', { method: 'POST' })
       router.push('/')
     } catch (err) {
-      alert('Failed to delete account. Please contact support.')
+      toast.error('Failed to delete account. Please contact support.')
       setDeleting(false)
     }
   }
