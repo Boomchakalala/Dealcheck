@@ -69,13 +69,18 @@ export default function DashboardPage() {
       setDeals((dealsRes.data as DealWithRounds[]) || [])
       setLoading(false)
 
-      // Check for pending trial import
-      const pendingTrial = sessionStorage.getItem('dealcheck_trial')
+      // Check for pending trial import (localStorage with 24h TTL)
+      const pendingTrial = localStorage.getItem('dealcheck_trial')
       if (pendingTrial) {
-        sessionStorage.removeItem('dealcheck_trial')
+        localStorage.removeItem('dealcheck_trial')
         try {
           const trialData = JSON.parse(pendingTrial)
-          const importRes = await fetch('/api/deal/import-trial', {
+          // Check 24h TTL
+          const savedAt = trialData._savedAt || 0
+          if (Date.now() - savedAt > 24 * 60 * 60 * 1000) {
+            // Expired — skip import
+          } else {
+            const importRes = await fetch('/api/deal/import-trial', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(trialData),
