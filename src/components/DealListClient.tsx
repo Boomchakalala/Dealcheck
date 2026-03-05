@@ -86,7 +86,7 @@ export function DealListClient({ deals }: DealListClientProps) {
 
           return (
             <Link key={deal.id} href={`/app/deal/${deal.id}`}>
-              <div className="bg-white rounded-xl border border-slate-200 p-5 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group">
+              <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     {/* Status + badges row */}
@@ -101,7 +101,7 @@ export function DealListClient({ deals }: DealListClientProps) {
                       {!isClosed && (
                         <button
                           onClick={(e) => handleQuickClose(e, deal.id, totalCommitment || undefined, roundCount)}
-                          className="text-xs font-medium px-2.5 py-1 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors"
+                          className="text-xs font-medium px-3 py-1.5 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors"
                         >
                           Close deal
                         </button>
