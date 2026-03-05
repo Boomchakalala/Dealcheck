@@ -3,6 +3,13 @@
 import { useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 
+const analyzingMessages = [
+  'Reading your quote...',
+  'Extracting pricing and terms...',
+  'Identifying negotiation levers...',
+  'Drafting your emails...',
+]
+
 interface QuoteUploaderCardProps {
   variant: 'public' | 'app'
   input: string
