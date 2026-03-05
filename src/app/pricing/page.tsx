@@ -1,21 +1,8 @@
-'use client'
-
-import { useState } from 'react'
 import Link from 'next/link'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
-import { CheckCircle2, Sparkles, ArrowRight } from 'lucide-react'
+import { CheckCircle2, Sparkles } from 'lucide-react'
 
 export default function PricingPage() {
-  const [waitlistEmail, setWaitlistEmail] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-
-  const handleWaitlist = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (waitlistEmail.trim()) {
-      setSubmitted(true)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
@@ -102,28 +89,12 @@ export default function PricingPage() {
                   ))}
                 </ul>
 
-                {submitted ? (
-                  <div className="w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    You&apos;re on the list. We&apos;ll email you when Pro launches.
-                  </div>
-                ) : (
-                  <form onSubmit={handleWaitlist} className="flex gap-2">
-                    <input
-                      type="email"
-                      value={waitlistEmail}
-                      onChange={(e) => setWaitlistEmail(e.target.value)}
-                      placeholder="you@company.com"
-                      required
-                      className="flex-1 px-4 py-3.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    />
-                    <button
-                      type="submit"
-                      className="px-6 py-3.5 text-sm font-semibold rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 transition-all shadow-sm hover:shadow-md whitespace-nowrap flex items-center gap-2"
-                    >
-                      Notify me <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </form>
-                )}
+                <a
+                  href="mailto:hello@dealcheck.app?subject=Interested in DealCheck Pro"
+                  className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 transition-all shadow-sm hover:shadow-md"
+                >
+                  Contact us about Pro
+                </a>
               </div>
             </div>
           </div>
@@ -138,7 +109,7 @@ export default function PricingPage() {
               { q: 'Can I use DealCheck without signing up?', a: 'Yes. You can try a one-off analysis on the homepage without creating an account. To save deals and track rounds, you\'ll need to sign up (free).' },
               { q: 'What do I get for free?', a: '5 full AI analyses including red flags, negotiation plan, and email drafts. After that, you\'ll need a Pro plan to continue.' },
               { q: 'What counts as an "analysis"?', a: 'Each time you submit a quote or document for AI analysis counts as one. This includes initial analyses and follow-up rounds on existing deals.' },
-              { q: 'When will Pro launch?', a: 'Soon. Join the waitlist above and we\'ll notify you. Pro will include unlimited analyses and priority processing.' },
+              { q: 'When will Pro launch?', a: 'Soon. Contact us at hello@dealcheck.app and we\'ll notify you. Pro will include unlimited analyses and priority processing.' },
             ].map((item, i) => (
               <details key={i} className="group border-b border-slate-200/60">
                 <summary className="flex items-center justify-between cursor-pointer py-6 text-left">
