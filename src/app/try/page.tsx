@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { OutputDisplay } from '@/components/OutputDisplay'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
+import { MarketingFooter } from '@/components/MarketingFooter'
 import type { DealOutput } from '@/types'
 
 export default function TryPage() {
@@ -156,6 +157,8 @@ This quote expires in 14 days.`
 
           <OutputDisplay output={output} />
         </main>
+
+        <MarketingFooter />
       </div>
     )
   }
@@ -360,6 +363,8 @@ This quote expires in 14 days.`
           </div>
         </div>
       </main>
+
+      <MarketingFooter />
     </div>
   )
 }
