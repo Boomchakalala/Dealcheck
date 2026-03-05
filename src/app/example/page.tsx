@@ -7,9 +7,9 @@ import Link from 'next/link'
 const exampleOutput: DealOutput = {
   title: "Cloud Storage Platform - Annual Enterprise Plan",
   vendor: "CloudVault Solutions",
-  verdict: "Several terms create vendor lock-in and cost risk. Pricing is 15-20% above typical market rates. Strong leverage exists to negotiate better terms given this commitment size.",
+  verdict: "The contract has strong infrastructure features but several terms create unnecessary lock-in and operational risk. You have real leverage to improve the renewal terms, overage structure, and support coverage before signing.",
   verdict_type: "negotiate",
-  price_insight: "Pricing is 15-20% above comparable storage platforms. A $42K commitment should qualify for volume discounts of 15-20%, saving $6-8K annually.",
+  price_insight: "The per-TB rate is on the higher side for this commitment level. Worth asking whether volume pricing applies — but the bigger issues here are the contract structure and overage terms.",
   snapshot: {
     vendor_product: "CloudVault Enterprise Storage Platform",
     term: "12 months (auto-renewal unless 60 days notice)",
@@ -25,125 +25,125 @@ const exampleOutput: DealOutput = {
       "Unlimited API calls and integrations included"
     ],
     whats_concerning: [
-      "Auto-renewal with 60-day notice period creates lock-in risk",
-      "Overage charges at 150% of base rate kick in above 10TB",
-      "No volume discount despite substantial commitment",
-      "All support incidents capped at 10 per month"
+      "Auto-renewal with only 60-day notice creates lock-in risk",
+      "Overage charges at 150% of base rate create unpredictable costs",
+      "Support incidents capped at 10/month — risky during migration",
+      "No termination-for-convenience clause after the initial term"
     ],
-    conclusion: "The quote includes solid infrastructure and compliance features, but several terms create vendor lock-in and cost risk. Pricing is 15-20% above typical market rates for comparable storage platforms. Strong leverage exists to negotiate better terms given the size of this commitment and competitive alternatives."
+    conclusion: "The infrastructure and compliance features are solid, but the contract terms create unnecessary vendor lock-in and cost unpredictability. The auto-renewal window is narrow, overages are punitive, and support limits could cause problems during onboarding. These are all negotiable."
   },
   red_flags: [
     {
-      type: "Commercial",
-      issue: "No volume discount applied despite $42K annual spend",
-      why_it_matters: "Comparable vendors typically offer 15-20% discounts for commitments above $30K annually. You're likely overpaying by $6-8K per year.",
-      what_to_ask_for: "Request 18% discount on total price, bringing annual cost to ~$34,500. Reference competitor pricing from Backblaze B2 ($6/TB/month) and Wasabi ($7/TB/month).",
-      if_they_push_back: "Offer to prepay annually upfront (vs quarterly) in exchange for 12% discount. This improves their cash flow while saving you ~$5K."
-    },
-    {
-      type: "Commercial",
-      issue: "Overage pricing at 150% of base rate",
-      why_it_matters: "If your usage grows by just 3TB beyond the 10TB limit, you'll pay an extra $15,750 annually at the overage rate. This creates unpredictable costs.",
-      what_to_ask_for: "Remove overage penalty entirely, or cap it at 110% of base rate with written notice before charges apply.",
-      if_they_push_back: "Negotiate a 15TB commitment at a blended rate of $320/TB to build in headroom without overage risk."
-    },
-    {
       type: "Legal",
-      issue: "60-day auto-renewal notice period",
-      why_it_matters: "If you miss the narrow 60-day window, you're automatically locked in for another full year with no mid-term termination rights.",
+      issue: "60-day auto-renewal locks you in if you miss the window",
+      why_it_matters: "If your team misses the narrow 60-day cancellation window, you're automatically committed to another full year with no mid-term exit. Most enterprise contracts allow 30-day notice or quarterly opt-out.",
       what_to_ask_for: "Change to 30-day notice period, or allow quarterly cancellation with 60 days notice instead of annual lock-in.",
-      if_they_push_back: "Request a 90-day termination-for-convenience clause after the initial 12 months to reduce long-term risk."
+      if_they_push_back: "Request a 90-day termination-for-convenience clause after the initial 12 months. This gives you a safety valve without fully removing their revenue predictability."
+    },
+    {
+      type: "Commercial",
+      issue: "Overage pricing at 150% of base rate creates cost unpredictability",
+      why_it_matters: "If your storage usage grows beyond 10TB, every additional TB costs 50% more than your contracted rate. Just 3TB of growth adds ~$15,750 in annual overage charges with no advance warning.",
+      what_to_ask_for: "Cap overage at 110% of base rate with 30-day written notice before charges apply. This protects you from surprise invoices.",
+      if_they_push_back: "Negotiate a higher committed tier (e.g., 15TB) at a blended rate that builds in headroom, removing overage risk entirely."
     },
     {
       type: "Operational",
-      issue: "Support incidents capped at 10/month",
-      why_it_matters: "During migration or infrastructure issues, you could easily exceed 10 tickets. Additional support costs $200/incident, adding unexpected expenses.",
-      what_to_ask_for: "Increase to unlimited email support and 25 priority tickets per month for the first 6 months (critical onboarding period).",
-      if_they_push_back: "Negotiate 20 tickets/month ongoing, with additional tickets at $100 (not $200) during peak usage."
+      issue: "Support incidents capped at 10/month during critical onboarding",
+      why_it_matters: "During migration and initial integration, your team will likely need more than 10 support interactions. Additional tickets cost $200 each, and delays in resolution could impact your go-live timeline.",
+      what_to_ask_for: "Increase to 25 priority tickets per month for the first 6 months (onboarding period), then 15/month ongoing.",
+      if_they_push_back: "At minimum, negotiate uncapped support during the first 90 days with a dedicated onboarding contact. This is standard practice for enterprise deals."
+    },
+    {
+      type: "Legal",
+      issue: "No termination-for-convenience clause",
+      why_it_matters: "If your needs change mid-contract — org restructure, acquisition, or a shift in strategy — you have no way to exit without paying the full remaining commitment.",
+      what_to_ask_for: "Add a termination-for-convenience clause allowing exit after 6 months with 90 days written notice and payment of a 2-month early termination fee.",
+      if_they_push_back: "Propose that termination-for-convenience kicks in after the initial 12-month term on any subsequent renewal period. This is a reasonable middle ground."
     }
   ],
   negotiation_plan: {
     leverage_you_have: [
-      "This is a significant new logo for CloudVault - they're motivated to close",
-      "Multiple credible alternatives exist (AWS S3, Backblaze B2, Wasabi) with lower pricing",
-      "You're willing to commit to annual contract vs month-to-month",
-      "End of their fiscal quarter approaching (typically March 31, June 30, Sept 30, Dec 31)"
+      "This is a new logo for CloudVault — they're motivated to close and will be flexible on terms",
+      "You have credible alternatives that you're actively evaluating",
+      "You're offering a meaningful annual commitment vs month-to-month",
+      "End of their fiscal quarter is approaching — sales teams are more flexible near quarter-end"
     ],
     must_have_asks: [
-      "15-18% price reduction on total commitment",
-      "Remove or significantly reduce overage penalty (150% → 110%)",
-      "Reduce auto-renewal notice period from 60 days to 30 days"
+      "Reduce auto-renewal notice period from 60 to 30 days",
+      "Cap overage charges at 110% with written advance notice",
+      "Increase support to 25 tickets/month during onboarding"
     ],
     nice_to_have_asks: [
-      "Increase support ticket limit to 25/month",
-      "Add 90-day termination-for-convenience after Year 1",
-      "Include 2TB additional storage as buffer at no extra cost",
-      "Priority onboarding and dedicated account manager"
+      "Add termination-for-convenience clause after Year 1",
+      "Include a 2TB storage buffer at the contracted rate",
+      "Dedicated account manager during the first 6 months",
+      "Quarterly business reviews with performance benchmarks"
     ],
     trades_you_can_offer: [
       "Prepay annually upfront instead of quarterly invoicing",
-      "Provide a case study or testimonial after 6 months",
-      "Agree to 18-month term (vs 12 months) if they meet your pricing and terms",
-      "Commit to single-vendor consolidation if they match your target economics"
+      "Provide a case study or testimonial after 6 months of usage",
+      "Agree to an 18-month initial term if they meet your terms requirements",
+      "Consolidate to single-vendor if the relationship performs well"
     ]
   },
   what_to_ask_for: {
     must_have: [
-      "Reduce total annual cost to $34,500 (18% discount)",
-      "Cap overage charges at 110% of base rate with written notification",
-      "Change auto-renewal to 30-day notice period"
+      "Change auto-renewal notice period from 60 to 30 days",
+      "Cap overage charges at 110% of base rate with advance notice",
+      "Increase support ticket limit to 25/month for first 6 months"
     ],
     nice_to_have: [
-      "25 priority support tickets per month (up from 10)",
+      "Add termination-for-convenience after 12 months",
       "Include 2TB storage buffer at no additional cost",
-      "Add quarterly performance reviews with dedicated CSM",
+      "Quarterly performance reviews with dedicated CSM",
       "Priority migration support during first 90 days"
     ]
   },
   email_drafts: {
     neutral: {
-      subject: "CloudVault Enterprise Storage - Questions on Pricing and Terms",
+      subject: "CloudVault Enterprise Storage - Questions on Contract Terms",
       body: `Hi [Sales Rep Name],
 
-Thanks for the CloudVault Enterprise Storage quote. We're interested in moving forward but have a few questions before we can finalize:
+Thanks for the CloudVault Enterprise Storage quote. We're interested in moving forward but have a few questions on terms before we can finalize:
 
-**Pricing:**
-We're evaluating several storage platforms and noticed your per-TB rate is higher than comparable providers (Backblaze B2, Wasabi, etc.). Given our $42K annual commitment, can you offer volume pricing? We'd typically expect 15-20% off for an engagement of this size.
+**Auto-renewal:**
+The 60-day notice period is tight for our procurement cycle. Could we adjust this to 30 days, or alternatively move to quarterly opt-out with 60 days notice? This would make internal approvals much smoother.
 
-**Overage Charges:**
-The 150% overage rate creates budget risk. Can we discuss either removing the overage penalty or capping it at 110% with advance notification before charges apply?
+**Overage terms:**
+The 150% overage rate creates budget unpredictability for us. Would it be possible to cap overages at 110% with written notice before charges apply? We want to grow with CloudVault, but need cost predictability.
 
-**Contract Terms:**
-The 60-day auto-renewal window is tight for our procurement cycle. Would you consider 30-day notice, or alternatively, allow us to cancel quarterly with 60 days' notice?
+**Support during onboarding:**
+The 10-ticket monthly cap concerns our engineering team. During migration, we'll likely need more support. Could we increase to 25 tickets for the first 6 months?
 
-**Support:**
-The 10-ticket monthly cap concerns our team during migration. Can we increase this to 20-25 tickets, especially during onboarding?
+**Contract flexibility:**
+Would you consider adding a termination-for-convenience clause after the initial 12 months? This would make it easier for our legal team to approve.
 
-We're ready to move quickly if we can align on these points. Are you available for a call this week to discuss?
+We're ready to move quickly if we can align on these points. Are you available for a call this week?
 
 Best,
 [Your Name]`
     },
     firm: {
-      subject: "CloudVault Quote - Revised Terms Required to Proceed",
+      subject: "CloudVault Quote - Revised Terms Needed to Proceed",
       body: `Hi [Sales Rep Name],
 
-We've completed our vendor evaluation and CloudVault is a strong fit technically. However, we need revised commercial terms to move forward:
+We've completed our evaluation and CloudVault is a strong technical fit. However, we need revised terms on a few points before we can get internal approval:
 
-**Required Changes:**
+**Required changes:**
 
-1. **Pricing:** Reduce annual cost to $34,500 (18% off). This aligns with market rates and our budget approval threshold. We're prepared to prepay annually upfront if that helps.
+1. **Auto-renewal:** Change notice period from 60 to 30 days. The current window doesn't align with our procurement cycles and our legal team has flagged it.
 
-2. **Overage Terms:** Cap overage charges at 110% (not 150%) with 30-day written notice before charges apply. Our usage may grow and we need predictable costs.
+2. **Overage protection:** Cap overage charges at 110% (not 150%) with 30-day written notice before charges apply. Unpredictable cost escalation is a deal-breaker for our finance team.
 
-3. **Contract Flexibility:** Change auto-renewal to 30-day notice period. The current 60-day window doesn't work with our procurement cycles.
+3. **Support coverage:** Increase monthly ticket limit to 25 during the first 6 months. We're planning a significant migration and need adequate support during onboarding.
 
-4. **Support:** Increase monthly ticket limit to 25 during the first year. Migration and onboarding will require more support than 10 tickets provides.
+4. **Exit clause:** Add a termination-for-convenience option after the initial 12-month term with 90 days notice. This is standard in our vendor agreements.
 
-**Our Position:**
-We have budget approved for cloud storage and need to select a vendor by [date 2 weeks out]. We're comparing CloudVault against Backblaze B2 and Wasabi, both of which meet our pricing requirements out of the gate.
+**Our position:**
+We have budget approved and need to select a vendor by [date]. We're comparing CloudVault against alternatives that already offer more flexible terms. If CloudVault can meet these requirements, we're ready to proceed immediately.
 
-Can you provide a revised proposal by [specific date] reflecting these terms? If CloudVault can meet these requirements, we're ready to proceed immediately.
+Could you send a revised proposal by [specific date]?
 
 Thanks,
 [Your Name]`
@@ -155,32 +155,32 @@ Thanks,
 We need to finalize our cloud storage vendor by EOD [specific date] and are down to two options: CloudVault and [Competitor].
 
 **Where we are:**
-CloudVault has better enterprise features and your team has been responsive. However, [Competitor] is $7,500/year cheaper and offers more flexible terms. Our CFO is pushing us toward the lower-cost option.
+CloudVault has better enterprise features and your team has been responsive. However, [Competitor] offers more flexible contract terms — shorter notice periods, no overage penalties, and a termination-for-convenience clause included by default.
 
 **What we need to choose CloudVault:**
 
-• **Price:** $34,500 annually (18% off your quote). This closes the pricing gap and gets us to approval.
-• **Overage protection:** 110% cap with advance notice. We need predictable costs.
-• **Exit flexibility:** 30-day renewal notice or quarterly cancellation option.
+• **Contract flexibility:** 30-day renewal notice (or quarterly opt-out). Our legal team won't approve the 60-day lock-in.
+• **Overage protection:** 110% cap with advance notice. We need predictable costs as we scale.
+• **Support:** 25 tickets/month during onboarding. This is a critical migration for us.
 
 **Timeline:**
-We're making the final decision in our Friday meeting (3 days). If you can meet these terms, we'll sign this week. If not, we'll likely move forward with [Competitor].
+We're presenting our final recommendation in Friday's meeting. If you can confirm these terms by Wednesday EOD, we'll recommend CloudVault. Otherwise, we'll need to go with [Competitor] since their terms already meet our requirements.
 
-I'd prefer to work with CloudVault given the product fit, but I need commercial terms that work for our business. Can you escalate internally and get back to me by Wednesday EOD?
+I'd prefer to work with CloudVault given the product fit. Can you escalate internally?
 
 Let me know,
 [Your Name]
 
-P.S. - If quarterly prepayment or an 18-month term helps you get to these numbers, we're open to discussing that structure.`
+P.S. — We're happy to discuss annual prepayment or an 18-month term if that helps your team approve more flexible terms on your side.`
     }
   },
   assumptions: [
-    "Pricing comparison based on publicly available competitor rates as of March 2026",
-    "Discount expectations based on typical SaaS vendor pricing flexibility for $30K+ deals",
-    "Support ticket estimates assume standard onboarding complexity for 10TB+ migrations",
-    "Overage risk assumes 20-30% annual storage growth based on typical enterprise usage patterns"
+    "Auto-renewal notice period assessment based on standard enterprise SaaS contract terms",
+    "Overage risk assumes 20-30% annual storage growth based on typical enterprise usage patterns",
+    "Support ticket estimates based on standard onboarding complexity for 10TB+ migrations",
+    "Termination clause expectations based on common enterprise procurement requirements"
   ],
-  disclaimer: "This analysis is for informational purposes only and does not constitute legal, financial, or professional advice. Verify all claims independently and consult with licensed advisors before making procurement decisions. Pricing benchmarks are estimates based on general market data, not proprietary databases."
+  disclaimer: "This analysis is for informational purposes only and does not constitute legal, financial, or professional advice. Verify all claims independently and consult with licensed advisors before making procurement decisions."
 }
 
 export default function ExamplePage() {

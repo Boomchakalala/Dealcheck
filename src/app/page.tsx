@@ -231,24 +231,24 @@ export default function LandingPage() {
                     {/* Styled to match real red flag cards in OutputDisplay */}
                     <div className="bg-white rounded-xl border border-red-200 p-5 mb-4">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Commercial</span>
+                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Legal</span>
                       </div>
-                      <h3 className="font-bold text-slate-900 text-sm mb-1">No volume discount applied despite $42K annual spend</h3>
-                      <p className="text-xs text-slate-600">Comparable vendors typically offer 15-20% discounts for commitments above $30K annually. You&apos;re likely overpaying by $6-8K per year.</p>
+                      <h3 className="font-bold text-slate-900 text-sm mb-1">60-day auto-renewal locks you in if you miss the window</h3>
+                      <p className="text-xs text-slate-600">If your team misses the narrow cancellation window, you&apos;re committed to another full year with no mid-term exit.</p>
                       <div className="mt-3 bg-emerald-50 rounded-lg border border-emerald-200 p-3">
                         <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">What to ask</p>
-                        <p className="text-sm text-slate-700">Request 18% discount on total price, bringing annual cost to ~$34,500.</p>
+                        <p className="text-sm text-slate-700">Change to 30-day notice, or allow quarterly opt-out with 60 days notice.</p>
                       </div>
                     </div>
                     <div className="bg-white rounded-xl border border-red-200 p-5">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Legal</span>
+                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Commercial</span>
                       </div>
-                      <h3 className="font-bold text-slate-900 text-sm mb-1">60-day auto-renewal notice period</h3>
-                      <p className="text-xs text-slate-600">If you miss the narrow window, you&apos;re locked in for another full year with no mid-term exit.</p>
+                      <h3 className="font-bold text-slate-900 text-sm mb-1">Overage pricing at 150% creates cost unpredictability</h3>
+                      <p className="text-xs text-slate-600">If usage grows beyond 10TB, every additional TB costs 50% more with no advance warning. 3TB of growth adds ~$15,750 in surprise charges.</p>
                     </div>
                     <p className="text-sm text-slate-500 mt-6 italic">
-                      Each red flag includes what to ask for and a fallback if they push back.
+                      Each flag includes what to ask for and a fallback if they push back.
                     </p>
                   </div>
                 )}
