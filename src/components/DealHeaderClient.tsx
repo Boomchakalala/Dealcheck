@@ -118,6 +118,15 @@ export function DealHeaderClient({
                   </p>
                 </div>
               )}
+              {whatChanged && whatChanged.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {whatChanged.map((item: string) => (
+                    <span key={item} className="px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-md">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
                 {closeSummary}
               </div>
