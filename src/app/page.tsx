@@ -260,9 +260,9 @@ export default function LandingPage() {
                       <h3 className="text-sm font-semibold text-slate-700 mb-2">Leverage you have</h3>
                       <ul className="space-y-1.5">
                         {[
-                          'Multiple credible alternatives exist with lower pricing',
-                          "You're willing to commit to annual contract vs month-to-month",
-                          'End of their fiscal quarter approaching',
+                          "This is a new logo for them — they're motivated to close and will flex on terms",
+                          "You have credible alternatives you're actively evaluating",
+                          'End of their fiscal quarter approaching — sales teams are more flexible',
                         ].map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
                             <svg className="w-3.5 h-3.5 text-emerald-600 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -280,9 +280,9 @@ export default function LandingPage() {
                       </div>
                       <div className="space-y-2">
                         {[
-                          '15-18% price reduction on total commitment',
-                          'Remove or reduce overage penalty (150% to 110%)',
                           'Reduce auto-renewal notice from 60 to 30 days',
+                          'Cap overage charges at 110% with advance written notice',
+                          'Increase support to 25 tickets/month during onboarding',
                         ].map((ask, idx) => (
                           <div key={idx} className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
                             <p className="text-sm text-slate-700">{ask}</p>
@@ -310,13 +310,13 @@ export default function LandingPage() {
                     <div className="rounded-xl border border-slate-200 overflow-hidden">
                       <div className="px-5 py-3 bg-slate-50 border-b border-slate-200">
                         <p className="text-xs font-medium text-slate-500">Subject</p>
-                        <p className="text-sm font-semibold text-slate-900">CloudVault Enterprise Storage - Questions on Pricing and Terms</p>
+                        <p className="text-sm font-semibold text-slate-900">CloudVault Enterprise Storage - Questions on Contract Terms</p>
                       </div>
                       <div className="p-5">
                         <p className="text-sm text-slate-700 leading-relaxed">
                           Hi [Sales Rep Name],<br /><br />
-                          Thanks for the CloudVault Enterprise Storage quote. We&apos;re interested in moving forward but have a few questions before we can finalize...<br /><br />
-                          <span className="text-slate-400">[Pricing, overage, contract, and support asks included based on your risk level]</span>
+                          Thanks for the CloudVault quote. We&apos;re interested in moving forward but have a few questions on terms before we can finalize. The 60-day auto-renewal window is tight for our procurement cycle — could we adjust to 30 days?...<br /><br />
+                          <span className="text-slate-400">[Overage, support, and exit clause asks included based on your risk level]</span>
                         </p>
                       </div>
                     </div>
