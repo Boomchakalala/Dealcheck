@@ -109,7 +109,7 @@ export default async function ProfilePage() {
           <div>
             <p className="text-sm font-semibold text-slate-900 mb-1">Current Plan: {currentPlan}</p>
             <p className="text-xs text-slate-600">
-              {isFreePlan ? 'Limited to 10 deals per month' : 'Unlimited deals'}
+              {isFreePlan ? '2 free AI analyses included' : 'Unlimited analyses'}
             </p>
           </div>
           {isFreePlan && (

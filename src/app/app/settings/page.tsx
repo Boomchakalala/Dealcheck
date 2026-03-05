@@ -72,7 +72,9 @@ export default async function SettingsPage() {
           </div>
           <div className="flex items-center justify-between py-3">
             <span className="text-sm text-slate-500">Analysis rounds</span>
-            <span className="text-sm font-medium text-emerald-700">Unlimited</span>
+            <span className="text-sm font-medium text-emerald-700">
+              {profile?.plan === 'free' ? '2 free analyses' : 'Unlimited'}
+            </span>
           </div>
           {profile?.plan === 'free' && (
             <div className="mt-6 rounded-xl bg-gradient-to-br from-emerald-50/50 to-teal-50/30 border border-emerald-200/60 p-5">
