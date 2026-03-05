@@ -338,7 +338,7 @@ export default function LandingPage() {
       <section id="data-privacy" className="py-16 bg-slate-50 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-10">
-            Your data stays private
+            Your quotes stay yours
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex flex-col items-center text-center gap-3">
@@ -346,8 +346,8 @@ export default function LandingPage() {
                 <Lock className="w-6 h-6 text-emerald-600" />
               </div>
               <div>
-                <p className="text-base font-semibold text-slate-900 mb-1">Encrypted & secure</p>
-                <p className="text-sm text-slate-600">Quotes are processed securely and never stored without permission</p>
+                <p className="text-base font-semibold text-slate-900 mb-1">Encrypted end-to-end</p>
+                <p className="text-sm text-slate-600">Your data is processed securely and deleted after analysis unless you save it</p>
               </div>
             </div>
             <div className="flex flex-col items-center text-center gap-3">
@@ -355,8 +355,8 @@ export default function LandingPage() {
                 <ShieldCheck className="w-6 h-6 text-emerald-600" />
               </div>
               <div>
-                <p className="text-base font-semibold text-slate-900 mb-1">No AI training on your data</p>
-                <p className="text-sm text-slate-600">Confidential quotes stay private and are never used for training</p>
+                <p className="text-base font-semibold text-slate-900 mb-1">Never used for AI training</p>
+                <p className="text-sm text-slate-600">Your confidential pricing and terms are never fed back into any model</p>
               </div>
             </div>
             <div className="flex flex-col items-center text-center gap-3">
@@ -364,8 +364,8 @@ export default function LandingPage() {
                 <Globe className="w-6 h-6 text-emerald-600" />
               </div>
               <div>
-                <p className="text-base font-semibold text-slate-900 mb-1">EU hosting & GDPR</p>
-                <p className="text-sm text-slate-600">Data processed in EU infrastructure with full GDPR compliance</p>
+                <p className="text-base font-semibold text-slate-900 mb-1">GDPR compliant</p>
+                <p className="text-sm text-slate-600">EU-hosted infrastructure with full compliance out of the box</p>
               </div>
             </div>
           </div>
