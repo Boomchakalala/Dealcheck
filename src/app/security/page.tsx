@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Header } from '@/components/Header'
-import { Shield, Lock, FileCheck, Code, Eye, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Trash2, FileText, Lock, Shield, ArrowRight } from 'lucide-react'
 
 export default function SecurityPage() {
   return (
@@ -11,57 +11,15 @@ export default function SecurityPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-b from-slate-50/60 to-white">
-          <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-20 sm:pt-24 pb-16">
+          <div className="max-w-4xl mx-auto px-5 sm:px-8 pt-20 sm:pt-24 pb-16">
             <div className="text-center max-w-3xl mx-auto">
               <h1 className="text-[2.5rem] sm:text-[3.5rem] leading-[1.08] font-bold text-slate-900 tracking-tight mb-4">
-                Security and Privacy at DealCheck
+                How We Handle Your Data
               </h1>
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-12">
-                Your sensitive deal data stays yours. Built with enterprise-grade security from day one.
-              </p>
-
-              {/* Illustration placeholder */}
-              <div className="relative mb-12">
-                <div className="flex items-center justify-center gap-8">
-                  {/* Document illustration */}
-                  <div className="relative">
-                    <div className="w-48 h-56 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg shadow-lg border border-slate-300 p-4">
-                      <div className="space-y-2">
-                        <div className="h-2 bg-slate-300 rounded w-3/4"></div>
-                        <div className="h-2 bg-slate-300 rounded w-full"></div>
-                        <div className="h-2 bg-slate-300 rounded w-5/6"></div>
-                        <div className="h-2 bg-slate-300 rounded w-2/3"></div>
-                      </div>
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg">
-                      <Lock className="w-5 h-5 text-white" />
-                    </div>
-                  </div>
-
-                  {/* Shield illustration */}
-                  <div className="relative">
-                    <div className="w-32 h-36 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-xl">
-                      <Shield className="w-16 h-16 text-white" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* SOC 2 Banner */}
-        <div className="bg-gradient-to-r from-emerald-600 to-emerald-700">
-          <div className="max-w-6xl mx-auto px-5 sm:px-8 py-6">
-            <div className="flex items-center justify-center gap-3 text-white">
-              <Shield className="w-5 h-5" />
-              <p className="text-sm sm:text-base font-semibold">
-                SOC 2 Hosting & Global Compliance
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+                Transparent about what we do with your quotes and how we protect your information.
               </p>
             </div>
-            <p className="text-center text-emerald-50 text-xs sm:text-sm mt-2 max-w-3xl mx-auto">
-              Our infrastructure is hosted on SOC 2 Type II certified platforms. Data is encrypted in transit and at rest, complying with GDPR, CCPA, and industry best practices.
-            </p>
           </div>
         </div>
 
