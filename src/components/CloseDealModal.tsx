@@ -97,14 +97,14 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
+        <div className="px-4 sm:px-6 py-4 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
           <h3 className="text-lg font-bold text-slate-900">Close Deal</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-lg transition-colors -mr-1">
             <X className="w-5 h-5 text-slate-500" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5">
           {/* Outcome Selector */}
           <div>
             <Label className="text-sm font-semibold text-slate-900 mb-3 block">Outcome</Label>
@@ -257,7 +257,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
           )}
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-2">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2 sm:gap-3 pt-2">
             <Button
               type="button"
               variant="outline"
