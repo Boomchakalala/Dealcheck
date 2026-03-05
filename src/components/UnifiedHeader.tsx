@@ -54,7 +54,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: Unifie
               <Link href="/#how-it-works" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
                 How it works
               </Link>
-              <Link href="/#security" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
+              <Link href="/security" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
                 Security
               </Link>
               <Link href="/#faq" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
