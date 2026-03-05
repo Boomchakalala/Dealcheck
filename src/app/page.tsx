@@ -19,10 +19,10 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left: Content */}
             <div>
-              <h1 className="text-[2.75rem] sm:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-6 leading-[1.15]">
+              <h1 className="text-3xl sm:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-6 leading-[1.15]">
                 Better terms in minutes, not weeks.
               </h1>
-              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+              <p className="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed">
                 Drop in a vendor quote. Get back exactly where you're overpaying, what to push for, and a ready-to-send email — before your next call.
               </p>
 
@@ -177,7 +177,7 @@ export default function LandingPage() {
               <div className="flex border-b border-slate-200 bg-slate-50">
                 <button
                   onClick={() => setActiveTab('price')}
-                  className={`flex-1 px-6 py-4 text-sm font-semibold transition-all ${
+                  className={`flex-1 px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold transition-all ${
                     activeTab === 'price'
                       ? 'text-emerald-700 bg-white border-b-2 border-emerald-600'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -187,7 +187,7 @@ export default function LandingPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('terms')}
-                  className={`flex-1 px-6 py-4 text-sm font-semibold transition-all ${
+                  className={`flex-1 px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold transition-all ${
                     activeTab === 'terms'
                       ? 'text-emerald-700 bg-white border-b-2 border-emerald-600'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
@@ -197,7 +197,7 @@ export default function LandingPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('emails')}
-                  className={`flex-1 px-6 py-4 text-sm font-semibold transition-all ${
+                  className={`flex-1 px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold transition-all ${
                     activeTab === 'emails'
                       ? 'text-emerald-700 bg-white border-b-2 border-emerald-600'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
