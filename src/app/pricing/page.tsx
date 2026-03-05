@@ -98,6 +98,13 @@ export default function PricingPage() {
               </div>
             </div>
           </div>
+
+          {/* Example link */}
+          <div className="text-center mt-8">
+            <Link href="/example" className="text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors underline underline-offset-2">
+              See an example analysis before you decide
+            </Link>
+          </div>
         </div>
 
         {/* FAQ strip */}
