@@ -500,22 +500,90 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
               <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Preview</span>
               <div className="flex-1 h-px bg-slate-200" />
             </div>
-            <div className="rounded-xl border border-slate-200 overflow-hidden">
-            <div className="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-slate-500">Subject</p>
-                <p className="text-sm font-semibold text-slate-900">{emailSubject}</p>
+
+            {/* Show regenerated emails if available */}
+            {regeneratedEmails ? (
+              <div className="space-y-3">
+                {/* Tab selector for regenerated emails */}
+                <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+                  {regeneratedEmails.map((email, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setRegenTab(idx)}
+                      className={`flex-1 px-3 py-2 text-xs font-semibold rounded-md transition-all ${
+                        regenTab === idx
+                          ? 'bg-white text-slate-900 shadow-sm'
+                          : 'text-slate-500 hover:text-slate-700'
+                      }`}
+                    >
+                      {email.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                  <Sparkles className="w-3 h-3" />
+                  Generated based on your settings — copy or regenerate again
+                </div>
+
+                <div className="rounded-xl border border-slate-200 overflow-hidden">
+                  <div className="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-slate-500">Subject</p>
+                      <p className="text-sm font-semibold text-slate-900">{regeneratedEmails[regenTab].subject}</p>
+                    </div>
+                    <CopyButton
+                      text={`Subject: ${regeneratedEmails[regenTab].subject}\n\n${regeneratedEmails[regenTab].body}`}
+                      label="Copy email"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{regeneratedEmails[regenTab].body}</p>
+                  </div>
+                </div>
               </div>
-              <CopyButton
-                text={`Subject: ${emailSubject}\n\n${emailBody}`}
-                label="Copy email"
-              />
-            </div>
-            <div className="p-5">
-              <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{emailBody}</p>
-            </div>
+            ) : (
+              /* Default email preview from original analysis */
+              <div className="rounded-xl border border-slate-200 overflow-hidden">
+                <div className="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-medium text-slate-500">Subject</p>
+                    <p className="text-sm font-semibold text-slate-900">{emailSubject}</p>
+                  </div>
+                  <CopyButton
+                    text={`Subject: ${emailSubject}\n\n${emailBody}`}
+                    label="Copy email"
+                  />
+                </div>
+                <div className="p-5">
+                  <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{emailBody}</p>
+                </div>
+              </div>
+            )}
           </div>
-          </div>
+
+          {/* Regenerate button */}
+          {regenError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+              {regenError}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={handleRegenerateEmails}
+            disabled={regenerating}
+            className="w-full p-4 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/50
+                       hover:border-emerald-400 hover:bg-emerald-50 transition-all flex items-center justify-center gap-2.5"
+          >
+            {regenerating ? (
+              <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4 text-emerald-600" />
+            )}
+            <span className="text-sm font-semibold text-emerald-900">
+              {regenerating ? 'Generating new emails...' : regeneratedEmails ? 'Regenerate with current settings' : 'Generate 3 new emails with these settings'}
+            </span>
+          </button>
         </div>
       </div>
 
