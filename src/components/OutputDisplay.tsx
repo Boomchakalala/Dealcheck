@@ -94,9 +94,9 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
           deadline,
           vendor: output.vendor || output.snapshot.vendor_product,
           totalCommitment: output.snapshot.total_commitment,
-          mustHaveAsks: output.what_to_ask_for.must_have,
-          niceToHaveAsks: output.what_to_ask_for.nice_to_have,
-          redFlags: output.red_flags.map(f => f.issue),
+          mustHaveAsks: output.what_to_ask_for?.must_have || [],
+          niceToHaveAsks: output.what_to_ask_for?.nice_to_have || [],
+          redFlags: output.red_flags?.map(f => f.issue) || [],
           leverage: output.negotiation_plan.leverage_you_have,
           conclusion: output.quick_read.conclusion,
         }),
@@ -317,6 +317,7 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
         )}
 
         {/* Must-have asks */}
+        {output.what_to_ask_for?.must_have?.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-2">
             <h3 className="text-sm font-semibold text-slate-700">Must-have asks</h3>
@@ -330,9 +331,10 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
             ))}
           </div>
         </div>
+        )}
 
         {/* Nice-to-have asks */}
-        {output.what_to_ask_for.nice_to_have.length > 0 && (
+        {output.what_to_ask_for?.nice_to_have?.length > 0 && (
           <div>
             <h3 className="text-sm font-semibold text-slate-700 mb-2">Nice-to-have asks</h3>
             <div className="space-y-2">
@@ -484,7 +486,7 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
                 <span
                   key={idx}
                   className={`inline-block px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium border max-w-full break-words ${
-                    idx < output.what_to_ask_for.must_have.length
+                    idx < (output.what_to_ask_for?.must_have?.length || 0)
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
                       : 'bg-slate-50 border-slate-200 text-slate-700'
                   }`}
