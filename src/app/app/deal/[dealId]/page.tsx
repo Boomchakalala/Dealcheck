@@ -155,7 +155,7 @@ export default async function DealPage({
             <span className="text-sm text-slate-500">Latest analysis</span>
             <div className="flex-1 h-px bg-slate-200" />
           </div>
-          <OutputDisplay output={latestOutput} />
+          <OutputDisplay output={latestOutput} roundId={latestRound.id} />
         </div>
       )}
 

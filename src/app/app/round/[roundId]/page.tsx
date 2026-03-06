@@ -89,7 +89,7 @@ export default async function RoundPage({
 
       {/* Analysis Output */}
       {round.status === 'done' && round.output_json && (
-        <OutputDisplay output={round.output_json} />
+        <OutputDisplay output={round.output_json} roundId={roundId} />
       )}
 
       {/* Extracted Text (if saved) */}
