@@ -343,227 +343,160 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         )}
       </div>
 
-      {/* ── Section 6: Email Builder ── */}
+      {/* ── Section 6: Email Builder (Simplified) ── */}
       <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden" id="email-builder">
         <div className="px-4 sm:px-6 py-5 border-b border-slate-200 bg-slate-50/50">
-          <div className="flex items-center gap-2 mb-1">
-            <Mail className="w-5 h-5 text-emerald-600" />
-            <h2 className="text-base font-bold text-slate-900">Email builder</h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Mail className="w-5 h-5 text-emerald-600" />
+                <h2 className="text-base font-bold text-slate-900">Email drafts</h2>
+              </div>
+              <p className="text-xs text-slate-500">Edit directly or regenerate with AI. Pick a tone and send.</p>
+            </div>
+            {roundId && remainingRegens > 0 && (
+              <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+                {remainingRegens} AI regen{remainingRegens !== 1 ? 's' : ''} left
+              </span>
+            )}
           </div>
-          <p className="text-xs text-slate-500">Adjust tone and risk level, then copy the email to send.</p>
         </div>
 
-        <div className="p-4 sm:p-6 space-y-5">
-          {/* Controls row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Tone toggle */}
+        <div className="p-4 sm:p-6 space-y-4">
+          {/* Email tabs */}
+          <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+            {emailTabs.map((tab, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveEmailTab(idx)}
+                className={`flex-1 px-3 py-2 rounded-md transition-all ${
+                  activeEmailTab === idx
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                <div className="text-xs font-semibold">{tab.label}</div>
+                <div className="text-[10px] text-slate-400 mt-0.5">{tab.desc}</div>
+              </button>
+            ))}
+          </div>
+
+          {/* Editable email */}
+          <div className="space-y-3">
             <div>
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">Tone</label>
-              <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-                {(Object.keys(toneLabels) as ToneKey[]).map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => setEmailTone(key)}
-                    className={`flex-1 px-3 py-2 text-xs font-semibold rounded-md transition-all ${
-                      emailTone === key
-                        ? 'bg-white text-slate-900 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
-                    }`}
-                  >
-                    {toneLabels[key].label}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">{toneLabels[emailTone].desc}</p>
+              <label className="text-xs font-semibold text-slate-600 mb-1.5 block">Subject line</label>
+              <input
+                type="text"
+                value={emailSubjects[activeEmailTab]}
+                onChange={(e) => {
+                  const newSubjects = [...emailSubjects]
+                  newSubjects[activeEmailTab] = e.target.value
+                  setEmailSubjects(newSubjects)
+                }}
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                placeholder="Email subject..."
+              />
             </div>
 
-            {/* Risk toggle */}
             <div>
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">Asks included</label>
-              <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-                {(Object.keys(riskLabels) as RiskLevel[]).map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => setEmailRisk(key)}
-                    className={`flex-1 px-3 py-2 text-xs font-semibold rounded-md transition-all ${
-                      emailRisk === key
-                        ? 'bg-white text-slate-900 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
-                    }`}
-                  >
-                    {riskLabels[key].label}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">{riskLabels[emailRisk].desc}</p>
+              <label className="text-xs font-semibold text-slate-600 mb-1.5 block">Email body</label>
+              <textarea
+                value={emailBodies[activeEmailTab]}
+                onChange={(e) => {
+                  const newBodies = [...emailBodies]
+                  newBodies[activeEmailTab] = e.target.value
+                  setEmailBodies(newBodies)
+                }}
+                rows={12}
+                className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none font-mono leading-relaxed"
+                placeholder="Email body..."
+              />
+              <p className="text-xs text-slate-400 mt-1.5">Edit this email directly, then copy it below.</p>
+            </div>
+
+            {/* Copy button */}
+            <div className="flex justify-end">
+              <CopyButton
+                text={`Subject: ${emailSubjects[activeEmailTab]}\n\n${emailBodies[activeEmailTab]}`}
+                label="Copy email"
+              />
             </div>
           </div>
 
-          {/* Editable variables */}
-          <div>
-            <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">Variables</label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div>
-                <label className="text-[11px] text-slate-500 mb-1 block">Discount target</label>
-                <input
-                  type="text"
-                  value={targetDiscount}
-                  onChange={(e) => setTargetDiscount(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  placeholder="10-15"
-                />
-              </div>
-              <div>
-                <label className="text-[11px] text-slate-500 mb-1 block">Renewal term</label>
-                <select
-                  value={renewalTerm}
-                  onChange={(e) => setRenewalTerm(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white"
-                >
-                  <option value="1-year">1 year</option>
-                  <option value="2-year">2 years</option>
-                  <option value="3-year">3 years</option>
-                  <option value="month-to-month">Month-to-month</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[11px] text-slate-500 mb-1 block">Payment terms</label>
-                <select
-                  value={paymentTerms}
-                  onChange={(e) => setPaymentTerms(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white"
-                >
-                  <option value="net-30">Net 30</option>
-                  <option value="net-45">Net 45</option>
-                  <option value="net-60">Net 60</option>
-                  <option value="quarterly">Quarterly</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[11px] text-slate-500 mb-1 block">Response deadline</label>
-                <input
-                  type="text"
-                  value={deadline}
-                  onChange={(e) => setDeadline(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  placeholder="e.g., Friday EOD"
-                />
-              </div>
-            </div>
-          </div>
+          {/* Regenerate section */}
+          {roundId && (
+            <div className="pt-4 border-t border-slate-200 space-y-3">
+              {showCustomPrompt && (
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 mb-1.5 block">
+                    Custom instructions (optional)
+                  </label>
+                  <textarea
+                    value={customPrompt}
+                    onChange={(e) => setCustomPrompt(e.target.value)}
+                    rows={2}
+                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+                    placeholder='e.g., "Make it more assertive" or "Add a 10% discount request"'
+                  />
+                  <p className="text-xs text-slate-400 mt-1">Tell AI how to adjust the emails.</p>
+                </div>
+              )}
 
-          {/* Asks included based on risk level */}
-          <div>
-            <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
-              Asks in this email ({visibleAsks.length})
-            </label>
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-              {visibleAsks.map((ask, idx) => (
-                <span
-                  key={idx}
-                  className={`inline-block px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium border max-w-full break-words ${
-                    idx < (output.what_to_ask_for?.must_have?.length || 0)
-                      ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                      : 'bg-slate-50 border-slate-200 text-slate-700'
+              {regenError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+                  {regenError}
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                {!showCustomPrompt && (
+                  <button
+                    onClick={() => setShowCustomPrompt(true)}
+                    className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                  >
+                    Add custom instructions
+                  </button>
+                )}
+                <button
+                  onClick={handleRegenerateEmails}
+                  disabled={regenerating || remainingRegens <= 0}
+                  className={`${showCustomPrompt ? 'flex-1' : 'flex-1'} px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 font-medium transition-all ${
+                    regenerating || remainingRegens <= 0
+                      ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                      : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'
                   }`}
                 >
-                  {ask.length > 45 ? ask.substring(0, 42) + '...' : ask}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Email preview */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex-1 h-px bg-slate-200" />
-              <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Preview</span>
-              <div className="flex-1 h-px bg-slate-200" />
-            </div>
-
-            {/* Show regenerated emails if available */}
-            {regeneratedEmails ? (
-              <div className="space-y-3">
-                {/* Tab selector for regenerated emails */}
-                <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
-                  {regeneratedEmails.map((email, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setRegenTab(idx)}
-                      className={`flex-1 px-3 py-2 text-xs font-semibold rounded-md transition-all ${
-                        regenTab === idx
-                          ? 'bg-white text-slate-900 shadow-sm'
-                          : 'text-slate-500 hover:text-slate-700'
-                      }`}
-                    >
-                      {email.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
-                  <Sparkles className="w-3 h-3" />
-                  Generated based on your settings — copy or regenerate again
-                </div>
-
-                <div className="rounded-xl border border-slate-200 overflow-hidden">
-                  <div className="px-4 sm:px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-start sm:items-center justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-slate-500">Subject</p>
-                      <p className="text-sm font-semibold text-slate-900 break-words">{regeneratedEmails[regenTab].subject}</p>
-                    </div>
-                    <CopyButton
-                      text={`Subject: ${regeneratedEmails[regenTab].subject}\n\n${regeneratedEmails[regenTab].body}`}
-                      label="Copy email"
-                    />
-                  </div>
-                  <div className="p-4 sm:p-5">
-                    <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{regeneratedEmails[regenTab].body}</p>
-                  </div>
-                </div>
+                  {regenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span className="text-sm">Generating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      <span className="text-sm">
+                        {remainingRegens <= 0 ? 'No regenerations left' : `Regenerate all 3 with AI`}
+                      </span>
+                    </>
+                  )}
+                </button>
               </div>
-            ) : (
-              /* Default email preview from original analysis */
-              <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <div className="px-4 sm:px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-start sm:items-center justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-medium text-slate-500">Subject</p>
-                    <p className="text-sm font-semibold text-slate-900 break-words">{emailSubject}</p>
-                  </div>
-                  <CopyButton
-                    text={`Subject: ${emailSubject}\n\n${emailBody}`}
-                    label="Copy email"
-                  />
-                </div>
-                <div className="p-4 sm:p-5">
-                  <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{emailBody}</p>
-                </div>
-              </div>
-            )}
-          </div>
 
-          {/* Regenerate button */}
-          {regenError && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-              {regenError}
+              {remainingRegens <= 0 && (
+                <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+                  You've used all 3 AI regenerations for this round. You can still edit the emails manually above.
+                </p>
+              )}
             </div>
           )}
-          <button
-            type="button"
-            onClick={handleRegenerateEmails}
-            disabled={regenerating}
-            className="w-full p-4 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/50
-                       hover:border-emerald-400 hover:bg-emerald-50 transition-all flex items-center justify-center gap-2.5"
-          >
-            {regenerating ? (
-              <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
-            ) : (
-              <RefreshCw className="w-4 h-4 text-emerald-600" />
-            )}
-            <span className="text-sm font-semibold text-emerald-900">
-              {regenerating ? 'Generating new emails...' : regeneratedEmails ? 'Regenerate with current settings' : 'Generate 3 new emails with these settings'}
-            </span>
-          </button>
+
+          {!roundId && (
+            <div className="pt-4 border-t border-slate-200">
+              <p className="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-3">
+                💡 Sign up to save this deal and unlock AI email regeneration (3 per round).
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
