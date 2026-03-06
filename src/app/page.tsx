@@ -151,14 +151,20 @@ export default function LandingPage() {
       </section>
 
       {/* How DealCheck Works */}
-      <section id="how-it-works" className="py-20 bg-white border-t border-slate-200">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-4">
-            From quote to savings in 3 steps
-          </h2>
-          <p className="text-base text-slate-600 text-center mb-16 max-w-2xl mx-auto">
-            No spreadsheets, no back-and-forth with legal. Just clarity on what to ask for and the words to say it.
-          </p>
+      <section id="how-it-works" className="py-24 sm:py-32 bg-gradient-to-b from-white via-slate-50/30 to-white relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-20 right-0 w-96 h-96 bg-emerald-100 rounded-full blur-3xl opacity-20 pointer-events-none" />
+        <div className="absolute bottom-20 left-0 w-96 h-96 bg-teal-100 rounded-full blur-3xl opacity-20 pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 relative">
+          <div className="text-center mb-20">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+              From quote to savings in 3 steps
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+              No spreadsheets, no back-and-forth with legal. Just clarity on what to ask for and the words to say it.
+            </p>
+          </div>
 
           {/* 3 Steps — Lucide icons */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
@@ -331,83 +337,94 @@ export default function LandingPage() {
       </section>
 
       {/* Data Privacy */}
-      <section id="data-privacy" className="py-20 bg-white border-t border-slate-200">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 text-center mb-4">
-            Your quotes stay yours
-          </h2>
-          <p className="text-base text-slate-600 text-center mb-16 max-w-2xl mx-auto">
-            Confidential pricing deserves confidential handling. Your data is encrypted, never trained on, and deleted when you say so.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative flex flex-col items-center text-center">
-              <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                <Lock className="w-7 h-7 text-emerald-700" />
+      <section id="data-privacy" className="py-24 sm:py-32 bg-white relative">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 relative">
+          <div className="text-center mb-20">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+              Your quotes stay yours
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+              Confidential pricing deserves confidential handling. Your data is encrypted, never trained on, and deleted when you say so.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+            <div className="relative flex flex-col items-center text-center group">
+              <div className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
+                <Lock className="w-8 h-8 text-emerald-700" />
               </div>
-              <p className="text-base font-semibold text-slate-900 mb-1.5">Encrypted end-to-end</p>
-              <p className="text-sm text-slate-600 max-w-[250px]">Processed securely and deleted after analysis unless you choose to save it.</p>
+              <p className="text-lg font-semibold text-slate-900 mb-2">Encrypted end-to-end</p>
+              <p className="text-sm text-slate-600 leading-relaxed">Processed securely and deleted after analysis unless you choose to save it.</p>
             </div>
-            <div className="relative flex flex-col items-center text-center">
-              <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                <ShieldCheck className="w-7 h-7 text-emerald-700" />
+            <div className="relative flex flex-col items-center text-center group">
+              <div className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
+                <ShieldCheck className="w-8 h-8 text-emerald-700" />
               </div>
-              <p className="text-base font-semibold text-slate-900 mb-1.5">Never used for AI training</p>
-              <p className="text-sm text-slate-600 max-w-[250px]">Your pricing, terms, and vendor details are never fed back into any model.</p>
+              <p className="text-lg font-semibold text-slate-900 mb-2">Never used for AI training</p>
+              <p className="text-sm text-slate-600 leading-relaxed">Your pricing, terms, and vendor details are never fed back into any model.</p>
             </div>
-            <div className="relative flex flex-col items-center text-center">
-              <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                <Globe className="w-7 h-7 text-emerald-700" />
+            <div className="relative flex flex-col items-center text-center group">
+              <div className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
+                <Globe className="w-8 h-8 text-emerald-700" />
               </div>
-              <p className="text-base font-semibold text-slate-900 mb-1.5">GDPR compliant</p>
-              <p className="text-sm text-slate-600 max-w-[250px]">EU-hosted infrastructure with full compliance built in from day one.</p>
+              <p className="text-lg font-semibold text-slate-900 mb-2">GDPR compliant</p>
+              <p className="text-sm text-slate-600 leading-relaxed">EU-hosted infrastructure with full compliance built in from day one.</p>
             </div>
           </div>
-          <div className="text-center mt-10">
-            <Link href="/security" className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors">
-              Learn more about our security practices →
+          <div className="text-center mt-12">
+            <Link href="/security" className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors group">
+              Learn more about our security practices
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Start free */}
-      <section id="pricing" className="py-20 bg-slate-50 border-t border-slate-200">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 text-center">
+      <section id="pricing" className="py-24 sm:py-32 bg-gradient-to-b from-slate-50 via-slate-50/50 to-white relative">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 text-center relative">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
             Your first savings are free
           </h2>
-          <p className="text-base text-slate-600 mb-10 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-slate-600 mb-12 max-w-2xl mx-auto">
             Get 2 full analyses — red flags, negotiation plan, and email drafts included. See what you've been leaving on the table.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link
               href="/try"
-              className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg"
+              className="group inline-flex items-center justify-center px-8 py-4 text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
             >
               Analyze a quote free
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/pricing"
-              className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors group"
             >
-              View pricing details →
+              View pricing details
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="bg-gradient-to-br from-emerald-600 to-emerald-700 py-20">
-        <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+      <section className="relative bg-gradient-to-br from-emerald-600 via-emerald-600 to-teal-700 py-24 sm:py-32 overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-white rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center relative">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 leading-tight">
             That quote in your inbox? You're probably overpaying.
           </h2>
-          <p className="text-emerald-100 text-lg mb-8">
+          <p className="text-emerald-100 text-lg sm:text-xl mb-10 leading-relaxed">
             Find out in 60 seconds. No signup, no commitment — just clarity.
           </p>
           <Link
             href="/try"
-            className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-white text-emerald-700 hover:bg-slate-50 transition-all shadow-lg hover:shadow-xl"
+            className="inline-flex items-center justify-center px-10 py-4 text-base font-semibold rounded-xl bg-white text-emerald-700 hover:bg-slate-50 transition-all shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:scale-[1.02] active:scale-[0.98]"
           >
             Analyze your first quote
           </Link>
