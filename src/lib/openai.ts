@@ -175,10 +175,9 @@ export async function analyzeDeal(
 
     return validated
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`AI analysis failed: ${error.message}`)
-    }
-    throw new Error('AI analysis failed with unknown error')
+    // CRITICAL: Never expose raw error messages - they may contain API keys in headers
+    console.error('OpenAI analysis error:', error)
+    throw new Error('AI analysis failed. Please try again or contact support.')
   }
 }
 
@@ -231,9 +230,8 @@ Return ONLY JSON with this structure:
     const parsed = JSON.parse(content)
     return parsed.email_drafts
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Email regeneration failed: ${error.message}`)
-    }
-    throw new Error('Email regeneration failed')
+    // CRITICAL: Never expose raw error messages - they may contain API keys
+    console.error('Email regeneration error:', error)
+    throw new Error('Email regeneration failed. Please try again.')
   }
 }

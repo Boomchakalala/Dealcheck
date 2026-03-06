@@ -128,10 +128,10 @@ export async function POST(
     })
   } catch (error) {
     console.error('Add round error:', error)
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
-    }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    // CRITICAL: Never send raw error.message to client - may contain sensitive data
+    return NextResponse.json({
+      error: 'Failed to add round. Please try again or contact support.'
+    }, { status: 500 })
   }
 }
 

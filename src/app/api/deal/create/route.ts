@@ -117,9 +117,9 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Create deal error:', error)
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
-    }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    // CRITICAL: Never send raw error.message to client - may contain sensitive data
+    return NextResponse.json({
+      error: 'Failed to create deal. Please try again or contact support.'
+    }, { status: 500 })
   }
 }
