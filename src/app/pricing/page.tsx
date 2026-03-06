@@ -4,7 +4,14 @@ import { CheckCircle2, Sparkles } from 'lucide-react'
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col relative">
+      {/* Noise texture overlay */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.015] mix-blend-overlay">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }} />
+      </div>
+
       {/* Header */}
       <UnifiedHeader variant="public" />
 
@@ -12,10 +19,10 @@ export default function PricingPage() {
         {/* Hero */}
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/40 via-white to-white pointer-events-none" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.06)_0%,transparent_65%)] pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.08)_0%,transparent_65%)] pointer-events-none" />
 
-          <div className="relative max-w-4xl mx-auto px-5 sm:px-8 pt-20 sm:pt-24 pb-16">
-            <div className="text-center mb-16">
+          <div className="relative max-w-4xl mx-auto px-5 sm:px-8 pt-24 sm:pt-32 pb-20">
+            <div className="text-center mb-20">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-emerald-200/60 shadow-sm mb-6">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                 <span className="text-xs font-semibold text-emerald-700 tracking-wide">Simple pricing</span>
@@ -28,9 +35,9 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {/* Free */}
-              <div className="rounded-2xl border border-slate-200/60 bg-white p-8 shadow-sm hover:shadow-md transition-shadow">
+              <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-8 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300 group">
                 <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">Try it out</p>
                 <div className="mb-6">
                   <span className="text-5xl font-bold text-slate-900 tracking-tight">$0</span>
@@ -61,9 +68,9 @@ export default function PricingPage() {
               </div>
 
               {/* Pro */}
-              <div className="rounded-2xl border-2 border-emerald-500/60 p-8 relative bg-gradient-to-b from-emerald-50/40 to-white shadow-md shadow-emerald-100/40">
-                <div className="absolute -top-3 left-6">
-                  <span className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold rounded-full tracking-wide shadow-sm">
+              <div className="rounded-2xl border-2 border-emerald-500/60 p-8 relative bg-gradient-to-b from-emerald-50/50 to-white shadow-lg shadow-emerald-100/50 hover:shadow-2xl hover:shadow-emerald-100/60 transition-all duration-300">
+                <div className="absolute -top-3.5 left-6">
+                  <span className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold rounded-full tracking-wide shadow-lg">
                     COMING SOON
                   </span>
                 </div>
@@ -100,17 +107,18 @@ export default function PricingPage() {
           </div>
 
           {/* Example link */}
-          <div className="text-center mt-8">
-            <Link href="/example" className="text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors underline underline-offset-2">
+          <div className="text-center mt-12 pb-8">
+            <Link href="/example" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors group">
               See an example analysis before you decide
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
 
         {/* FAQ strip */}
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-24">
+        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-24 sm:py-32">
           <p className="text-xs font-semibold tracking-widest text-emerald-700 uppercase mb-3 text-center">Common questions</p>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-12 text-center">Pricing FAQ</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-12 text-center">Pricing FAQ</h2>
           <div className="space-y-0 border-t border-slate-200/60">
             {[
               { q: 'Can I use DealCheck without signing up?', a: 'Yes. You can try a one-off analysis on the homepage without creating an account. To save deals and track rounds, you\'ll need to sign up (free).' },
