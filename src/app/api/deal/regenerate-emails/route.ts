@@ -62,10 +62,10 @@ DEAL CONTEXT:
 - Leverage: ${(leverage || []).slice(0, 3).join('; ') || 'None specified'}
 
 PRIORITY ASKS (must include):
-${must.map((a, i) => `${i + 1}. ${a}`).join('\n')}
+${must.map((a: string, i: number) => `${i + 1}. ${a}`).join('\n')}
 
 SECONDARY ASKS (nice to have):
-${nice.map((a, i) => `${i + 1}. ${a}`).join('\n')}
+${nice.map((a: string, i: number) => `${i + 1}. ${a}`).join('\n')}
 
 ${customPrompt ? `USER'S CUSTOM REQUEST:\n${customPrompt}\n` : ''}
 

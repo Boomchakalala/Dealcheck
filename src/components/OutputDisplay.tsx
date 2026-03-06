@@ -50,7 +50,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
     }
 
     if (remainingRegens <= 0) {
-      setRegenError('You've used all 3 email regenerations for this round.')
+      setRegenError('You have used all 3 email regenerations for this round.')
       return
     }
 
@@ -484,7 +484,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
               {remainingRegens <= 0 && (
                 <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
-                  You've used all 3 AI regenerations for this round. You can still edit the emails manually above.
+                  You have used all 3 AI regenerations for this round. You can still edit the emails manually above.
                 </p>
               )}
             </div>
