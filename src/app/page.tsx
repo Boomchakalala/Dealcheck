@@ -9,14 +9,25 @@ export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<'price' | 'terms' | 'emails'>('price')
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
+      {/* Noise texture overlay */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.015] mix-blend-overlay">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }} />
+      </div>
+
       {/* Header */}
       <UnifiedHeader variant="landing" />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-16">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <section className="relative overflow-hidden pt-24 pb-20 sm:pt-32 sm:pb-28">
+        {/* Gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/30 via-white to-white pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.08)_0%,transparent_70%)] pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left: Content */}
             <div>
               <h1 className="text-3xl sm:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-6 leading-[1.15]">
@@ -46,15 +57,16 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/try"
-                  className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg"
+                  className="group inline-flex items-center justify-center px-8 py-4 text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Analyze a quote free
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/example"
-                  className="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border-2 border-slate-300"
+                  className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border-2 border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md"
                 >
-                  See a real example <ArrowRight className="w-4 h-4 ml-2" />
+                  See a real example
                 </Link>
               </div>
 
@@ -62,8 +74,12 @@ export default function LandingPage() {
             </div>
 
             {/* Right: Product Preview */}
-            <div className="relative">
-              <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div className="relative lg:pl-8">
+              {/* Decorative blur orbs */}
+              <div className="absolute -top-10 -right-10 w-64 h-64 bg-emerald-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
+              <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-teal-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
+
+              <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/60 overflow-hidden hover:shadow-[0_20px_70px_-10px_rgba(0,0,0,0.15)] transition-shadow duration-500">
                 {/* Mock browser chrome */}
                 <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-6 border-b border-slate-200">
                   <div className="flex items-center gap-2 mb-4">
