@@ -65,6 +65,7 @@ export const CreateDealSchema = z.object({
     mimeType: z.string(),
   }).optional(),
   saveExtractedText: z.boolean().default(false),
+  isDemoText: z.boolean().default(false), // Flag for demo text (don't count against usage)
 }).refine(
   (data) => (data.extractedText && data.extractedText.length >= 10) || data.imageData,
   { message: 'Either extractedText (min 10 chars) or imageData must be provided' }

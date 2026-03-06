@@ -102,8 +102,8 @@ export async function POST(request: Request) {
       throw new Error('Failed to create round')
     }
 
-    // Increment usage count (skip for admins)
-    if (!profile.is_admin) {
+    // Increment usage count (skip for admins and demo text)
+    if (!profile.is_admin && !validated.isDemoText) {
       await supabase
         .from('profiles')
         .update({ usage_count: profile.usage_count + 1 })
