@@ -4,6 +4,8 @@ import OpenAI from 'openai'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
+const MAX_REGENERATIONS = 3
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
@@ -15,12 +17,8 @@ export async function POST(request: Request) {
 
     const body = await request.json()
     const {
-      tone,
-      riskLevel,
-      targetDiscount,
-      renewalTerm,
-      paymentTerms,
-      deadline,
+      roundId,
+      customPrompt,
       vendor,
       totalCommitment,
       mustHaveAsks,
@@ -30,64 +28,63 @@ export async function POST(request: Request) {
       conclusion,
     } = body
 
-    if (!tone || !riskLevel) {
-      return NextResponse.json({ error: 'Missing tone or riskLevel' }, { status: 400 })
+    // Check if round exists and belongs to user
+    const { data: round, error: roundError } = await supabase
+      .from('rounds')
+      .select('email_regeneration_count')
+      .eq('id', roundId)
+      .eq('user_id', user.id)
+      .single()
+
+    if (roundError || !round) {
+      return NextResponse.json({ error: 'Round not found' }, { status: 404 })
     }
 
-    // Build the asks list based on risk level
+    // Check regeneration limit
+    if (round.email_regeneration_count >= MAX_REGENERATIONS) {
+      return NextResponse.json({
+        error: `You've reached the limit of ${MAX_REGENERATIONS} email regenerations for this round.`
+      }, { status: 429 })
+    }
+
+    // Build the asks list
     const must = mustHaveAsks || []
     const nice = niceToHaveAsks || []
-    let asksToInclude: string[] = []
-    if (riskLevel === 'safe') {
-      asksToInclude = must
-    } else if (riskLevel === 'balanced') {
-      asksToInclude = [...must, ...nice.slice(0, 1)]
-    } else {
-      asksToInclude = [...must, ...nice]
-    }
+    const allAsks = [...must, ...nice]
 
-    const toneInstructions: Record<string, string> = {
-      neutral: 'Warm, collaborative, and professional. Emphasize partnership and mutual benefit.',
-      firm: 'Direct and focused. Polite but clearly states requirements without hedging.',
-      final: 'Urgent and deadline-driven. Makes clear this is the final opportunity before the decision is made.',
-    }
-
-    const prompt = `Generate 3 different negotiation email drafts for a procurement deal.
+    const basePrompt = `Generate 3 different negotiation email drafts for a procurement deal.
 
 DEAL CONTEXT:
 - Vendor: ${vendor || 'the vendor'}
 - Total commitment: ${totalCommitment || 'not specified'}
 - Situation: ${conclusion || 'Negotiation in progress'}
-- Key red flags: ${(redFlags || []).slice(0, 3).join('; ') || 'None specified'}
+- Key concerns: ${(redFlags || []).slice(0, 3).join('; ') || 'None specified'}
 - Leverage: ${(leverage || []).slice(0, 3).join('; ') || 'None specified'}
 
-USER PREFERENCES:
-- Tone: ${tone} — ${toneInstructions[tone] || toneInstructions.neutral}
-- Discount target: ${targetDiscount || '10-15'}%
-- Preferred term: ${renewalTerm || '1-year'}
-- Payment terms: ${paymentTerms || 'net-30'}
-- Response deadline: ${deadline || '[DATE]'}
+PRIORITY ASKS (must include):
+${must.map((a, i) => `${i + 1}. ${a}`).join('\n')}
 
-ASKS TO INCLUDE IN THE EMAILS:
-${asksToInclude.map((a, i) => `${i + 1}. ${a}`).join('\n')}
+SECONDARY ASKS (nice to have):
+${nice.map((a, i) => `${i + 1}. ${a}`).join('\n')}
+
+${customPrompt ? `USER'S CUSTOM REQUEST:\n${customPrompt}\n` : ''}
 
 INSTRUCTIONS:
-- Write 3 distinct email variations, each with a different angle/approach but all matching the requested tone
-- Email 1: Lead with the strongest ask or biggest concern
-- Email 2: Lead with partnership/value framing
-- Email 3: Lead with a specific deadline or next step
-- Each email should naturally incorporate the asks listed above
-- Use the discount target, term, payment terms, and deadline where relevant
+- Write 3 distinct email variations with different angles/tones:
+  * Email 1: Friendly & collaborative (warm, partnership-focused)
+  * Email 2: Direct & focused (clear asks, professional)
+  * Email 3: Urgent & firm (deadline-driven, final push)
+- Each email should incorporate the priority asks
 - Keep each email 150-250 words
 - Make them sound human and natural, not templated
-- Address the vendor by name if provided
+- Include a clear call-to-action
 
 Return ONLY valid JSON (no markdown, no code fences):
 {
   "emails": [
-    { "label": "short 2-3 word label for this angle", "subject": "email subject", "body": "email body" },
-    { "label": "short 2-3 word label for this angle", "subject": "email subject", "body": "email body" },
-    { "label": "short 2-3 word label for this angle", "subject": "email subject", "body": "email body" }
+    { "label": "Friendly", "subject": "email subject", "body": "email body" },
+    { "label": "Direct", "subject": "email subject", "body": "email body" },
+    { "label": "Firm", "subject": "email subject", "body": "email body" }
   ]
 }`
 
@@ -98,7 +95,7 @@ Return ONLY valid JSON (no markdown, no code fences):
           role: 'system',
           content: 'You are a procurement negotiation expert. Write professional, effective emails. Return only valid JSON.'
         },
-        { role: 'user', content: prompt }
+        { role: 'user', content: basePrompt }
       ],
       temperature: 0.7,
       max_tokens: 2000,
@@ -119,7 +116,16 @@ Return ONLY valid JSON (no markdown, no code fences):
       return NextResponse.json({ error: 'Invalid response format' }, { status: 500 })
     }
 
-    return NextResponse.json({ emails: result.emails.slice(0, 3) })
+    // Increment regeneration count
+    await supabase
+      .from('rounds')
+      .update({ email_regeneration_count: round.email_regeneration_count + 1 })
+      .eq('id', roundId)
+
+    return NextResponse.json({
+      emails: result.emails.slice(0, 3),
+      remainingRegenerations: MAX_REGENERATIONS - round.email_regeneration_count - 1
+    })
   } catch (error) {
     console.error('Regenerate emails error:', error)
     return NextResponse.json(
