@@ -16,6 +16,10 @@ export default async function SettingsPage() {
     .eq('id', user.id)
     .single()
 
+  const usageCount = profile?.usage_count || 0
+  const isFreePlan = profile?.plan !== 'pro'
+  const analysesRemaining = isFreePlan ? Math.max(0, 2 - usageCount) : null
+
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-10">
@@ -73,7 +77,7 @@ export default async function SettingsPage() {
           <div className="flex items-center justify-between py-3">
             <span className="text-sm text-slate-500">Analysis rounds</span>
             <span className="text-sm font-medium text-emerald-700">
-              {profile?.plan === 'free' ? '2 free analyses' : 'Unlimited'}
+              {isFreePlan ? `${analysesRemaining} of 2 remaining` : 'Unlimited'}
             </span>
           </div>
           {profile?.plan === 'free' && (
