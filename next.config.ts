@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
   // Exclude pdf-parse from bundling to prevent test code execution
   serverExternalPackages: ['pdf-parse', 'canvas'],
 
+  // Allow preview URLs for development
+  ...(process.env.NODE_ENV === 'development' && {
+    allowedDevOrigins: ['preview-*.share.sandbox.dev'],
+  }),
+
   async headers() {
     return [
       {
