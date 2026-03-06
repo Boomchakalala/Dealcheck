@@ -10,9 +10,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['pdf-parse', 'canvas'],
 
   // Allow preview URLs for development
-  ...(process.env.NODE_ENV === 'development' && {
-    allowedDevOrigins: ['preview-*.share.sandbox.dev'],
-  }),
+  allowedDevOrigins: ['preview-*.share.sandbox.dev'],
 
   async headers() {
     return [
