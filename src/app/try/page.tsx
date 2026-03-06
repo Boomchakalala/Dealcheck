@@ -39,6 +39,7 @@ export default function TryPage() {
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [dealType, setDealType] = useState<'New' | 'Renewal'>('New')
   const [goal, setGoal] = useState('')
+  const [isDemoText, setIsDemoText] = useState(false) // Track if using demo text
 
   const demoText = `QUOTE - CloudStore Enterprise Plan
 
@@ -60,14 +61,24 @@ Support:
 
 This quote expires in 14 days.`
 
+  const handleInputChange = (value: string) => {
+    setInput(value)
+    // If user manually changes the text, it's no longer demo text
+    if (value !== demoText) {
+      setIsDemoText(false)
+    }
+  }
+
   const handleUseDemoText = () => {
     setInput(demoText)
     setUploadedFileName(null)
+    setIsDemoText(true) // Mark as demo text
   }
 
   const handleFileUpload = async (file: File) => {
     setUploading(true)
     setError(null)
+    setIsDemoText(false) // Mark as user's own content
     try {
       const formData = new FormData()
       formData.append('file', file)
@@ -97,7 +108,8 @@ This quote expires in 14 days.`
         body: JSON.stringify({
           extractedText: input,
           dealType,
-          goal: goal || null
+          goal: goal || null,
+          isDemoText, // Pass demo text flag to API
         }),
       })
       const data = await response.json()
@@ -205,7 +217,7 @@ This quote expires in 14 days.`
         <QuoteUploaderCard
           variant="public"
           input={input}
-          setInput={setInput}
+          setInput={handleInputChange}
           uploading={uploading}
           analyzing={analyzing}
           error={error}
