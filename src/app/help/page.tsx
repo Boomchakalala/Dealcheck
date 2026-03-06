@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
-import { HelpCircle, Mail } from 'lucide-react'
+import { HelpCircle, Mail, ArrowRight } from 'lucide-react'
 
 export default function HelpPage() {
   const faqs = [
@@ -15,19 +15,26 @@ export default function HelpPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col relative">
+      {/* Noise texture overlay */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.015] mix-blend-overlay">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }} />
+      </div>
+
       {/* Header */}
       <UnifiedHeader variant="public" />
 
       <main className="flex-1">
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-slate-50/60 to-white pointer-events-none" />
-          <div className="relative max-w-3xl mx-auto px-5 sm:px-8 pt-20 sm:pt-24 pb-8">
+          <div className="relative max-w-3xl mx-auto px-5 sm:px-8 pt-24 sm:pt-32 pb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/60 shadow-sm mb-6">
               <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
               <span className="text-xs font-semibold text-emerald-700 tracking-wide">Help center</span>
             </div>
-            <h1 className="text-[2.25rem] sm:text-[3rem] leading-[1.08] font-bold text-slate-900 tracking-tight mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-4">
               Frequently asked questions
             </h1>
             <p className="text-lg text-slate-500 leading-relaxed max-w-xl mb-16">
@@ -49,17 +56,18 @@ export default function HelpPage() {
             ))}
           </div>
 
-          <div className="mt-20 rounded-2xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-white p-10 text-center shadow-sm">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
-              <Mail className="w-5 h-5" />
+          <div className="mt-20 rounded-2xl border-2 border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-10 text-center shadow-sm hover:shadow-lg transition-all duration-300">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-5 shadow-sm">
+              <Mail className="w-6 h-6" />
             </div>
             <p className="text-base font-semibold text-slate-900 mb-2">Still have questions?</p>
-            <p className="text-sm text-slate-500 mb-4">We&apos;re here to help.</p>
+            <p className="text-sm text-slate-500 mb-5">We're here to help.</p>
             <a
               href="mailto:support@dealcheck.app"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800 transition-colors"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800 transition-colors group"
             >
               support@dealcheck.app
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
         </div>

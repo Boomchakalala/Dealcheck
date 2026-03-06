@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
-import { CheckCircle2, Sparkles } from 'lucide-react'
+import { CheckCircle2, Sparkles, ArrowRight } from 'lucide-react'
 
 export default function PricingPage() {
   return (
