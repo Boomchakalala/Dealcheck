@@ -7,78 +7,53 @@ import { useState, useMemo } from 'react'
 
 interface OutputDisplayProps {
   output: DealOutput
+  roundId?: string // Optional - only available in authenticated flow
 }
 
 type ToneKey = 'neutral' | 'firm' | 'final'
 type RiskLevel = 'safe' | 'balanced' | 'aggressive'
 
-export function OutputDisplay({ output }: OutputDisplayProps) {
+export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
   const [expandedFlags, setExpandedFlags] = useState<number[]>([0])
-  const [emailTone, setEmailTone] = useState<ToneKey>('neutral')
-  const [emailRisk, setEmailRisk] = useState<RiskLevel>('balanced')
   const [showAssumptions, setShowAssumptions] = useState(false)
+  const [activeEmailTab, setActiveEmailTab] = useState(0)
 
-  // Editable email variables
-  const [targetDiscount, setTargetDiscount] = useState('10-15')
-  const [renewalTerm, setRenewalTerm] = useState('1-year')
-  const [paymentTerms, setPaymentTerms] = useState('net-30')
-  const [deadline, setDeadline] = useState('[DATE]')
+  // Email editing state
+  const [emailSubjects, setEmailSubjects] = useState([
+    output.email_drafts.neutral.subject,
+    output.email_drafts.firm.subject,
+    output.email_drafts.final_push.subject
+  ])
+  const [emailBodies, setEmailBodies] = useState([
+    output.email_drafts.neutral.body,
+    output.email_drafts.firm.body,
+    output.email_drafts.final_push.body
+  ])
 
-  // Regenerated emails state
+  // Regeneration state
+  const [customPrompt, setCustomPrompt] = useState('')
   const [regenerating, setRegenerating] = useState(false)
-  const [regeneratedEmails, setRegeneratedEmails] = useState<{label: string; subject: string; body: string}[] | null>(null)
-  const [regenTab, setRegenTab] = useState(0)
   const [regenError, setRegenError] = useState<string | null>(null)
+  const [remainingRegens, setRemainingRegens] = useState(3)
+  const [showCustomPrompt, setShowCustomPrompt] = useState(false)
 
-  const emailDrafts = {
-    neutral: output.email_drafts.neutral,
-    firm: output.email_drafts.firm,
-    final: output.email_drafts.final_push,
-  }
-
-  const toneLabels: Record<ToneKey, { label: string; desc: string }> = {
-    neutral: { label: 'Friendly', desc: 'Warm, collaborative opening' },
-    firm: { label: 'Direct', desc: 'Clear and focused follow-up' },
-    final: { label: 'Urgent', desc: 'Deadline-driven close' },
-  }
-
-  const riskLabels: Record<RiskLevel, { label: string; desc: string }> = {
-    safe: { label: 'Safe', desc: 'Must-have asks only' },
-    balanced: { label: 'Balanced', desc: 'Must-have + key nice-to-haves' },
-    aggressive: { label: 'Push more', desc: 'All asks included' },
-  }
-
-  // Build email body with variable substitution and risk-adjusted asks
-  const emailBody = useMemo(() => {
-    let body = emailDrafts[emailTone].body
-
-    // Substitute variables
-    body = body.replace(/\[DATE\]/g, deadline)
-    body = body.replace(/10-15%/g, `${targetDiscount}%`)
-    body = body.replace(/10%/g, `${targetDiscount}%`)
-    body = body.replace(/15%/g, `${targetDiscount}%`)
-
-    return body
-  }, [emailTone, targetDiscount, renewalTerm, paymentTerms, deadline])
-
-  const emailSubject = emailDrafts[emailTone].subject
-
-  // Determine which asks to show based on risk level
-  const visibleAsks = useMemo(() => {
-    const mustHave = output.what_to_ask_for?.must_have || []
-    const niceToHave = output.what_to_ask_for?.nice_to_have || []
-    if (emailRisk === 'safe') return mustHave
-    if (emailRisk === 'balanced') return [
-      ...mustHave,
-      ...niceToHave.slice(0, 1),
-    ]
-    return [
-      ...mustHave,
-      ...niceToHave,
-    ]
-  }, [emailRisk, output])
+  const emailTabs = [
+    { label: 'Friendly', desc: 'Warm & collaborative' },
+    { label: 'Direct', desc: 'Clear & focused' },
+    { label: 'Firm', desc: 'Urgent & deadline-driven' }
+  ]
 
   const handleRegenerateEmails = async () => {
+    if (!roundId) {
+      setRegenError('Email regeneration is only available for saved deals. Please sign in.')
+      return
+    }
+
+    if (remainingRegens <= 0) {
+      setRegenError('You've used all 3 email regenerations for this round.')
+      return
+    }
+
     setRegenerating(true)
     setRegenError(null)
     try {
@@ -86,12 +61,8 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          tone: emailTone,
-          riskLevel: emailRisk,
-          targetDiscount,
-          renewalTerm,
-          paymentTerms,
-          deadline,
+          roundId,
+          customPrompt: customPrompt.trim() || null,
           vendor: output.vendor || output.snapshot.vendor_product,
           totalCommitment: output.snapshot.total_commitment,
           mustHaveAsks: output.what_to_ask_for?.must_have || [],
@@ -103,8 +74,13 @@ export function OutputDisplay({ output }: OutputDisplayProps) {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to regenerate')
-      setRegeneratedEmails(data.emails)
-      setRegenTab(0)
+
+      // Update email state with new generated emails
+      setEmailSubjects(data.emails.map((e: any) => e.subject))
+      setEmailBodies(data.emails.map((e: any) => e.body))
+      setRemainingRegens(data.remainingRegenerations)
+      setCustomPrompt('') // Clear prompt after success
+      setShowCustomPrompt(false)
     } catch (err) {
       setRegenError(err instanceof Error ? err.message : 'Failed to regenerate emails')
     } finally {
