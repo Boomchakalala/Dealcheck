@@ -49,9 +49,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ extractedText, useVision: false })
   } catch (error) {
     console.error('Upload error:', error)
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
-    }
-    return NextResponse.json({ error: 'Failed to process file' }, { status: 500 })
+    // Log full error for debugging, but don't expose to client
+    return NextResponse.json({
+      error: 'Failed to process file. Please try a different file or contact support.'
+    }, { status: 500 })
   }
 }
