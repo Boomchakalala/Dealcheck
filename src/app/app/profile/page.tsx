@@ -35,8 +35,10 @@ export default async function ProfilePage() {
   })
 
   // For now, everyone is on Free plan - can be enhanced later with Stripe
-  const currentPlan = 'Free'
+  const currentPlan = profile?.plan === 'pro' ? 'Pro' : 'Free'
   const isFreePlan = currentPlan === 'Free'
+  const usageCount = profile?.usage_count || 0
+  const analysesRemaining = isFreePlan ? Math.max(0, 2 - usageCount) : null
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -109,7 +111,9 @@ export default async function ProfilePage() {
           <div>
             <p className="text-sm font-semibold text-slate-900 mb-1">Current Plan: {currentPlan}</p>
             <p className="text-xs text-slate-600">
-              {isFreePlan ? '2 free AI analyses included' : 'Unlimited analyses'}
+              {isFreePlan
+                ? `${analysesRemaining} of 2 free analyses remaining`
+                : 'Unlimited analyses'}
             </p>
           </div>
           {isFreePlan && (

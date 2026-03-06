@@ -4,7 +4,7 @@ import { AddRoundSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/openai'
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 
-const FREE_ANALYSIS_LIMIT = 5
+const FREE_ANALYSIS_LIMIT = 2
 
 export async function POST(
   request: Request,
