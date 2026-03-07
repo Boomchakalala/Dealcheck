@@ -4,13 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select } from '@/components/ui/select'
 import { CopyButton } from '@/components/CopyButton'
 import type { EmailControls } from '@/types'
 
@@ -76,45 +70,42 @@ export function EmailGenerator({ roundId, defaultControls }: EmailGeneratorProps
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="tone">Tone</Label>
-          <Select value={tonePreference} onValueChange={(v) => setTonePreference(v as any)}>
-            <SelectTrigger id="tone">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="soft">Soft - Warm and collaborative</SelectItem>
-              <SelectItem value="balanced">Balanced - Professional and direct</SelectItem>
-              <SelectItem value="firm">Firm - Assertive and businesslike</SelectItem>
-            </SelectContent>
+          <Select
+            id="tone"
+            value={tonePreference}
+            onChange={(e) => setTonePreference(e.target.value as EmailControls['tone_preference'])}
+          >
+            <option value="soft">Soft - Warm and collaborative</option>
+            <option value="balanced">Balanced - Professional and direct</option>
+            <option value="firm">Firm - Assertive and businesslike</option>
           </Select>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="relationship">Supplier Relationship</Label>
-          <Select value={supplierRelationship} onValueChange={(v) => setSupplierRelationship(v as any)}>
-            <SelectTrigger id="relationship">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="new">New - First time engagement</SelectItem>
-              <SelectItem value="existing">Existing - Current supplier</SelectItem>
-              <SelectItem value="renewal">Renewal - Renewing contract</SelectItem>
-              <SelectItem value="unknown">Unknown</SelectItem>
-            </SelectContent>
+          <Select
+            id="relationship"
+            value={supplierRelationship}
+            onChange={(e) => setSupplierRelationship(e.target.value as EmailControls['supplier_relationship'])}
+          >
+            <option value="new">New - First time engagement</option>
+            <option value="existing">Existing - Current supplier</option>
+            <option value="renewal">Renewal - Renewing contract</option>
+            <option value="unknown">Unknown</option>
           </Select>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="goal">Email Goal</Label>
-          <Select value={emailGoal} onValueChange={(v) => setEmailGoal(v as any)}>
-            <SelectTrigger id="goal">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="clarify">Clarify - Request information</SelectItem>
-              <SelectItem value="negotiate">Negotiate - Discuss terms</SelectItem>
-              <SelectItem value="revise">Revise - Request changes</SelectItem>
-              <SelectItem value="accept">Accept - Confirm with conditions</SelectItem>
-            </SelectContent>
+          <Select
+            id="goal"
+            value={emailGoal}
+            onChange={(e) => setEmailGoal(e.target.value as EmailControls['email_goal'])}
+          >
+            <option value="clarify">Clarify - Request information</option>
+            <option value="negotiate">Negotiate - Discuss terms</option>
+            <option value="revise">Revise - Request changes</option>
+            <option value="accept">Accept - Confirm with conditions</option>
           </Select>
         </div>
       </div>

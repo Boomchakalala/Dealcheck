@@ -96,7 +96,7 @@ export function DealCard({ deal }: DealCardProps) {
                 {deal.deal_type}
               </Badge>
               {isV2 && (
-                <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                <Badge variant="secondary" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
                   V2
                 </Badge>
               )}
