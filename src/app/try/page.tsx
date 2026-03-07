@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { OutputDisplay } from '@/components/OutputDisplay'
+import { OutputDisplayV2 } from '@/components/OutputDisplayV2'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
 import { MarketingFooter } from '@/components/MarketingFooter'
-import type { DealOutput } from '@/types'
+import type { DealOutputV2 } from '@/types'
 
 const TRIAL_STORAGE_KEY = 'dealcheck_trial'
 const TRIAL_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours

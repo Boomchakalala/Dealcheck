@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { analyzeDeal } from '@/lib/openai'
-import { DealOutputSchema } from '@/lib/schemas'
+import { analyzeDealV2 } from '@/lib/openai'
+import { DealOutputSchemaV2 } from '@/lib/schemas'
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 import { headers } from 'next/headers'
 
-// Guest trial - no auth required, rate limited per IP
+// Guest trial - no auth required, rate limited per IP - Uses V2 schema
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -31,8 +31,8 @@ export async function POST(request: Request) {
       )
     }
 
-    // Analyze the deal with AI (no storage, no user)
-    const output = await analyzeDeal(
+    // Analyze the deal with AI V2 (no storage, no user)
+    const output = await analyzeDealV2(
       extractedText,
       dealType || 'New',
       goal,
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     )
 
     // Validate output
-    const validated = DealOutputSchema.parse(output)
+    const validated = DealOutputSchemaV2.parse(output)
 
     return NextResponse.json({
       success: true,
