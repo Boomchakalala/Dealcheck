@@ -69,11 +69,12 @@ export type Database = {
           created_at: string
           note: string | null
           extracted_text: string | null
-          output_json: DealOutput
-          output_markdown: string
+          output_json: DealOutput | DealOutputV2
+          output_markdown: string | null
           status: 'done' | 'error'
           error_message: string | null
           model_version: string | null
+          schema_version: 'v1' | 'v2'
         }
         Insert: {
           id?: string
@@ -83,11 +84,12 @@ export type Database = {
           created_at?: string
           note?: string | null
           extracted_text?: string | null
-          output_json: DealOutput
-          output_markdown: string
+          output_json: DealOutput | DealOutputV2
+          output_markdown?: string | null
           status?: 'done' | 'error'
           error_message?: string | null
           model_version?: string | null
+          schema_version?: 'v1' | 'v2'
         }
         Update: {
           id?: string
@@ -97,11 +99,12 @@ export type Database = {
           created_at?: string
           note?: string | null
           extracted_text?: string | null
-          output_json?: DealOutput
-          output_markdown?: string
+          output_json?: DealOutput | DealOutputV2
+          output_markdown?: string | null
           status?: 'done' | 'error'
           error_message?: string | null
           model_version?: string | null
+          schema_version?: 'v1' | 'v2'
         }
       }
     }

@@ -1,6 +1,6 @@
 import OpenAI from 'openai'
-import { DealOutputSchema, type DealOutputType } from './schemas'
-import type { DealOutput } from '@/types'
+import { DealOutputSchema, DealOutputSchemaV2, type DealOutputType, type DealOutputTypeV2 } from './schemas'
+import type { DealOutput, DealOutputV2 } from '@/types'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
