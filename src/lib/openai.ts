@@ -608,6 +608,74 @@ export async function analyzeDeal(
   }
 }
 
+// V2 Analysis Function
+export async function analyzeDealV2(
+  extractedText: string,
+  dealType: 'New' | 'Renewal',
+  goal?: string,
+  notes?: string,
+  previousRoundOutput?: DealOutputV2,
+  imageData?: { base64: string; mimeType: string }
+): Promise<DealOutputTypeV2> {
+  const contextParts = [
+    `Deal Type: ${dealType}`,
+    goal && `User Goal: ${goal}`,
+    notes && `User Notes: ${notes}`,
+    previousRoundOutput && `Previous Round Context: ${JSON.stringify(previousRoundOutput, null, 2)}`,
+  ].filter(Boolean)
+
+  const userPrompt = imageData
+    ? contextParts.join('\n\n') + '\n\nPlease analyze the quote/contract shown in the image.'
+    : contextParts.join('\n\n') + `\n\nSupplier Document/Quote:\n${extractedText}`
+
+  try {
+    const messages: any[] = [
+      { role: 'system', content: SYSTEM_PROMPT_V2 },
+    ]
+
+    // If we have image data, use vision API
+    if (imageData) {
+      messages.push({
+        role: 'user',
+        content: [
+          { type: 'text', text: userPrompt },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:${imageData.mimeType};base64,${imageData.base64}`,
+            },
+          },
+        ],
+      })
+    } else {
+      messages.push({ role: 'user', content: userPrompt })
+    }
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages,
+      response_format: { type: 'json_object' },
+      temperature: 0.7,
+      max_tokens: 3500,
+    })
+
+    const content = completion.choices[0]?.message?.content
+    if (!content) {
+      throw new Error('No response from OpenAI')
+    }
+
+    // Parse and validate JSON
+    const parsed = JSON.parse(content)
+    const validated = DealOutputSchemaV2.parse(parsed)
+
+    return validated
+  } catch (error) {
+    // CRITICAL: Never expose raw error messages - they may contain API keys in headers
+    console.error('OpenAI V2 analysis error:', error)
+    throw new Error('AI analysis failed. Please try again or contact support.')
+  }
+}
+
 export async function regenerateEmailDrafts(
   extractedText: string,
   currentOutput: DealOutput
