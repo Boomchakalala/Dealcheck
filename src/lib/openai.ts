@@ -235,11 +235,21 @@ Return valid JSON only. Match this structure exactly:
       "body": "Urgent but respectful final push with close line"
     }
   },
-  "assumptions": ["max 3 bullets of missing info you assumed"],
+  "assumptions": ["max 3 bullets of missing info you assumed — be concise"],
   "disclaimer": "This analysis is not legal advice. You are responsible for verifying all information and consulting appropriate professionals. No proprietary benchmark data was used."
 }
 
-Return ONLY valid JSON. Be crisp, procurement-led, no fluff.`
+CRITICAL REMINDERS:
+- Be selective: fewer, sharper points beat comprehensive coverage
+- Lead with the dominant issue
+- Adapt to business vs personal context
+- Only include price_insight if quote contains pricing signals
+- red_flags: 0-3 items (not always 3)
+- must_have asks: typically 1-3 items including price improvement
+- If quote is mostly acceptable, say so clearly
+- Never pad output just to fill the template
+
+Return ONLY valid JSON. Be crisp, selective, commercially intelligent.`
 
 export async function analyzeDeal(
   extractedText: string,
