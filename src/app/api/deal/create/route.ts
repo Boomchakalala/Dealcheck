@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { CreateDealSchema } from '@/lib/schemas'
 import { analyzeDealV2 } from '@/lib/openai'
+import { extractAndNormalize } from '@/lib/extract-normalize'
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 
 const FREE_ANALYSIS_LIMIT = 2
@@ -50,18 +51,24 @@ export async function POST(request: Request) {
     const body = await request.json()
     const validated = CreateDealSchema.parse(body)
 
-    // Analyze the deal with AI V2 (with optional vision support)
-    const output = await analyzeDealV2(
+    // STEP 1: Extract & normalize commercial facts
+    const extracted = await extractAndNormalize(
       validated.extractedText || '',
-      validated.dealType,
-      validated.goal || undefined,
-      validated.notes || undefined,
-      undefined,
       validated.imageData
     )
 
-    // Auto-detect vendor from output
-    const vendor = validated.vendor || output.commercial_facts.supplier
+    // STEP 2: Analyze using structured extraction (not raw text)
+    const output = await analyzeDealV2(
+      extracted,
+      validated.dealType,
+      {
+        goal: validated.goal || undefined,
+        notes: validated.notes || undefined,
+      }
+    )
+
+    // Auto-detect vendor from extraction or analysis
+    const vendor = validated.vendor || extracted.supplier || output.commercial_facts.supplier
 
     // Create deal
     const { data: deal, error: dealError } = await supabase
@@ -89,6 +96,7 @@ export async function POST(request: Request) {
         round_number: 1,
         note: validated.notes,
         extracted_text: validated.saveExtractedText ? validated.extractedText : null,
+        extracted_data: extracted, // NEW: Store extraction results
         output_json: output,
         output_markdown: null, // V2 doesn't generate markdown
         status: 'done',
