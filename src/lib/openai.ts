@@ -212,14 +212,14 @@ Return valid JSON only. Match this structure exactly:
   ],
   "NOTE": "red_flags array should contain 0-3 items only. Quality over quantity. If quote is mostly fine, return 0-1 flags.",
   "negotiation_plan": {
-    "leverage_you_have": ["max 5 bullets, no bluffing"],
-    "must_have_asks": ["max 3 critical items, should typically include a discount/price improvement request"],
-    "nice_to_have_asks": ["max 3 secondary items"],
-    "trades_you_can_offer": ["max 3 concessions you can make"]
+    "leverage_you_have": ["max 5 bullets, no bluffing — only real leverage from quote/context"],
+    "must_have_asks": ["1-3 critical items ONLY, should typically include price improvement"],
+    "nice_to_have_asks": ["0-3 secondary items if justified"],
+    "trades_you_can_offer": ["0-3 pragmatic concessions you can make"]
   },
   "what_to_ask_for": {
-    "must_have": ["Could we... / Would you consider... bullets, should typically include asking for a discount or better pricing"],
-    "nice_to_have": ["Could we... / Would you consider... bullets"]
+    "must_have": ["Could we... / Would you consider... bullets with WHY it matters, typically 1-3 items including pricing"],
+    "nice_to_have": ["Could we... / Would you consider... bullets, 0-3 items if justified"]
   },
   "email_drafts": {
     "neutral": {
