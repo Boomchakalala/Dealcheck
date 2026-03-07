@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { OutputDisplay } from '@/components/OutputDisplay'
+import { OutputDisplayV2 } from '@/components/OutputDisplayV2'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { DealActionBar } from '@/components/DealActionBar'
 import { CheckSquare, Mail, Plus, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { AddRoundForm } from './AddRoundForm'
+import type { DealOutput, DealOutputV2 } from '@/types'
 
 export default async function DealPage({
   params,
@@ -44,7 +46,14 @@ export default async function DealPage({
   const sortedRounds = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number) || []
   const latestRound = sortedRounds[0]
   const latestOutput = latestRound?.output_json
-  const dealName = deal.vendor || latestOutput?.vendor || deal.title || 'Deal'
+  const schemaVersion = latestRound?.schema_version || 'v1'
+  const isV2 = schemaVersion === 'v2'
+
+  // Get vendor name based on schema version
+  const dealName = deal.vendor ||
+    (isV2 ? (latestOutput as DealOutputV2)?.commercial_facts?.supplier : (latestOutput as DealOutput)?.vendor) ||
+    deal.title ||
+    'Deal'
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -113,12 +122,27 @@ export default async function DealPage({
             Next Actions
           </h2>
 
-          {/* Must-have asks as checklist */}
-          {latestOutput.what_to_ask_for?.must_have?.length > 0 && (
+          {/* V2: Priority points as checklist */}
+          {isV2 && (latestOutput as DealOutputV2).priority_points?.length > 0 && (
+            <div className="mb-5">
+              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">Priority Points</h3>
+              <ul className="space-y-2">
+                {(latestOutput as DealOutputV2).priority_points.map((point, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <div className="mt-1 w-4 h-4 rounded border-2 border-slate-300 flex-shrink-0" />
+                    <span className="text-sm text-slate-700 leading-relaxed">{point.title}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* V1: Must-have asks as checklist */}
+          {!isV2 && (latestOutput as DealOutput).what_to_ask_for?.must_have?.length > 0 && (
             <div className="mb-5">
               <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">Must-Have Asks</h3>
               <ul className="space-y-2">
-                {latestOutput.what_to_ask_for.must_have.map((ask: string, idx: number) => (
+                {(latestOutput as DealOutput).what_to_ask_for.must_have.map((ask: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-3">
                     <div className="mt-1 w-4 h-4 rounded border-2 border-slate-300 flex-shrink-0" />
                     <span className="text-sm text-slate-700 leading-relaxed">{ask}</span>
@@ -132,7 +156,7 @@ export default async function DealPage({
             <a href="#email-drafts">
               <Button variant="outline" size="sm" className="gap-2">
                 <Mail className="w-4 h-4" />
-                Send Email
+                {isV2 ? 'Generate Email' : 'Send Email'}
               </Button>
             </a>
             <a href="#add-round">
@@ -155,7 +179,11 @@ export default async function DealPage({
             <span className="text-sm text-slate-500">Latest analysis</span>
             <div className="flex-1 h-px bg-slate-200" />
           </div>
-          <OutputDisplay output={latestOutput} roundId={latestRound.id} />
+          {isV2 ? (
+            <OutputDisplayV2 output={latestOutput as DealOutputV2} roundId={latestRound.id} />
+          ) : (
+            <OutputDisplay output={latestOutput as DealOutput} roundId={latestRound.id} />
+          )}
         </div>
       )}
 
@@ -185,7 +213,11 @@ export default async function DealPage({
       {/* Sticky Action Bar */}
       <DealActionBar
         dealId={dealId}
-        currentTotal={latestOutput?.snapshot?.total_commitment}
+        currentTotal={
+          isV2
+            ? `${(latestOutput as DealOutputV2)?.commercial_facts?.total_value} ${(latestOutput as DealOutputV2)?.commercial_facts?.currency}`
+            : (latestOutput as DealOutput)?.snapshot?.total_commitment
+        }
         dealStatus={deal.status}
         roundCount={sortedRounds.length}
       />

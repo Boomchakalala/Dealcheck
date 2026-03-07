@@ -1,10 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import { OutputDisplay } from '@/components/OutputDisplay'
+import { OutputDisplayV2 } from '@/components/OutputDisplayV2'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import type { DealOutput, DealOutputV2 } from '@/types'
 
 export default async function RoundPage({
   params,
@@ -35,6 +37,8 @@ export default async function RoundPage({
   }
 
   const deal = Array.isArray(round.deals) ? round.deals[0] : round.deals
+  const schemaVersion = round.schema_version || 'v1'
+  const isV2 = schemaVersion === 'v2'
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -76,6 +80,11 @@ export default async function RoundPage({
           <p>
             <span className="font-semibold">Model:</span> {round.model_version || 'gpt-4o'}
           </p>
+          {isV2 && (
+            <p>
+              <span className="font-semibold">Schema:</span> V2 (Selective, issue-driven)
+            </p>
+          )}
         </div>
 
         {round.error_message && (
@@ -89,7 +98,11 @@ export default async function RoundPage({
 
       {/* Analysis Output */}
       {round.status === 'done' && round.output_json && (
-        <OutputDisplay output={round.output_json} roundId={roundId} />
+        isV2 ? (
+          <OutputDisplayV2 output={round.output_json as DealOutputV2} roundId={roundId} />
+        ) : (
+          <OutputDisplay output={round.output_json as DealOutput} roundId={roundId} />
+        )
       )}
 
       {/* Extracted Text (if saved) */}
