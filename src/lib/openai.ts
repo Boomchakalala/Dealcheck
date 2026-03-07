@@ -222,19 +222,11 @@ Return valid JSON only. Match this structure exactly:
     "nice_to_have": ["Could we... / Would you consider... bullets, 0-3 items if justified"]
   },
   "email_drafts": {
-    "neutral": {
-      "subject": "Re: [Vendor] Quote Review",
-      "body": "Full polite email with:\\n- 1 short warm opening acknowledging quote\\n- Bullet asks (max 4), phrased as requests not demands\\n- Request for updated quote in writing\\n- Deadline [DATE]\\n- Optional fallback call line"
-    },
-    "firm": {
-      "subject": "Re: [Vendor] Quote - Follow-up",
-      "body": "Firmer but still polite version if they dodge or push for call"
-    },
-    "final_push": {
-      "subject": "Re: [Vendor] Quote - Final Review",
-      "body": "Urgent but respectful final push with close line"
-    }
+    "neutral": {"subject": "...", "body": "..."},
+    "firm": {"subject": "...", "body": "..."},
+    "final_push": {"subject": "...", "body": "..."}
   },
+  "NOTE_EMAILS": "Generate 3 email variations following the rules below",
   "assumptions": ["max 3 bullets of missing info you assumed — be concise"],
   "disclaimer": "This analysis is not legal advice. You are responsible for verifying all information and consulting appropriate professionals. No proprietary benchmark data was used."
 }
