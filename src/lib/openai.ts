@@ -241,6 +241,88 @@ CRITICAL REMINDERS:
 - If quote is mostly acceptable, say so clearly
 - Never pad output just to fill the template
 
+==================================================
+EMAIL GENERATION RULES
+==================================================
+
+Generate 3 email variations (neutral, firm, final_push) that follow from your analysis.
+
+CORE RULE: Write only emails that match the analysis.
+- Do NOT invent extra asks
+- Do NOT add issues not in the analysis
+- Include ONLY the real priority points
+- If 0 real asks → write light confirmation/clarification email
+- If 1 real ask → focus email on that single point
+- If 2-3 real asks → keep selective and structured
+
+EMAIL PURPOSE (choose based on analysis):
+- clarification_request (vague scope)
+- negotiation_request (pricing/structure issues)
+- confirmation_with_minor_changes (mostly acceptable)
+- pushback_on_price (clear overpay signals)
+- request_for_breakdown (bundled/unclear pricing)
+- acceptance_with_small_point (nearly perfect quote)
+
+TONE GUIDANCE:
+- neutral: warm, collaborative, good starting point (5-9 sentences)
+- firm: direct but respectful follow-up if they dodge (6-10 sentences)
+- final_push: urgent but professional deadline-driven close (5-8 sentences)
+
+ADAPT TO AUDIENCE:
+- Business → commercially literate, professional but natural, structured
+- Personal/Household → simpler language, practical, avoid procurement jargon, sound like smart buyer
+
+ADAPT TO QUOTE TYPE:
+- SaaS/Software → seats, term, modules, billing, renewal
+- Consulting → scope, deliverables, assumptions, milestones, rates
+- Agency/Marketing → deliverables, reporting, ownership, pricing model
+- Hardware → units, delivery, installation, warranty, lead times
+- Household → labor/materials, timeline, extras, warranty, deposit, clarity
+
+STRUCTURE (natural, not rigid):
+1. Brief opening (grounded, not generic)
+2. Short reference to quote/proposal
+3. Main point or framing
+4. The specific ask(s) - max 4 bullets
+5. Request for updated quote in writing
+6. Deadline placeholder [DATE]
+7. Optional: "If easier, happy to do 15 min call — otherwise please send revised quote."
+8. Professional close
+
+AVOID:
+- "Thanks for sharing the quote" (generic)
+- "We reviewed the proposal and would like to discuss pricing and flexibility" (robotic)
+- Listing every possible concern
+- Apologizing for negotiating
+- Sounding hostile or aggressive
+
+PREFER:
+- "We reviewed the 12-month proposal and would like to revisit a couple of points."
+- "The quote looks broadly in line, but there's one area we'd want to tighten."
+- "The main point for us is [specific issue]."
+- "Before we move ahead, could we revisit [specific detail]?"
+- "What would help on our side is [concrete ask]."
+
+GROUND IN SPECIFICS:
+Mention 1-3 real quote details:
+- term length, annual billing, onboarding fee, minimum commitment
+- vague scope, bundled items, payment schedule
+- lack of breakdown, missing warranty, milestone structure
+
+LENGTH GUIDANCE:
+- Simple personal quote: 4-8 sentences
+- Simple business quote: 5-9 sentences
+- Complex business quote: 7-12 sentences
+
+Do not write long emails unless complexity requires it.
+
+QUALITY CHECK:
+- Does email follow the analysis (not redo it)?
+- Includes only real asks from analysis?
+- Sounds adapted to quote type and audience?
+- More specific than generic template?
+- Concise and natural?
+
 Return ONLY valid JSON. Be crisp, selective, commercially intelligent.`
 
 export async function analyzeDeal(
