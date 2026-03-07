@@ -787,3 +787,126 @@ Return ONLY JSON with this structure:
     throw new Error('Email regeneration failed. Please try again.')
   }
 }
+
+// V2 Email Generation - On-demand with user controls
+export async function generateEmailV2(
+  analysisOutput: DealOutputV2,
+  emailControls: {
+    tone_preference: 'soft' | 'balanced' | 'firm'
+    supplier_relationship: 'new' | 'existing' | 'renewal' | 'unknown'
+    email_goal: 'clarify' | 'negotiate' | 'revise' | 'accept'
+    user_notes?: string
+  }
+): Promise<{ subject: string; body: string }> {
+  const { tone_preference, supplier_relationship, email_goal, user_notes } = emailControls
+
+  const prompt = `You are DealCheck's V2 email generation engine. Write a single supplier-facing email based on the analysis and user preferences.
+
+ANALYSIS CONTEXT:
+Supplier: ${analysisOutput.commercial_facts.supplier}
+Total Value: ${analysisOutput.commercial_facts.total_value} ${analysisOutput.commercial_facts.currency}
+Term: ${analysisOutput.commercial_facts.term_length}
+Audience: ${analysisOutput.deal_snapshot.audience}
+Quote Type: ${analysisOutput.deal_snapshot.quote_type}
+
+Dominant Issue:
+${analysisOutput.dominant_issue.title}
+${analysisOutput.dominant_issue.explanation}
+
+Priority Points (${analysisOutput.priority_points.length}):
+${analysisOutput.priority_points.map(p => `- ${p.title}: ${p.recommended_direction}`).join('\n') || 'None'}
+
+Recommended Posture: ${analysisOutput.recommended_strategy.posture}
+Strategy Summary: ${analysisOutput.recommended_strategy.summary}
+
+USER PREFERENCES:
+Tone: ${tone_preference}
+Relationship: ${supplier_relationship}
+Goal: ${email_goal}
+${user_notes ? `User Notes: ${user_notes}` : ''}
+
+EMAIL GENERATION RULES:
+
+CORE RULE: Write email that matches the analysis.
+- Include ONLY the dominant issue and priority points
+- Do NOT invent extra asks
+- Adapt tone to user preference
+
+TONE ADAPTATION:
+- soft: Warm, collaborative, cautious language. "Would you be open to...", "We'd appreciate..."
+- balanced: Professional, direct but respectful. "Could we...", "Would it be possible to..."
+- firm: Assertive, businesslike. "We need to...", "Before we proceed, we require..."
+
+RELATIONSHIP ADAPTATION:
+- new: More formal, build rapport, explain reasoning
+- existing: Friendly but professional, reference history
+- renewal: Balance appreciation with needs, reference current relationship
+- unknown: Neutral professional tone
+
+GOAL ADAPTATION:
+- clarify: Focus on questions and information needs
+- negotiate: Lead with asks, explain why they matter
+- revise: Request specific changes to quote
+- accept: Confirm with any minor conditions
+
+AUDIENCE ADAPTATION:
+- business: Professional, commercially literate, structured
+- personal: Simpler language, practical, friendly, avoid jargon
+
+QUOTE TYPE ADAPTATION:
+- saas_software: seats, modules, billing, renewal terms
+- consulting_services: scope, deliverables, assumptions, rates
+- home_improvement: labor/materials, timeline, warranty, deposit
+- etc: Adapt to context
+
+STRUCTURE:
+1. Opening (adapt to relationship)
+2. Reference to quote/proposal
+3. Main point or framing
+4. Specific ask(s) - 1-4 bullets based on priority points
+5. Request for response/updated quote
+6. Deadline [DATE]
+7. Optional: call offer if appropriate
+8. Professional close
+
+LENGTH:
+- Simple quotes: 5-8 sentences
+- Complex quotes: 7-12 sentences
+- Adapt to number of priority points
+
+GROUND IN SPECIFICS:
+Mention real details from commercial_facts and priority_points.
+
+Return ONLY JSON:
+{
+  "subject": "Clear, specific subject line",
+  "body": "Email body text"
+}`
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini', // Use mini for cost efficiency
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails. Adapt to user preferences. Be concise and specific. Return only valid JSON.'
+        },
+        { role: 'user', content: prompt },
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.7,
+      max_tokens: 1500,
+    })
+
+    const content = completion.choices[0]?.message?.content
+    if (!content) {
+      throw new Error('No response from OpenAI')
+    }
+
+    const parsed = JSON.parse(content)
+    return { subject: parsed.subject, body: parsed.body }
+  } catch (error) {
+    console.error('V2 email generation error:', error)
+    throw new Error('Email generation failed. Please try again.')
+  }
+}
