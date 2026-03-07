@@ -4,12 +4,14 @@ import Link from 'next/link'
 import { Card } from './ui/card'
 import { Badge } from './ui/badge'
 import { ChevronRight, AlertTriangle } from 'lucide-react'
+import type { DealOutput, DealOutputV2 } from '@/types'
 
 type RoundData = {
   id: string
-  output_json: any
+  output_json: DealOutput | DealOutputV2
   round_number: number
   status: string
+  schema_version?: 'v1' | 'v2'
 }
 
 interface DealCardProps {
@@ -29,13 +31,25 @@ function getConclusion(deal: DealCardProps['deal']): string | null {
   if (!deal.rounds || deal.rounds.length === 0) return null
   const sorted = [...deal.rounds].sort((a, b) => b.round_number - a.round_number)
   const latest = sorted[0]
-  return latest?.output_json?.quick_read?.conclusion || null
+
+  if (!latest?.output_json) return null
+
+  const schemaVersion = latest.schema_version || 'v1'
+  if (schemaVersion === 'v2') {
+    return (latest.output_json as DealOutputV2).dominant_issue?.title || null
+  } else {
+    return (latest.output_json as DealOutput).quick_read?.conclusion || null
+  }
 }
 
-function getLatestOutput(deal: DealCardProps['deal']): any | null {
-  if (!deal.rounds || deal.rounds.length === 0) return null
+function getLatestOutput(deal: DealCardProps['deal']): { output: DealOutput | DealOutputV2 | null; version: 'v1' | 'v2' } {
+  if (!deal.rounds || deal.rounds.length === 0) return { output: null, version: 'v1' }
   const sorted = [...deal.rounds].sort((a, b) => b.round_number - a.round_number)
-  return sorted[0]?.output_json || null
+  const latest = sorted[0]
+  return {
+    output: latest?.output_json || null,
+    version: latest?.schema_version || 'v1'
+  }
 }
 
 function getConclusionColor(conclusion: string | null): string {
@@ -52,10 +66,18 @@ function getConclusionColor(conclusion: string | null): string {
 
 export function DealCard({ deal }: DealCardProps) {
   const roundCount = deal.rounds?.length || 0
-  const latestOutput = getLatestOutput(deal)
+  const { output: latestOutput, version } = getLatestOutput(deal)
   const conclusion = getConclusion(deal)
-  const totalCommitment = latestOutput?.snapshot?.total_commitment
-  const redFlagCount = latestOutput?.red_flags?.length || 0
+
+  // Get values based on schema version
+  const isV2 = version === 'v2'
+  const totalCommitment = isV2
+    ? `${(latestOutput as DealOutputV2)?.commercial_facts?.total_value} ${(latestOutput as DealOutputV2)?.commercial_facts?.currency}`
+    : (latestOutput as DealOutput)?.snapshot?.total_commitment
+
+  const flagCount = isV2
+    ? (latestOutput as DealOutputV2)?.priority_points?.length || 0
+    : (latestOutput as DealOutput)?.red_flags?.length || 0
 
   const formattedDate = new Date(deal.updated_at).toLocaleDateString('en-US', {
     month: 'short',
@@ -73,6 +95,11 @@ export function DealCard({ deal }: DealCardProps) {
               <Badge variant={deal.deal_type === 'New' ? 'default' : 'secondary'}>
                 {deal.deal_type}
               </Badge>
+              {isV2 && (
+                <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                  V2
+                </Badge>
+              )}
             </div>
 
             {deal.vendor && (
@@ -83,10 +110,10 @@ export function DealCard({ deal }: DealCardProps) {
               {totalCommitment && (
                 <span className="text-sm font-semibold text-slate-900">{totalCommitment}</span>
               )}
-              {redFlagCount > 0 && (
-                <span className="inline-flex items-center gap-1 text-sm text-red-600 font-medium">
+              {flagCount > 0 && (
+                <span className="inline-flex items-center gap-1 text-sm text-amber-600 font-medium">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  {redFlagCount} red flag{redFlagCount !== 1 ? 's' : ''}
+                  {flagCount} {isV2 ? 'priority' : 'red flag'}{flagCount !== 1 ? (isV2 ? ' points' : 's') : ''}
                 </span>
               )}
             </div>
