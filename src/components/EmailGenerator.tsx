@@ -33,7 +33,7 @@ export function EmailGenerator({ roundId, defaultControls }: EmailGeneratorProps
     setError(null)
 
     try {
-      const response = await fetch(`/api/deal/${roundId}/generate-email`, {
+      const response = await fetch(`/api/round/${roundId}/generate-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
