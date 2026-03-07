@@ -78,6 +78,93 @@ export const AddRoundSchema = z.object({
   saveExtractedText: z.boolean().default(false),
 })
 
+// V2 Schema - Selective, issue-driven analysis
+export const PriorityPointSchema = z.object({
+  title: z.string(),
+  why_it_matters: z.string(),
+  recommended_direction: z.string(),
+})
+
+export const EmailControlsSchema = z.object({
+  tone_preference: z.enum(['soft', 'balanced', 'firm']),
+  supplier_relationship: z.enum(['new', 'existing', 'renewal', 'unknown']),
+  email_goal: z.enum(['clarify', 'negotiate', 'revise', 'accept']),
+  user_notes: z.string().optional().default(''),
+})
+
+export const DealOutputSchemaV2 = z.object({
+  schema_version: z.literal('v2'),
+  deal_snapshot: z.object({
+    audience: z.enum(['business', 'personal']),
+    quote_type: z.enum([
+      'saas_software',
+      'consulting_services',
+      'home_improvement',
+      'marketing_agency',
+      'hardware_equipment',
+      'managed_services',
+      'professional_services',
+      'household_services',
+      'construction',
+      'maintenance',
+      'other',
+    ]),
+    deal_type: z.enum(['new_purchase', 'renewal', 'expansion', 'trial_conversion', 'unknown']),
+    pricing_model: z.enum([
+      'fixed_fee',
+      'per_seat',
+      'usage_based',
+      'tiered',
+      'hybrid',
+      'quote_based',
+      'hourly',
+      'milestone',
+      'unclear',
+    ]),
+    leverage_level: z.enum(['high', 'medium', 'low', 'unclear']),
+    main_negotiation_angle: z.enum([
+      'price',
+      'flexibility',
+      'scope_clarity',
+      'payment_terms',
+      'commitment_length',
+      'renewal_terms',
+      'bundling',
+      'none',
+    ]),
+    overall_assessment: z.string(),
+  }),
+  commercial_facts: z.object({
+    supplier: z.string(),
+    total_value: z.string(),
+    currency: z.string(),
+    term_length: z.string(),
+    billing_structure: z.string(),
+    key_elements: z.array(z.string()),
+    unclear_or_missing: z.array(z.string()),
+  }),
+  dominant_issue: z.object({
+    title: z.string(),
+    explanation: z.string(),
+  }),
+  priority_points: z.array(PriorityPointSchema).max(3),
+  low_priority_or_acceptable: z.array(z.string()),
+  recommended_strategy: z.object({
+    posture: z.enum([
+      'no_push_needed',
+      'soft_clarification',
+      'collaborative_optimization',
+      'standard_negotiation',
+      'firm_pushback',
+      'structural_rethink',
+    ]),
+    summary: z.string(),
+    success_looks_like: z.string(),
+  }),
+  email_controls: EmailControlsSchema,
+})
+
 export type DealOutputType = z.infer<typeof DealOutputSchema>
+export type DealOutputTypeV2 = z.infer<typeof DealOutputSchemaV2>
 export type CreateDealInput = z.infer<typeof CreateDealSchema>
 export type AddRoundInput = z.infer<typeof AddRoundSchema>

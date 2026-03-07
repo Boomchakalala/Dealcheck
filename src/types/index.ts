@@ -108,7 +108,7 @@ export type Database = {
   }
 }
 
-// Deal output structure
+// Deal output structure (V1)
 export type RedFlag = {
   type: 'Commercial' | 'Legal' | 'Operational' | 'Security'
   issue: string
@@ -159,6 +159,88 @@ export type DealOutput = {
   }
   assumptions: string[]
   disclaimer: string
+}
+
+// V2 Schema Types
+export type PriorityPoint = {
+  title: string
+  why_it_matters: string
+  recommended_direction: string
+}
+
+export type EmailControls = {
+  tone_preference: 'soft' | 'balanced' | 'firm'
+  supplier_relationship: 'new' | 'existing' | 'renewal' | 'unknown'
+  email_goal: 'clarify' | 'negotiate' | 'revise' | 'accept'
+  user_notes?: string
+}
+
+export type DealOutputV2 = {
+  schema_version: 'v2'
+  deal_snapshot: {
+    audience: 'business' | 'personal'
+    quote_type:
+      | 'saas_software'
+      | 'consulting_services'
+      | 'home_improvement'
+      | 'marketing_agency'
+      | 'hardware_equipment'
+      | 'managed_services'
+      | 'professional_services'
+      | 'household_services'
+      | 'construction'
+      | 'maintenance'
+      | 'other'
+    deal_type: 'new_purchase' | 'renewal' | 'expansion' | 'trial_conversion' | 'unknown'
+    pricing_model:
+      | 'fixed_fee'
+      | 'per_seat'
+      | 'usage_based'
+      | 'tiered'
+      | 'hybrid'
+      | 'quote_based'
+      | 'hourly'
+      | 'milestone'
+      | 'unclear'
+    leverage_level: 'high' | 'medium' | 'low' | 'unclear'
+    main_negotiation_angle:
+      | 'price'
+      | 'flexibility'
+      | 'scope_clarity'
+      | 'payment_terms'
+      | 'commitment_length'
+      | 'renewal_terms'
+      | 'bundling'
+      | 'none'
+    overall_assessment: string
+  }
+  commercial_facts: {
+    supplier: string
+    total_value: string
+    currency: string
+    term_length: string
+    billing_structure: string
+    key_elements: string[]
+    unclear_or_missing: string[]
+  }
+  dominant_issue: {
+    title: string
+    explanation: string
+  }
+  priority_points: PriorityPoint[]
+  low_priority_or_acceptable: string[]
+  recommended_strategy: {
+    posture:
+      | 'no_push_needed'
+      | 'soft_clarification'
+      | 'collaborative_optimization'
+      | 'standard_negotiation'
+      | 'firm_pushback'
+      | 'structural_rethink'
+    summary: string
+    success_looks_like: string
+  }
+  email_controls: EmailControls
 }
 
 // UI types
