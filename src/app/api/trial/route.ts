@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { analyzeDealV2 } from '@/lib/openai'
+import { extractAndNormalize } from '@/lib/extract-normalize'
 import { DealOutputSchemaV2 } from '@/lib/schemas'
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 import { headers } from 'next/headers'
@@ -31,13 +32,18 @@ export async function POST(request: Request) {
       )
     }
 
-    // Analyze the deal with AI V2 (no storage, no user)
+    // STEP 1: Extract & normalize
+    const extracted = await extractAndNormalize(extractedText)
+
+    // STEP 2: Analyze with V2 (uses structured extraction)
     const output = await analyzeDealV2(
-      extractedText,
+      extracted,
       dealType || 'New',
-      goal,
-      notes,
-      previousOutput // Pass previous round output for context
+      {
+        goal,
+        notes,
+        previousAnalysis: previousOutput, // Pass previous round output for context
+      }
     )
 
     // Validate output
@@ -46,6 +52,10 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       output: validated,
+      extraction: {
+        confidence: extracted.confidence,
+        unclear_fields: extracted.unclear_fields,
+      },
       message: 'Sign up to save your analysis and track negotiation rounds!'
     })
   } catch (error) {
