@@ -69,6 +69,7 @@ export type Database = {
           created_at: string
           note: string | null
           extracted_text: string | null
+          extracted_data: any | null
           output_json: DealOutput | DealOutputV2
           output_markdown: string | null
           status: 'done' | 'error'
@@ -84,6 +85,7 @@ export type Database = {
           created_at?: string
           note?: string | null
           extracted_text?: string | null
+          extracted_data?: any | null
           output_json: DealOutput | DealOutputV2
           output_markdown?: string | null
           status?: 'done' | 'error'
@@ -99,6 +101,7 @@ export type Database = {
           created_at?: string
           note?: string | null
           extracted_text?: string | null
+          extracted_data?: any | null
           output_json?: DealOutput | DealOutputV2
           output_markdown?: string | null
           status?: 'done' | 'error'
