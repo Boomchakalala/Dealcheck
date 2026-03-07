@@ -1,6 +1,7 @@
 import OpenAI from 'openai'
 import { DealOutputSchema, DealOutputSchemaV2, type DealOutputType, type DealOutputTypeV2 } from './schemas'
 import type { DealOutput, DealOutputV2 } from '@/types'
+import type { ExtractedQuote } from './extract-normalize'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -497,55 +498,57 @@ export async function analyzeDeal(
   }
 }
 
-// V2 Analysis Function
+// V2 Analysis Function - Now uses extracted data
 export async function analyzeDealV2(
-  extractedText: string,
+  extracted: ExtractedQuote,
   dealType: 'New' | 'Renewal',
-  goal?: string,
-  notes?: string,
-  previousRoundOutput?: DealOutputV2,
-  imageData?: { base64: string; mimeType: string }
+  userContext?: {
+    goal?: string
+    notes?: string
+    previousAnalysis?: DealOutputV2
+  }
 ): Promise<DealOutputTypeV2> {
+
+  // Build context from extracted structured data (not raw text)
   const contextParts = [
     `Deal Type: ${dealType}`,
-    goal && `User Goal: ${goal}`,
-    notes && `User Notes: ${notes}`,
-    previousRoundOutput && `Previous Round Context: ${JSON.stringify(previousRoundOutput, null, 2)}`,
+    extracted.supplier && `Supplier: ${extracted.supplier}`,
+    extracted.total_value && `Total Value: ${extracted.total_value}`,
+    extracted.currency && `Currency: ${extracted.currency}`,
+    extracted.term_length && `Term: ${extracted.term_length}`,
+    extracted.billing_structure && `Billing: ${extracted.billing_structure}`,
+    extracted.unclear_fields.length > 0 && `Unclear Fields: ${extracted.unclear_fields.join(', ')}`,
+    extracted.confidence && `Extraction Confidence: ${extracted.confidence}`,
+    extracted.extraction_notes && `Notes: ${extracted.extraction_notes}`,
+    userContext?.goal && `User Goal: ${userContext.goal}`,
+    userContext?.notes && `User Notes: ${userContext.notes}`,
+    userContext?.previousAnalysis && `Previous Round: ${JSON.stringify(userContext.previousAnalysis.dominant_issue, null, 2)}`,
   ].filter(Boolean)
 
-  const userPrompt = imageData
-    ? contextParts.join('\n\n') + '\n\nPlease analyze the quote/contract shown in the image.'
-    : contextParts.join('\n\n') + `\n\nSupplier Document/Quote:\n${extractedText}`
+  const userPrompt = contextParts.join('\n\n') +
+    `\n\nExtracted Commercial Facts:\n${JSON.stringify({
+      supplier: extracted.supplier,
+      total_value: extracted.total_value,
+      currency: extracted.currency,
+      term_length: extracted.term_length,
+      billing_structure: extracted.billing_structure,
+      key_elements: extracted.key_elements,
+      unclear_fields: extracted.unclear_fields,
+      confidence: extracted.confidence,
+    }, null, 2)}`
 
   try {
     const messages: any[] = [
       { role: 'system', content: SYSTEM_PROMPT_V2 },
+      { role: 'user', content: userPrompt },
     ]
-
-    // If we have image data, use vision API
-    if (imageData) {
-      messages.push({
-        role: 'user',
-        content: [
-          { type: 'text', text: userPrompt },
-          {
-            type: 'image_url',
-            image_url: {
-              url: `data:${imageData.mimeType};base64,${imageData.base64}`,
-            },
-          },
-        ],
-      })
-    } else {
-      messages.push({ role: 'user', content: userPrompt })
-    }
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages,
       response_format: { type: 'json_object' },
       temperature: 0.7,
-      max_tokens: 3500,
+      max_tokens: 2000, // Reduced from 3500 (extraction is separate now)
     })
 
     const content = completion.choices[0]?.message?.content
