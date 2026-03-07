@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { CreateDealSchema } from '@/lib/schemas'
-import { analyzeDeal } from '@/lib/openai'
+import { analyzeDealV2 } from '@/lib/openai'
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
-import { renderMarkdown } from '@/lib/render-markdown'
 
 const FREE_ANALYSIS_LIMIT = 2
 
@@ -51,8 +50,8 @@ export async function POST(request: Request) {
     const body = await request.json()
     const validated = CreateDealSchema.parse(body)
 
-    // Analyze the deal with AI (with optional vision support)
-    const output = await analyzeDeal(
+    // Analyze the deal with AI V2 (with optional vision support)
+    const output = await analyzeDealV2(
       validated.extractedText || '',
       validated.dealType,
       validated.goal || undefined,
@@ -61,8 +60,8 @@ export async function POST(request: Request) {
       validated.imageData
     )
 
-    // Auto-detect vendor from output if not provided
-    const vendor = validated.vendor || output.vendor
+    // Auto-detect vendor from output
+    const vendor = validated.vendor || output.commercial_facts.supplier
 
     // Create deal
     const { data: deal, error: dealError } = await supabase
@@ -70,7 +69,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         vendor,
-        title: output.title,
+        title: `${vendor} - ${validated.dealType} - ${new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`,
         deal_type: validated.dealType,
         goal: validated.goal,
       })
@@ -81,7 +80,7 @@ export async function POST(request: Request) {
       throw new Error('Failed to create deal')
     }
 
-    // Create Round 1
+    // Create Round 1 with V2 schema
     const { data: round, error: roundError } = await supabase
       .from('rounds')
       .insert({
@@ -91,9 +90,10 @@ export async function POST(request: Request) {
         note: validated.notes,
         extracted_text: validated.saveExtractedText ? validated.extractedText : null,
         output_json: output,
-        output_markdown: renderMarkdown(output),
+        output_markdown: null, // V2 doesn't generate markdown
         status: 'done',
         model_version: 'gpt-4o',
+        schema_version: 'v2',
       })
       .select()
       .single()

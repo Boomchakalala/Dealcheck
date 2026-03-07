@@ -31,13 +31,20 @@ export async function POST(request: Request) {
     // Check if round exists and belongs to user
     const { data: round, error: roundError } = await supabase
       .from('rounds')
-      .select('email_regeneration_count')
+      .select('email_regeneration_count, schema_version')
       .eq('id', roundId)
       .eq('user_id', user.id)
       .single()
 
     if (roundError || !round) {
       return NextResponse.json({ error: 'Round not found' }, { status: 404 })
+    }
+
+    // V2 rounds use on-demand email generation
+    if (round.schema_version === 'v2') {
+      return NextResponse.json({
+        error: 'Email regeneration is not available for V2 analysis. Use the on-demand email generator instead.'
+      }, { status: 400 })
     }
 
     // Check regeneration limit
