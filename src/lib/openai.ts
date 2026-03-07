@@ -396,21 +396,75 @@ export async function regenerateEmailDrafts(
   extractedText: string,
   currentOutput: DealOutput
 ): Promise<DealOutputType['email_drafts']> {
-  const prompt = `Based on this deal overview and the original quote, generate 3 email draft variations (neutral, firm, final_push).
+  const prompt = `You are DealCheck's email generation engine. Write 3 supplier-facing email variations based on the completed analysis below.
 
-All emails must be polite and collaborative. Use "Could we...", "Would it be possible to..." style language. Never demand -- always ask.
+CORE RULE: Write only emails that match the analysis.
+- Do NOT invent extra asks
+- Do NOT add issues not in the analysis
+- Include ONLY the real priority points from the analysis
+- If analysis shows minimal concerns → write light confirmation/clarification emails
+- If analysis shows 1 key ask → focus emails on that single point
+- If analysis shows 2-3 asks → keep selective and structured
 
-Deal Snapshot:
-${JSON.stringify(currentOutput.snapshot, null, 2)}
+ANALYSIS CONTEXT:
+Vendor: ${currentOutput.vendor || currentOutput.snapshot.vendor_product}
+Total Commitment: ${currentOutput.snapshot.total_commitment}
+Term: ${currentOutput.snapshot.term}
+Verdict Type: ${currentOutput.verdict_type}
+Verdict: ${currentOutput.verdict}
 
 Must-Have Asks:
-${currentOutput.what_to_ask_for.must_have.join('\n')}
+${currentOutput.what_to_ask_for?.must_have?.join('\n') || 'None'}
 
 Nice-to-Have Asks:
-${currentOutput.what_to_ask_for.nice_to_have.join('\n')}
+${currentOutput.what_to_ask_for?.nice_to_have?.join('\n') || 'None'}
 
-Original Quote:
-${extractedText}
+Red Flags:
+${currentOutput.red_flags?.map(f => `- ${f.issue}`).join('\n') || 'None'}
+
+Leverage:
+${currentOutput.negotiation_plan.leverage_you_have.join('\n')}
+
+Conclusion: ${currentOutput.quick_read.conclusion}
+
+EMAIL GENERATION RULES:
+
+TONE GUIDANCE:
+- neutral: warm, collaborative starting point (5-9 sentences)
+- firm: direct but respectful follow-up if they dodge (6-10 sentences)
+- final_push: urgent but professional deadline close (5-8 sentences)
+
+STRUCTURE (natural, not rigid):
+1. Brief opening (grounded, not "Thanks for sharing")
+2. Short reference to quote
+3. Main point or framing
+4. Specific ask(s) - max 4 bullets if needed
+5. Request for updated quote in writing
+6. Deadline [DATE]
+7. Optional: "If easier, happy to do 15 min call — otherwise please send revised quote."
+8. Professional close
+
+ADAPT TO VERDICT TYPE:
+- competitive → light email, maybe 1-2 minor points to tighten
+- negotiate → standard negotiation with clear asks
+- overpay_risk → more assertive, lead with structural issues
+
+GROUND IN SPECIFICS:
+Mention 1-3 real quote details from the snapshot:
+- term, billing, fees, commitments, unclear scope, bundling, payment terms
+
+AVOID:
+- Generic templates
+- Listing every concern
+- Apologizing for negotiating
+- Sounding aggressive
+
+PREFER:
+- "We reviewed the [term] proposal and would like to revisit [specific issue]."
+- "The quote looks solid overall, but could we tighten [specific point]?"
+- "Before moving forward, the main area we'd like to address is [specific]."
+
+LENGTH: Keep concise. Simple quotes: 4-8 sentences. Complex: 7-12 sentences max.
 
 Return ONLY JSON with this structure:
 {
@@ -425,7 +479,10 @@ Return ONLY JSON with this structure:
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
-        { role: 'system', content: 'You are a procurement email writer. All emails should be polite and collaborative -- frame requests as asks, not demands. Return only valid JSON.' },
+        {
+          role: 'system',
+          content: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails that match the provided analysis. Be concise and specific. Return only valid JSON.'
+        },
         { role: 'user', content: prompt },
       ],
       response_format: { type: 'json_object' },
