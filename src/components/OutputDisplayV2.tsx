@@ -252,9 +252,19 @@ export function OutputDisplayV2({ output, roundId }: OutputDisplayV2Props) {
           <div className="flex items-start gap-3">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-emerald-900 mb-1">No Major Concerns</p>
+              <p className="text-sm font-semibold text-emerald-900 mb-1">
+                {output.recommended_strategy.posture === 'no_push_needed'
+                  ? 'Quote is broadly acceptable'
+                  : output.recommended_strategy.posture === 'soft_clarification'
+                  ? 'Focus on clarification first'
+                  : 'Main concern is outlined above'}
+              </p>
               <p className="text-sm text-emerald-800">
-                Beyond the dominant issue, there are no additional priority points requiring negotiation.
+                {output.recommended_strategy.posture === 'no_push_needed'
+                  ? 'No additional negotiation points needed beyond minor clarifications.'
+                  : output.recommended_strategy.posture === 'soft_clarification'
+                  ? 'Get clarity on the dominant issue before negotiating other terms.'
+                  : 'The dominant issue is the main commercial concern. Additional asks aren\'t warranted here.'}
               </p>
             </div>
           </div>
