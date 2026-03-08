@@ -360,7 +360,7 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
             Showing <span className="font-bold">{selectedCategory}</span> deals
           </span>
           <button
-            onClick={() => setSelectedCategory('all')}
+            onClick={() => handleCategoryChange('all')}
             className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
           >
             Clear filter
