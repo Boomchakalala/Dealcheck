@@ -21,6 +21,22 @@ interface DealHeaderClientProps {
   whatChanged?: string[] | null
 }
 
+// Helper to detect currency from total commitment
+function detectCurrency(str?: string): string {
+  if (!str) return '$'
+  if (str.includes('€') || str.toUpperCase().includes('EUR')) return '€'
+  if (str.includes('£') || str.toUpperCase().includes('GBP')) return '£'
+  if (str.includes('C$') || str.toUpperCase().includes('CAD')) return 'C$'
+  if (str.includes('A$') || str.toUpperCase().includes('AUD')) return 'A$'
+  return '$'
+}
+
+// Format savings with proper currency
+function formatSavings(amount: number, currency: string): string {
+  const rounded = Math.round(amount)
+  return `${currency}${rounded.toLocaleString('en-US')}`
+}
+
 export function DealHeaderClient({
   dealId,
   dealStatus,
@@ -38,6 +54,7 @@ export function DealHeaderClient({
 
   const isClosed = dealStatus.startsWith('closed_')
   const outcome = isClosed ? dealStatus.replace('closed_', '') : null
+  const currency = detectCurrency(currentTotal)
 
   const handleReopen = async () => {
     setReopening(true)
@@ -68,7 +85,7 @@ export function DealHeaderClient({
   }
 
   return (
-    <>
+    <div className="space-y-4">
       {/* Close Deal Button / Status */}
       <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
         {isClosed ? (
@@ -95,14 +112,14 @@ export function DealHeaderClient({
         )}
       </div>
 
-      {/* Outcome Card */}
-      {isClosed && closeSummary && (
+      {/* Outcome Card - Only show when closed */}
+      {isClosed && (
         <Card className="p-5 bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200">
-          <div className="flex items-start gap-3 mb-3">
+          <div className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
               {getOutcomeIcon()}
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-bold text-slate-900">Outcome</h3>
                 {closedAt && (
@@ -111,25 +128,33 @@ export function DealHeaderClient({
                   </span>
                 )}
               </div>
+
+              {/* Savings Badge */}
               {savingsAmount !== null && savingsAmount !== undefined && savingsAmount > 0 && (
-                <div className="mb-3 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
-                  <p className="text-sm font-semibold text-emerald-900">
-                    Saved: ${savingsAmount.toFixed(2)} ({savingsPercent?.toFixed(1)}%)
+                <div className="mb-3 px-4 py-2.5 bg-emerald-50 border-2 border-emerald-200 rounded-lg">
+                  <p className="text-sm font-bold text-emerald-900">
+                    Saved: {formatSavings(savingsAmount, currency)} ({savingsPercent?.toFixed(1)}%)
                   </p>
                 </div>
               )}
+
+              {/* What Changed Chips */}
               {whatChanged && whatChanged.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {whatChanged.map((item: string) => (
-                    <span key={item} className="px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-md">
+                    <span key={item} className="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-700 rounded-md border border-emerald-200">
                       {item}
                     </span>
                   ))}
                 </div>
               )}
-              <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
-                {closeSummary}
-              </div>
+
+              {/* AI Summary */}
+              {closeSummary && (
+                <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
+                  {closeSummary}
+                </div>
+              )}
             </div>
           </div>
         </Card>
@@ -148,6 +173,6 @@ export function DealHeaderClient({
           }}
         />
       )}
-    </>
+    </div>
   )
 }
