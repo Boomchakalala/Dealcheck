@@ -388,14 +388,45 @@ Sharp, direct, commercially aware:
 OUTPUT SCHEMA:
 {
   "schema_version": "v2",
+
+  "quote_snapshot": {
+    "vendor_product": "Vendor / Product name",
+    "term": "contract duration",
+    "total_commitment": "total $ commitment",
+    "billing_payment": "how billing works",
+    "pricing_model": "pricing structure description"
+  },
+
+  "quick_read": {
+    "whats_solid": ["2-3 bullets of genuinely good things (be selective)"],
+    "whats_concerning": ["2-3 bullets of real concerns (not padding)"],
+    "conclusion": "One sharp sentence on what to do"
+  },
+
+  "red_flags": [
+    {
+      "type": "Commercial|Legal|Operational|Security",
+      "issue": "Specific commercial problem",
+      "why_it_matters": "How this costs money/risk/leverage",
+      "what_to_ask_for": "Could we... / Would you consider... [specific ask]",
+      "if_they_push_back": "Fallback position"
+    }
+  ],
+  "NOTE_RED_FLAGS": "0-3 items only. Focus on $ impact, not admin stuff",
+
+  "what_to_ask_for": {
+    "must_have": ["Could we... bullets - 1-4 items, ALWAYS include price/savings angle"],
+    "nice_to_have": ["Could we... bullets - 0-3 items if justified"]
+  },
+
   "deal_snapshot": {
     "audience": "business|personal",
-    "quote_type": "saas_software|consulting_services|home_improvement|marketing_agency|hardware_equipment|managed_services|professional_services|household_services|construction|maintenance|other",
+    "quote_type": "saas_software|consulting_services|etc",
     "deal_type": "new_purchase|renewal|expansion|trial_conversion|unknown",
-    "pricing_model": "fixed_fee|per_seat|usage_based|tiered|hybrid|quote_based|hourly|milestone|unclear",
+    "pricing_model": "fixed_fee|per_seat|usage_based|etc",
     "leverage_level": "high|medium|low|unclear",
-    "main_negotiation_angle": "price|flexibility|scope_clarity|payment_terms|commitment_length|renewal_terms|bundling|none",
-    "overall_assessment": "One sharp sentence on commercial position"
+    "main_negotiation_angle": "price|flexibility|scope_clarity|payment_terms|etc",
+    "overall_assessment": "One sharp commercial sentence"
   },
   "commercial_facts": {
     "supplier": "from extraction",
@@ -404,24 +435,24 @@ OUTPUT SCHEMA:
     "term_length": "from extraction",
     "billing_structure": "from extraction",
     "key_elements": ["from extraction"],
-    "unclear_or_missing": ["ONLY if commercially important - skip admin stuff"]
+    "unclear_or_missing": ["ONLY if commercially important"]
   },
   "dominant_issue": {
     "title": "Clear commercial problem",
-    "explanation": "2-3 sentences on WHY this costs them money/risk"
+    "explanation": "2-3 sentences on WHY this costs money/risk"
   },
   "priority_points": [
     {
       "title": "Specific commercial issue",
-      "why_it_matters": "Commercial impact - money/risk/leverage",
-      "recommended_direction": "Specific ask with fallback position"
+      "why_it_matters": "$ impact",
+      "recommended_direction": "Specific ask with fallback"
     }
   ],
-  "low_priority_or_acceptable": ["0-5 items that are fine or low impact"],
+  "low_priority_or_acceptable": ["0-5 items"],
   "recommended_strategy": {
-    "posture": "...",
-    "summary": "2-3 sentences on how to approach negotiation",
-    "success_looks_like": "Concrete outcome (X% savings, better terms, etc)"
+    "posture": "no_push_needed|collaborative_optimization|standard_negotiation|firm_pushback|structural_rethink",
+    "summary": "2-3 sentences on approach",
+    "success_looks_like": "Concrete outcome"
   },
   "email_controls": {
     "tone_preference": "balanced",
@@ -432,11 +463,14 @@ OUTPUT SCHEMA:
 }
 
 CRITICAL RULES:
+- quote_snapshot: Clear summary of what the deal is
+- quick_read: What's good/bad + sharp conclusion
+- red_flags: 0-3 items, focus on $ impact
+- what_to_ask_for: ALWAYS include price/savings in must_have
 - Price analysis comes FIRST if quote includes pricing
 - Focus on commercial leverage, not admin clarity
-- Be specific with numbers when possible ("20% above typical", "save $10K/year")
-- Skip generic legal advice unless it has direct $ impact
-- If quote is vague, focus on "this vagueness will cost you X%" not "please provide more info"
+- Be specific with numbers when possible
+- Skip generic advice unless it has direct $ impact
 
 Return ONLY valid JSON. Be commercially sharp.`
 
