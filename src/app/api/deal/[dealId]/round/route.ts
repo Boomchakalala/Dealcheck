@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { AddRoundSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/openai'
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
+import { checkRateLimit } from '@/lib/rate-limit'
 
-const FREE_ANALYSIS_LIMIT = 2
+const FREE_ANALYSIS_LIMIT = 5
 
 export async function POST(
   request: Request,
@@ -33,18 +33,24 @@ export async function POST(
 
     // Rate limiting (admins bypass)
     if (!profile.is_admin) {
-      const rl = rateLimit(`analysis:${user.id}`, RATE_LIMITS.analysis)
-      if (!rl.allowed) {
+      const isPro = profile.plan === 'pro'
+      const rateLimit = await checkRateLimit(user.id, isPro)
+
+      if (!rateLimit.allowed) {
         return NextResponse.json(
-          { error: 'Too many requests. Please try again later.' },
+          {
+            error: rateLimit.message || 'Rate limit exceeded',
+            remaining: rateLimit.remaining,
+            resetAt: rateLimit.resetAt
+          },
           { status: 429 }
         )
       }
 
-      // Usage limits (admins bypass)
-      if (profile.plan !== 'pro' && profile.usage_count >= FREE_ANALYSIS_LIMIT) {
+      // Free plan limits
+      if (!isPro && profile.usage_count >= FREE_ANALYSIS_LIMIT) {
         return NextResponse.json(
-          { error: `Free plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to continue.` },
+          { error: `Free plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Pro for unlimited analyses.` },
           { status: 403 }
         )
       }
