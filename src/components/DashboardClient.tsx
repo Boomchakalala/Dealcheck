@@ -35,8 +35,18 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
 
   // Update base currency preference
   const updateBaseCurrency = async (newCurrency: Currency) => {
+    const oldCurrency = baseCurrency
     setIsConverting(true)
     setBaseCurrency(newCurrency)
+
+    // Track currency change
+    trackEvent({
+      name: 'currency_changed',
+      properties: {
+        from: oldCurrency,
+        to: newCurrency
+      }
+    })
 
     try {
       await fetch('/api/user/currency', {
@@ -113,6 +123,18 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
       newExpanded.add(mainCategory)
     }
     setExpandedMainCategories(newExpanded)
+  }
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category)
+
+    // Track category filter (only when filtering, not when clearing)
+    if (category !== 'all') {
+      trackEvent({
+        name: 'category_filtered',
+        properties: { category }
+      })
+    }
   }
 
   const filteredDeals = deals.filter(deal => {
@@ -220,7 +242,7 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
             </h2>
             {selectedCategory !== 'all' && (
               <button
-                onClick={() => setSelectedCategory('all')}
+                onClick={() => handleCategoryChange('all')}
                 className="text-sm text-slate-600 hover:text-slate-900 font-medium"
               >
                 Clear filter
