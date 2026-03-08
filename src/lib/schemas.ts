@@ -26,6 +26,7 @@ export const DealOutputSchema = z.object({
     vendor_product: z.string(),
     term: z.string(),
     total_commitment: z.string(),
+    currency: z.enum(['USD', 'EUR', 'GBP', 'CAD', 'AUD']).optional().default('USD'),
     billing_payment: z.string(),
     pricing_model: z.string(),
     deal_type: z.string(),
