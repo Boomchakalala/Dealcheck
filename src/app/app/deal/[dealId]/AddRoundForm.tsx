@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
 import { Loader2, Plus, ChevronDown, ChevronUp, Upload, X } from 'lucide-react'
+import { trackEvent } from '@/lib/analytics'
 
 interface AddRoundFormProps {
   dealId: string
@@ -100,6 +101,16 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
       if (!response.ok) {
         throw new Error(data.error || 'Failed to add round')
       }
+
+      // Track round added
+      trackEvent({
+        name: 'round_added',
+        properties: {
+          roundNumber,
+          hasNote: !!note,
+          hasGoal: false
+        }
+      })
 
       // Redirect to the new round
       router.push(`/app/round/${data.roundId}`)
