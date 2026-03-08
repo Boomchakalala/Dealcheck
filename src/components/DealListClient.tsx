@@ -52,6 +52,27 @@ function getStatusIcon(deal: any) {
   return null
 }
 
+// Helper to detect currency symbol from total commitment string
+function detectCurrency(str?: string): string {
+  if (!str) return '$'
+  if (str.includes('€') || str.toUpperCase().includes('EUR')) return '€'
+  if (str.includes('£') || str.toUpperCase().includes('GBP')) return '£'
+  if (str.includes('C$') || str.toUpperCase().includes('CAD')) return 'C$'
+  if (str.includes('A$') || str.toUpperCase().includes('AUD')) return 'A$'
+  return '$'
+}
+
+// Format savings with correct currency
+function formatSavings(amount: number, currency: string): string {
+  if (amount >= 1000000) {
+    return `${currency}${(amount / 1000000).toFixed(1)}M`
+  }
+  if (amount >= 1000) {
+    return `${currency}${(amount / 1000).toFixed(1)}K`
+  }
+  return `${currency}${amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+}
+
 export function DealListClient({ deals }: DealListClientProps) {
   const router = useRouter()
   const [dealToClose, setDealToClose] = useState<{id: string, total?: string, roundCount: number} | null>(null)
@@ -112,6 +133,7 @@ export function DealListClient({ deals }: DealListClientProps) {
           const category = latestOutput?.category || null
           const isClosed = deal.status?.startsWith('closed_')
           const totalCommitment = latestOutput?.snapshot?.total_commitment
+          const currency = detectCurrency(totalCommitment)
           const conclusion = latestOutput?.quick_read?.conclusion || null
           const redFlagCount = latestOutput?.red_flags?.length || 0
           const roundCount = deal.rounds?.length || 0
