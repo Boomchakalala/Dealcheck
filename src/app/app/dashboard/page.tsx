@@ -302,7 +302,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* All Deals with Category Filtering */}
-      <DashboardClient deals={allDeals} />
+      <DashboardClient deals={allDeals} userId={user.id} baseCurrency={baseCurrency} />
     </div>
   )
 }

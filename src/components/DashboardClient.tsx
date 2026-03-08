@@ -1,11 +1,15 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { DealListClient } from './DealListClient'
-import { Layers, ChevronDown, ChevronRight } from 'lucide-react'
+import { Layers, ChevronDown, ChevronRight, Globe } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { parseMoney, formatCurrency, convertCurrency, SUPPORTED_CURRENCIES, type Currency } from '@/lib/currency'
 
 interface DashboardClientProps {
   deals: any[]
+  userId: string
+  baseCurrency: Currency
 }
 
 interface CategoryData {
