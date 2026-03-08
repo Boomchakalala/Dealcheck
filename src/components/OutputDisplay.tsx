@@ -299,14 +299,14 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         {/* Must-have asks */}
         {output.what_to_ask_for?.must_have?.length > 0 && (
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-sm font-semibold text-slate-700">Must-have asks</h3>
-            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Priority</span>
+          <div className="flex items-center gap-2 mb-3">
+            <h3 className="text-base font-bold text-slate-900">Push for these</h3>
+            <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2.5 py-1 rounded-full border border-blue-200">Must-have</span>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {output.what_to_ask_for.must_have.map((ask, idx) => (
-              <div key={idx} className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                <p className="text-sm text-slate-700">{ask}</p>
+              <div key={idx} className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 shadow-sm">
+                <p className="text-sm text-slate-800 font-semibold leading-relaxed">{ask}</p>
               </div>
             ))}
           </div>
