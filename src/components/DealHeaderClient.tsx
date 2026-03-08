@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card'
 import { CloseDealModal } from '@/components/CloseDealModal'
 import { CheckCircle2, TrendingDown, Minus, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { trackEvent } from '@/lib/analytics'
 
 interface DealHeaderClientProps {
   dealId: string
