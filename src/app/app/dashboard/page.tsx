@@ -47,32 +47,36 @@ export default async function DashboardPage() {
   const baseCurrency = (profile?.base_currency as 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD') || 'USD'
   const FREE_LIMIT = 5
 
+  // Pre-convert all deal amounts to base currency for client component
+  const dealsWithConvertedAmounts = await Promise.all(
+    allDeals.map(async (deal) => {
+      const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
+      const totalStr = latestRound?.output_json?.snapshot?.total_commitment
+      const dealCurrency = latestRound?.output_json?.snapshot?.currency as Currency | undefined
+
+      const convertedAmount = await convertDealAmount(totalStr, dealCurrency, baseCurrency)
+
+      return {
+        ...deal,
+        _convertedAmount: convertedAmount
+      }
+    })
+  )
+
   // Calculate KPIs
-  const totalDeals = allDeals.length
-  const closedDeals = allDeals.filter(d => d.status?.startsWith('closed_'))
+  const totalDeals = dealsWithConvertedAmounts.length
+  const closedDeals = dealsWithConvertedAmounts.filter(d => d.status?.startsWith('closed_'))
   const wonDeals = closedDeals.filter(d => d.status === 'closed_won')
 
-  // Calculate total spend analyzed (all deals) - converted to base currency
-  const totalSpendAnalyzed = await allDeals.reduce(async (sumPromise, deal) => {
-    const sum = await sumPromise
-    const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
-    const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-    const dealCurrency = latestRound?.output_json?.snapshot?.currency as Currency | undefined
+  // Calculate total spend analyzed (all deals) - already converted
+  const totalSpendAnalyzed = dealsWithConvertedAmounts.reduce((sum, deal) => {
+    return sum + (deal._convertedAmount || 0)
+  }, 0)
 
-    const amount = await convertDealAmount(totalStr, dealCurrency, baseCurrency)
-    return sum + amount
-  }, Promise.resolve(0))
-
-  // Calculate total spend closed (only closed deals) - converted to base currency
-  const totalSpendClosed = await closedDeals.reduce(async (sumPromise, deal) => {
-    const sum = await sumPromise
-    const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
-    const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-    const dealCurrency = latestRound?.output_json?.snapshot?.currency as Currency | undefined
-
-    const amount = await convertDealAmount(totalStr, dealCurrency, baseCurrency)
-    return sum + amount
-  }, Promise.resolve(0))
+  // Calculate total spend closed (only closed deals) - already converted
+  const totalSpendClosed = closedDeals.reduce((sum, deal) => {
+    return sum + (deal._convertedAmount || 0)
+  }, 0)
 
   const totalSavings = closedDeals.reduce((sum, d) => sum + (d.savings_amount || 0), 0)
   const savingsPercent = totalSpendClosed > 0 ? (totalSavings / totalSpendClosed) * 100 : 0
@@ -289,7 +293,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* All Deals with Category Filtering */}
-      <DashboardClient deals={allDeals} userId={user.id} baseCurrency={baseCurrency} />
+      <DashboardClient deals={dealsWithConvertedAmounts} userId={user.id} baseCurrency={baseCurrency} />
     </div>
   )
 }
