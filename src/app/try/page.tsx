@@ -133,13 +133,38 @@ This quote expires in 14 days.`
 
   // If we have output, show results
   if (output) {
+    // Calculate metrics for snapshot
+    const totalCommitment = output.snapshot?.total_commitment
+    const redFlagCount = output.red_flags?.length || 0
+    const potentialSavings = output.potential_savings?.reduce((sum, saving) => {
+      const match = saving.annual_impact.match(/\$[\d,]+(?:K|k)?/)
+      if (match) {
+        let amount = match[0].replace(/[$,]/g, '')
+        if (amount.toLowerCase().includes('k')) {
+          amount = parseFloat(amount.replace(/k/i, '')) * 1000
+        } else {
+          amount = parseFloat(amount)
+        }
+        return sum + (isNaN(amount) ? 0 : amount)
+      }
+      return sum
+    }, 0) || 0
+
+    const formatSavings = (amount: number) => {
+      if (amount >= 1000000) {
+        return `$${(amount / 1000000).toFixed(1)}M`
+      }
+      const rounded = Math.round(amount)
+      return `$${rounded.toLocaleString('en-US')}`
+    }
+
     return (
       <div className="min-h-screen bg-white">
         <UnifiedHeader variant="public" />
 
-        <main className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
+        <main className="max-w-5xl mx-auto px-5 sm:px-8 py-12 space-y-6">
           {/* Sign in banner at top */}
-          <div className="mb-6 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-4">
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-bold text-slate-900">Sign in to save this analysis and add negotiation rounds</p>
@@ -155,7 +180,7 @@ This quote expires in 14 days.`
           </div>
 
           {/* Back button */}
-          <div className="mb-6">
+          <div>
             <button
               onClick={() => {
                 setOutput(null)
@@ -167,6 +192,55 @@ This quote expires in 14 days.`
             >
               ← Analyze another quote
             </button>
+          </div>
+
+          {/* Premium Snapshot Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Total Commitment */}
+            <Card className="p-6 border-2 border-slate-200 hover:border-slate-300 transition-all hover:shadow-md">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                  <Package className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-wide mb-1">Total Commitment</p>
+                <p className="text-3xl font-bold text-slate-900">{totalCommitment || 'N/A'}</p>
+              </div>
+            </Card>
+
+            {/* Red Flags */}
+            <Card className="p-6 border-2 border-slate-200 hover:border-red-300 transition-all hover:shadow-md">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                  <AlertTriangle className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-wide mb-1">Red Flags</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-3xl font-bold text-slate-900">{redFlagCount}</p>
+                  {redFlagCount > 0 && (
+                    <span className="text-sm font-semibold text-red-600">to address</span>
+                  )}
+                </div>
+              </div>
+            </Card>
+
+            {/* Potential Savings */}
+            <Card className="p-6 bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-300 hover:border-emerald-400 transition-all hover:shadow-md">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                  <BadgeDollarSign className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-emerald-700 font-bold uppercase tracking-wide mb-1">Potential Savings</p>
+                <p className="text-3xl font-bold text-emerald-900">
+                  {potentialSavings > 0 ? formatSavings(potentialSavings) : 'TBD'}
+                </p>
+              </div>
+            </Card>
           </div>
 
           {/* Full analysis output (no roundId = trial mode) */}
