@@ -167,16 +167,26 @@ Rules:
 - "Would you consider adding an overage cap to protect against usage spikes?"
 - "Can we discuss payment terms?"
 
-✅ RIGHT FORMAT (assertive, direct):
+✅ RIGHT FORMAT (assertive, direct, WITH SPECIFIC $ IMPACT):
 - "Negotiate 20% volume discount at 100+ seats — target $80/seat from $100 (saves $24K annually)"
 - "Request hard overage cap at 120% of commit — prevents $50K surprise cost if usage spikes"
 - "Secure quarterly payment terms instead of annual upfront — improves cash flow by $30K"
+
+CRITICAL: Every must-have ask MUST include:
+1. Specific number/percentage (20%, 120%, $X cap)
+2. Dollar impact where possible ($24K saved, $50K protected)
+3. Context that makes it concrete (100+ seats, 10M to 15M logs/day)
 
 Examples of strong asks:
 - "Negotiate the $15K onboarding fee down to $8K or spread across Q1-Q2 milestones (saves $7K upfront, 15% of year-1 spend)"
 - "Push for 20% volume discount at 100+ seats — target $80/seat from current $100 (saves $24K annually)"
 - "Request overage cap at 120% of commit — without this, spike from 10M to 15M logs/day = $50K unbudgeted cost"
 - "Lock in pricing freeze for year 2 renewal — current terms allow unlimited price increases"
+
+Weak asks (NEVER include):
+- "Negotiate a fixed overage rate" (too vague - fixed at what level?)
+- "Request lower pricing" (no target, no $ impact)
+- "Prevents significant costs" (how much? $5K or $500K?)
 
 Weak asks (NEVER include):
 - "Could we negotiate pricing" (too vague and passive)
@@ -309,11 +319,11 @@ Return valid JSON only. Match this structure exactly:
     "renewal_date": "March 15, 2026",
     "signing_deadline": "February 28, 2026"
   },
-  "NOTE_TOTAL": "total_commitment = FULL ANNUAL COST. Example: if monthly payment is $1,250 × 12 months = $15,000 total. Show '$15,000' NOT '$1,250/month'.",
-  "NOTE_BILLING": "billing_payment = how they pay ('Monthly', 'Quarterly', 'Annual upfront')",
-  "NOTE_DEAL_TYPE": "deal_type = 'Renewal' if renewing existing contract, 'New purchase' if brand new vendor",
-  "NOTE_DATES": "renewal_date and signing_deadline = extract if mentioned in quote, otherwise omit these fields",
-  "NOTE_CATEGORY_DESC": "category = short label like 'SaaS Infra', 'Marketing Agency', etc. description = 1 line what the product/service does",
+  "NOTE_TOTAL": "total_commitment = CAREFULLY FIND THE ACTUAL TOTAL CONTRACT VALUE. Look for phrases like 'Total Contract Value', 'Annual Total', 'Total Amount', 'Grand Total'. DO NOT just multiply a monthly line item by 12 - find the actual stated total. If monthly amount shown, verify it matches: (total ÷ 12) = monthly.",
+  "NOTE_BILLING": "billing_payment = 'Monthly', 'Quarterly', 'Annual upfront', etc. Keep it simple.",
+  "NOTE_DEAL_TYPE": "deal_type = 'Renewal' if renewing existing, 'New purchase' if new vendor",
+  "NOTE_DATES": "renewal_date and signing_deadline = extract if stated, otherwise omit",
+  "NOTE_CATEGORY_DESC": "category = business type ('SaaS Infra', 'Marketing Agency'). description = 1 line what it does",
   "quick_read": {
     "whats_solid": ["15% discount already applied", "Flexible host scaling", "No minimum term commitment"],
     "whats_concerning": ["No overage protection", "Auto-renewal at 90 days", "Pricing above typical for volume"],
