@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server'
-import { analyzeDealV2 } from '@/lib/openai'
-import { extractAndNormalize } from '@/lib/extract-normalize'
-import { DealOutputSchemaV2 } from '@/lib/schemas'
-import { headers } from 'next/headers'
+import { analyzeDeal } from '@/lib/openai'
 
-// Guest trial - no auth required, rate limited per IP - Uses V2 schema
+// Guest trial - no auth required, uses V1 schema (full text analysis)
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { extractedText, dealType, goal, notes, previousOutput, isDemoText } = body
+    const { extractedText, dealType, goal, notes, imageData } = body
 
     // TODO: Add IP-based rate limiting for trial route (currently unlimited for testing)
 
@@ -19,30 +16,19 @@ export async function POST(request: Request) {
       )
     }
 
-    // STEP 1: Extract & normalize
-    const extracted = await extractAndNormalize(extractedText)
-
-    // STEP 2: Analyze with V2 (uses structured extraction)
-    const output = await analyzeDealV2(
-      extracted,
+    // Analyze with V1 (full text analysis - catches everything)
+    const output = await analyzeDeal(
+      extractedText,
       dealType || 'New',
-      {
-        goal,
-        notes,
-        previousAnalysis: previousOutput, // Pass previous round output for context
-      }
+      goal,
+      notes,
+      undefined,
+      imageData
     )
-
-    // Validate output
-    const validated = DealOutputSchemaV2.parse(output)
 
     return NextResponse.json({
       success: true,
-      output: validated,
-      extraction: {
-        confidence: extracted.confidence,
-        unclear_fields: extracted.unclear_fields,
-      },
+      output,
       message: 'Sign up to save your analysis and track negotiation rounds!'
     })
   } catch (error) {
