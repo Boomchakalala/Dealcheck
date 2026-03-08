@@ -358,15 +358,15 @@ Return valid JSON only. Match this structure exactly:
   "NOTE_MUST_HAVE": "These are MORE SPECIFIC and ACTIONABLE than quick_read or red_flags. Include $ impact.",
   "potential_savings": [
     {
-      "ask": "5% discount on annual spend",
-      "annual_impact": "$7,500 saved"
+      "ask": "10% volume discount (200+ users)",
+      "annual_impact": "$3,000 saved"
     },
     {
-      "ask": "Overage cap at 120% of commit",
-      "annual_impact": "Up to $50K protected"
+      "ask": "Remove 20 unused seats",
+      "annual_impact": "$2,400 saved"
     }
   ],
-  "NOTE_SAVINGS": "Optional. If you recommend price reductions or caps, show the $ impact here. 0-3 items max.",
+  "NOTE_SAVINGS": "CRITICAL: Total savings MUST be less than total_commitment. Show realistic % discounts (5-20%) or cost removals. Use this to highlight the top 2-3 negotiation levers with clear $ impact. Format: '$X saved' or '$X reduction'. Omit if no clear savings opportunities.",
   "email_drafts": {
     "neutral": {"subject": "...", "body": "..."},
     "firm": {"subject": "...", "body": "..."},
