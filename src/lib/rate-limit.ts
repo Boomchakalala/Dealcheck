@@ -1,63 +1,128 @@
-// Simple in-memory rate limiter (no external dependencies)
-// Resets on server restart - good enough for a startup
+import { createClient } from '@/lib/supabase/server'
 
-interface RateLimitEntry {
-  count: number
-  resetAt: number
+export interface RateLimitConfig {
+  hourlyLimit: number
+  dailyLimit: number
 }
 
-const store = new Map<string, RateLimitEntry>()
-
-// Clean up expired entries every 5 minutes
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, entry] of store.entries()) {
-    if (now > entry.resetAt) {
-      store.delete(key)
-    }
-  }
-}, 5 * 60 * 1000)
-
-interface RateLimitConfig {
-  maxRequests: number  // Max requests per window
-  windowMs: number     // Window in milliseconds
-}
-
-interface RateLimitResult {
+export interface RateLimitResult {
   allowed: boolean
   remaining: number
-  resetAt: number
+  limit: number
+  resetAt: Date
+  message?: string
 }
 
-export function rateLimit(
-  key: string,
-  config: RateLimitConfig
-): RateLimitResult {
-  const now = Date.now()
-  const entry = store.get(key)
-
-  if (!entry || now > entry.resetAt) {
-    // New window
-    store.set(key, { count: 1, resetAt: now + config.windowMs })
-    return { allowed: true, remaining: config.maxRequests - 1, resetAt: now + config.windowMs }
-  }
-
-  if (entry.count >= config.maxRequests) {
-    return { allowed: false, remaining: 0, resetAt: entry.resetAt }
-  }
-
-  entry.count++
-  return { allowed: true, remaining: config.maxRequests - entry.count, resetAt: entry.resetAt }
+// Default limits for free users
+const DEFAULT_LIMITS: RateLimitConfig = {
+  hourlyLimit: 10,
+  dailyLimit: 50,
 }
 
-// Preset configs
-export const RATE_LIMITS = {
-  // AI analysis endpoints - expensive (OpenAI costs)
-  analysis: { maxRequests: 10, windowMs: 60 * 60 * 1000 },     // 10/hour
-  // Trial endpoint - even stricter (no auth, public)
-  trial: { maxRequests: 3, windowMs: 60 * 60 * 1000 },          // 3/hour per IP
-  // General API - moderate
-  api: { maxRequests: 60, windowMs: 60 * 1000 },                 // 60/min
-  // Upload endpoint
-  upload: { maxRequests: 20, windowMs: 60 * 60 * 1000 },         // 20/hour
+// Pro user limits (for future use)
+const PRO_LIMITS: RateLimitConfig = {
+  hourlyLimit: 50,
+  dailyLimit: 500,
+}
+
+export async function checkRateLimit(userId: string, isPro: boolean = false): Promise<RateLimitResult> {
+  const supabase = await createClient()
+  const now = new Date()
+
+  const limits = isPro ? PRO_LIMITS : DEFAULT_LIMITS
+
+  // Count analyses in the last hour
+  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
+  const { count: hourlyCount } = await supabase
+    .from('rounds')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', oneHourAgo.toISOString())
+
+  // Count analyses today
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const { count: dailyCount } = await supabase
+    .from('rounds')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', startOfDay.toISOString())
+
+  // Check hourly limit
+  if ((hourlyCount || 0) >= limits.hourlyLimit) {
+    const resetAt = new Date(oneHourAgo.getTime() + 60 * 60 * 1000)
+    return {
+      allowed: false,
+      remaining: 0,
+      limit: limits.hourlyLimit,
+      resetAt,
+      message: `Hourly limit of ${limits.hourlyLimit} analyses reached. Resets at ${resetAt.toLocaleTimeString()}.`
+    }
+  }
+
+  // Check daily limit
+  if ((dailyCount || 0) >= limits.dailyLimit) {
+    const resetAt = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000)
+    return {
+      allowed: false,
+      remaining: 0,
+      limit: limits.dailyLimit,
+      resetAt,
+      message: `Daily limit of ${limits.dailyLimit} analyses reached. Resets at ${resetAt.toLocaleDateString()}.`
+    }
+  }
+
+  // Calculate remaining (use the more restrictive one)
+  const hourlyRemaining = limits.hourlyLimit - (hourlyCount || 0)
+  const dailyRemaining = limits.dailyLimit - (dailyCount || 0)
+  const remaining = Math.min(hourlyRemaining, dailyRemaining)
+
+  return {
+    allowed: true,
+    remaining,
+    limit: limits.dailyLimit,
+    resetAt: new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000),
+  }
+}
+
+export async function getUserUsage(userId: string): Promise<{
+  hourlyUsed: number
+  dailyUsed: number
+  hourlyLimit: number
+  dailyLimit: number
+}> {
+  const supabase = await createClient()
+  const now = new Date()
+
+  // Get user's plan
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('plan')
+    .eq('id', userId)
+    .single()
+
+  const isPro = profile?.plan === 'pro'
+  const limits = isPro ? PRO_LIMITS : DEFAULT_LIMITS
+
+  // Count hourly usage
+  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
+  const { count: hourlyUsed } = await supabase
+    .from('rounds')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', oneHourAgo.toISOString())
+
+  // Count daily usage
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const { count: dailyUsed } = await supabase
+    .from('rounds')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', startOfDay.toISOString())
+
+  return {
+    hourlyUsed: hourlyUsed || 0,
+    dailyUsed: dailyUsed || 0,
+    hourlyLimit: limits.hourlyLimit,
+    dailyLimit: limits.dailyLimit,
+  }
 }
