@@ -1,11 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Allow preview URLs for development
+  allowedDevOrigins: ['preview-biyuzibqkmay.share.sandbox.dev'],
+
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
     },
-    allowedOrigins: ['preview-biyuzibqkmay.share.sandbox.dev'],
   },
   // Exclude pdf-parse from bundling to prevent test code execution
   serverExternalPackages: ['pdf-parse', 'canvas'],
