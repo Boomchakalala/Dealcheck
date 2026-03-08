@@ -102,11 +102,20 @@ Strong red flags:
 - "Deposit of 50% before any delivery shifts financial risk entirely to you"
 - "Vague scope ('as needed') makes cost impossible to predict"
 
-Weak red flags (avoid):
+Weak red flags (NEVER include):
 - "Review confidentiality terms"
 - "Legal review recommended"
 - "Consider liability limits"
 - "Clarify delivery dates"
+- "Supplier/vendor name unclear"
+- "Contact information missing"
+- Any admin/logistics issue that doesn't affect cost/risk
+
+CRITICAL: BE SPECIFIC TO THIS QUOTE
+- Don't say "pricing may be high" → say "at $X/unit for Y volume, you're paying Z% above typical"
+- Don't say "watch commit risks" → say "if you exceed 10M logs/day, overage charges at $0.XX/GB will cost you $Y extra"
+- Don't say "renewal terms" → say "90-day auto-renewal notice at this contract value locks you in"
+- Always reference ACTUAL NUMBERS and TERMS from the quote
 
 ==================================================
 STEP 4: SELECTIVE MUST-HAVE ASKS
@@ -115,13 +124,22 @@ STEP 4: SELECTIVE MUST-HAVE ASKS
 Return 1-3 must-have asks (typically should include price improvement).
 
 Rules:
-- Each ask must be specific and actionable
+- Each ask must be SPECIFIC to this quote with ACTUAL NUMBERS
 - Frame as polite requests: "Could we...", "Would you consider...", "Would it be possible to..."
-- Explain WHY each ask matters (not just what to ask for)
+- Explain WHY with SPECIFIC impact (not generic reasons)
 - Prioritize commercial levers over boilerplate terms
+- Reference actual pricing/terms from the quote
 
 Examples of strong asks:
-- "Could we reduce the onboarding fee or break it into milestones? This inflates first-year cost without clear added value."
+- "Could we reduce the $15K onboarding fee to $8K or spread it across Q1-Q2 milestones? At 15% of year-1 spend, this is inflating first-year TCO."
+- "Would you consider 20% volume discount at 100+ seats (target: $80/seat from $100)? Current per-seat pricing doesn't reflect enterprise scale."
+- "Could we get overage cap at 120% of commit? Without this, a spike from 10M to 15M logs/day = $50K unbudgeted cost."
+
+Weak asks (NEVER include):
+- "Negotiate pricing" (too vague)
+- "Review terms" (not specific)
+- "Ask for flexibility" (what flexibility?)
+- "Clarify contact info" (useless)
 - "Would you consider a volume discount or flexible seat model? A 100-seat commitment with per-seat pricing removes our scaling flexibility."
 - "Could we get an itemized breakdown of labor vs materials? Without this, we can't fairly compare your quote to alternatives."
 - "Would it be possible to adjust the payment schedule to 30/40/30 across milestones? The current 60% upfront shifts too much risk to us."
