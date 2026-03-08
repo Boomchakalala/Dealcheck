@@ -9,7 +9,7 @@ import { OutputDisplayV2 } from '@/components/OutputDisplayV2'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { DealActionBar } from '@/components/DealActionBar'
-import { CheckSquare, Mail, Plus, FileText, AlertTriangle, TrendingDown, BadgeDollarSign, Package } from 'lucide-react'
+import { CheckSquare, Mail, Plus, FileText, AlertTriangle, TrendingDown, BadgeDollarSign, Package, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { AddRoundForm } from './AddRoundForm'
 import type { DealOutput, DealOutputV2 } from '@/types'
@@ -277,11 +277,54 @@ export default async function DealPage({
       {/* Rounds List */}
       {sortedRounds.length > 1 && (
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Previous Rounds</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-slate-400"></div>
+            Round History
+          </h2>
           <div className="space-y-3">
-            {sortedRounds.slice(1).map((round: any) => (
-              <RoundCard key={round.id} round={round} dealId={dealId} />
-            ))}
+            {sortedRounds.slice(1).map((round: any, idx: number) => {
+              const roundOutput = round.output_json as any
+              const roundTotal = roundOutput?.snapshot?.total_commitment
+              const roundRedFlags = roundOutput?.red_flags?.length || 0
+
+              return (
+                <Link key={round.id} href={`/app/round/${round.id}`}>
+                  <Card className="p-4 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-full text-xs font-bold flex-shrink-0">
+                          Round {round.round_number}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-slate-600 mb-1">
+                            {new Date(round.created_at).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
+                          </p>
+                          {round.note && (
+                            <p className="text-sm text-slate-700 truncate">{round.note}</p>
+                          )}
+                        </div>
+                        {roundRedFlags > 0 && (
+                          <span className="inline-flex items-center gap-1 text-xs text-red-600 font-medium flex-shrink-0">
+                            <AlertTriangle className="w-3.5 h-3.5" />
+                            {roundRedFlags}
+                          </span>
+                        )}
+                        {roundTotal && (
+                          <span className="text-sm font-bold text-slate-900 flex-shrink-0">
+                            {roundTotal}
+                          </span>
+                        )}
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-slate-400" />
+                    </div>
+                  </Card>
+                </Link>
+              )
+            })}
           </div>
         </div>
       )}
