@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
-import { TrendingUp, Target, CheckCircle2, Plus, Zap, Lock, Crown } from 'lucide-react'
+import { TrendingUp, Target, CheckCircle2, Plus, Zap, Lock, Crown, DollarSign, Percent, BarChart3 } from 'lucide-react'
 import { DashboardClient } from '@/components/DashboardClient'
 import Link from 'next/link'
 

@@ -198,21 +198,23 @@ export default async function DealPage({
 
       {/* Next Actions Panel */}
       {latestOutput && (
-        <Card className="p-5 sm:p-6 bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 shadow-sm">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-1 flex items-center gap-2">
-            <CheckSquare className="w-5 h-5 text-emerald-600" />
-            Next Actions
+        <Card className="p-6 bg-gradient-to-br from-emerald-500 via-emerald-600 to-green-600 border-0 shadow-lg">
+          <h2 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+              <CheckSquare className="w-5 h-5 text-white" />
+            </div>
+            What to ask for
           </h2>
-          <p className="text-xs text-emerald-700 mb-4 font-medium">Key items to negotiate on this deal</p>
+          <p className="text-sm text-emerald-50 mb-5 font-medium">Top negotiation priorities for this deal</p>
 
           {/* V2: Priority points as checklist */}
           {isV2 && (latestOutput as DealOutputV2).priority_points?.length > 0 && (
             <div className="mb-5">
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {(latestOutput as DealOutputV2).priority_points.map((point, idx) => (
-                  <li key={idx} className="flex items-start gap-3 p-3 bg-white rounded-lg border-2 border-emerald-200">
-                    <div className="mt-0.5 w-5 h-5 rounded border-2 border-emerald-400 flex-shrink-0" />
-                    <span className="text-sm text-slate-800 leading-relaxed font-medium">{point.title}</span>
+                  <li key={idx} className="flex items-start gap-3 p-4 bg-white/95 rounded-lg shadow-sm">
+                    <div className="mt-0.5 w-5 h-5 rounded-md border-2 border-emerald-500 flex-shrink-0" />
+                    <span className="text-sm text-slate-900 leading-relaxed font-semibold">{point.title}</span>
                   </li>
                 ))}
               </ul>
@@ -222,11 +224,11 @@ export default async function DealPage({
           {/* V1: Must-have asks as checklist */}
           {!isV2 && (latestOutput as DealOutput).what_to_ask_for?.must_have?.length > 0 && (
             <div className="mb-5">
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {(latestOutput as DealOutput).what_to_ask_for.must_have.map((ask: string, idx: number) => (
-                  <li key={idx} className="flex items-start gap-3 p-3 bg-white rounded-lg border-2 border-emerald-200">
-                    <div className="mt-0.5 w-5 h-5 rounded border-2 border-emerald-400 flex-shrink-0" />
-                    <span className="text-sm text-slate-800 leading-relaxed font-medium">{ask}</span>
+                  <li key={idx} className="flex items-start gap-3 p-4 bg-white/95 rounded-lg shadow-sm">
+                    <div className="mt-0.5 w-5 h-5 rounded-md border-2 border-emerald-500 flex-shrink-0" />
+                    <span className="text-sm text-slate-900 leading-relaxed font-semibold">{ask}</span>
                   </li>
                 ))}
               </ul>
@@ -235,13 +237,13 @@ export default async function DealPage({
 
           <div className="flex items-center gap-3 flex-wrap">
             <a href="#email-drafts" className="flex-1 sm:flex-none">
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
+              <Button className="w-full bg-white text-emerald-700 hover:bg-emerald-50 shadow-md font-bold">
                 <Mail className="w-4 h-4 mr-2" />
                 {isV2 ? 'Generate Email' : 'View Email Drafts'}
               </Button>
             </a>
             <a href="#add-round" className="flex-1 sm:flex-none">
-              <Button variant="outline" size="default" className="w-full border-2 border-emerald-200 hover:bg-emerald-50">
+              <Button variant="outline" size="default" className="w-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 font-semibold">
                 <Plus className="w-4 h-4 mr-2" />
                 Add New Round
               </Button>
