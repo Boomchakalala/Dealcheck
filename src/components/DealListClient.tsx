@@ -132,15 +132,28 @@ export function DealListClient({ deals }: DealListClientProps) {
                       <Badge variant={deal.deal_type === 'New' ? 'default' : 'secondary'}>
                         {deal.deal_type}
                       </Badge>
-                      {!isClosed && (
+                    </div>
+
+                    {/* Action buttons */}
+                    {!isClosed ? (
+                      <div className="flex items-center gap-2 mb-2">
                         <button
                           onClick={(e) => handleQuickClose(e, deal.id, totalCommitment || undefined, roundCount)}
-                          className="text-xs font-medium px-3 py-1.5 rounded-md border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-sm"
                         >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
                           Close deal
                         </button>
-                      )}
-                    </div>
+                        <button
+                          onClick={(e) => handleDelete(e, deal.id)}
+                          disabled={deletingId === deal.id}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          {deletingId === deal.id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </div>
+                    ) : null}
 
                     {/* Vendor name */}
                     <h3 className="text-base font-bold text-slate-900 mb-1 truncate group-hover:text-emerald-700 transition-colors">
