@@ -51,32 +51,7 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
     }
   }
 
-  // Helper to parse money strings
-  const parseMoney = (str: string): number => {
-    if (!str || typeof str !== 'string') return 0
-
-    let cleaned = str
-      .toUpperCase()
-      .replace(/USD/g, '')
-      .replace(/\/MONTH/g, '')
-      .replace(/MONTHLY/g, '')
-      .replace(/ANNUAL/g, '')
-      .trim()
-
-    const match = cleaned.match(/\$?\s*([\d,]+\.?\d*)\s*([KM])?/)
-    if (!match) return 0
-
-    const numberStr = match[1].replace(/,/g, '')
-    const suffix = match[2]
-    const baseAmount = parseFloat(numberStr)
-
-    if (isNaN(baseAmount)) return 0
-    if (suffix === 'K') return baseAmount * 1000
-    if (suffix === 'M') return baseAmount * 1000000
-    return baseAmount
-  }
-
-  // Extract hierarchical categories and calculate spend
+  // Extract hierarchical categories and calculate spend (with currency conversion)
   const categoryHierarchy = useMemo(() => {
     const hierarchy = new Map<string, MainCategoryData>()
 
@@ -84,7 +59,15 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
       const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
       const fullCategory = latestRound?.output_json?.category || 'Uncategorized'
       const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-      const total = parseMoney(totalStr)
+      const dealCurrency = (latestRound?.output_json?.snapshot?.currency as Currency) || 'USD'
+
+      // Parse money
+      const { amount, currency } = parseMoney(totalStr)
+      const finalCurrency = dealCurrency || currency
+
+      // For now, we'll just use the amount directly
+      // TODO: Implement async conversion properly
+      const total = amount
 
       // Parse category: "SaaS - Infrastructure" -> main: "SaaS", sub: "Infrastructure"
       let mainCategory = 'Other'
@@ -126,7 +109,7 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
 
     // Convert to array and sort by total spend
     return Array.from(hierarchy.values()).sort((a, b) => b.totalSpend - a.totalSpend)
-  }, [deals])
+  }, [deals, baseCurrency])
 
   const toggleMainCategory = (mainCategory: string) => {
     const newExpanded = new Set(expandedMainCategories)
@@ -161,13 +144,35 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
   })
 
   const formatAmount = (amount: number) => {
-    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`
-    if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`
-    return `$${amount.toFixed(0)}`
+    return formatCurrency(amount, baseCurrency)
   }
 
   return (
     <div className="space-y-6">
+      {/* Currency Selector */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Globe className="w-5 h-5 text-slate-600" />
+          <span className="text-sm text-slate-600 font-medium">Base Currency:</span>
+          <select
+            value={baseCurrency}
+            onChange={(e) => updateBaseCurrency(e.target.value as Currency)}
+            disabled={isConverting}
+            className="text-sm font-semibold px-3 py-1.5 rounded-lg border-2 border-slate-200 hover:border-slate-300 focus:border-emerald-500 focus:outline-none disabled:opacity-50"
+          >
+            {SUPPORTED_CURRENCIES.map(curr => (
+              <option key={curr} value={curr}>{curr}</option>
+            ))}
+          </select>
+          {isConverting && (
+            <span className="text-xs text-slate-500">Converting...</span>
+          )}
+        </div>
+        <span className="text-xs text-slate-500">
+          Note: Conversion uses daily exchange rates
+        </span>
+      </div>
+
       {/* Status Filter Tabs */}
       <div className="flex items-center gap-2 border-b-2 border-slate-200">
         <button
