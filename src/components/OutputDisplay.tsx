@@ -584,19 +584,21 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       </div>
 
       {/* ── Section 8: Assumptions & Disclaimer ── */}
-      <div className="rounded-xl border border-slate-200 overflow-hidden">
+      <div className="rounded-xl border-2 border-slate-200 overflow-hidden shadow-sm">
         <button
           onClick={() => setShowAssumptions(!showAssumptions)}
           className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors text-left"
         >
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-slate-400" />
-            <h2 className="text-sm font-semibold text-slate-700">Assumptions & disclaimer</h2>
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 bg-slate-100 rounded-lg">
+              <Shield className="w-5 h-5 text-slate-500" />
+            </div>
+            <h2 className="text-lg font-bold text-slate-900">Assumptions & disclaimer</h2>
           </div>
           {showAssumptions ? (
-            <ChevronUp className="w-4 h-4 text-slate-400" />
+            <ChevronUp className="w-5 h-5 text-slate-400" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-slate-400" />
+            <ChevronDown className="w-5 h-5 text-slate-400" />
           )}
         </button>
 
