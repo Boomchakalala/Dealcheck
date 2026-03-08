@@ -226,7 +226,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
             ))}
           </nav>
 
-          {/* Right: Help + Upgrade (if not upgraded) + User dropdown (desktop) */}
+          {/* Right: Help + Usage + Upgrade (if not upgraded) + User dropdown (desktop) */}
           <div className="hidden md:flex items-center gap-3">
             {/* Help link */}
             <Link
@@ -237,8 +237,29 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
               <span className="hidden lg:inline">Help</span>
             </Link>
 
+            {/* Usage indicator (skip for admins) */}
+            {!isAdmin && (
+              <>
+                {isUpgraded ? (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200">
+                    <Crown className="w-3.5 h-3.5 text-purple-600" />
+                    <span className="text-xs font-bold text-purple-900">Pro</span>
+                  </div>
+                ) : (
+                  <Link
+                    href="/app/dashboard"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors"
+                    title="Free plan usage"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-slate-600" />
+                    <span className="text-xs font-bold text-slate-900">{usageCount}/5</span>
+                  </Link>
+                )}
+              </>
+            )}
+
             {/* Upgrade button (if not upgraded) */}
-            {!isUpgraded && (
+            {!isUpgraded && !isAdmin && (
               <Link
                 href="/pricing"
                 className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
@@ -327,6 +348,24 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
               </Link>
             ))}
             <div className="border-t border-slate-200 my-2" />
+
+            {/* Usage indicator (mobile) */}
+            {!isAdmin && (
+              <div className="px-4 py-2">
+                {isUpgraded ? (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200">
+                    <Crown className="w-3.5 h-3.5 text-purple-600" />
+                    <span className="text-xs font-bold text-purple-900">Pro Plan</span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100">
+                    <Zap className="w-3.5 h-3.5 text-slate-600" />
+                    <span className="text-xs font-bold text-slate-900">{usageCount} of 5 analyses used</span>
+                  </div>
+                )}
+              </div>
+            )}
+
             <Link
               href="/help"
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
@@ -335,7 +374,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
               <HelpCircle className="w-4 h-4" />
               Help
             </Link>
-            {!isUpgraded && (
+            {!isUpgraded && !isAdmin && (
               <Link
                 href="/pricing"
                 className="mx-4 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center block"
