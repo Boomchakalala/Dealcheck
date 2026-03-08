@@ -297,9 +297,9 @@ export default function LandingPage() {
                       </div>
                       <div className="space-y-2">
                         {[
-                          'Reduce auto-renewal notice from 60 to 30 days — prevents accidental $42K lock-in',
-                          'Cap overage at 110% with advance notice — protects against $15K+ surprise costs',
-                          'Increase support to 25 tickets/month during onboarding — saves $3K in overage fees',
+                          'Negotiate 20% volume discount at 200-user commitment — target $10/user/month (saves $6K annually)',
+                          'Request quarterly true-up instead of fixed seats — pay only for active users (eliminates seat waste)',
+                          'Lock in 2-year pricing — prevents future price increases',
                         ].map((ask, idx) => (
                           <div key={idx} className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 shadow-sm">
                             <p className="text-sm text-slate-800 font-semibold">{ask}</p>
@@ -327,13 +327,13 @@ export default function LandingPage() {
                     <div className="rounded-xl border-2 border-slate-200 overflow-hidden bg-gradient-to-br from-slate-50 to-white shadow-sm">
                       <div className="px-5 py-3 bg-slate-50 border-b-2 border-slate-200">
                         <p className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Subject line</p>
-                        <p className="text-sm font-semibold text-slate-900">CloudVault Enterprise Storage - Questions on Contract Terms</p>
+                        <p className="text-sm font-semibold text-slate-900">Slack Business+ Renewal - Pricing Discussion</p>
                       </div>
                       <div className="p-5">
                         <p className="text-sm text-slate-700 leading-relaxed">
-                          Hi [Sales Rep Name],<br /><br />
-                          Thanks for the CloudVault quote. We&apos;re interested in moving forward but have a few questions on terms before we can finalize. Could we adjust the 60-day auto-renewal to 30 days? This would make internal approvals much smoother...<br /><br />
-                          <span className="text-slate-400">[Overage caps, support limits, and exit clause questions included]</span>
+                          Hi [Account Manager],<br /><br />
+                          Thanks for the Slack renewal quote. We're planning to continue, but I'd like to discuss the pricing before we finalize. At $12.50/user for 200 users, could we revisit this? We'd expect something closer to $10/user at this commitment level...<br /><br />
+                          <span className="text-slate-400">[Volume discount and seat flexibility requests included]</span>
                         </p>
                       </div>
                     </div>
