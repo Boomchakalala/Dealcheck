@@ -116,7 +116,7 @@ export type Database = {
 
 // Deal output structure (V1)
 export type RedFlag = {
-  type: 'Commercial' | 'Legal' | 'Operational' | 'Security'
+  type: string
   issue: string
   why_it_matters: string
   what_to_ask_for: string
@@ -131,6 +131,8 @@ export type EmailDraft = {
 export type DealOutput = {
   title: string
   vendor: string
+  category?: string
+  description?: string
   verdict: string
   verdict_type: 'negotiate' | 'competitive' | 'overpay_risk'
   price_insight?: string
@@ -158,6 +160,10 @@ export type DealOutput = {
     must_have: string[]
     nice_to_have: string[]
   }
+  potential_savings?: Array<{
+    ask: string
+    annual_impact: string
+  }>
   email_drafts: {
     neutral: EmailDraft
     firm: EmailDraft

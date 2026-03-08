@@ -422,19 +422,21 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         )
       })()}
 
-      {/* ── Section 7: Email Builder (Simplified) ── */}
-      <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden" id="email-builder">
-        <div className="px-4 sm:px-6 py-5 border-b border-slate-200 bg-slate-50/50">
+      {/* ── Section 7: Email Builder (Premium) ── */}
+      <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden shadow-md" id="email-builder">
+        <div className="px-4 sm:px-6 py-5 border-b border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100/50">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Mail className="w-5 h-5 text-emerald-600" />
-                <h2 className="text-base font-bold text-slate-900">Email drafts</h2>
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="p-1.5 bg-emerald-100 rounded-lg">
+                  <Mail className="w-5 h-5 text-emerald-600" />
+                </div>
+                <h2 className="text-lg font-bold text-slate-900">Email drafts</h2>
               </div>
-              <p className="text-xs text-slate-500">Edit directly or regenerate with AI. Pick a tone and send.</p>
+              <p className="text-xs text-slate-600">Edit directly or regenerate with AI. Pick a tone and send.</p>
             </div>
             {roundId && remainingRegens > 0 && (
-              <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+              <span className="text-xs font-semibold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full border border-emerald-200">
                 {remainingRegens} AI regen{remainingRegens !== 1 ? 's' : ''} left
               </span>
             )}
@@ -443,27 +445,27 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
         <div className="p-4 sm:p-6 space-y-4">
           {/* Email tabs */}
-          <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+          <div className="flex gap-1.5 bg-slate-100 rounded-xl p-1.5 shadow-inner">
             {emailTabs.map((tab, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveEmailTab(idx)}
-                className={`flex-1 px-3 py-2 rounded-md transition-all ${
+                className={`flex-1 px-4 py-2.5 rounded-lg transition-all ${
                   activeEmailTab === idx
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white text-slate-900 shadow-md border border-slate-200'
+                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                 }`}
               >
-                <div className="text-xs font-semibold">{tab.label}</div>
+                <div className="text-sm font-bold">{tab.label}</div>
                 <div className="text-[10px] text-slate-400 mt-0.5">{tab.desc}</div>
               </button>
             ))}
           </div>
 
           {/* Editable email */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div>
-              <label className="text-xs font-semibold text-slate-600 mb-1.5 block">Subject line</label>
+              <label className="text-xs font-bold text-slate-700 mb-2 block uppercase tracking-wide">Subject line</label>
               <input
                 type="text"
                 value={emailSubjects[activeEmailTab]}
@@ -472,13 +474,13 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                   newSubjects[activeEmailTab] = e.target.value
                   setEmailSubjects(newSubjects)
                 }}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm"
                 placeholder="Email subject..."
               />
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-600 mb-1.5 block">Email body</label>
+              <label className="text-xs font-bold text-slate-700 mb-2 block uppercase tracking-wide">Email body</label>
               <textarea
                 value={emailBodies[activeEmailTab]}
                 onChange={(e) => {
@@ -486,15 +488,15 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                   newBodies[activeEmailTab] = e.target.value
                   setEmailBodies(newBodies)
                 }}
-                rows={12}
-                className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none font-mono leading-relaxed"
+                rows={14}
+                className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none font-mono leading-relaxed shadow-sm"
                 placeholder="Email body..."
               />
-              <p className="text-xs text-slate-400 mt-1.5">Edit this email directly, then copy it below.</p>
+              <p className="text-xs text-slate-500 mt-2 italic">Edit this email directly, then copy it below.</p>
             </div>
 
             {/* Copy button */}
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-2">
               <CopyButton
                 text={`Subject: ${emailSubjects[activeEmailTab]}\n\n${emailBodies[activeEmailTab]}`}
                 label="Copy email"
@@ -504,25 +506,25 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
           {/* Regenerate section */}
           {roundId && (
-            <div className="pt-4 border-t border-slate-200 space-y-3">
+            <div className="pt-4 border-t-2 border-slate-200 space-y-3">
               {showCustomPrompt && (
                 <div>
-                  <label className="text-xs font-semibold text-slate-600 mb-1.5 block">
+                  <label className="text-xs font-bold text-slate-700 mb-2 block uppercase tracking-wide">
                     Custom instructions (optional)
                   </label>
                   <textarea
                     value={customPrompt}
                     onChange={(e) => setCustomPrompt(e.target.value)}
                     rows={2}
-                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+                    className="w-full px-4 py-2.5 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none shadow-sm"
                     placeholder='e.g., "Make it more assertive" or "Add a 10% discount request"'
                   />
-                  <p className="text-xs text-slate-400 mt-1">Tell AI how to adjust the emails.</p>
+                  <p className="text-xs text-slate-500 mt-1.5">Tell AI how to adjust the emails.</p>
                 </div>
               )}
 
               {regenError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+                <div className="p-3 bg-red-50 border-2 border-red-200 rounded-lg text-sm text-red-800">
                   {regenError}
                 </div>
               )}
@@ -531,7 +533,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 {!showCustomPrompt && (
                   <button
                     onClick={() => setShowCustomPrompt(true)}
-                    className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                    className="flex-1 px-4 py-3 text-sm font-semibold text-slate-600 hover:text-slate-900 border-2 border-slate-200 rounded-lg hover:bg-slate-50 transition-all shadow-sm"
                   >
                     Add custom instructions
                   </button>
@@ -539,10 +541,10 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 <button
                   onClick={handleRegenerateEmails}
                   disabled={regenerating || remainingRegens <= 0}
-                  className={`${showCustomPrompt ? 'flex-1' : 'flex-1'} px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 font-medium transition-all ${
+                  className={`${showCustomPrompt ? 'flex-1' : 'flex-1'} px-5 py-3 rounded-lg flex items-center justify-center gap-2 font-bold transition-all ${
                     regenerating || remainingRegens <= 0
                       ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                      : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'
+                      : 'bg-gradient-to-br from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 shadow-md hover:shadow-lg'
                   }`}
                 >
                   {regenerating ? (
@@ -562,7 +564,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               </div>
 
               {remainingRegens <= 0 && (
-                <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+                <p className="text-xs text-amber-700 bg-amber-50 border-2 border-amber-200 rounded-lg p-3">
                   You have used all 3 AI regenerations for this round. You can still edit the emails manually above.
                 </p>
               )}
@@ -570,8 +572,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           )}
 
           {!roundId && (
-            <div className="pt-4 border-t border-slate-200">
-              <p className="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-3">
+            <div className="pt-4 border-t-2 border-slate-200">
+              <p className="text-xs text-slate-600 bg-slate-50 border-2 border-slate-200 rounded-lg p-3.5">
                 💡 Sign up to save this deal and unlock AI email regeneration (3 per round).
               </p>
             </div>
