@@ -38,44 +38,51 @@ export default async function DashboardPage() {
   const closedDeals = allDeals.filter(d => d.status?.startsWith('closed_'))
   const wonDeals = closedDeals.filter(d => d.status === 'closed_won')
 
+  // Helper function to parse money strings
+  const parseMoney = (str: string): number => {
+    if (!str || typeof str !== 'string') return 0
+
+    // Remove currency symbols and extra text
+    let cleaned = str
+      .toUpperCase()
+      .replace(/USD/g, '')
+      .replace(/\/MONTH/g, '')
+      .replace(/\/YEAR/g, '')
+      .replace(/MONTHLY/g, '')
+      .replace(/ANNUAL/g, '')
+      .replace(/CONTRACT/g, '')
+      .trim()
+
+    // Extract just the number part with K/M suffix
+    const match = cleaned.match(/\$?\s*([\d,]+\.?\d*)\s*([KM])?/)
+    if (!match) return 0
+
+    const numberStr = match[1].replace(/,/g, '')
+    const suffix = match[2]
+    const baseAmount = parseFloat(numberStr)
+
+    if (isNaN(baseAmount)) return 0
+
+    if (suffix === 'K') return baseAmount * 1000
+    if (suffix === 'M') return baseAmount * 1000000
+    return baseAmount
+  }
+
   // Calculate total spend analyzed (all deals)
   const totalSpendAnalyzed = allDeals.reduce((sum, deal) => {
     const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
     const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-    console.log('Deal:', deal.vendor || deal.title, 'Total:', totalStr)
-    if (totalStr && typeof totalStr === 'string') {
-      const cleaned = totalStr.replace(/[$,\s]/g, '')
-      let amount = 0
-      if (cleaned.toLowerCase().includes('k')) {
-        amount = parseFloat(cleaned.replace(/k/i, '')) * 1000
-      } else if (cleaned.toLowerCase().includes('m')) {
-        amount = parseFloat(cleaned.replace(/m/i, '')) * 1000000
-      } else {
-        amount = parseFloat(cleaned) || 0
-      }
-      console.log('  Parsed:', amount)
-      return sum + amount
-    }
-    return sum
+    const amount = parseMoney(totalStr)
+    console.log('Deal:', deal.vendor || deal.title, 'Total:', totalStr, '→', amount)
+    return sum + amount
   }, 0)
 
   // Calculate total spend closed (only closed deals)
   const totalSpendClosed = closedDeals.reduce((sum, deal) => {
     const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
     const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-    if (totalStr && typeof totalStr === 'string') {
-      const cleaned = totalStr.replace(/[$,\s]/g, '')
-      let amount = 0
-      if (cleaned.toLowerCase().includes('k')) {
-        amount = parseFloat(cleaned.replace(/k/i, '')) * 1000
-      } else if (cleaned.toLowerCase().includes('m')) {
-        amount = parseFloat(cleaned.replace(/m/i, '')) * 1000000
-      } else {
-        amount = parseFloat(cleaned) || 0
-      }
-      return sum + amount
-    }
-    return sum
+    const amount = parseMoney(totalStr)
+    return sum + amount
   }, 0)
 
   const totalSavings = closedDeals.reduce((sum, d) => sum + (d.savings_amount || 0), 0)
