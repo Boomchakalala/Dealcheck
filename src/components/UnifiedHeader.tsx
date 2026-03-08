@@ -3,15 +3,17 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { HelpCircle, ChevronDown, User, LogOut, Menu, X, Settings } from 'lucide-react'
+import { HelpCircle, ChevronDown, User, LogOut, Menu, X, Settings, Zap, Crown } from 'lucide-react'
 
 interface UnifiedHeaderProps {
   variant: 'landing' | 'public' | 'app'
   userEmail?: string
   isUpgraded?: boolean
+  usageCount?: number
+  isAdmin?: boolean
 }
 
-export function UnifiedHeader({ variant, userEmail, isUpgraded = false }: UnifiedHeaderProps) {
+export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCount = 0, isAdmin = false }: UnifiedHeaderProps) {
   const pathname = usePathname()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)

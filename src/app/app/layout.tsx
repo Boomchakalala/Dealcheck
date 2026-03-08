@@ -15,15 +15,25 @@ export default async function AppLayout({
     redirect('/login')
   }
 
-  // For now, everyone is on Free plan - can be enhanced later
-  const isUpgraded = false
+  // Get user profile for usage tracking
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('usage_count, plan, is_admin')
+    .eq('id', user.id)
+    .single()
+
+  const isPro = profile?.plan === 'pro'
+  const isAdmin = profile?.is_admin || false
+  const usageCount = profile?.usage_count || 0
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50/80 to-white flex flex-col">
       <UnifiedHeader
         variant="app"
         userEmail={user.email || 'user@example.com'}
-        isUpgraded={isUpgraded}
+        isUpgraded={isPro}
+        usageCount={usageCount}
+        isAdmin={isAdmin}
       />
       <main className="max-w-7xl mx-auto px-5 sm:px-8 py-10 flex-1 w-full">
         {children}
