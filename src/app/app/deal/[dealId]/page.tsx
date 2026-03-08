@@ -150,6 +150,73 @@ export default async function DealPage({
         </div>
       </Card>
 
+      {/* Outcome Card - Shows when deal is closed */}
+      {deal.status?.startsWith('closed_') && (
+        <Card className="p-5 bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+              {deal.status === 'closed_won' && <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+              {deal.status === 'closed_lost' && <TrendingDown className="w-5 h-5 text-red-600" />}
+              {deal.status === 'closed_paused' && <Plus className="w-5 h-5 rotate-45 text-slate-600" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-bold text-slate-900">Outcome</h3>
+                {deal.closed_at && (
+                  <span className="text-xs text-slate-500">
+                    Closed {new Date(deal.closed_at).toLocaleDateString()}
+                  </span>
+                )}
+              </div>
+
+              {/* Savings Badge */}
+              {deal.savings_amount !== null && deal.savings_amount !== undefined && deal.savings_amount > 0 && (() => {
+                const currency = totalCommitment?.includes('€') ? '€' : totalCommitment?.includes('£') ? '£' : '$'
+                const savingsFormatted = `${currency}${Math.round(deal.savings_amount).toLocaleString('en-US')}`
+                return (
+                  <div className="mb-3 px-4 py-2.5 bg-emerald-50 border-2 border-emerald-200 rounded-lg">
+                    <p className="text-sm font-bold text-emerald-900">
+                      Saved: {savingsFormatted} ({deal.savings_percent?.toFixed(1)}%)
+                    </p>
+                  </div>
+                )
+              })()}
+
+              {/* What Changed Chips */}
+              {deal.what_changed && deal.what_changed.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {deal.what_changed.map((item: string) => (
+                    <span key={item} className="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-700 rounded-md border border-emerald-200">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* AI Summary */}
+              {deal.close_summary && (
+                <div className="text-sm text-slate-700 leading-relaxed">
+                  {deal.close_summary.split('\n').map((line, i) => {
+                    // Convert markdown bold (**text**) to actual bold
+                    const parts = line.split(/(\*\*[^*]+\*\*)/g)
+                    return (
+                      <p key={i} className="mb-1.5">
+                        {parts.map((part, j) => {
+                          if (part.startsWith('**') && part.endsWith('**')) {
+                            return <strong key={j} className="font-bold text-slate-900">{part.slice(2, -2)}</strong>
+                          }
+                          return part
+                        })}
+                      </p>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Key Metrics Summary */}
       {latestOutput && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
