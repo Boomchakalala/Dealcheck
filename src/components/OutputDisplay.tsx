@@ -68,8 +68,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           mustHaveAsks: output.what_to_ask_for?.must_have || [],
           niceToHaveAsks: output.what_to_ask_for?.nice_to_have || [],
           redFlags: output.red_flags?.map(f => f.issue) || [],
-          leverage: output.negotiation_plan.leverage_you_have,
-          conclusion: output.quick_read.conclusion,
+          leverage: output.negotiation_plan?.leverage_you_have,
+          conclusion: output.quick_read?.conclusion,
         }),
       })
       const data = await res.json()
@@ -203,7 +203,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         </div>
         <p className="text-xs text-emerald-700/70 mb-4 font-medium">Good aspects in this deal — build on these.</p>
         <ul className="space-y-2.5">
-          {output.quick_read.whats_solid.map((item, idx) => (
+          {output.quick_read?.whats_solid?.map((item, idx) => (
             <li key={idx} className="flex items-start gap-3 text-sm text-slate-800 leading-relaxed font-medium">
               <span className="text-emerald-600 mt-1 flex-shrink-0">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -217,7 +217,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       </div>
 
       {/* ── Section 4: Watch Out ── */}
-      {(output.quick_read.whats_concerning.length > 0 || output.red_flags.length > 0) && (
+      {(output.quick_read?.whats_concerning?.length > 0 || output.red_flags?.length > 0) && (
         <div className="space-y-4">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 bg-red-100 rounded-lg">
