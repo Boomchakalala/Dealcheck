@@ -15,14 +15,14 @@ export interface RateLimitResult {
 
 // Default limits for free users
 const DEFAULT_LIMITS: RateLimitConfig = {
-  hourlyLimit: 10,
-  dailyLimit: 50,
+  hourlyLimit: 5,
+  dailyLimit: 5,
 }
 
-// Pro user limits (for future use)
+// Pro user limits
 const PRO_LIMITS: RateLimitConfig = {
-  hourlyLimit: 50,
-  dailyLimit: 500,
+  hourlyLimit: 10,
+  dailyLimit: 30,
 }
 
 export async function checkRateLimit(userId: string, isPro: boolean = false): Promise<RateLimitResult> {

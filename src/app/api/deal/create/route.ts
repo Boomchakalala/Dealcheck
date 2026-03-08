@@ -4,7 +4,7 @@ import { CreateDealSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/openai'
 import { checkRateLimit } from '@/lib/rate-limit'
 
-const FREE_ANALYSIS_LIMIT = 50
+const FREE_ANALYSIS_LIMIT = 5
 
 export async function POST(request: Request) {
   try {
