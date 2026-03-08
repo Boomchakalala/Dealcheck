@@ -56,9 +56,24 @@ export default async function DashboardPage() {
 
       const convertedAmount = await convertDealAmount(totalStr, dealCurrency, baseCurrency)
 
+      // Also convert savings amount if deal is closed with savings
+      let convertedSavings = 0
+      if (deal.savings_amount && deal.savings_amount > 0) {
+        // Detect currency from original total commitment
+        const { currency: originalCurrency } = parseMoney(totalStr)
+        const fromCurrency = dealCurrency || originalCurrency
+
+        if (fromCurrency === baseCurrency) {
+          convertedSavings = deal.savings_amount
+        } else {
+          convertedSavings = await convertCurrency(deal.savings_amount, fromCurrency, baseCurrency)
+        }
+      }
+
       return {
         ...deal,
-        _convertedAmount: convertedAmount
+        _convertedAmount: convertedAmount,
+        _convertedSavings: convertedSavings
       }
     })
   )
@@ -78,7 +93,8 @@ export default async function DashboardPage() {
     return sum + (deal._convertedAmount || 0)
   }, 0)
 
-  const totalSavings = closedDeals.reduce((sum, d) => sum + (d.savings_amount || 0), 0)
+  // Calculate total savings - using converted amounts
+  const totalSavings = closedDeals.reduce((sum, d) => sum + (d._convertedSavings || 0), 0)
   const savingsPercent = totalSpendClosed > 0 ? (totalSavings / totalSpendClosed) * 100 : 0
 
   const formatMoney = (amount: number) => {
