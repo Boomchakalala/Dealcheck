@@ -155,10 +155,22 @@ Return 1-3 must-have asks (typically should include price improvement).
 Rules:
 - Each ask must be SPECIFIC to this quote with ACTUAL NUMBERS
 - Be ASSERTIVE and direct - start with action verbs
-- Frame as confident recommendations: "Negotiate...", "Push for...", "Request...", "Lock in..."
+- NEVER use: "Could we...", "Would you consider...", "Would it be possible to...", "Can we..."
+- Frame as confident recommendations: "Negotiate...", "Push for...", "Request...", "Lock in...", "Get...", "Secure..."
+- Format: "[Action verb] [specific request] — [why/impact with $ numbers]"
 - Explain WHY with SPECIFIC impact (not generic reasons)
 - Prioritize commercial levers over boilerplate terms
 - Reference actual pricing/terms from the quote
+
+❌ WRONG FORMAT (passive, questions):
+- "Could we negotiate a volume discount at this scale?"
+- "Would you consider adding an overage cap to protect against usage spikes?"
+- "Can we discuss payment terms?"
+
+✅ RIGHT FORMAT (assertive, direct):
+- "Negotiate 20% volume discount at 100+ seats — target $80/seat from $100 (saves $24K annually)"
+- "Request hard overage cap at 120% of commit — prevents $50K surprise cost if usage spikes"
+- "Secure quarterly payment terms instead of annual upfront — improves cash flow by $30K"
 
 Examples of strong asks:
 - "Negotiate the $15K onboarding fee down to $8K or spread across Q1-Q2 milestones (saves $7K upfront, 15% of year-1 spend)"
