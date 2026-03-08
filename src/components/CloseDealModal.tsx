@@ -39,15 +39,15 @@ function parseMoney(str: string): number {
   return parseFloat(cleaned.replace(/,/g, '')) || 0
 }
 
-// Format number with currency
+// Format number with currency - cleaner display
 function formatMoney(amount: number, currency: string): string {
+  // For millions, use M notation
   if (amount >= 1000000) {
     return `${currency}${(amount / 1000000).toFixed(1)}M`
   }
-  if (amount >= 1000) {
-    return `${currency}${(amount / 1000).toFixed(1)}K`
-  }
-  return `${currency}${amount.toLocaleString()}`
+  // For everything else, show actual number with commas
+  const rounded = Math.round(amount)
+  return `${currency}${rounded.toLocaleString('en-US')}`
 }
 
 export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, onSuccess }: CloseDealModalProps) {

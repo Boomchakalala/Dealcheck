@@ -62,15 +62,15 @@ function detectCurrency(str?: string): string {
   return '$'
 }
 
-// Format savings with correct currency
+// Format savings with correct currency - cleaner display
 function formatSavings(amount: number, currency: string): string {
+  // For millions, use M notation
   if (amount >= 1000000) {
     return `${currency}${(amount / 1000000).toFixed(1)}M`
   }
-  if (amount >= 1000) {
-    return `${currency}${(amount / 1000).toFixed(1)}K`
-  }
-  return `${currency}${amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+  // For everything else, show actual number with commas
+  const rounded = Math.round(amount)
+  return `${currency}${rounded.toLocaleString('en-US')}`
 }
 
 export function DealListClient({ deals }: DealListClientProps) {

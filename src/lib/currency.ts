@@ -106,6 +106,7 @@ export async function convertCurrency(
 
 /**
  * Format currency amount with symbol
+ * Shows actual numbers with commas for better precision
  */
 export function formatCurrency(amount: number, currency: Currency): string {
   const symbols: Record<Currency, string> = {
@@ -118,13 +119,15 @@ export function formatCurrency(amount: number, currency: Currency): string {
 
   const symbol = symbols[currency]
 
+  // For millions, use M notation (e.g., $2.5M)
   if (amount >= 1000000) {
     return `${symbol}${(amount / 1000000).toFixed(1)}M`
   }
-  if (amount >= 1000) {
-    return `${symbol}${(amount / 1000).toFixed(0)}K`
-  }
-  return `${symbol}${amount.toFixed(0)}`
+
+  // For amounts under 1M, show actual number with thousand separators
+  // Round to nearest dollar for cleaner display
+  const rounded = Math.round(amount)
+  return `${symbol}${rounded.toLocaleString('en-US')}`
 }
 
 /**
