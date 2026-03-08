@@ -233,10 +233,10 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           <p className="text-xs text-red-600/70 -mt-2 font-medium">Issues costing you money or flexibility — each includes what to push for.</p>
 
           {/* Quick concerns */}
-          {output.quick_read.whats_concerning.length > 0 && (
+          {output.quick_read?.whats_concerning.length > 0 && (
             <div className="bg-amber-50 rounded-xl border-2 border-amber-200 p-4 sm:p-5 shadow-sm">
               <ul className="space-y-2.5">
-                {output.quick_read.whats_concerning.map((concern, idx) => (
+                {output.quick_read?.whats_concerning.map((concern, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-sm text-slate-800 leading-relaxed font-medium">
                     <span className="text-amber-600 mt-1.5 flex-shrink-0 w-2 h-2 rounded-full bg-amber-500" />
                     {concern}
@@ -294,11 +294,11 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         </div>
 
         {/* Leverage */}
-        {output.negotiation_plan.leverage_you_have.length > 0 && (
+        {output.negotiation_plan?.leverage_you_have.length > 0 && (
           <div>
             <h3 className="text-sm font-bold text-slate-800 mb-3">Leverage you have</h3>
             <ul className="space-y-2">
-              {output.negotiation_plan.leverage_you_have.map((item, idx) => (
+              {output.negotiation_plan?.leverage_you_have.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
                   <span className="text-emerald-600 mt-1 flex-shrink-0">
                     <Zap className="w-4 h-4" />
@@ -342,11 +342,11 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         )}
 
         {/* Trades */}
-        {output.negotiation_plan.trades_you_can_offer.length > 0 && (
+        {output.negotiation_plan?.trades_you_can_offer.length > 0 && (
           <div>
             <h3 className="text-sm font-bold text-slate-800 mb-3">Trades you can offer</h3>
             <ul className="space-y-2">
-              {output.negotiation_plan.trades_you_can_offer.map((trade, idx) => (
+              {output.negotiation_plan?.trades_you_can_offer.map((trade, idx) => (
                 <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
                   <span className="text-slate-400 mt-1 flex-shrink-0">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
