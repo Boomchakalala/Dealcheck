@@ -152,64 +152,72 @@ export default async function DealPage({
 
       {/* Outcome Card - Shows when deal is closed */}
       {deal.status?.startsWith('closed_') && (
-        <Card className="p-5 bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200">
-          <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-              {deal.status === 'closed_won' && <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
-              {deal.status === 'closed_lost' && <TrendingDown className="w-5 h-5 text-red-600" />}
-              {deal.status === 'closed_paused' && <Plus className="w-5 h-5 rotate-45 text-slate-600" />}
+        <Card className="p-6 bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 border-2 border-emerald-300 shadow-lg">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center flex-shrink-0 shadow-md">
+              {deal.status === 'closed_won' && <CheckCircle2 className="w-6 h-6 text-white" />}
+              {deal.status === 'closed_lost' && <TrendingDown className="w-6 h-6 text-white" />}
+              {deal.status === 'closed_paused' && <Minus className="w-6 h-6 text-white" />}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-bold text-slate-900">Outcome</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-bold text-slate-900">Deal Closed</h3>
                 {deal.closed_at && (
-                  <span className="text-xs text-slate-500">
-                    Closed {new Date(deal.closed_at).toLocaleDateString()}
+                  <span className="text-xs text-slate-600 font-medium px-3 py-1 bg-white rounded-full border border-slate-200">
+                    {new Date(deal.closed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 )}
               </div>
 
-              {/* Savings Badge */}
+              {/* Savings Badge - Make it prominent */}
               {deal.savings_amount !== null && deal.savings_amount !== undefined && deal.savings_amount > 0 && (() => {
                 const currency = totalCommitment?.includes('€') ? '€' : totalCommitment?.includes('£') ? '£' : '$'
                 const savingsFormatted = `${currency}${Math.round(deal.savings_amount).toLocaleString('en-US')}`
                 return (
-                  <div className="mb-3 px-4 py-2.5 bg-emerald-50 border-2 border-emerald-200 rounded-lg">
-                    <p className="text-sm font-bold text-emerald-900">
-                      Saved: {savingsFormatted} ({deal.savings_percent?.toFixed(1)}%)
-                    </p>
+                  <div className="mb-4 p-4 bg-white rounded-xl border-2 border-emerald-300 shadow-sm">
+                    <p className="text-xs text-emerald-700 font-bold uppercase tracking-wide mb-1">Total Savings</p>
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-3xl font-bold text-emerald-900">{savingsFormatted}</p>
+                      <p className="text-xl font-bold text-emerald-700">({deal.savings_percent?.toFixed(1)}%)</p>
+                    </div>
                   </div>
                 )
               })()}
 
               {/* What Changed Chips */}
               {deal.what_changed && deal.what_changed.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {deal.what_changed.map((item: string) => (
-                    <span key={item} className="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-700 rounded-md border border-emerald-200">
-                      {item}
-                    </span>
-                  ))}
+                <div className="mb-4">
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">What Changed</p>
+                  <div className="flex flex-wrap gap-2">
+                    {deal.what_changed.map((item: string) => (
+                      <span key={item} className="px-3 py-1.5 text-xs font-bold bg-white text-emerald-700 rounded-lg border-2 border-emerald-200 shadow-sm">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
 
               {/* AI Summary */}
               {deal.close_summary && (
-                <div className="text-sm text-slate-700 leading-relaxed">
-                  {deal.close_summary.split('\n').map((line, i) => {
-                    // Convert markdown bold (**text**) to actual bold
-                    const parts = line.split(/(\*\*[^*]+\*\*)/g)
-                    return (
-                      <p key={i} className="mb-1.5">
-                        {parts.map((part, j) => {
-                          if (part.startsWith('**') && part.endsWith('**')) {
-                            return <strong key={j} className="font-bold text-slate-900">{part.slice(2, -2)}</strong>
-                          }
-                          return part
-                        })}
-                      </p>
-                    )
-                  })}
+                <div className="p-4 bg-white rounded-xl border border-slate-200">
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Summary</p>
+                  <div className="text-sm text-slate-700 leading-relaxed">
+                    {deal.close_summary.split('\n').map((line, i) => {
+                      // Convert markdown bold (**text**) to actual bold
+                      const parts = line.split(/(\*\*[^*]+\*\*)/g)
+                      return (
+                        <p key={i} className="mb-2">
+                          {parts.map((part, j) => {
+                            if (part.startsWith('**') && part.endsWith('**')) {
+                              return <strong key={j} className="font-bold text-slate-900">{part.slice(2, -2)}</strong>
+                            }
+                            return part
+                          })}
+                        </p>
+                      )
+                    })}
+                  </div>
                 </div>
               )}
             </div>
@@ -217,47 +225,52 @@ export default async function DealPage({
         </Card>
       )}
 
-      {/* Key Metrics Summary */}
+      {/* Key Metrics Summary - Premium Snapshot */}
       {latestOutput && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Total Commitment */}
-          <Card className="p-5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Package className="w-5 h-5 text-blue-600" />
+          <Card className="p-6 border-2 border-slate-200 hover:border-slate-300 transition-all hover:shadow-md">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                <Package className="w-6 h-6 text-white" />
               </div>
-              <div>
-                <p className="text-xs text-slate-500 font-medium">Total Commitment</p>
-                <p className="text-2xl font-bold text-slate-900">{totalCommitment || 'N/A'}</p>
-              </div>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wide mb-1">Total Commitment</p>
+              <p className="text-3xl font-bold text-slate-900">{totalCommitment || 'N/A'}</p>
             </div>
           </Card>
 
           {/* Red Flags */}
-          <Card className="p-5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
+          <Card className="p-6 border-2 border-slate-200 hover:border-red-300 transition-all hover:shadow-md">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                <AlertTriangle className="w-6 h-6 text-white" />
               </div>
-              <div>
-                <p className="text-xs text-slate-500 font-medium">Red Flags</p>
-                <p className="text-2xl font-bold text-slate-900">{redFlagCount}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wide mb-1">Red Flags</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-3xl font-bold text-slate-900">{redFlagCount}</p>
+                {redFlagCount > 0 && (
+                  <span className="text-sm font-semibold text-red-600">to address</span>
+                )}
               </div>
             </div>
           </Card>
 
           {/* Potential Savings */}
-          <Card className="p-5 bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                <BadgeDollarSign className="w-5 h-5 text-emerald-600" />
+          <Card className="p-6 bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-300 hover:border-emerald-400 transition-all hover:shadow-md">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                <BadgeDollarSign className="w-6 h-6 text-white" />
               </div>
-              <div>
-                <p className="text-xs text-emerald-700 font-medium">Potential Savings</p>
-                <p className="text-2xl font-bold text-emerald-900">
-                  {potentialSavings > 0 ? formatSavings(potentialSavings) : 'TBD'}
-                </p>
-              </div>
+            </div>
+            <div>
+              <p className="text-xs text-emerald-700 font-bold uppercase tracking-wide mb-1">Potential Savings</p>
+              <p className="text-3xl font-bold text-emerald-900">
+                {potentialSavings > 0 ? formatSavings(potentialSavings) : 'TBD'}
+              </p>
             </div>
           </Card>
         </div>
