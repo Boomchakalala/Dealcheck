@@ -7,6 +7,7 @@ import { X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { DealListClient } from '@/components/DealListClient'
 import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
+import { trackEvent } from '@/lib/analytics'
 
 type RoundData = {
   id: string
@@ -66,6 +67,16 @@ export default function DashboardPage() {
       setProfile(profileRes.data)
       setDeals((dealsRes.data as DealWithRounds[]) || [])
       setLoading(false)
+
+      // Track dashboard view
+      const closedDeals = (dealsRes.data as DealWithRounds[])?.filter(d => d.status && ['won', 'lost', 'paused'].includes(d.status)) || []
+      trackEvent({
+        name: 'dashboard_viewed',
+        properties: {
+          dealCount: (dealsRes.data as DealWithRounds[])?.length || 0,
+          closedCount: closedDeals.length
+        }
+      })
 
       // Check for pending trial import (localStorage with 24h TTL)
       const pendingTrial = localStorage.getItem('dealcheck_trial')
@@ -153,6 +164,16 @@ export default function DashboardPage() {
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to create deal')
+
+      // Track deal creation
+      trackEvent({
+        name: 'deal_created',
+        properties: {
+          dealType: payload.dealType,
+          source: imageData ? 'upload' : uploadedFileName ? 'upload' : 'paste',
+          hasGoal: false
+        }
+      })
 
       // Redirect to the new deal
       router.push(`/app/deal/${data.dealId}`)
