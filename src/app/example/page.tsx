@@ -45,9 +45,9 @@ const exampleOutput: DealOutput = {
     {
       type: "Commercial",
       issue: "Forced to pay for 200 seats regardless of actual usage",
-      why_it_matters: "You're paying for users who rarely log in. If 40 seats are underutilized, that's $6,000/year wasted on inactive licenses.",
-      what_to_ask_for: "Switch to quarterly true-up model where you pay for active users (logged in last 30 days). This eliminates paying for inactive seats.",
-      if_they_push_back: "Request 10% buffer allowance — pay for 180 seats but can use up to 200 without penalty. Saves $3K annually on seat waste."
+      why_it_matters: "You're paying for users who rarely log in. If 40 seats are underutilized at $12.50/user/month, that's $500/month or $6,000/year wasted on inactive licenses.",
+      what_to_ask_for: "Switch to quarterly true-up model where you pay for active users (logged in last 30 days). Or request 10% buffer — pay for 180 seats but can use up to 200.",
+      if_they_push_back: "Accept monthly reconciliation instead of quarterly, or negotiate down to 180 committed seats with option to add more as needed."
     }
   ],
   negotiation_plan: {
@@ -162,7 +162,7 @@ export default function ExamplePage() {
             <div className="flex-1">
               <h2 className="text-lg font-bold text-blue-900 mb-1">Demo Analysis</h2>
               <p className="text-sm text-blue-800 mb-3">
-                This is an example analysis showing how DealCheck evaluates vendor quotes. The data below is fictional but representative of a typical cloud storage procurement.
+                This is an example analysis showing how DealCheck evaluates vendor quotes. The data below is fictional but representative of a typical SaaS renewal.
               </p>
               <div className="flex items-center gap-3">
                 <Link
