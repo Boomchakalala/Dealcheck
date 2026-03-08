@@ -105,6 +105,15 @@ export function DealListClient({ deals }: DealListClientProps) {
       })
 
       if (response.ok) {
+        // Track deal deletion
+        trackEvent({
+          name: 'deal_deleted',
+          properties: {
+            isClosed: !!isClosed,
+            hasSavings: !!hasSavings
+          }
+        })
+
         router.refresh()
       } else {
         alert('Failed to delete deal')

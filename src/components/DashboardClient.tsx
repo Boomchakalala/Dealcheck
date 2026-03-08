@@ -5,6 +5,7 @@ import { DealListClient } from './DealListClient'
 import { Layers, ChevronDown, ChevronRight, Globe } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { parseMoney, formatCurrency, convertCurrency, SUPPORTED_CURRENCIES, type Currency } from '@/lib/currency'
+import { trackEvent } from '@/lib/analytics'
 
 interface DashboardClientProps {
   deals: any[]
