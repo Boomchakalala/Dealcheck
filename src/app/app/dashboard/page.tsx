@@ -42,8 +42,9 @@ export default async function DashboardPage() {
   const totalSpendAnalyzed = allDeals.reduce((sum, deal) => {
     const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
     const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-    if (totalStr) {
-      const cleaned = totalStr.replace(/[$,]/g, '')
+    console.log('Deal:', deal.vendor || deal.title, 'Total:', totalStr)
+    if (totalStr && typeof totalStr === 'string') {
+      const cleaned = totalStr.replace(/[$,\s]/g, '')
       let amount = 0
       if (cleaned.toLowerCase().includes('k')) {
         amount = parseFloat(cleaned.replace(/k/i, '')) * 1000
@@ -52,6 +53,7 @@ export default async function DashboardPage() {
       } else {
         amount = parseFloat(cleaned) || 0
       }
+      console.log('  Parsed:', amount)
       return sum + amount
     }
     return sum
@@ -61,8 +63,8 @@ export default async function DashboardPage() {
   const totalSpendClosed = closedDeals.reduce((sum, deal) => {
     const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
     const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-    if (totalStr) {
-      const cleaned = totalStr.replace(/[$,]/g, '')
+    if (totalStr && typeof totalStr === 'string') {
+      const cleaned = totalStr.replace(/[$,\s]/g, '')
       let amount = 0
       if (cleaned.toLowerCase().includes('k')) {
         amount = parseFloat(cleaned.replace(/k/i, '')) * 1000
@@ -78,6 +80,13 @@ export default async function DashboardPage() {
 
   const totalSavings = closedDeals.reduce((sum, d) => sum + (d.savings_amount || 0), 0)
   const savingsPercent = totalSpendClosed > 0 ? (totalSavings / totalSpendClosed) * 100 : 0
+
+  console.log('Dashboard KPIs:', {
+    totalSpendAnalyzed,
+    totalSpendClosed,
+    totalSavings,
+    savingsPercent
+  })
 
   const formatMoney = (amount: number) => {
     if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`
