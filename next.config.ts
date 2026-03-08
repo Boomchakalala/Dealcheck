@@ -5,12 +5,10 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: '10mb',
     },
+    allowedOrigins: ['preview-biyuzibqkmay.share.sandbox.dev'],
   },
   // Exclude pdf-parse from bundling to prevent test code execution
   serverExternalPackages: ['pdf-parse', 'canvas'],
-
-  // Allow preview URLs for development
-  allowedDevOrigins: ['preview-*.share.sandbox.dev'],
 
   async headers() {
     return [
