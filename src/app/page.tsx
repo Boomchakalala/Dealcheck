@@ -364,8 +364,8 @@ export default function LandingPage() {
               <div className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
                 <Lock className="w-8 h-8 text-emerald-700" />
               </div>
-              <p className="text-lg font-semibold text-slate-900 mb-2">Encrypted end-to-end</p>
-              <p className="text-sm text-slate-600 leading-relaxed">Processed securely and deleted after analysis unless you choose to save it.</p>
+              <p className="text-lg font-semibold text-slate-900 mb-2">Enterprise-grade security</p>
+              <p className="text-sm text-slate-600 leading-relaxed">Data encrypted in transit and at rest. Securely processed and deleted after analysis unless you save it.</p>
             </div>
             <div className="relative flex flex-col items-center text-center group">
               <div className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
