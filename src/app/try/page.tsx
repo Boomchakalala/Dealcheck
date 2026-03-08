@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { OutputDisplayV2 } from '@/components/OutputDisplayV2'
+import { OutputDisplay } from '@/components/OutputDisplay'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
 import { MarketingFooter } from '@/components/MarketingFooter'
-import type { DealOutputV2 } from '@/types'
+import type { DealOutput } from '@/types'
 
 const TRIAL_STORAGE_KEY = 'dealcheck_trial'
 const TRIAL_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
@@ -35,7 +35,7 @@ export default function TryPage() {
   const [uploading, setUploading] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [output, setOutput] = useState<DealOutputV2 | null>(null)
+  const [output, setOutput] = useState<DealOutput | null>(null)
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [dealType, setDealType] = useState<'New' | 'Renewal'>('New')
   const [goal, setGoal] = useState('')
@@ -152,23 +152,8 @@ This quote expires in 14 days.`
             <span className="text-xs font-medium text-slate-400">Your analysis is ready</span>
           </div>
 
-          {/* Result context banner */}
-          {output.recommended_strategy.posture === 'no_push_needed' ? (
-            <div className="mb-6 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-              <p className="text-sm font-semibold text-emerald-900">This quote is already competitive.</p>
-              <p className="text-xs text-emerald-700 mt-1">A few minor tweaks and you&apos;re good to go. See the dominant issue below.</p>
-            </div>
-          ) : output.deal_snapshot.leverage_level === 'high' ? (
-            <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <p className="text-sm font-semibold text-amber-900">
-                You have high leverage in this negotiation.
-              </p>
-              <p className="text-xs text-amber-700 mt-1">Scroll down for your strategy and email generator.</p>
-            </div>
-          ) : null}
-
           {/* Analysis output — shown FIRST */}
-          <OutputDisplayV2 output={output} />
+          <OutputDisplay output={output} />
 
           {/* Save CTA — shown AFTER results */}
           <div className="mt-10 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-6 text-center">
