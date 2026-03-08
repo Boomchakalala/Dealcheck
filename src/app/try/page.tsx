@@ -136,8 +136,24 @@ This quote expires in 14 days.`
         <UnifiedHeader variant="public" />
 
         <main className="max-w-5xl mx-auto px-5 sm:px-8 py-12">
-          {/* Top bar: back button + "analysis ready" label */}
-          <div className="flex items-center justify-between mb-6">
+          {/* Sign in banner at top */}
+          <div className="mb-6 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-bold text-slate-900">Sign in to save this analysis and add negotiation rounds</p>
+                <p className="text-xs text-slate-600 mt-1">Your analysis will be lost if you leave this page.</p>
+              </div>
+              <Link
+                href="/login?from=trial"
+                className="flex-shrink-0 inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+              >
+                Sign in
+              </Link>
+            </div>
+          </div>
+
+          {/* Back button */}
+          <div className="mb-6">
             <button
               onClick={() => {
                 setOutput(null)
@@ -149,33 +165,10 @@ This quote expires in 14 days.`
             >
               ← Analyze another quote
             </button>
-            <span className="text-xs font-medium text-slate-400">Your analysis is ready</span>
           </div>
 
-          {/* Analysis output — shown FIRST */}
+          {/* Full analysis output (no roundId = trial mode) */}
           <OutputDisplay output={output} />
-
-          {/* Save CTA — shown AFTER results */}
-          <div className="mt-10 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-6 text-center">
-            <p className="text-xs font-medium text-emerald-700 mb-3">This was 1 of your 2 free analyses</p>
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Keep this analysis. Add rounds. Close the deal.</h3>
-            <p className="text-sm text-slate-600 mb-5">Create a free account to save this analysis, track negotiation rounds, and follow through.</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/login?from=trial"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
-              >
-                Save analysis — sign up free
-              </Link>
-              <Link
-                href="/login?from=trial"
-                className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
-              >
-                Already have an account? Sign in
-              </Link>
-            </div>
-            <p className="text-xs text-slate-400 mt-3">Your analysis stays on this page until you save it.</p>
-          </div>
         </main>
 
         <MarketingFooter />
