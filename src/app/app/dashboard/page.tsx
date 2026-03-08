@@ -13,10 +13,10 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  // Get user profile for usage tracking
+  // Get user profile for usage tracking and currency preference
   const { data: profile } = await supabase
     .from('profiles')
-    .select('usage_count, plan, is_admin')
+    .select('usage_count, plan, is_admin, base_currency')
     .eq('id', user.id)
     .single()
 
@@ -25,12 +25,13 @@ export default async function DashboardPage() {
     .from('deals')
     .select(`*, rounds (id, output_json, round_number, status)`)
     .eq('user_id', user.id)
-    .order('updated_at', { ascending: false })
+    .order('updated_at', { ascending: false})
 
   const allDeals = deals || []
   const isPro = profile?.plan === 'pro'
   const isAdmin = profile?.is_admin || false
   const usageCount = profile?.usage_count || 0
+  const baseCurrency = (profile?.base_currency as 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD') || 'USD'
   const FREE_LIMIT = 5
 
   // Calculate KPIs

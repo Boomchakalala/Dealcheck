@@ -313,6 +313,7 @@ Return valid JSON only. Match this structure exactly:
     "vendor_product": "Datadog / Observability Platform",
     "term": "12 months",
     "total_commitment": "$15,000",
+    "currency": "USD",
     "billing_payment": "Monthly",
     "pricing_model": "Commit-based: 10M logs/day + per-host",
     "deal_type": "Renewal",
@@ -320,6 +321,7 @@ Return valid JSON only. Match this structure exactly:
     "signing_deadline": "February 28, 2026"
   },
   "NOTE_TOTAL": "total_commitment = CAREFULLY FIND THE ACTUAL TOTAL CONTRACT VALUE. Look for phrases like 'Total Contract Value', 'Annual Total', 'Total Amount', 'Grand Total'. DO NOT just multiply a monthly line item by 12 - find the actual stated total. If monthly amount shown, verify it matches: (total ÷ 12) = monthly.",
+  "NOTE_CURRENCY": "currency = Detect from the quote: 'USD' ($ or USD), 'EUR' (€ or EUR), 'GBP' (£ or GBP), 'CAD' (C$ or CAD), 'AUD' (A$ or AUD). Default to 'USD' if unclear.",
   "NOTE_BILLING": "billing_payment = 'Monthly', 'Quarterly', 'Annual upfront', etc. Keep it simple.",
   "NOTE_DEAL_TYPE": "deal_type = 'Renewal' if renewing existing, 'New purchase' if new vendor",
   "NOTE_DATES": "renewal_date and signing_deadline = extract if stated, otherwise omit",
