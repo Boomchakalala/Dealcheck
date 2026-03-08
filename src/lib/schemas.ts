@@ -94,6 +94,33 @@ export const EmailControlsSchema = z.object({
 
 export const DealOutputSchemaV2 = z.object({
   schema_version: z.literal('v2'),
+
+  // Quote Summary
+  quote_snapshot: z.object({
+    vendor_product: z.string(),
+    term: z.string(),
+    total_commitment: z.string(),
+    billing_payment: z.string(),
+    pricing_model: z.string(),
+  }),
+
+  // Quick Read - What's good/bad
+  quick_read: z.object({
+    whats_solid: z.array(z.string()).max(3),
+    whats_concerning: z.array(z.string()).max(3),
+    conclusion: z.string(),
+  }),
+
+  // Red Flags with mitigation
+  red_flags: z.array(RedFlagSchema).max(3),
+
+  // What to Ask For
+  what_to_ask_for: z.object({
+    must_have: z.array(z.string()).max(4),
+    nice_to_have: z.array(z.string()).max(3),
+  }),
+
+  // Deal metadata
   deal_snapshot: z.object({
     audience: z.enum(['business', 'personal']),
     quote_type: z.enum([
