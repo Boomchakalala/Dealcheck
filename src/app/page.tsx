@@ -99,7 +99,7 @@ export default function LandingPage() {
                   <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full border border-amber-200">Negotiate before signing</span>
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">SaaS Infra</span>
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">SaaS - Infrastructure</span>
                     </div>
                     <div className="space-y-2">
                       <div className="h-2 bg-amber-200 rounded w-full" />
