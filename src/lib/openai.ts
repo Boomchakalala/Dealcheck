@@ -243,26 +243,37 @@ Prefer:
 EMAIL RULES
 ==================================================
 
-- Emails must be professional and collaborative (not aggressive)
-- In email BODY bullets: Use assertive but polite language - "Negotiate...", "Push for...", "Request...", "Lock in..." (be direct)
-- In email SUBJECT and OPENING: Stay warm and collaborative
-- Include: bullet asks (max 4), request for updated quote, deadline [DATE], optional call offer
-- neutral: warm & collaborative approach
-- firm: direct but respectful follow-up
-- final_push: urgent but professional close
+CRITICAL: Emails use DIFFERENT language than must-have asks section!
+- Must-have asks section: ASSERTIVE ("Negotiate...", "Push for...")
+- Emails: POLITE QUESTIONS ("Could we...", "Would you consider...")
+
+Email tone:
+- Professional, warm, collaborative
+- Use polite questions: "Could we...", "Would you consider...", "Would it be possible to...", "Can we discuss..."
+- Never aggressive or demanding
+- Build rapport while making clear requests
 
 Structure:
 1. Warm opening (reference quote/conversation)
-2. Main framing sentence
-3. Specific asks as bullets:
-   • Negotiate [specific request with $ impact]
-   • Push for [specific request with why]
-   • Request [specific request with benefit]
-   • Lock in [specific commitment]
-4. Request updated quote in writing
-5. Deadline [DATE]
-6. Optional: offer call if needed
+2. Brief context (1 sentence on what you reviewed)
+3. Specific asks as polite questions (2-4 bullets):
+   • Could we [specific request]? [Brief why]
+   • Would you consider [specific request]? [Brief benefit]
+   • Would it be possible to [specific request]? [Brief impact]
+4. Request for updated quote in writing
+5. Deadline: [DATE]
+6. Optional: Offer call if helpful
 7. Professional close
+
+Email variations:
+- neutral: warm & collaborative, gentle questions
+- firm: direct but respectful follow-up, clearer deadline emphasis
+- final_push: urgent but professional close, strong deadline language
+
+Example email bullets (POLITE):
+• "Could we explore a volume discount at 100+ seats? Current per-seat pricing doesn't reflect enterprise scale."
+• "Would you consider adding an overage cap at 120% of commit? This would help us manage budget predictability."
+• "Would it be possible to adjust payment terms to quarterly? This would improve our cash flow planning."
 
 ==================================================
 SCOPE LIMITS
@@ -289,11 +300,12 @@ Return valid JSON only. Match this structure exactly:
   "snapshot": {
     "vendor_product": "Datadog / Observability Platform",
     "term": "12 months",
-    "total_commitment": "$150,000 total ($12,500/month)",
-    "billing_payment": "Monthly in arrears",
+    "total_commitment": "$150,000 annual contract",
+    "billing_payment": "Monthly payments of $12,500",
     "pricing_model": "Commit-based: 10M logs/day + per-host pricing",
     "deal_type": "New purchase"
   },
+  "NOTE_PRICING": "Keep total_commitment and billing_payment SEPARATE. Never combine like '$150K total ($12.5K/month)'",
   "quick_read": {
     "whats_solid": ["15% discount already applied", "Flexible host scaling", "No minimum term commitment"],
     "whats_concerning": ["No overage protection", "Auto-renewal at 90 days", "Pricing above typical for volume"],
