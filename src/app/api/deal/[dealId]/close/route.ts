@@ -18,7 +18,7 @@ export async function POST(
     }
 
     const body = await request.json()
-    const { outcome, savingsAmount, savingsPercent, whatChanged, notes } = body
+    const { outcome, finalTotal, savingsAmount, savingsPercent, whatChanged, notes } = body
 
     if (!['won', 'lost', 'paused'].includes(outcome)) {
       return NextResponse.json({ error: 'Invalid outcome' }, { status: 400 })
@@ -36,48 +36,33 @@ export async function POST(
       return NextResponse.json({ error: 'Deal not found' }, { status: 404 })
     }
 
-    // Calculate savings if possible
-    let finalSavingsAmount = savingsAmount
-    let finalSavingsPercent = savingsPercent
-    const latestRound = deal.rounds?.[0]
+    // Get the latest round for context
+    const sortedRounds = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number) || []
+    const latestRound = sortedRounds[0]
     const baseTotal = latestRound?.output_json?.snapshot?.total_commitment
-
-    // If user didn't provide savings but we have base total, try to calculate
-    if (!finalSavingsAmount && !finalSavingsPercent && baseTotal) {
-      // This would be where AI estimation happens in the future
-      // For now, we just use what the user provided
-    }
 
     // Generate close summary using OpenAI
     let closeSummary = null
-    if (latestRound?.output_json) {
+    if (latestRound?.output_json && outcome === 'won') {
       try {
-        const summaryPrompt = `Generate a brief 5-line recap for this procurement deal that was just closed:
+        const summaryPrompt = `Generate a brief summary for this procurement deal that was just closed:
 
 Vendor: ${deal.vendor || 'Unknown'}
-Outcome: ${outcome === 'won' ? 'Deal closed successfully' : outcome === 'lost' ? 'Deal lost' : 'Deal paused'}
 Original total: ${baseTotal || 'Unknown'}
-${finalSavingsAmount ? `Savings: $${finalSavingsAmount}` : ''}${finalSavingsPercent ? ` (${finalSavingsPercent}%)` : ''}
-${whatChanged ? `What changed: ${whatChanged.join(', ')}` : ''}
+Final total: ${finalTotal || 'Not specified'}
+${savingsAmount ? `Savings: $${savingsAmount.toLocaleString()}` : ''}${savingsPercent ? ` (${savingsPercent.toFixed(1)}%)` : ''}
+${whatChanged?.length ? `What changed: ${whatChanged.join(', ')}` : ''}
 Notes: ${notes || 'None'}
-
-Starting position from first round:
-${latestRound.output_json.snapshot?.overview || 'Unknown'}
 
 Key asks from negotiation:
 ${latestRound.output_json.what_to_ask_for?.must_have?.slice(0, 3).join('\n') || 'None'}
 
-Format as exactly 5 bullet points covering:
-1. Starting position
-2. Final terms
-3. Savings (if any)
-4. Key concessions won
-5. Next action or note`
+Generate 3-5 concise bullet points covering: starting position, final terms, savings (if any), key wins, and next action.`
 
         const completion = await openai.chat.completions.create({
           model: 'gpt-4o-mini',
           messages: [
-            { role: 'system', content: 'You are a procurement analyst. Generate concise, factual close summaries in exactly 5 bullet points.' },
+            { role: 'system', content: 'You are a procurement analyst. Generate concise, factual close summaries in 3-5 bullet points.' },
             { role: 'user', content: summaryPrompt }
           ],
           temperature: 0.3,
@@ -97,8 +82,8 @@ Format as exactly 5 bullet points covering:
       .update({
         status: `closed_${outcome}`,
         closed_at: new Date().toISOString(),
-        savings_amount: finalSavingsAmount,
-        savings_percent: finalSavingsPercent,
+        savings_amount: savingsAmount,
+        savings_percent: savingsPercent,
         what_changed: whatChanged,
         close_notes: notes,
         close_summary: closeSummary,
@@ -108,6 +93,7 @@ Format as exactly 5 bullet points covering:
       .eq('user_id', user.id)
 
     if (updateError) {
+      console.error('Update error:', updateError)
       return NextResponse.json({ error: 'Failed to update deal' }, { status: 500 })
     }
 
