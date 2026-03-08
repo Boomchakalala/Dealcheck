@@ -30,10 +30,9 @@ const exampleOutput: DealOutput = {
     whats_concerning: [
       "Auto-renewal with only 60-day notice creates lock-in risk",
       "Overage charges at 150% of base rate create unpredictable costs",
-      "Support incidents capped at 10/month — risky during migration",
-      "No termination-for-convenience clause after the initial term"
+      "Support incidents capped at 10/month — risky during migration"
     ],
-    conclusion: "The infrastructure and compliance features are solid, but the contract terms create unnecessary vendor lock-in and cost unpredictability. The auto-renewal window is narrow, overages are punitive, and support limits could cause problems during onboarding. These are all negotiable."
+    conclusion: "Solid infrastructure and compliance, but contract terms create vendor lock-in and cost unpredictability — all negotiable."
   },
   red_flags: [
     {
