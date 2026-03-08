@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { CloseDealModal } from '@/components/CloseDealModal'
-import { AlertTriangle, CheckCircle2, TrendingDown, Pause } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, X } from 'lucide-react'
 
 interface DealListClientProps {
   deals: any[]
@@ -55,11 +55,39 @@ function getStatusIcon(deal: any) {
 export function DealListClient({ deals }: DealListClientProps) {
   const router = useRouter()
   const [dealToClose, setDealToClose] = useState<{id: string, total?: string, roundCount: number} | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const handleQuickClose = (e: React.MouseEvent, dealId: string, currentTotal?: string, roundCount?: number) => {
     e.preventDefault()
     e.stopPropagation()
     setDealToClose({ id: dealId, total: currentTotal, roundCount: roundCount || 0 })
+  }
+
+  const handleDelete = async (e: React.MouseEvent, dealId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!confirm('Are you sure you want to delete this deal? This action cannot be undone.')) {
+      return
+    }
+
+    setDeletingId(dealId)
+
+    try {
+      const response = await fetch(`/api/deal/${dealId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        router.refresh()
+      } else {
+        alert('Failed to delete deal')
+      }
+    } catch (error) {
+      alert('Error deleting deal')
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   if (deals.length === 0) {
