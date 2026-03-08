@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card'
 import { TrendingUp, Target, CheckCircle2, Plus, Zap, Lock, Crown, DollarSign, Percent, BarChart3 } from 'lucide-react'
 import { DashboardClient } from '@/components/DashboardClient'
 import Link from 'next/link'
+import { parseMoney, formatCurrency, type Currency } from '@/lib/currency'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -39,49 +40,19 @@ export default async function DashboardPage() {
   const closedDeals = allDeals.filter(d => d.status?.startsWith('closed_'))
   const wonDeals = closedDeals.filter(d => d.status === 'closed_won')
 
-  // Helper function to parse money strings
-  const parseMoney = (str: string): number => {
-    if (!str || typeof str !== 'string') return 0
-
-    // Remove currency symbols and extra text
-    let cleaned = str
-      .toUpperCase()
-      .replace(/USD/g, '')
-      .replace(/\/MONTH/g, '')
-      .replace(/\/YEAR/g, '')
-      .replace(/MONTHLY/g, '')
-      .replace(/ANNUAL/g, '')
-      .replace(/CONTRACT/g, '')
-      .trim()
-
-    // Extract just the number part with K/M suffix
-    const match = cleaned.match(/\$?\s*([\d,]+\.?\d*)\s*([KM])?/)
-    if (!match) return 0
-
-    const numberStr = match[1].replace(/,/g, '')
-    const suffix = match[2]
-    const baseAmount = parseFloat(numberStr)
-
-    if (isNaN(baseAmount)) return 0
-
-    if (suffix === 'K') return baseAmount * 1000
-    if (suffix === 'M') return baseAmount * 1000000
-    return baseAmount
-  }
-
-  // Calculate total spend analyzed (all deals)
+  // Calculate total spend analyzed (all deals) - in base currency
   const totalSpendAnalyzed = allDeals.reduce((sum, deal) => {
     const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
     const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-    const amount = parseMoney(totalStr)
+    const { amount } = parseMoney(totalStr)
     return sum + amount
   }, 0)
 
-  // Calculate total spend closed (only closed deals)
+  // Calculate total spend closed (only closed deals) - in base currency
   const totalSpendClosed = closedDeals.reduce((sum, deal) => {
     const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
     const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-    const amount = parseMoney(totalStr)
+    const { amount } = parseMoney(totalStr)
     return sum + amount
   }, 0)
 
@@ -89,9 +60,7 @@ export default async function DashboardPage() {
   const savingsPercent = totalSpendClosed > 0 ? (totalSavings / totalSpendClosed) * 100 : 0
 
   const formatMoney = (amount: number) => {
-    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`
-    if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`
-    return `$${amount.toFixed(0)}`
+    return formatCurrency(amount, baseCurrency)
   }
 
   if (totalDeals === 0) {
