@@ -143,6 +143,8 @@ export type DealOutput = {
     billing_payment: string
     pricing_model: string
     deal_type: string
+    renewal_date?: string
+    signing_deadline?: string
   }
   quick_read: {
     whats_solid: string[]
