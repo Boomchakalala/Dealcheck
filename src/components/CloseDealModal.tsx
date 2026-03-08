@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { X, Loader2, Sparkles, TrendingDown, Edit3 } from 'lucide-react'
+import { trackEvent } from '@/lib/analytics'
 
 interface CloseDealModalProps {
   dealId: string
@@ -135,6 +136,16 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to close deal')
       }
+
+      // Track deal closed event
+      trackEvent({
+        name: 'deal_closed',
+        properties: {
+          outcome,
+          hasSavings: actualSavingsAmount > 0,
+          savingsAmount: actualSavingsAmount > 0 ? actualSavingsAmount : undefined
+        }
+      })
 
       onSuccess()
     } catch (err) {

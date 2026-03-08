@@ -64,6 +64,13 @@ export function DealHeaderClient({
         method: 'POST',
       })
       if (!response.ok) throw new Error('Failed to reopen deal')
+
+      // Track reopen event
+      trackEvent({
+        name: 'deal_reopened',
+        properties: { dealId }
+      })
+
       router.refresh()
     } catch (err) {
       console.error(err)
