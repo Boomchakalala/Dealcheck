@@ -1,8 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
-import { TrendingUp, Target, CheckCircle2, Plus, Layers } from 'lucide-react'
-import { DealListClient } from '@/components/DealListClient'
+import { TrendingUp, Target, CheckCircle2, Plus } from 'lucide-react'
 import { DashboardClient } from '@/components/DashboardClient'
 import Link from 'next/link'
 
@@ -116,11 +115,8 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {/* All Deals */}
-      <div>
-        <h2 className="text-lg font-bold text-slate-900 mb-4">All Deals</h2>
-        <DealListClient deals={allDeals} />
-      </div>
+      {/* All Deals with Category Filtering */}
+      <DashboardClient deals={allDeals} />
     </div>
   )
 }
