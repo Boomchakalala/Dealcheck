@@ -51,23 +51,16 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
     }
   }
 
-  // Extract hierarchical categories and calculate spend (with currency conversion)
+  // Extract hierarchical categories and calculate spend (using pre-converted amounts)
   const categoryHierarchy = useMemo(() => {
     const hierarchy = new Map<string, MainCategoryData>()
 
     deals.forEach(deal => {
       const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
       const fullCategory = latestRound?.output_json?.category || 'Uncategorized'
-      const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-      const dealCurrency = (latestRound?.output_json?.snapshot?.currency as Currency) || 'USD'
 
-      // Parse money
-      const { amount, currency } = parseMoney(totalStr)
-      const finalCurrency = dealCurrency || currency
-
-      // For now, we'll just use the amount directly
-      // TODO: Implement async conversion properly
-      const total = amount
+      // Use pre-converted amount from server
+      const total = deal._convertedAmount || 0
 
       // Parse category: "SaaS - Infrastructure" -> main: "SaaS", sub: "Infrastructure"
       let mainCategory = 'Other'
