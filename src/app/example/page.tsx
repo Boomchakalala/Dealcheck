@@ -5,18 +5,21 @@ import { type DealOutput } from '@/types'
 import Link from 'next/link'
 
 const exampleOutput: DealOutput = {
-  title: "Cloud Storage Platform - Annual Enterprise Plan",
+  title: "CloudVault Solutions -- New Purchase -- March 2026",
   vendor: "CloudVault Solutions",
-  verdict: "The contract has strong infrastructure features but several terms create unnecessary lock-in and operational risk. You have real leverage to improve the renewal terms, overage structure, and support coverage before signing.",
+  category: "SaaS Infra",
+  description: "Enterprise cloud storage platform with security certifications and API integrations",
+  verdict: "Push for better renewal terms, overage caps, and support coverage before signing.",
   verdict_type: "negotiate",
-  price_insight: "The per-TB rate is on the higher side for this commitment level. Worth asking whether volume pricing applies — but the bigger issues here are the contract structure and overage terms.",
+  price_insight: "The per-TB rate is on the higher side for this commitment level — but the bigger issues are contract structure and overage terms.",
   snapshot: {
-    vendor_product: "CloudVault Enterprise Storage Platform",
-    term: "12 months (auto-renewal unless 60 days notice)",
-    total_commitment: "$42,000 annually",
-    billing_payment: "Quarterly invoicing, Net 30 payment terms",
+    vendor_product: "CloudVault / Enterprise Storage Platform",
+    term: "12 months",
+    total_commitment: "$42,000",
+    billing_payment: "Quarterly",
     pricing_model: "Per-TB storage ($350/TB/month) + user seats ($25/user/month)",
-    deal_type: "New procurement"
+    deal_type: "New purchase",
+    signing_deadline: "March 31, 2026"
   },
   quick_read: {
     whats_solid: [
@@ -89,17 +92,26 @@ const exampleOutput: DealOutput = {
   },
   what_to_ask_for: {
     must_have: [
-      "Change auto-renewal notice period from 60 to 30 days",
-      "Cap overage charges at 110% of base rate with advance notice",
-      "Increase support ticket limit to 25/month for first 6 months"
+      "Reduce auto-renewal notice period from 60 to 30 days — prevents accidental lock-in for additional $42K year",
+      "Cap overage charges at 110% of base rate with advance notice — protects against $15K+ surprise costs if storage grows 3TB",
+      "Increase support ticket limit to 25/month for first 6 months — prevents $200/ticket charges during critical onboarding phase"
     ],
     nice_to_have: [
       "Add termination-for-convenience after 12 months",
       "Include 2TB storage buffer at no additional cost",
-      "Quarterly performance reviews with dedicated CSM",
-      "Priority migration support during first 90 days"
+      "Quarterly performance reviews with dedicated CSM"
     ]
   },
+  potential_savings: [
+    {
+      ask: "Cap overage at 110% instead of 150%",
+      annual_impact: "$15,750 protected"
+    },
+    {
+      ask: "Increase support to 25 tickets/month during onboarding",
+      annual_impact: "$3,000 saved"
+    }
+  ],
   email_drafts: {
     neutral: {
       subject: "CloudVault Enterprise Storage - Questions on Contract Terms",
