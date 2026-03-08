@@ -63,11 +63,15 @@ export function DealListClient({ deals }: DealListClientProps) {
     setDealToClose({ id: dealId, total: currentTotal, roundCount: roundCount || 0 })
   }
 
-  const handleDelete = async (e: React.MouseEvent, dealId: string) => {
+  const handleDelete = async (e: React.MouseEvent, dealId: string, isClosed?: boolean, hasSavings?: boolean) => {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!confirm('Are you sure you want to delete this deal? This action cannot be undone.')) {
+    const message = isClosed && hasSavings
+      ? 'This is a closed deal with savings data. Are you sure you want to delete it? This action cannot be undone.'
+      : 'Are you sure you want to delete this deal? This action cannot be undone.'
+
+    if (!confirm(message)) {
       return
     }
 
@@ -135,8 +139,8 @@ export function DealListClient({ deals }: DealListClientProps) {
                     </div>
 
                     {/* Action buttons */}
-                    {!isClosed ? (
-                      <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      {!isClosed && (
                         <button
                           onClick={(e) => handleQuickClose(e, deal.id, totalCommitment || undefined, roundCount)}
                           className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-sm"
@@ -144,16 +148,16 @@ export function DealListClient({ deals }: DealListClientProps) {
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           Close deal
                         </button>
-                        <button
-                          onClick={(e) => handleDelete(e, deal.id)}
-                          disabled={deletingId === deal.id}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          {deletingId === deal.id ? 'Deleting...' : 'Delete'}
-                        </button>
-                      </div>
-                    ) : null}
+                      )}
+                      <button
+                        onClick={(e) => handleDelete(e, deal.id)}
+                        disabled={deletingId === deal.id}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        {deletingId === deal.id ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </div>
 
                     {/* Vendor name */}
                     <h3 className="text-base font-bold text-slate-900 mb-1 truncate group-hover:text-emerald-700 transition-colors">
