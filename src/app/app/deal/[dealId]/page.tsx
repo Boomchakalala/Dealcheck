@@ -110,7 +110,14 @@ export default async function DealPage({
       <Card className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-3xl font-bold text-slate-900 mb-2">{deal.title}</h1>
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <h1 className="text-xl sm:text-3xl font-bold text-slate-900">{deal.title}</h1>
+              {category && (
+                <span className="inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                  {category}
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               {deal.vendor && (
                 <span className="text-slate-600">{deal.vendor}</span>
@@ -142,6 +149,52 @@ export default async function DealPage({
           <p className="font-semibold mt-2">{sortedRounds.length} round{sortedRounds.length !== 1 ? 's' : ''}</p>
         </div>
       </Card>
+
+      {/* Key Metrics Summary */}
+      {latestOutput && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Total Commitment */}
+          <Card className="p-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <Package className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-medium">Total Commitment</p>
+                <p className="text-2xl font-bold text-slate-900">{totalCommitment || 'N/A'}</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Red Flags */}
+          <Card className="p-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 font-medium">Red Flags</p>
+                <p className="text-2xl font-bold text-slate-900">{redFlagCount}</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Potential Savings */}
+          <Card className="p-5 bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                <BadgeDollarSign className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-xs text-emerald-700 font-medium">Potential Savings</p>
+                <p className="text-2xl font-bold text-emerald-900">
+                  {potentialSavings > 0 ? formatSavings(potentialSavings) : 'TBD'}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Next Actions Panel */}
       {latestOutput && (
