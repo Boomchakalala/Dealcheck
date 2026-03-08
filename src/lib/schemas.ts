@@ -44,6 +44,10 @@ export const DealOutputSchema = z.object({
     must_have: z.array(z.string()),
     nice_to_have: z.array(z.string()),
   }),
+  potential_savings: z.array(z.object({
+    ask: z.string(),
+    annual_impact: z.string(),
+  })).optional(),
   email_drafts: z.object({
     neutral: EmailDraftSchema,
     firm: EmailDraftSchema,
