@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select } from '@/components/ui/select'
 import { CopyButton } from '@/components/CopyButton'
+import { trackEvent } from '@/lib/analytics'
 import type { EmailControls } from '@/types'
 
 interface EmailGeneratorProps {
@@ -51,6 +52,15 @@ export function EmailGenerator({ roundId, defaultControls }: EmailGeneratorProps
 
       const data = await response.json()
       setGeneratedEmail(data)
+
+      // Track email generation
+      trackEvent({
+        name: 'email_generated',
+        properties: {
+          emailType: emailGoal,
+          hasCustomPrompt: !!userNotes
+        }
+      })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate email')
     } finally {

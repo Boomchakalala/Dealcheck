@@ -9,15 +9,21 @@ interface CopyButtonProps {
   text: string
   label?: string
   variant?: 'default' | 'ghost' | 'outline'
+  onCopy?: () => void
 }
 
-export function CopyButton({ text, label = 'Copy', variant = 'outline' }: CopyButtonProps) {
+export function CopyButton({ text, label = 'Copy', variant = 'outline', onCopy }: CopyButtonProps) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(text)
     setCopied(true)
     toast.success('Copied to clipboard')
+
+    // Call the onCopy callback if provided
+    if (onCopy) {
+      onCopy()
+    }
 
     setTimeout(() => {
       setCopied(false)
