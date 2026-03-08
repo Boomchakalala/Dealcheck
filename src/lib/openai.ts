@@ -300,12 +300,13 @@ Return valid JSON only. Match this structure exactly:
   "snapshot": {
     "vendor_product": "Datadog / Observability Platform",
     "term": "12 months",
-    "total_commitment": "$150,000",
-    "billing_payment": "Monthly",
+    "total_commitment": "$195,941",
+    "billing_payment": "Monthly payments of $16,328",
     "pricing_model": "Commit-based: 10M logs/day + per-host",
     "deal_type": "New purchase"
   },
-  "NOTE_PRICING": "total_commitment = just the number. Keep it simple. '$150,000' or '$50K' - no extra explanation.",
+  "NOTE_TOTAL_COMMITMENT": "CRITICAL — total_commitment = TOTAL ANNUAL COST. If they pay $16,328/month for 12 months, total_commitment is '$195,936' (not '$16,328/month'). NEVER include '/month' or '/year' — just the yearly total dollar amount.",
+  "NOTE_BILLING": "billing_payment = how they pay (e.g., 'Monthly', 'Quarterly', 'Annual upfront', 'Monthly payments of $X'). This is separate from total_commitment.",
   "quick_read": {
     "whats_solid": ["15% discount already applied", "Flexible host scaling", "No minimum term commitment"],
     "whats_concerning": ["No overage protection", "Auto-renewal at 90 days", "Pricing above typical for volume"],
