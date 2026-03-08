@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
-import { X, Loader2, Sparkles } from 'lucide-react'
+import { X, Loader2, Sparkles, TrendingDown } from 'lucide-react'
 
 interface CloseDealModalProps {
   dealId: string
@@ -17,14 +17,33 @@ interface CloseDealModalProps {
 
 export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, onSuccess }: CloseDealModalProps) {
   const [outcome, setOutcome] = useState<'won' | 'lost' | 'paused'>('won')
-  const [savingsAmount, setSavingsAmount] = useState('')
-  const [savingsPercent, setSavingsPercent] = useState('')
+  const [finalTotal, setFinalTotal] = useState('')
   const [whatChanged, setWhatChanged] = useState<string[]>([])
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [estimating, setEstimating] = useState(false)
   const [aiEstimated, setAiEstimated] = useState(false)
+
+  // Parse original total to number for calculations
+  const parseTotal = (str: string): number => {
+    if (!str) return 0
+    // Remove currency symbols, commas, and extract number
+    const cleaned = str.replace(/[^0-9.,]/g, '').replace(/,/g, '')
+    // Handle K/M suffix
+    if (str.toUpperCase().includes('K')) {
+      return parseFloat(cleaned) * 1000
+    }
+    if (str.toUpperCase().includes('M')) {
+      return parseFloat(cleaned) * 1000000
+    }
+    return parseFloat(cleaned) || 0
+  }
+
+  const originalAmount = parseTotal(currentTotal || '')
+  const finalAmount = parseTotal(finalTotal)
+  const savingsAmount = originalAmount > 0 && finalAmount > 0 ? originalAmount - finalAmount : 0
+  const savingsPercent = originalAmount > 0 && savingsAmount > 0 ? (savingsAmount / originalAmount) * 100 : 0
 
   const changeOptions = [
     'Price',
@@ -43,7 +62,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
     )
   }
 
-  const handleEstimateSavings = async () => {
+  const handleAIAnalyze = async () => {
     setEstimating(true)
     setError(null)
     try {
@@ -51,13 +70,12 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to estimate')
 
-      if (data.savings_amount) setSavingsAmount(String(data.savings_amount))
-      if (data.savings_percent) setSavingsPercent(String(data.savings_percent))
+      if (data.final_total) setFinalTotal(data.final_total)
       if (data.what_changed?.length) setWhatChanged(data.what_changed)
       if (data.summary) setNotes(data.summary)
       setAiEstimated(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to estimate')
+      setError(err instanceof Error ? err.message : 'Failed to analyze')
     } finally {
       setEstimating(false)
     }
@@ -74,8 +92,9 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           outcome,
-          savingsAmount: savingsAmount ? parseFloat(savingsAmount.replace(/[^0-9.-]/g, '')) : null,
-          savingsPercent: savingsPercent ? parseFloat(savingsPercent.replace(/[^0-9.-]/g, '')) : null,
+          finalTotal: finalTotal || null,
+          savingsAmount: savingsAmount > 0 ? savingsAmount : null,
+          savingsPercent: savingsPercent > 0 ? savingsPercent : null,
           whatChanged: whatChanged.length > 0 ? whatChanged : null,
           notes: notes || null,
         }),
@@ -145,11 +164,11 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
             </div>
           </div>
 
-          {/* AI Estimation Button */}
+          {/* AI Analyze Button */}
           {outcome === 'won' && !aiEstimated && roundCount >= 1 && (
             <button
               type="button"
-              onClick={handleEstimateSavings}
+              onClick={handleAIAnalyze}
               disabled={estimating}
               className="w-full p-4 rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50/50
                          hover:border-emerald-400 hover:bg-emerald-50 transition-all text-left flex items-center gap-3"
@@ -161,51 +180,67 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
               )}
               <div>
                 <p className="text-sm font-semibold text-emerald-900">
-                  {estimating ? 'Analyzing your rounds...' : 'Let AI analyze what you won'}
+                  {estimating ? 'Analyzing your rounds...' : 'Let AI fill everything'}
                 </p>
                 <p className="text-xs text-emerald-700 mt-0.5">
-                  Pre-fills savings, changes, and notes from your negotiation rounds
+                  AI analyzes your negotiation rounds and pre-fills final total, changes, and notes
                 </p>
               </div>
             </button>
           )}
 
-          {/* Savings */}
+          {/* Original vs Final Total */}
           {outcome === 'won' && (
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label className="text-sm font-semibold text-slate-900">
-                  Savings <span className="text-slate-500 font-normal">(optional)</span>
-                </Label>
-                {aiEstimated && (
-                  <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
-                    <Sparkles className="w-3 h-3" />
-                    Pre-filled by AI — edit as needed
+            <div className="space-y-4">
+              {/* Original Total (display only) */}
+              {currentTotal && (
+                <div className="p-4 bg-slate-50 rounded-xl border-2 border-slate-200">
+                  <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">Original Total</p>
+                  <p className="text-2xl font-bold text-slate-900">{currentTotal}</p>
+                </div>
+              )}
+
+              {/* Final Total (input) */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Label className="text-sm font-semibold text-slate-900">
+                    Final Total <span className="text-slate-500 font-normal">(optional)</span>
+                  </Label>
+                  {aiEstimated && (
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                      <Sparkles className="w-3 h-3" />
+                      AI filled
+                    </div>
+                  )}
+                </div>
+                <Input
+                  type="text"
+                  value={finalTotal}
+                  onChange={(e) => setFinalTotal(e.target.value)}
+                  placeholder="$180,000 or $15K/year"
+                  disabled={loading}
+                  className="text-lg font-semibold"
+                />
+                <p className="text-xs text-slate-500 mt-1.5">The amount you actually agreed to pay</p>
+              </div>
+
+              {/* Calculated Savings (display) */}
+              {savingsAmount > 0 && (
+                <div className="p-4 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200">
+                  <div className="flex items-center gap-2 mb-1">
+                    <TrendingDown className="w-4 h-4 text-emerald-600" />
+                    <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Calculated Savings</p>
                   </div>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <Input
-                    type="text"
-                    value={savingsAmount}
-                    onChange={(e) => setSavingsAmount(e.target.value)}
-                    placeholder="$5,000"
-                    disabled={loading}
-                  />
-                  <p className="text-xs text-slate-500 mt-1">Amount saved</p>
+                  <div className="flex items-baseline gap-3">
+                    <p className="text-2xl font-bold text-emerald-900">
+                      ${savingsAmount.toLocaleString()}
+                    </p>
+                    <p className="text-lg font-bold text-emerald-700">
+                      ({savingsPercent.toFixed(1)}%)
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <Input
-                    type="text"
-                    value={savingsPercent}
-                    onChange={(e) => setSavingsPercent(e.target.value)}
-                    placeholder="15%"
-                    disabled={loading}
-                  />
-                  <p className="text-xs text-slate-500 mt-1">Percent saved</p>
-                </div>
-              </div>
+              )}
             </div>
           )}
 
