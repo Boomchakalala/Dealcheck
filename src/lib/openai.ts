@@ -304,7 +304,7 @@ Return valid JSON only. Match this structure exactly:
 {
   "title": "Vendor -- New/Renewal -- Month Year",
   "vendor": "vendor name",
-  "category": "SaaS Infra",
+  "category": "SaaS - Infrastructure",
   "description": "Observability and monitoring platform for cloud infrastructure",
   "verdict": "One clear sentence telling the user what to do next",
   "verdict_type": "negotiate|competitive|overpay_risk",
@@ -323,7 +323,25 @@ Return valid JSON only. Match this structure exactly:
   "NOTE_BILLING": "billing_payment = 'Monthly', 'Quarterly', 'Annual upfront', etc. Keep it simple.",
   "NOTE_DEAL_TYPE": "deal_type = 'Renewal' if renewing existing, 'New purchase' if new vendor",
   "NOTE_DATES": "renewal_date and signing_deadline = extract if stated, otherwise omit",
-  "NOTE_CATEGORY_DESC": "category = business type ('SaaS Infra', 'Marketing Agency'). description = 1 line what it does",
+  "NOTE_CATEGORY": "category = Pick ONE from this list based on what the vendor does:
+    • SaaS - Infrastructure (cloud hosting, databases, monitoring, DevOps tools)
+    • SaaS - Security (cybersecurity, compliance, identity management)
+    • SaaS - Productivity (collaboration, communication, document management)
+    • SaaS - Marketing (marketing automation, CRM, analytics, advertising)
+    • SaaS - Sales (CRM, sales enablement, lead generation)
+    • SaaS - Finance (accounting, payments, invoicing, expense management)
+    • SaaS - HR (recruiting, payroll, benefits, performance management)
+    • SaaS - Customer Support (helpdesk, chat, knowledge base)
+    • SaaS - Data & Analytics (BI, data warehousing, ETL)
+    • SaaS - Development (code repos, CI/CD, project management)
+    • Professional Services - Consulting
+    • Professional Services - Marketing Agency
+    • Professional Services - Legal
+    • Hardware & Equipment
+    • Telecom & Internet
+    • Other - [specify]
+    IMPORTANT: Always use the format 'Category - Subcategory' (e.g., 'SaaS - Infrastructure', NOT just 'SaaS' or 'Infrastructure')",
+  "NOTE_CATEGORY_DESC": "description = 1 sentence explaining what this vendor does",
   "quick_read": {
     "whats_solid": ["15% discount already applied", "Flexible host scaling", "No minimum term commitment"],
     "whats_concerning": ["No overage protection", "Auto-renewal at 90 days", "Pricing above typical for volume"],
