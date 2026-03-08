@@ -23,6 +23,7 @@ interface MainCategoryData {
 export function DashboardClient({ deals }: DashboardClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [expandedMainCategories, setExpandedMainCategories] = useState<Set<string>>(new Set())
+  const [statusFilter, setStatusFilter] = useState<'all' | 'in_progress' | 'closed'>('all')
 
   // Helper to parse money strings
   const parseMoney = (str: string): number => {
@@ -111,18 +112,27 @@ export function DashboardClient({ deals }: DashboardClientProps) {
     setExpandedMainCategories(newExpanded)
   }
 
-  const filteredDeals = selectedCategory === 'all'
-    ? deals
-    : deals.filter(deal => {
-        const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
-        const fullCategory = latestRound?.output_json?.category || 'Uncategorized'
+  const filteredDeals = deals.filter(deal => {
+    // Filter by status
+    if (statusFilter === 'in_progress' && deal.status?.startsWith('closed_')) {
+      return false
+    }
+    if (statusFilter === 'closed' && !deal.status?.startsWith('closed_')) {
+      return false
+    }
 
-        // Match full category or main category
-        if (fullCategory === selectedCategory) return true
-        if (fullCategory.startsWith(selectedCategory + ' - ')) return true
+    // Filter by category
+    if (selectedCategory === 'all') return true
 
-        return false
-      })
+    const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
+    const fullCategory = latestRound?.output_json?.category || 'Uncategorized'
+
+    // Match full category or main category
+    if (fullCategory === selectedCategory) return true
+    if (fullCategory.startsWith(selectedCategory + ' - ')) return true
+
+    return false
+  })
 
   const formatAmount = (amount: number) => {
     if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`
