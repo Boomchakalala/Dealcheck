@@ -203,7 +203,7 @@ export function DealListClient({ deals }: DealListClientProps) {
                         {deal.savings_amount && deal.savings_amount > 0 && (
                           <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold">
                             <CheckCircle2 className="w-3.5 h-3.5" />
-                            Saved ${deal.savings_amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                            Saved {formatSavings(deal.savings_amount, currency)}
                             {deal.savings_percent ? ` (${deal.savings_percent.toFixed(0)}%)` : ''}
                           </span>
                         )}
