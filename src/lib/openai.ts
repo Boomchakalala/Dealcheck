@@ -275,28 +275,28 @@ Return valid JSON only. Match this structure exactly:
   "verdict_type": "negotiate|competitive|overpay_risk",
   "price_insight": "Optional -- concise pricing observation based on quote signals only. Omit if no pricing signals.",
   "snapshot": {
-    "vendor_product": "vendor / product",
-    "term": "contract duration",
-    "total_commitment": "total financial commitment",
-    "billing_payment": "how billing works",
-    "pricing_model": "commit vs usage description",
-    "deal_type": "new / renewal / expansion"
+    "vendor_product": "Datadog / Observability Platform",
+    "term": "12 months",
+    "total_commitment": "$150,000 total ($12,500/month)",
+    "billing_payment": "Monthly in arrears",
+    "pricing_model": "Commit-based: 10M logs/day + per-host pricing",
+    "deal_type": "New purchase"
   },
   "quick_read": {
-    "whats_solid": ["2-3 bullets of what's genuinely good (be selective)"],
-    "whats_concerning": ["2-3 bullets of real concerns (not padding)"],
-    "conclusion": "Concise verdict tied to dominant issue"
+    "whats_solid": ["15% discount already applied", "Flexible host scaling", "No minimum term commitment"],
+    "whats_concerning": ["No overage protection", "Auto-renewal at 90 days", "Pricing above typical for volume"],
+    "conclusion": "Decent baseline but push on overage caps and renewal terms before signing"
   },
   "red_flags": [
     {
-      "type": "Commercial|Legal|Operational|Security",
-      "issue": "clear, specific issue tied to this quote",
-      "why_it_matters": "explain how this costs money or flexibility",
-      "what_to_ask_for": "Could we... / Would you consider... [specific polite request with context]",
-      "if_they_push_back": "pragmatic fallback position"
+      "type": "Commercial",
+      "issue": "No overage cap on log volume means unlimited cost exposure",
+      "why_it_matters": "If you spike from committed 10M logs/day to 15M, overage charges at $0.10/GB could add $50K+ unbudgeted cost per month",
+      "what_to_ask_for": "Request hard cap at 120% of committed volume ($18K max overage/month) or negotiate flat overage rate",
+      "if_they_push_back": "Accept soft cap with billing alerts at 110% threshold"
     }
   ],
-  "NOTE": "red_flags array should contain 0-3 items only. Quality over quantity. If quote is mostly fine, return 0-1 flags.",
+  "NOTE": "See how red_flag is MUCH MORE DETAILED than the quick_read concern? This is correct.",
   "negotiation_plan": {
     "leverage_you_have": ["max 5 bullets, no bluffing — only real leverage from quote/context"],
     "must_have_asks": ["1-3 critical items ONLY, should typically include price improvement"],
@@ -304,9 +304,16 @@ Return valid JSON only. Match this structure exactly:
     "trades_you_can_offer": ["0-3 pragmatic concessions you can make"]
   },
   "what_to_ask_for": {
-    "must_have": ["Could we... / Would you consider... bullets with WHY it matters, typically 1-3 items including pricing"],
-    "nice_to_have": ["Could we... / Would you consider... bullets, 0-3 items if justified"]
+    "must_have": [
+      "Negotiate overage cap at 120% of 10M logs/day commit — prevents $50K+ surprise costs if usage spikes",
+      "Push for opt-out renewal instead of auto-renew — preserves negotiation leverage at year-end",
+      "Request 5% additional discount at $150K annual spend — brings per-log cost to market rate"
+    ],
+    "nice_to_have": [
+      "Lock in year 2 pricing freeze — current terms allow unlimited increases"
+    ]
   },
+  "NOTE_MUST_HAVE": "These are MORE SPECIFIC and ACTIONABLE than quick_read or red_flags. Include $ impact.",
   "email_drafts": {
     "neutral": {"subject": "...", "body": "..."},
     "firm": {"subject": "...", "body": "..."},
