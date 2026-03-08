@@ -142,6 +142,49 @@ export function DashboardClient({ deals }: DashboardClientProps) {
 
   return (
     <div className="space-y-6">
+      {/* Status Filter Tabs */}
+      <div className="flex items-center gap-2 border-b-2 border-slate-200">
+        <button
+          onClick={() => setStatusFilter('all')}
+          className={`px-4 py-2 text-sm font-semibold transition-all relative ${
+            statusFilter === 'all'
+              ? 'text-emerald-700'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          All Deals
+          {statusFilter === 'all' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />
+          )}
+        </button>
+        <button
+          onClick={() => setStatusFilter('in_progress')}
+          className={`px-4 py-2 text-sm font-semibold transition-all relative ${
+            statusFilter === 'in_progress'
+              ? 'text-emerald-700'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          In Progress
+          {statusFilter === 'in_progress' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />
+          )}
+        </button>
+        <button
+          onClick={() => setStatusFilter('closed')}
+          className={`px-4 py-2 text-sm font-semibold transition-all relative ${
+            statusFilter === 'closed'
+              ? 'text-emerald-700'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          Closed
+          {statusFilter === 'closed' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />
+          )}
+        </button>
+      </div>
+
       {/* Category breakdown */}
       {categoryHierarchy.length > 0 && (
         <div>

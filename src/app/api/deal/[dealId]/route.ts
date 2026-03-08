@@ -30,14 +30,6 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    // Prevent deletion of closed deals
-    if (deal.status?.startsWith('closed_')) {
-      return NextResponse.json(
-        { error: 'Cannot delete closed deals' },
-        { status: 400 }
-      )
-    }
-
     // Delete the deal (rounds will cascade delete via foreign key)
     const { error: deleteError } = await supabase
       .from('deals')
