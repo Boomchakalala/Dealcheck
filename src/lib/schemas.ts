@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 // Zod schema for strict validation of OpenAI output
 export const RedFlagSchema = z.object({
-  type: z.enum(['Commercial', 'Legal', 'Operational', 'Security']),
+  type: z.string(), // Flexible to allow any category
   issue: z.string(),
   why_it_matters: z.string(),
   what_to_ask_for: z.string(),
