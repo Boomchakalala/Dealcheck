@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
-import { TrendingUp, Target, CheckCircle2, Plus } from 'lucide-react'
+import { TrendingUp, Target, CheckCircle2, Plus, Layers } from 'lucide-react'
 import { DealListClient } from '@/components/DealListClient'
+import { DashboardClient } from '@/components/DashboardClient'
 import Link from 'next/link'
 
 export default async function DashboardPage() {

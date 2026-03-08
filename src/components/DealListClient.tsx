@@ -77,6 +77,7 @@ export function DealListClient({ deals }: DealListClientProps) {
           const latestRound = getLatestRound(deal)
           const latestOutput = latestRound?.output_json
           const vendorName = deal.vendor || latestOutput?.vendor || deal.title
+          const category = latestOutput?.category || null
           const isClosed = deal.status?.startsWith('closed_')
           const totalCommitment = latestOutput?.snapshot?.total_commitment
           const conclusion = latestOutput?.quick_read?.conclusion || null
@@ -95,6 +96,11 @@ export function DealListClient({ deals }: DealListClientProps) {
                         {getStatusIcon(deal)}
                         {status.label}
                       </span>
+                      {category && (
+                        <span className="inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                          {category}
+                        </span>
+                      )}
                       <Badge variant={deal.deal_type === 'New' ? 'default' : 'secondary'}>
                         {deal.deal_type}
                       </Badge>
