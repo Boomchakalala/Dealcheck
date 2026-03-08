@@ -41,7 +41,7 @@ function LoginForm() {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -49,10 +49,30 @@ function LoginForm() {
           },
         })
         if (error) throw error
+
+        // Track signup completion
+        if (data.user) {
+          trackEvent({
+            name: 'signup_completed',
+            properties: { email }
+          })
+          identifyUser(data.user.id, { email })
+        }
+
         setMessage('Check your email for the confirmation link.')
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
+
+        // Track login completion
+        if (data.user) {
+          trackEvent({
+            name: 'login_completed',
+            properties: { email }
+          })
+          identifyUser(data.user.id, { email })
+        }
+
         router.push('/app')
         router.refresh()
       }
