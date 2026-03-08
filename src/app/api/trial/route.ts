@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { analyzeDealV2 } from '@/lib/openai'
 import { extractAndNormalize } from '@/lib/extract-normalize'
 import { DealOutputSchemaV2 } from '@/lib/schemas'
-import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 import { headers } from 'next/headers'
 
 // Guest trial - no auth required, rate limited per IP - Uses V2 schema
@@ -11,19 +10,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { extractedText, dealType, goal, notes, previousOutput, isDemoText } = body
 
-    // Skip rate limiting for demo text (users can try demo multiple times)
-    if (!isDemoText) {
-      // Rate limit by IP for real analyses only
-      const headersList = await headers()
-      const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-      const rl = rateLimit(`trial:${ip}`, RATE_LIMITS.trial)
-      if (!rl.allowed) {
-        return NextResponse.json(
-          { error: 'Trial limit reached. Sign up for more analyses.' },
-          { status: 429 }
-        )
-      }
-    }
+    // TODO: Add IP-based rate limiting for trial route (currently unlimited for testing)
 
     if (!extractedText || extractedText.length < 10) {
       return NextResponse.json(
