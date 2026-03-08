@@ -156,7 +156,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           </div>
           <div className="sm:text-right flex-shrink-0">
             <p className="text-xs font-medium text-slate-500 mb-1">Total commitment</p>
-            <p className="text-xl sm:text-2xl font-bold text-slate-900">{output.snapshot.total_commitment}</p>
+            <p className="text-xl sm:text-2xl font-bold text-slate-900">{output.snapshot?.total_commitment || 'N/A'}</p>
           </div>
         </div>
 
