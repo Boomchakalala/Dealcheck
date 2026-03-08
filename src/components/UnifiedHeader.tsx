@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { HelpCircle, ChevronDown, User, LogOut, Menu, X, Settings, Zap, Crown } from 'lucide-react'
+import { trackEvent } from '@/lib/analytics'
 
 interface UnifiedHeaderProps {
   variant: 'landing' | 'public' | 'app'
@@ -262,6 +263,12 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
             {!isUpgraded && !isAdmin && (
               <Link
                 href="/pricing"
+                onClick={() => {
+                  trackEvent({
+                    name: 'upgrade_clicked',
+                    properties: { source: 'header' }
+                  })
+                }}
                 className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
               >
                 Upgrade
