@@ -37,8 +37,53 @@ export default async function DashboardPage() {
   const totalDeals = allDeals.length
   const closedDeals = allDeals.filter(d => d.status?.startsWith('closed_'))
   const wonDeals = closedDeals.filter(d => d.status === 'closed_won')
+
+  // Calculate total spend analyzed (all deals)
+  const totalSpendAnalyzed = allDeals.reduce((sum, deal) => {
+    const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
+    const totalStr = latestRound?.output_json?.snapshot?.total_commitment
+    if (totalStr) {
+      const cleaned = totalStr.replace(/[$,]/g, '')
+      let amount = 0
+      if (cleaned.toLowerCase().includes('k')) {
+        amount = parseFloat(cleaned.replace(/k/i, '')) * 1000
+      } else if (cleaned.toLowerCase().includes('m')) {
+        amount = parseFloat(cleaned.replace(/m/i, '')) * 1000000
+      } else {
+        amount = parseFloat(cleaned) || 0
+      }
+      return sum + amount
+    }
+    return sum
+  }, 0)
+
+  // Calculate total spend closed (only closed deals)
+  const totalSpendClosed = closedDeals.reduce((sum, deal) => {
+    const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
+    const totalStr = latestRound?.output_json?.snapshot?.total_commitment
+    if (totalStr) {
+      const cleaned = totalStr.replace(/[$,]/g, '')
+      let amount = 0
+      if (cleaned.toLowerCase().includes('k')) {
+        amount = parseFloat(cleaned.replace(/k/i, '')) * 1000
+      } else if (cleaned.toLowerCase().includes('m')) {
+        amount = parseFloat(cleaned.replace(/m/i, '')) * 1000000
+      } else {
+        amount = parseFloat(cleaned) || 0
+      }
+      return sum + amount
+    }
+    return sum
+  }, 0)
+
   const totalSavings = closedDeals.reduce((sum, d) => sum + (d.savings_amount || 0), 0)
-  const winRate = closedDeals.length > 0 ? (wonDeals.length / closedDeals.length) * 100 : 0
+  const savingsPercent = totalSpendClosed > 0 ? (totalSavings / totalSpendClosed) * 100 : 0
+
+  const formatMoney = (amount: number) => {
+    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`
+    if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`
+    return `$${amount.toFixed(0)}`
+  }
 
   if (totalDeals === 0) {
     return (
@@ -181,47 +226,67 @@ export default async function DashboardPage() {
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Spend Analyzed */}
+        <Card className="p-5 border-2">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-blue-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Total Analyzed</p>
+              <p className="text-2xl font-bold text-slate-900">
+                {formatMoney(totalSpendAnalyzed)}
+              </p>
+              <p className="text-xs text-slate-400 mt-0.5">{totalDeals} deal{totalDeals !== 1 ? 's' : ''}</p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Total Spend Closed */}
+        <Card className="p-5 border-2">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-purple-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wide">Spend Closed</p>
+              <p className="text-2xl font-bold text-slate-900">
+                {formatMoney(totalSpendClosed)}
+              </p>
+              <p className="text-xs text-slate-400 mt-0.5">{closedDeals.length} closed</p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Total Savings $ */}
+        <Card className="p-5 border-2 bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-emerald-600" />
             </div>
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Total Savings</p>
-              <p className="text-2xl font-bold text-slate-900">
-                ${totalSavings.toFixed(0)}
+            <div className="flex-1">
+              <p className="text-xs text-emerald-700 font-semibold uppercase tracking-wide">Total Savings</p>
+              <p className="text-2xl font-bold text-emerald-900">
+                {formatMoney(totalSavings)}
               </p>
+              <p className="text-xs text-emerald-600 mt-0.5">{wonDeals.length} won</p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-5">
+        {/* Savings % */}
+        <Card className="p-5 border-2 bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <Target className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+              <Percent className="w-5 h-5 text-emerald-600" />
             </div>
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Win Rate</p>
-              <p className="text-2xl font-bold text-slate-900">
-                {winRate.toFixed(0)}%
+            <div className="flex-1">
+              <p className="text-xs text-emerald-700 font-semibold uppercase tracking-wide">Savings Rate</p>
+              <p className="text-2xl font-bold text-emerald-900">
+                {savingsPercent.toFixed(1)}%
               </p>
-              <p className="text-xs text-slate-400">{wonDeals.length} of {closedDeals.length} closed</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-              <CheckCircle2 className="w-5 h-5 text-slate-600" />
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 font-medium">Total Deals</p>
-              <p className="text-2xl font-bold text-slate-900">
-                {totalDeals}
-              </p>
-              <p className="text-xs text-slate-400">{totalDeals - closedDeals.length} in progress</p>
+              <p className="text-xs text-emerald-600 mt-0.5">of closed spend</p>
             </div>
           </div>
         </Card>
