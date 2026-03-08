@@ -9,7 +9,7 @@ import { OutputDisplayV2 } from '@/components/OutputDisplayV2'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { Breadcrumb } from '@/components/Breadcrumb'
 import { DealActionBar } from '@/components/DealActionBar'
-import { CheckSquare, Mail, Plus, FileText } from 'lucide-react'
+import { CheckSquare, Mail, Plus, FileText, AlertTriangle, TrendingDown, BadgeDollarSign, Package } from 'lucide-react'
 import Link from 'next/link'
 import { AddRoundForm } from './AddRoundForm'
 import type { DealOutput, DealOutputV2 } from '@/types'
@@ -54,6 +54,35 @@ export default async function DealPage({
     (isV2 ? (latestOutput as DealOutputV2)?.commercial_facts?.supplier : (latestOutput as DealOutput)?.vendor) ||
     deal.title ||
     'Deal'
+
+  // Extract key metrics from latest analysis
+  const category = (latestOutput as DealOutput)?.category
+  const redFlagCount = isV2
+    ? (latestOutput as DealOutputV2)?.priority_points?.length || 0
+    : (latestOutput as DealOutput)?.red_flags?.length || 0
+
+  // Calculate total potential savings
+  const potentialSavings = (latestOutput as DealOutput)?.potential_savings?.reduce((sum, saving) => {
+    const match = saving.annual_impact.match(/\$[\d,]+(?:K|k)?/)
+    if (match) {
+      let amount = match[0].replace(/[$,]/g, '')
+      if (amount.toLowerCase().includes('k')) {
+        amount = parseFloat(amount.replace(/k/i, '')) * 1000
+      } else {
+        amount = parseFloat(amount)
+      }
+      return sum + (isNaN(amount) ? 0 : amount)
+    }
+    return sum
+  }, 0) || 0
+
+  const formatSavings = (amount: number) => {
+    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`
+    if (amount >= 1000) return `$${(amount / 1000).toFixed(1)}K`
+    return `$${amount.toFixed(0)}`
+  }
+
+  const totalCommitment = latestOutput?.snapshot?.total_commitment
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
