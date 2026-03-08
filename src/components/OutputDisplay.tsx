@@ -2,7 +2,7 @@
 
 import { type DealOutput } from '@/types'
 import { CopyButton } from './CopyButton'
-import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, Shield, TrendingDown, Zap, RefreshCw, Loader2, Sparkles, PiggyBank } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, Shield, TrendingDown, Zap, RefreshCw, Loader2, Sparkles, BadgeDollarSign } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
 interface OutputDisplayProps {
@@ -352,7 +352,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl border-2 border-purple-200 p-4 sm:p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-1">
             <div className="p-1.5 bg-purple-100 rounded-lg">
-              <PiggyBank className="w-5 h-5 text-purple-600" />
+              <BadgeDollarSign className="w-5 h-5 text-purple-600" />
             </div>
             <h2 className="text-lg font-bold text-slate-900">Potential savings</h2>
           </div>
