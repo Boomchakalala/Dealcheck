@@ -273,21 +273,21 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       )}
 
       {/* ── Section 5: Your Negotiation Plan ── */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6 space-y-5">
+      <div className="bg-white rounded-xl border-2 border-slate-200 p-4 sm:p-6 space-y-5 shadow-sm">
         <div>
-          <h2 className="text-base font-bold text-slate-900 mb-1">Your negotiation plan</h2>
-          <p className="text-xs text-slate-500">Your leverage, what to ask for, and what you can trade.</p>
+          <h2 className="text-lg font-bold text-slate-900 mb-1">Your negotiation plan</h2>
+          <p className="text-xs text-slate-600 font-medium">Your leverage, what to push for, and what you can trade.</p>
         </div>
 
         {/* Leverage */}
         {output.negotiation_plan.leverage_you_have.length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-slate-700 mb-2">Leverage you have</h3>
-            <ul className="space-y-1.5">
+            <h3 className="text-sm font-bold text-slate-800 mb-3">Leverage you have</h3>
+            <ul className="space-y-2">
               {output.negotiation_plan.leverage_you_have.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
                   <span className="text-emerald-600 mt-1 flex-shrink-0">
-                    <Zap className="w-3.5 h-3.5" />
+                    <Zap className="w-4 h-4" />
                   </span>
                   {item}
                 </li>
@@ -299,13 +299,13 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         {/* Must-have asks */}
         {output.what_to_ask_for?.must_have?.length > 0 && (
         <div>
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2.5 mb-3">
             <h3 className="text-base font-bold text-slate-900">Push for these</h3>
             <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2.5 py-1 rounded-full border border-blue-200">Must-have</span>
           </div>
           <div className="space-y-3">
             {output.what_to_ask_for.must_have.map((ask, idx) => (
-              <div key={idx} className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 shadow-sm">
+              <div key={idx} className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 shadow-sm">
                 <p className="text-sm text-slate-800 font-semibold leading-relaxed">{ask}</p>
               </div>
             ))}
@@ -316,11 +316,11 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         {/* Nice-to-have asks */}
         {output.what_to_ask_for?.nice_to_have?.length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-slate-700 mb-2">Nice-to-have asks</h3>
-            <div className="space-y-2">
+            <h3 className="text-sm font-bold text-slate-800 mb-3">Nice-to-have asks</h3>
+            <div className="space-y-2.5">
               {output.what_to_ask_for.nice_to_have.map((ask, idx) => (
-                <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <p className="text-sm text-slate-600">{ask}</p>
+                <div key={idx} className="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                  <p className="text-sm text-slate-700 font-medium">{ask}</p>
                 </div>
               ))}
             </div>
@@ -330,12 +330,12 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         {/* Trades */}
         {output.negotiation_plan.trades_you_can_offer.length > 0 && (
           <div>
-            <h3 className="text-sm font-semibold text-slate-700 mb-2">Trades you can offer</h3>
-            <ul className="space-y-1.5">
+            <h3 className="text-sm font-bold text-slate-800 mb-3">Trades you can offer</h3>
+            <ul className="space-y-2">
               {output.negotiation_plan.trades_you_can_offer.map((trade, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
+                <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
                   <span className="text-slate-400 mt-1 flex-shrink-0">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                     </svg>
                   </span>
