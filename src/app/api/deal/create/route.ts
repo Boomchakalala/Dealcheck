@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { CreateDealSchema } from '@/lib/schemas'
-import { analyzeDealV2 } from '@/lib/openai'
-import { extractAndNormalize } from '@/lib/extract-normalize'
+import { analyzeDeal } from '@/lib/openai'
 import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit'
 
 const FREE_ANALYSIS_LIMIT = 2
@@ -51,24 +50,18 @@ export async function POST(request: Request) {
     const body = await request.json()
     const validated = CreateDealSchema.parse(body)
 
-    // STEP 1: Extract & normalize commercial facts
-    const extracted = await extractAndNormalize(
+    // Analyze with V1 (full text analysis - catches everything)
+    const output = await analyzeDeal(
       validated.extractedText || '',
+      validated.dealType,
+      validated.goal,
+      validated.notes,
+      undefined,
       validated.imageData
     )
 
-    // STEP 2: Analyze using structured extraction (not raw text)
-    const output = await analyzeDealV2(
-      extracted,
-      validated.dealType,
-      {
-        goal: validated.goal || undefined,
-        notes: validated.notes || undefined,
-      }
-    )
-
-    // Auto-detect vendor from extraction or analysis
-    const vendor = validated.vendor || extracted.supplier || output.commercial_facts.supplier
+    // Auto-detect vendor
+    const vendor = validated.vendor || output.vendor
 
     // Create deal
     const { data: deal, error: dealError } = await supabase
@@ -96,12 +89,11 @@ export async function POST(request: Request) {
         round_number: 1,
         note: validated.notes,
         extracted_text: validated.saveExtractedText ? validated.extractedText : null,
-        extracted_data: extracted, // NEW: Store extraction results
         output_json: output,
-        output_markdown: null, // V2 doesn't generate markdown
+        output_markdown: '', // V1 doesn't need markdown
         status: 'done',
         model_version: 'gpt-4o',
-        schema_version: 'v2',
+        schema_version: 'v1',
       })
       .select()
       .single()
