@@ -248,21 +248,21 @@ export default function LandingPage() {
                     {/* Styled to match real red flag cards in OutputDisplay */}
                     <div className="bg-white rounded-xl border border-red-200 p-5 mb-4">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Legal</span>
+                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Commercial</span>
                       </div>
-                      <h3 className="font-bold text-slate-900 text-sm mb-1">60-day auto-renewal locks you in if you miss the window</h3>
-                      <p className="text-xs text-slate-600">If your team misses the narrow cancellation window, you&apos;re committed to another full year with no mid-term exit.</p>
+                      <h3 className="font-bold text-slate-900 text-sm mb-1">No volume discount at 200+ users</h3>
+                      <p className="text-xs text-slate-600">You're paying full $12.50/user list price at 200 users. A 20% volume discount would save $6,000/year.</p>
                       <div className="mt-3 bg-emerald-50 rounded-lg border border-emerald-200 p-3">
                         <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">What to ask</p>
-                        <p className="text-sm text-slate-700">Change to 30-day notice, or allow quarterly opt-out with 60 days notice.</p>
+                        <p className="text-sm text-slate-700">Request 20% volume discount for 200+ user commitment. Target $10/user/month.</p>
                       </div>
                     </div>
                     <div className="bg-white rounded-xl border border-red-200 p-5">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Commercial</span>
                       </div>
-                      <h3 className="font-bold text-slate-900 text-sm mb-1">Overage pricing at 150% creates cost unpredictability</h3>
-                      <p className="text-xs text-slate-600">If usage grows beyond 10TB, every additional TB costs 50% more with no advance warning. 3TB of growth adds ~$15,750 in surprise charges.</p>
+                      <h3 className="font-bold text-slate-900 text-sm mb-1">Paying for 200 seats regardless of actual usage</h3>
+                      <p className="text-xs text-slate-600">If 40 seats are underutilized, that's $6,000/year wasted on inactive licenses. Switch to quarterly true-up where you pay for active users only.</p>
                     </div>
                     <p className="text-sm text-slate-500 mt-6 italic">
                       Every flag comes with exactly what to say — and a fallback if they push back.
@@ -277,9 +277,9 @@ export default function LandingPage() {
                       <h3 className="text-sm font-semibold text-slate-700 mb-2">Leverage you have</h3>
                       <ul className="space-y-1.5">
                         {[
-                          "This is a new logo for them — they're motivated to close and will flex on terms",
-                          "You have credible alternatives you're actively evaluating",
-                          'End of their fiscal quarter approaching — sales teams are more flexible',
+                          "You're an existing customer — they want to keep your revenue and won't risk losing you",
+                          "Microsoft Teams included with Office 365 — credible alternative at no additional cost",
+                          'Renewal timing gives you leverage (they need to hit quarter targets)',
                         ].map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
                             <svg className="w-3.5 h-3.5 text-emerald-600 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
