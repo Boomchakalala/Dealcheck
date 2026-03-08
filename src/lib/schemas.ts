@@ -123,42 +123,11 @@ export const DealOutputSchemaV2 = z.object({
   // Deal metadata
   deal_snapshot: z.object({
     audience: z.enum(['business', 'personal']),
-    quote_type: z.enum([
-      'saas_software',
-      'consulting_services',
-      'home_improvement',
-      'marketing_agency',
-      'hardware_equipment',
-      'managed_services',
-      'professional_services',
-      'household_services',
-      'construction',
-      'maintenance',
-      'other',
-    ]),
-    deal_type: z.enum(['new_purchase', 'renewal', 'expansion', 'trial_conversion', 'unknown']),
-    pricing_model: z.enum([
-      'fixed_fee',
-      'per_seat',
-      'usage_based',
-      'tiered',
-      'hybrid',
-      'quote_based',
-      'hourly',
-      'milestone',
-      'unclear',
-    ]),
+    quote_type: z.string(), // Allow any description
+    deal_type: z.string(), // Allow any description
+    pricing_model: z.string(), // Allow any description
     leverage_level: z.enum(['high', 'medium', 'low', 'unclear']),
-    main_negotiation_angle: z.enum([
-      'price',
-      'flexibility',
-      'scope_clarity',
-      'payment_terms',
-      'commitment_length',
-      'renewal_terms',
-      'bundling',
-      'none',
-    ]),
+    main_negotiation_angle: z.string(), // Allow any description
     overall_assessment: z.string(),
   }),
   commercial_facts: z.object({

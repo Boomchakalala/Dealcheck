@@ -421,11 +421,11 @@ OUTPUT SCHEMA:
 
   "deal_snapshot": {
     "audience": "business|personal",
-    "quote_type": "saas_software|consulting_services|etc",
-    "deal_type": "new_purchase|renewal|expansion|trial_conversion|unknown",
-    "pricing_model": "fixed_fee|per_seat|usage_based|etc",
+    "quote_type": "Brief description (e.g., SaaS, consulting, hardware, construction)",
+    "deal_type": "Brief description (e.g., new purchase, renewal, expansion)",
+    "pricing_model": "Brief description of pricing structure",
     "leverage_level": "high|medium|low|unclear",
-    "main_negotiation_angle": "price|flexibility|scope_clarity|payment_terms|etc",
+    "main_negotiation_angle": "Brief description of main angle (e.g., price, flexibility, payment terms)",
     "overall_assessment": "One sharp commercial sentence"
   },
   "commercial_facts": {
