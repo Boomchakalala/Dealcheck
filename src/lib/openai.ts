@@ -294,16 +294,18 @@ Return valid JSON only. Match this structure exactly:
 {
   "title": "Vendor -- New/Renewal -- Month Year",
   "vendor": "vendor name",
+  "category": "SaaS Infra|Marketing Agency|Consulting|Hardware|Insurance|Legal Services|etc.",
+  "description": "Quick 1-2 line summary of what this product/service does",
   "verdict": "One clear sentence telling the user what to do next",
   "verdict_type": "negotiate|competitive|overpay_risk",
   "price_insight": "Optional -- concise pricing observation based on quote signals only. Omit if no pricing signals.",
   "snapshot": {
     "vendor_product": "Datadog / Observability Platform",
     "term": "12 months",
-    "total_commitment": "$195,941",
-    "billing_payment": "Monthly payments of $16,328",
+    "total_commitment": "$15,000",
+    "billing_payment": "Monthly payments of $1,250",
     "pricing_model": "Commit-based: 10M logs/day + per-host",
-    "deal_type": "New purchase"
+    "deal_type": "Renewal"
   },
   "NOTE_TOTAL_COMMITMENT": "CRITICAL — total_commitment = TOTAL ANNUAL COST. If they pay $16,328/month for 12 months, total_commitment is '$195,936' (not '$16,328/month'). NEVER include '/month' or '/year' — just the yearly total dollar amount.",
   "NOTE_BILLING": "billing_payment = how they pay (e.g., 'Monthly', 'Quarterly', 'Annual upfront', 'Monthly payments of $X'). This is separate from total_commitment.",
