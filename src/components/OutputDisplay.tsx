@@ -139,14 +139,14 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1">{output.title}</h1>
             {(output.category || output.description) && (
-              <div className="mb-2 flex flex-wrap items-center gap-2">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
                 {output.category && (
-                  <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-200 text-slate-700">
+                  <span className="inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
                     {output.category}
                   </span>
                 )}
                 {output.description && (
-                  <p className="text-xs text-slate-600 leading-relaxed">{output.description}</p>
+                  <p className="text-xs text-slate-600 font-medium">{output.description}</p>
                 )}
               </div>
             )}

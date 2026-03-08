@@ -294,8 +294,8 @@ Return valid JSON only. Match this structure exactly:
 {
   "title": "Vendor -- New/Renewal -- Month Year",
   "vendor": "vendor name",
-  "category": "SaaS Infra|Marketing Agency|Consulting|Hardware|Insurance|Legal Services|etc.",
-  "description": "Quick 1-2 line summary of what this product/service does",
+  "category": "SaaS Infra",
+  "description": "Observability and monitoring platform for cloud infrastructure",
   "verdict": "One clear sentence telling the user what to do next",
   "verdict_type": "negotiate|competitive|overpay_risk",
   "price_insight": "Optional -- concise pricing observation based on quote signals only. Omit if no pricing signals.",
@@ -303,23 +303,17 @@ Return valid JSON only. Match this structure exactly:
     "vendor_product": "Datadog / Observability Platform",
     "term": "12 months",
     "total_commitment": "$15,000",
-    "billing_payment": "Monthly payments of $1,250",
+    "billing_payment": "Monthly",
     "pricing_model": "Commit-based: 10M logs/day + per-host",
     "deal_type": "Renewal",
     "renewal_date": "March 15, 2026",
     "signing_deadline": "February 28, 2026"
   },
-  "NOTE_TOTAL_COMMITMENT": "CRITICAL — total_commitment = TOTAL ANNUAL COST OVER THE ENTIRE TERM. Calculate it step by step:
-    - If quote shows monthly amount: multiply by number of months in term
-    - Example: $1,250/month × 12 months = $15,000 total (show '$15,000', NOT '$1,250/month')
-    - Example: $16,328.40/month × 12 months = $195,941 total (show '$195,941', NOT '$16,328.40/month')
-    - If quote shows annual amount: use that number directly
-    - NEVER include '/month' or '/year' in total_commitment — just the total dollar amount",
-  "NOTE_BILLING": "billing_payment = how they pay (e.g., 'Monthly', 'Quarterly', 'Annual upfront', 'Monthly payments of $X'). This is separate from total_commitment.",
-  "NOTE_DEAL_TYPE": "deal_type = 'Renewal' if quote mentions renewal, existing contract, current agreement, or replacing existing service. 'New purchase' if it's a net-new vendor/service.",
-  "NOTE_DATES": "renewal_date = when current contract expires (if mentioned). signing_deadline = when they need signature by (if mentioned). Omit if not in quote.",
-  "NOTE_CATEGORY": "category = business category (e.g., 'SaaS Infra', 'Marketing Agency', 'Legal Services', 'Consulting', 'Insurance', 'Hardware', 'HR Software')",
-  "NOTE_DESCRIPTION": "description = 1-2 line plain-English summary of what this product/service actually does",
+  "NOTE_TOTAL": "total_commitment = FULL ANNUAL COST. Example: if monthly payment is $1,250 × 12 months = $15,000 total. Show '$15,000' NOT '$1,250/month'.",
+  "NOTE_BILLING": "billing_payment = how they pay ('Monthly', 'Quarterly', 'Annual upfront')",
+  "NOTE_DEAL_TYPE": "deal_type = 'Renewal' if renewing existing contract, 'New purchase' if brand new vendor",
+  "NOTE_DATES": "renewal_date and signing_deadline = extract if mentioned in quote, otherwise omit these fields",
+  "NOTE_CATEGORY_DESC": "category = short label like 'SaaS Infra', 'Marketing Agency', etc. description = 1 line what the product/service does",
   "quick_read": {
     "whats_solid": ["15% discount already applied", "Flexible host scaling", "No minimum term commitment"],
     "whats_concerning": ["No overage protection", "Auto-renewal at 90 days", "Pricing above typical for volume"],
