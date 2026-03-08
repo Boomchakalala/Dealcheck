@@ -338,6 +338,17 @@ Return valid JSON only. Match this structure exactly:
     ]
   },
   "NOTE_MUST_HAVE": "These are MORE SPECIFIC and ACTIONABLE than quick_read or red_flags. Include $ impact.",
+  "potential_savings": [
+    {
+      "ask": "5% discount on annual spend",
+      "annual_impact": "$7,500 saved"
+    },
+    {
+      "ask": "Overage cap at 120% of commit",
+      "annual_impact": "Up to $50K protected"
+    }
+  ],
+  "NOTE_SAVINGS": "Optional. If you recommend price reductions or caps, show the $ impact here. 0-3 items max.",
   "email_drafts": {
     "neutral": {"subject": "...", "body": "..."},
     "firm": {"subject": "...", "body": "..."},
