@@ -198,21 +198,21 @@ export default async function DealPage({
 
       {/* Next Actions Panel */}
       {latestOutput && (
-        <Card className="p-4 sm:p-6 bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <Card className="p-5 sm:p-6 bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 shadow-sm">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-1 flex items-center gap-2">
             <CheckSquare className="w-5 h-5 text-emerald-600" />
             Next Actions
           </h2>
+          <p className="text-xs text-emerald-700 mb-4 font-medium">Key items to negotiate on this deal</p>
 
           {/* V2: Priority points as checklist */}
           {isV2 && (latestOutput as DealOutputV2).priority_points?.length > 0 && (
             <div className="mb-5">
-              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">Priority Points</h3>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {(latestOutput as DealOutputV2).priority_points.map((point, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <div className="mt-1 w-4 h-4 rounded border-2 border-slate-300 flex-shrink-0" />
-                    <span className="text-sm text-slate-700 leading-relaxed">{point.title}</span>
+                  <li key={idx} className="flex items-start gap-3 p-3 bg-white rounded-lg border-2 border-emerald-200">
+                    <div className="mt-0.5 w-5 h-5 rounded border-2 border-emerald-400 flex-shrink-0" />
+                    <span className="text-sm text-slate-800 leading-relaxed font-medium">{point.title}</span>
                   </li>
                 ))}
               </ul>
@@ -222,12 +222,11 @@ export default async function DealPage({
           {/* V1: Must-have asks as checklist */}
           {!isV2 && (latestOutput as DealOutput).what_to_ask_for?.must_have?.length > 0 && (
             <div className="mb-5">
-              <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">Must-Have Asks</h3>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {(latestOutput as DealOutput).what_to_ask_for.must_have.map((ask: string, idx: number) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <div className="mt-1 w-4 h-4 rounded border-2 border-slate-300 flex-shrink-0" />
-                    <span className="text-sm text-slate-700 leading-relaxed">{ask}</span>
+                  <li key={idx} className="flex items-start gap-3 p-3 bg-white rounded-lg border-2 border-emerald-200">
+                    <div className="mt-0.5 w-5 h-5 rounded border-2 border-emerald-400 flex-shrink-0" />
+                    <span className="text-sm text-slate-800 leading-relaxed font-medium">{ask}</span>
                   </li>
                 ))}
               </ul>
@@ -235,15 +234,15 @@ export default async function DealPage({
           )}
 
           <div className="flex items-center gap-3 flex-wrap">
-            <a href="#email-drafts">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Mail className="w-4 h-4" />
-                {isV2 ? 'Generate Email' : 'Send Email'}
+            <a href="#email-drafts" className="flex-1 sm:flex-none">
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
+                <Mail className="w-4 h-4 mr-2" />
+                {isV2 ? 'Generate Email' : 'View Email Drafts'}
               </Button>
             </a>
-            <a href="#add-round">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Plus className="w-4 h-4" />
+            <a href="#add-round" className="flex-1 sm:flex-none">
+              <Button variant="outline" size="default" className="w-full border-2 border-emerald-200 hover:bg-emerald-50">
+                <Plus className="w-4 h-4 mr-2" />
                 Add New Round
               </Button>
             </a>
