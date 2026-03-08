@@ -155,7 +155,16 @@ export function EmailGenerator({ roundId, defaultControls }: EmailGeneratorProps
               </div>
               <div className="mt-1 font-medium text-gray-900">{generatedEmail.subject}</div>
             </div>
-            <CopyButton text={generatedEmail.subject} label="Copy Subject" />
+            <CopyButton
+              text={generatedEmail.subject}
+              label="Copy Subject"
+              onCopy={() => {
+                trackEvent({
+                  name: 'email_copied',
+                  properties: { emailType: 'subject' }
+                })
+              }}
+            />
           </div>
 
           <div className="border-t border-emerald-200 pt-4">
@@ -163,7 +172,16 @@ export function EmailGenerator({ roundId, defaultControls }: EmailGeneratorProps
               <div className="text-xs font-medium uppercase tracking-wide text-emerald-700">
                 Email Body
               </div>
-              <CopyButton text={generatedEmail.body} label="Copy Email" />
+              <CopyButton
+                text={generatedEmail.body}
+                label="Copy Email"
+                onCopy={() => {
+                  trackEvent({
+                    name: 'email_copied',
+                    properties: { emailType: 'body' }
+                  })
+                }}
+              />
             </div>
             <div className="mt-3 whitespace-pre-wrap rounded-lg bg-white p-4 text-sm text-gray-900">
               {generatedEmail.body}

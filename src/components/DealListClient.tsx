@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { CloseDealModal } from '@/components/CloseDealModal'
 import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, X } from 'lucide-react'
+import { trackEvent } from '@/lib/analytics'
 
 interface DealListClientProps {
   deals: any[]
