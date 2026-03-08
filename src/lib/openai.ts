@@ -305,7 +305,9 @@ Return valid JSON only. Match this structure exactly:
     "total_commitment": "$15,000",
     "billing_payment": "Monthly payments of $1,250",
     "pricing_model": "Commit-based: 10M logs/day + per-host",
-    "deal_type": "Renewal"
+    "deal_type": "Renewal",
+    "renewal_date": "March 15, 2026",
+    "signing_deadline": "February 28, 2026"
   },
   "NOTE_TOTAL_COMMITMENT": "CRITICAL — total_commitment = TOTAL ANNUAL COST OVER THE ENTIRE TERM. Calculate it step by step:
     - If quote shows monthly amount: multiply by number of months in term
@@ -315,6 +317,7 @@ Return valid JSON only. Match this structure exactly:
     - NEVER include '/month' or '/year' in total_commitment — just the total dollar amount",
   "NOTE_BILLING": "billing_payment = how they pay (e.g., 'Monthly', 'Quarterly', 'Annual upfront', 'Monthly payments of $X'). This is separate from total_commitment.",
   "NOTE_DEAL_TYPE": "deal_type = 'Renewal' if quote mentions renewal, existing contract, current agreement, or replacing existing service. 'New purchase' if it's a net-new vendor/service.",
+  "NOTE_DATES": "renewal_date = when current contract expires (if mentioned). signing_deadline = when they need signature by (if mentioned). Omit if not in quote.",
   "NOTE_CATEGORY": "category = business category (e.g., 'SaaS Infra', 'Marketing Agency', 'Legal Services', 'Consulting', 'Insurance', 'Hardware', 'HR Software')",
   "NOTE_DESCRIPTION": "description = 1-2 line plain-English summary of what this product/service actually does",
   "quick_read": {

@@ -29,6 +29,8 @@ export const DealOutputSchema = z.object({
     billing_payment: z.string(),
     pricing_model: z.string(),
     deal_type: z.string(),
+    renewal_date: z.string().optional(),
+    signing_deadline: z.string().optional(),
   }),
   quick_read: z.object({
     whats_solid: z.array(z.string()),
