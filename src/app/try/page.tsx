@@ -104,6 +104,14 @@ This quote expires in 14 days.`
     }
     setAnalyzing(true)
     setError(null)
+
+    // Track trial start
+    const source = isDemoText ? 'demo' : uploadedFileName ? 'upload' : 'paste'
+    trackEvent({
+      name: 'trial_started',
+      properties: { source, dealType }
+    })
+
     try {
       const response = await fetch('/api/trial', {
         method: 'POST',
@@ -118,6 +126,17 @@ This quote expires in 14 days.`
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to analyze')
       setOutput(data.output)
+
+      // Track trial completion
+      trackEvent({
+        name: 'trial_completed',
+        properties: {
+          redFlags: data.output.red_flags?.length || 0,
+          potentialSavings: data.output.potential_savings?.length || 0,
+          hasCategory: !!data.output.snapshot?.category
+        }
+      })
+
       // Store trial result for post-auth import (localStorage with 24h TTL)
       saveTrialToStorage({
         output: data.output,
@@ -126,7 +145,14 @@ This quote expires in 14 days.`
         extractedText: input,
       })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred'
+      setError(errorMessage)
+
+      // Track trial error
+      trackEvent({
+        name: 'trial_error',
+        properties: { error: errorMessage }
+      })
     } finally {
       setAnalyzing(false)
     }

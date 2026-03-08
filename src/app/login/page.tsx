@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
@@ -9,6 +9,7 @@ import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { Loader2, ArrowRight, Shield } from 'lucide-react'
 import Link from 'next/link'
+import { trackEvent, identifyUser } from '@/lib/analytics'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
@@ -21,6 +22,16 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const fromTrial = searchParams.get('from') === 'trial'
   const supabase = createClient()
+
+  // Track when user switches to sign up mode
+  useEffect(() => {
+    if (isSignUp) {
+      trackEvent({
+        name: 'signup_started',
+        properties: { source: fromTrial ? 'trial' : undefined }
+      })
+    }
+  }, [isSignUp, fromTrial])
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
