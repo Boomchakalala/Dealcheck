@@ -292,17 +292,17 @@ export default function LandingPage() {
                     </div>
                     <div className="mb-5">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-sm font-semibold text-slate-700">Must-have asks</h3>
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Priority</span>
+                        <h3 className="text-sm font-semibold text-slate-900">Push for these</h3>
+                        <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-200">Must-have</span>
                       </div>
                       <div className="space-y-2">
                         {[
-                          'Reduce auto-renewal notice from 60 to 30 days',
-                          'Cap overage charges at 110% with advance written notice',
-                          'Increase support to 25 tickets/month during onboarding',
+                          'Reduce auto-renewal notice from 60 to 30 days — prevents accidental $42K lock-in',
+                          'Cap overage at 110% with advance notice — protects against $15K+ surprise costs',
+                          'Increase support to 25 tickets/month during onboarding — saves $3K in overage fees',
                         ].map((ask, idx) => (
-                          <div key={idx} className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                            <p className="text-sm text-slate-700">{ask}</p>
+                          <div key={idx} className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 shadow-sm">
+                            <p className="text-sm text-slate-800 font-semibold">{ask}</p>
                           </div>
                         ))}
                       </div>
@@ -318,27 +318,27 @@ export default function LandingPage() {
                     {/* Styled to match real email builder */}
                     <div className="mb-4">
                       <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">Tone</label>
-                      <div className="flex gap-1 bg-slate-100 rounded-lg p-1 max-w-xs">
-                        <span className="flex-1 px-3 py-2 text-xs font-semibold rounded-md bg-white text-slate-900 shadow-sm text-center">Friendly</span>
-                        <span className="flex-1 px-3 py-2 text-xs font-semibold rounded-md text-slate-500 text-center">Direct</span>
-                        <span className="flex-1 px-3 py-2 text-xs font-semibold rounded-md text-slate-500 text-center">Urgent</span>
+                      <div className="flex gap-1.5 bg-slate-100 rounded-xl p-1.5 max-w-xs shadow-inner">
+                        <span className="flex-1 px-3 py-2 text-xs font-bold rounded-lg bg-white text-slate-900 shadow-md border border-slate-200 text-center">Friendly</span>
+                        <span className="flex-1 px-3 py-2 text-xs font-semibold rounded-lg text-slate-500 text-center">Direct</span>
+                        <span className="flex-1 px-3 py-2 text-xs font-semibold rounded-lg text-slate-500 text-center">Firm</span>
                       </div>
                     </div>
-                    <div className="rounded-xl border border-slate-200 overflow-hidden">
-                      <div className="px-5 py-3 bg-slate-50 border-b border-slate-200">
-                        <p className="text-xs font-medium text-slate-500">Subject</p>
+                    <div className="rounded-xl border-2 border-slate-200 overflow-hidden bg-gradient-to-br from-slate-50 to-white shadow-sm">
+                      <div className="px-5 py-3 bg-slate-50 border-b-2 border-slate-200">
+                        <p className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Subject line</p>
                         <p className="text-sm font-semibold text-slate-900">CloudVault Enterprise Storage - Questions on Contract Terms</p>
                       </div>
                       <div className="p-5">
                         <p className="text-sm text-slate-700 leading-relaxed">
                           Hi [Sales Rep Name],<br /><br />
-                          Thanks for the CloudVault quote. We&apos;re interested in moving forward but have a few questions on terms before we can finalize. The 60-day auto-renewal window is tight for our procurement cycle — could we adjust to 30 days?...<br /><br />
-                          <span className="text-slate-400">[Overage, support, and exit clause asks included based on your risk level]</span>
+                          Thanks for the CloudVault quote. We&apos;re interested in moving forward but have a few questions on terms before we can finalize. Could we adjust the 60-day auto-renewal to 30 days? This would make internal approvals much smoother...<br /><br />
+                          <span className="text-slate-400">[Overage caps, support limits, and exit clause questions included]</span>
                         </p>
                       </div>
                     </div>
                     <p className="text-sm text-slate-500 mt-6 italic">
-                      Pick your tone, adjust the asks, and send. Done in 30 seconds.
+                      Pick your tone, edit directly, and copy. Ready in 30 seconds.
                     </p>
                   </div>
                 )}
