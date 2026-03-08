@@ -66,8 +66,8 @@ const exampleOutput: DealOutput = {
   },
   what_to_ask_for: {
     must_have: [
-      "Negotiate 20% volume discount at 200-user commitment — target $10/user/month (saves $6,000 annually)",
-      "Request quarterly true-up instead of fixed 200 seats — pay only for active users (saves $6,000 on seat waste)",
+      "Negotiate 20% volume discount at 200-user commitment — target $10/user/month (saves $6,000 annually from $30K to $24K)",
+      "Request quarterly true-up instead of fixed 200 seats — pay only for active users (eliminates seat waste)",
       "Lock in pricing for 2-year renewal — prevents future price increases"
     ],
     nice_to_have: [
@@ -78,10 +78,6 @@ const exampleOutput: DealOutput = {
   potential_savings: [
     {
       ask: "20% volume discount (200+ users)",
-      annual_impact: "$6,000 saved"
-    },
-    {
-      ask: "Quarterly true-up (pay for active users only)",
       annual_impact: "$6,000 saved"
     }
   ],
