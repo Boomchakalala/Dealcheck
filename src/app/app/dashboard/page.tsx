@@ -4,7 +4,19 @@ import { Card } from '@/components/ui/card'
 import { TrendingUp, Target, CheckCircle2, Plus, Zap, Lock, Crown, DollarSign, Percent, BarChart3 } from 'lucide-react'
 import { DashboardClient } from '@/components/DashboardClient'
 import Link from 'next/link'
-import { parseMoney, formatCurrency, type Currency } from '@/lib/currency'
+import { parseMoney, formatCurrency, convertCurrency, type Currency } from '@/lib/currency'
+
+async function convertDealAmount(totalStr: string, dealCurrency: Currency | undefined, baseCurrency: Currency): Promise<number> {
+  const { amount, currency } = parseMoney(totalStr)
+  const fromCurrency = dealCurrency || currency
+
+  if (fromCurrency === baseCurrency) {
+    return amount
+  }
+
+  // Convert to base currency
+  return await convertCurrency(amount, fromCurrency, baseCurrency)
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -40,21 +52,27 @@ export default async function DashboardPage() {
   const closedDeals = allDeals.filter(d => d.status?.startsWith('closed_'))
   const wonDeals = closedDeals.filter(d => d.status === 'closed_won')
 
-  // Calculate total spend analyzed (all deals) - in base currency
-  const totalSpendAnalyzed = allDeals.reduce((sum, deal) => {
+  // Calculate total spend analyzed (all deals) - converted to base currency
+  const totalSpendAnalyzed = await allDeals.reduce(async (sumPromise, deal) => {
+    const sum = await sumPromise
     const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
     const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-    const { amount } = parseMoney(totalStr)
-    return sum + amount
-  }, 0)
+    const dealCurrency = latestRound?.output_json?.snapshot?.currency as Currency | undefined
 
-  // Calculate total spend closed (only closed deals) - in base currency
-  const totalSpendClosed = closedDeals.reduce((sum, deal) => {
+    const amount = await convertDealAmount(totalStr, dealCurrency, baseCurrency)
+    return sum + amount
+  }, Promise.resolve(0))
+
+  // Calculate total spend closed (only closed deals) - converted to base currency
+  const totalSpendClosed = await closedDeals.reduce(async (sumPromise, deal) => {
+    const sum = await sumPromise
     const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
     const totalStr = latestRound?.output_json?.snapshot?.total_commitment
-    const { amount } = parseMoney(totalStr)
+    const dealCurrency = latestRound?.output_json?.snapshot?.currency as Currency | undefined
+
+    const amount = await convertDealAmount(totalStr, dealCurrency, baseCurrency)
     return sum + amount
-  }, 0)
+  }, Promise.resolve(0))
 
   const totalSavings = closedDeals.reduce((sum, d) => sum + (d.savings_amount || 0), 0)
   const savingsPercent = totalSpendClosed > 0 ? (totalSavings / totalSpendClosed) * 100 : 0
