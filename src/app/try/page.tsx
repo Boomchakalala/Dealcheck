@@ -6,6 +6,8 @@ import { OutputDisplay } from '@/components/OutputDisplay'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
 import { MarketingFooter } from '@/components/MarketingFooter'
+import { Card } from '@/components/ui/card'
+import { Package, AlertTriangle, BadgeDollarSign } from 'lucide-react'
 import type { DealOutput } from '@/types'
 
 const TRIAL_STORAGE_KEY = 'dealcheck_trial'
