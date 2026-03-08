@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
-import { TrendingUp, Target, CheckCircle2, Plus } from 'lucide-react'
+import { TrendingUp, Target, CheckCircle2, Plus, Zap, Lock, Crown } from 'lucide-react'
 import { DashboardClient } from '@/components/DashboardClient'
 import Link from 'next/link'
 
@@ -13,6 +13,13 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
+  // Get user profile for usage tracking
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('usage_count, plan, is_admin')
+    .eq('id', user.id)
+    .single()
+
   // Get all deals with rounds
   const { data: deals } = await supabase
     .from('deals')
@@ -21,6 +28,10 @@ export default async function DashboardPage() {
     .order('updated_at', { ascending: false })
 
   const allDeals = deals || []
+  const isPro = profile?.plan === 'pro'
+  const isAdmin = profile?.is_admin || false
+  const usageCount = profile?.usage_count || 0
+  const FREE_LIMIT = 5
 
   // Calculate KPIs
   const totalDeals = allDeals.length
