@@ -172,8 +172,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       </div>
 
       {/* ── Section 2: Deal Snapshot ── */}
-      <div className="bg-white rounded-xl border-2 border-slate-200 px-4 sm:px-6 py-5 shadow-sm">
-        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Deal snapshot</h2>
+      <div className="bg-white rounded-xl border-2 border-slate-200 p-4 sm:p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-slate-900 mb-4">Deal snapshot</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[
             { label: 'Vendor', value: output.snapshot.vendor_product },
@@ -182,6 +182,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             { label: 'Billing', value: output.snapshot.billing_payment },
             { label: 'Pricing model', value: output.snapshot.pricing_model },
             { label: 'Deal type', value: output.snapshot.deal_type },
+            ...(output.snapshot.renewal_date ? [{ label: 'Renewal date', value: output.snapshot.renewal_date }] : []),
+            ...(output.snapshot.signing_deadline ? [{ label: 'Signing deadline', value: output.snapshot.signing_deadline }] : []),
           ].map((item) => (
             <div key={item.label}>
               <p className="text-xs font-semibold text-slate-500 mb-1.5">{item.label}</p>
@@ -463,9 +465,11 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           </div>
 
           {/* Editable email */}
-          <div className="space-y-4">
+          <div className="space-y-4 bg-gradient-to-br from-slate-50 to-white rounded-xl p-5 border-2 border-slate-200">
             <div>
-              <label className="text-xs font-bold text-slate-700 mb-2 block uppercase tracking-wide">Subject line</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Subject line</label>
+              </div>
               <input
                 type="text"
                 value={emailSubjects[activeEmailTab]}
@@ -474,13 +478,19 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                   newSubjects[activeEmailTab] = e.target.value
                   setEmailSubjects(newSubjects)
                 }}
-                className="w-full px-4 py-2.5 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm"
+                className="w-full px-4 py-2.5 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm bg-white"
                 placeholder="Email subject..."
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-700 mb-2 block uppercase tracking-wide">Email body</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email body</label>
+                <CopyButton
+                  text={`Subject: ${emailSubjects[activeEmailTab]}\n\n${emailBodies[activeEmailTab]}`}
+                  label="Copy email"
+                />
+              </div>
               <textarea
                 value={emailBodies[activeEmailTab]}
                 onChange={(e) => {
@@ -489,18 +499,10 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                   setEmailBodies(newBodies)
                 }}
                 rows={14}
-                className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none font-mono leading-relaxed shadow-sm"
+                className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none font-mono leading-relaxed shadow-sm bg-white"
                 placeholder="Email body..."
               />
-              <p className="text-xs text-slate-500 mt-2 italic">Edit this email directly, then copy it below.</p>
-            </div>
-
-            {/* Copy button */}
-            <div className="flex justify-end pt-2">
-              <CopyButton
-                text={`Subject: ${emailSubjects[activeEmailTab]}\n\n${emailBodies[activeEmailTab]}`}
-                label="Copy email"
-              />
+              <p className="text-xs text-slate-500 mt-2">Edit directly or use AI regeneration below.</p>
             </div>
           </div>
 
