@@ -8,6 +8,7 @@ import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { Card } from '@/components/ui/card'
 import { Package, AlertTriangle, BadgeDollarSign } from 'lucide-react'
+import { trackEvent } from '@/lib/analytics'
 import type { DealOutput } from '@/types'
 
 const TRIAL_STORAGE_KEY = 'dealcheck_trial'
