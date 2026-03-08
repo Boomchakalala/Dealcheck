@@ -150,7 +150,7 @@ export function DealListClient({ deals }: DealListClientProps) {
                         </button>
                       )}
                       <button
-                        onClick={(e) => handleDelete(e, deal.id)}
+                        onClick={(e) => handleDelete(e, deal.id, isClosed, (deal.savings_amount || 0) > 0)}
                         disabled={deletingId === deal.id}
                         className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50"
                       >
