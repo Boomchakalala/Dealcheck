@@ -24,10 +24,32 @@ interface MainCategoryData {
   totalSpend: number
 }
 
-export function DashboardClient({ deals }: DashboardClientProps) {
+export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurrency }: DashboardClientProps) {
+  const router = useRouter()
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [expandedMainCategories, setExpandedMainCategories] = useState<Set<string>>(new Set())
   const [statusFilter, setStatusFilter] = useState<'all' | 'in_progress' | 'closed'>('all')
+  const [baseCurrency, setBaseCurrency] = useState<Currency>(initialBaseCurrency)
+  const [isConverting, setIsConverting] = useState(false)
+
+  // Update base currency preference
+  const updateBaseCurrency = async (newCurrency: Currency) => {
+    setIsConverting(true)
+    setBaseCurrency(newCurrency)
+
+    try {
+      await fetch('/api/user/currency', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ baseCurrency: newCurrency })
+      })
+      router.refresh()
+    } catch (error) {
+      console.error('Failed to update currency:', error)
+    } finally {
+      setIsConverting(false)
+    }
+  }
 
   // Helper to parse money strings
   const parseMoney = (str: string): number => {
