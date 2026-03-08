@@ -73,7 +73,6 @@ export default async function DashboardPage() {
     const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
     const totalStr = latestRound?.output_json?.snapshot?.total_commitment
     const amount = parseMoney(totalStr)
-    console.log('Deal:', deal.vendor || deal.title, 'Total:', totalStr, '→', amount)
     return sum + amount
   }, 0)
 
@@ -87,13 +86,6 @@ export default async function DashboardPage() {
 
   const totalSavings = closedDeals.reduce((sum, d) => sum + (d.savings_amount || 0), 0)
   const savingsPercent = totalSpendClosed > 0 ? (totalSavings / totalSpendClosed) * 100 : 0
-
-  console.log('Dashboard KPIs:', {
-    totalSpendAnalyzed,
-    totalSpendClosed,
-    totalSavings,
-    savingsPercent
-  })
 
   const formatMoney = (amount: number) => {
     if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`
