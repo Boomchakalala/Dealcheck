@@ -180,17 +180,19 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       </div>
 
       {/* ── Section 3: What's Working ── */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-6">
+      <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200 p-4 sm:p-6 shadow-sm">
         <div className="flex items-center gap-2 mb-1">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          <h2 className="text-base font-bold text-slate-900">What's working</h2>
+          <div className="p-1.5 bg-emerald-100 rounded-lg">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+          </div>
+          <h2 className="text-lg font-bold text-slate-900">What's already solid</h2>
         </div>
-        <p className="text-xs text-slate-500 mb-4">Solid aspects of this deal you can build on.</p>
-        <ul className="space-y-2">
+        <p className="text-xs text-emerald-700/70 mb-4 font-medium">Good aspects in this deal — build on these.</p>
+        <ul className="space-y-2.5">
           {output.quick_read.whats_solid.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-3 text-sm text-slate-700 leading-relaxed">
-              <span className="text-emerald-500 mt-1 flex-shrink-0">
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+            <li key={idx} className="flex items-start gap-3 text-sm text-slate-800 leading-relaxed font-medium">
+              <span className="text-emerald-600 mt-1 flex-shrink-0">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </span>
@@ -203,24 +205,26 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       {/* ── Section 4: Watch Out ── */}
       {(output.quick_read.whats_concerning.length > 0 || output.red_flags.length > 0) && (
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
-            <h2 className="text-base font-bold text-slate-900">What's costing you</h2>
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 bg-red-100 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-red-600" />
+            </div>
+            <h2 className="text-lg font-bold text-slate-900">Red flags to address</h2>
             {output.red_flags.length > 0 && (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
-                {output.red_flags.length} flag{output.red_flags.length !== 1 ? 's' : ''}
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-700 border-2 border-red-200 shadow-sm">
+                {output.red_flags.length} issue{output.red_flags.length !== 1 ? 's' : ''}
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500 -mt-2">Issues that could cost you money or flexibility. Each one includes what to ask for.</p>
+          <p className="text-xs text-red-600/70 -mt-2 font-medium">Issues costing you money or flexibility — each includes what to push for.</p>
 
           {/* Quick concerns */}
           {output.quick_read.whats_concerning.length > 0 && (
-            <div className="bg-amber-50/50 rounded-xl border border-amber-200 p-4 sm:p-5">
-              <ul className="space-y-2">
+            <div className="bg-amber-50 rounded-xl border-2 border-amber-200 p-4 sm:p-5 shadow-sm">
+              <ul className="space-y-2.5">
                 {output.quick_read.whats_concerning.map((concern, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm text-slate-700 leading-relaxed">
-                    <span className="text-amber-500 mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  <li key={idx} className="flex items-start gap-3 text-sm text-slate-800 leading-relaxed font-medium">
+                    <span className="text-amber-600 mt-1.5 flex-shrink-0 w-2 h-2 rounded-full bg-amber-500" />
                     {concern}
                   </li>
                 ))}
@@ -230,23 +234,23 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
           {/* Red flags - expandable */}
           {output.red_flags.map((flag, idx) => (
-            <div key={idx} className="bg-white rounded-xl border border-red-200 overflow-hidden">
+            <div key={idx} className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl border-2 border-red-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <button
                 onClick={() => toggleFlag(idx)}
-                className="w-full px-5 py-4 flex items-start justify-between hover:bg-red-50/30 transition-colors text-left"
+                className="w-full px-5 py-4 flex items-start justify-between hover:bg-red-100/50 transition-colors text-left"
               >
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">{flag.type}</span>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-[10px] font-bold text-red-700 uppercase tracking-wider bg-red-100 px-2 py-0.5 rounded">{flag.type}</span>
                   </div>
-                  <h3 className="font-bold text-slate-900 text-sm">{flag.issue}</h3>
-                  <p className="text-xs text-slate-600 mt-1">{flag.why_it_matters}</p>
+                  <h3 className="font-bold text-slate-900 text-base mb-1">{flag.issue}</h3>
+                  <p className="text-sm text-slate-700 font-medium">{flag.why_it_matters}</p>
                 </div>
                 <div className="ml-4 flex-shrink-0 mt-1">
                   {expandedFlags.includes(idx) ? (
-                    <ChevronUp className="w-4 h-4 text-slate-400" />
+                    <ChevronUp className="w-5 h-5 text-red-600" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-slate-400" />
+                    <ChevronDown className="w-5 h-5 text-red-600" />
                   )}
                 </div>
               </button>
