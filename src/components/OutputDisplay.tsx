@@ -151,7 +151,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               </div>
             )}
             <p className={`text-sm sm:text-base font-medium ${vc.text} leading-relaxed`}>
-              {output.verdict || output.quick_read.conclusion}
+              {output.verdict || output.quick_read?.conclusion || 'No verdict available'}
             </p>
           </div>
           <div className="sm:text-right flex-shrink-0">
