@@ -63,8 +63,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         body: JSON.stringify({
           roundId,
           customPrompt: customPrompt.trim() || null,
-          vendor: output.vendor || output.snapshot.vendor_product,
-          totalCommitment: output.snapshot.total_commitment,
+          vendor: output.vendor || output.snapshot?.vendor_product,
+          totalCommitment: output.snapshot?.total_commitment,
           mustHaveAsks: output.what_to_ask_for?.must_have || [],
           niceToHaveAsks: output.what_to_ask_for?.nice_to_have || [],
           redFlags: output.red_flags?.map(f => f.issue) || [],
@@ -176,14 +176,14 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         <h2 className="text-lg font-bold text-slate-900 mb-4">Deal snapshot</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[
-            { label: 'Vendor', value: output.snapshot.vendor_product },
-            { label: 'Term', value: output.snapshot.term },
-            { label: 'Total', value: output.snapshot.total_commitment },
-            { label: 'Billing', value: output.snapshot.billing_payment },
-            { label: 'Pricing model', value: output.snapshot.pricing_model },
-            { label: 'Deal type', value: output.snapshot.deal_type },
-            ...(output.snapshot.renewal_date ? [{ label: 'Renewal date', value: output.snapshot.renewal_date }] : []),
-            ...(output.snapshot.signing_deadline ? [{ label: 'Signing deadline', value: output.snapshot.signing_deadline }] : []),
+            { label: 'Vendor', value: output.snapshot?.vendor_product },
+            { label: 'Term', value: output.snapshot?.term },
+            { label: 'Total', value: output.snapshot?.total_commitment },
+            { label: 'Billing', value: output.snapshot?.billing_payment },
+            { label: 'Pricing model', value: output.snapshot?.pricing_model },
+            { label: 'Deal type', value: output.snapshot?.deal_type },
+            ...(output.snapshot?.renewal_date ? [{ label: 'Renewal date', value: output.snapshot.renewal_date }] : []),
+            ...(output.snapshot?.signing_deadline ? [{ label: 'Signing deadline', value: output.snapshot.signing_deadline }] : []),
           ].map((item) => (
             <div key={item.label}>
               <p className="text-xs font-semibold text-slate-500 mb-1.5">{item.label}</p>
