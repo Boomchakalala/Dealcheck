@@ -125,21 +125,23 @@ Return 1-3 must-have asks (typically should include price improvement).
 
 Rules:
 - Each ask must be SPECIFIC to this quote with ACTUAL NUMBERS
-- Frame as polite requests: "Could we...", "Would you consider...", "Would it be possible to..."
+- Be ASSERTIVE and direct - start with action verbs
+- Frame as confident recommendations: "Negotiate...", "Push for...", "Request...", "Lock in..."
 - Explain WHY with SPECIFIC impact (not generic reasons)
 - Prioritize commercial levers over boilerplate terms
 - Reference actual pricing/terms from the quote
 
 Examples of strong asks:
-- "Could we reduce the $15K onboarding fee to $8K or spread it across Q1-Q2 milestones? At 15% of year-1 spend, this is inflating first-year TCO."
-- "Would you consider 20% volume discount at 100+ seats (target: $80/seat from $100)? Current per-seat pricing doesn't reflect enterprise scale."
-- "Could we get overage cap at 120% of commit? Without this, a spike from 10M to 15M logs/day = $50K unbudgeted cost."
+- "Negotiate the $15K onboarding fee down to $8K or spread across Q1-Q2 milestones (saves $7K upfront, 15% of year-1 spend)"
+- "Push for 20% volume discount at 100+ seats — target $80/seat from current $100 (saves $24K annually)"
+- "Request overage cap at 120% of commit — without this, spike from 10M to 15M logs/day = $50K unbudgeted cost"
+- "Lock in pricing freeze for year 2 renewal — current terms allow unlimited price increases"
 
 Weak asks (NEVER include):
-- "Negotiate pricing" (too vague)
-- "Review terms" (not specific)
+- "Could we negotiate pricing" (too vague and passive)
+- "Would you consider reviewing terms" (not specific)
 - "Ask for flexibility" (what flexibility?)
-- "Clarify contact info" (useless)
+- "Could we clarify contact info" (useless)
 - "Would you consider a volume discount or flexible seat model? A 100-seat commitment with per-seat pricing removes our scaling flexibility."
 - "Could we get an itemized breakdown of labor vs materials? Without this, we can't fairly compare your quote to alternatives."
 - "Would it be possible to adjust the payment schedule to 30/40/30 across milestones? The current 60% upfront shifts too much risk to us."
