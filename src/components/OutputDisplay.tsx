@@ -160,9 +160,9 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       </div>
 
       {/* ── Section 2: Deal Snapshot ── */}
-      <div className="bg-slate-50/50 rounded-xl border border-slate-100 px-4 sm:px-6 py-5">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Deal snapshot</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+      <div className="bg-white rounded-xl border-2 border-slate-200 px-4 sm:px-6 py-5 shadow-sm">
+        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Deal snapshot</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[
             { label: 'Vendor', value: output.snapshot.vendor_product },
             { label: 'Term', value: output.snapshot.term },
@@ -172,8 +172,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             { label: 'Deal type', value: output.snapshot.deal_type },
           ].map((item) => (
             <div key={item.label}>
-              <p className="text-xs font-medium text-slate-400 mb-1">{item.label}</p>
-              <p className="text-sm font-semibold text-slate-900 break-words">{item.value || 'N/A'}</p>
+              <p className="text-xs font-semibold text-slate-500 mb-1.5">{item.label}</p>
+              <p className="text-sm font-bold text-slate-900 break-words leading-snug">{item.value || 'N/A'}</p>
             </div>
           ))}
         </div>
