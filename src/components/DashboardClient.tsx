@@ -135,54 +135,92 @@ export function DashboardClient({ deals }: DashboardClientProps) {
       {/* Category breakdown */}
       {categoryHierarchy.length > 0 && (
         <div>
-          <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <Layers className="w-5 h-5" />
-            Spend by category
-          </h2>
-          <div className="space-y-2">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <Layers className="w-5 h-5" />
+              Spend by category
+            </h2>
+            {selectedCategory !== 'all' && (
+              <button
+                onClick={() => setSelectedCategory('all')}
+                className="text-sm text-slate-600 hover:text-slate-900 font-medium"
+              >
+                Clear filter
+              </button>
+            )}
+          </div>
+
+          {/* Main categories as cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {categoryHierarchy.map((mainCat) => {
-              const isExpanded = expandedMainCategories.has(mainCat.mainCategory)
-              const isMainSelected = selectedCategory === mainCat.mainCategory
+              const isSelected = selectedCategory === mainCat.mainCategory
+              const hasSubcategories = mainCat.subcategories.size > 1
 
               return (
-                <div key={mainCat.mainCategory} className="border-2 border-slate-200 rounded-xl overflow-hidden">
-                  {/* Main category header */}
-                  <div className="flex items-center justify-between">
-                    <button
-                      onClick={() => setSelectedCategory(isMainSelected ? 'all' : mainCat.mainCategory)}
-                      className={`flex-1 p-4 text-left transition-all ${
-                        isMainSelected
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-white hover:bg-slate-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className={`text-sm font-bold ${isMainSelected ? 'text-white' : 'text-slate-900'}`}>
-                            {mainCat.mainCategory}
-                          </p>
-                          <p className={`text-xs ${isMainSelected ? 'text-emerald-100' : 'text-slate-500'} mt-0.5`}>
-                            {mainCat.totalCount} deal{mainCat.totalCount !== 1 ? 's' : ''}
-                          </p>
-                        </div>
-                        <p className={`text-lg font-bold ${isMainSelected ? 'text-white' : 'text-slate-900'}`}>
-                          {formatAmount(mainCat.totalSpend)}
+                <div
+                  key={mainCat.mainCategory}
+                  className={`rounded-xl border-2 transition-all ${
+                    isSelected
+                      ? 'border-emerald-500 bg-emerald-50 shadow-md'
+                      : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
+                  }`}
+                >
+                  {/* Main category */}
+                  <button
+                    onClick={() => setSelectedCategory(isSelected ? 'all' : mainCat.mainCategory)}
+                    className="w-full p-5 text-left"
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex-1">
+                        <h3 className={`text-sm font-bold mb-1 ${
+                          isSelected ? 'text-emerald-900' : 'text-slate-900'
+                        }`}>
+                          {mainCat.mainCategory}
+                        </h3>
+                        <p className={`text-xs ${
+                          isSelected ? 'text-emerald-700' : 'text-slate-500'
+                        }`}>
+                          {mainCat.totalCount} deal{mainCat.totalCount !== 1 ? 's' : ''}
                         </p>
                       </div>
-                    </button>
-                    {mainCat.subcategories.size > 1 && (
-                      <button
-                        onClick={() => toggleMainCategory(mainCat.mainCategory)}
-                        className={`p-4 ${isMainSelected ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
-                      >
-                        {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-                      </button>
-                    )}
-                  </div>
+                      <div className={`text-2xl font-bold ${
+                        isSelected ? 'text-emerald-900' : 'text-slate-900'
+                      }`}>
+                        {formatAmount(mainCat.totalSpend)}
+                      </div>
+                    </div>
 
-                  {/* Subcategories (when expanded) */}
-                  {isExpanded && mainCat.subcategories.size > 1 && (
-                    <div className="bg-slate-50 border-t-2 border-slate-200">
+                    {/* Subcategories preview (compact list) */}
+                    {hasSubcategories && (
+                      <div className="space-y-1.5 pt-3 border-t border-slate-200">
+                        {Array.from(mainCat.subcategories.entries())
+                          .sort((a, b) => b[1].total - a[1].total)
+                          .slice(0, 3)
+                          .map(([subCat, data]) => (
+                            <div
+                              key={subCat}
+                              className={`flex items-center justify-between text-xs ${
+                                isSelected ? 'text-emerald-800' : 'text-slate-600'
+                              }`}
+                            >
+                              <span className="truncate">{subCat}</span>
+                              <span className="font-semibold ml-2">{formatAmount(data.total)}</span>
+                            </div>
+                          ))}
+                        {mainCat.subcategories.size > 3 && (
+                          <p className={`text-xs italic ${
+                            isSelected ? 'text-emerald-700' : 'text-slate-500'
+                          }`}>
+                            +{mainCat.subcategories.size - 3} more
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Subcategory chips (when main selected and has subs) */}
+                  {isSelected && hasSubcategories && (
+                    <div className="px-5 pb-4 flex flex-wrap gap-2">
                       {Array.from(mainCat.subcategories.entries())
                         .sort((a, b) => b[1].total - a[1].total)
                         .map(([subCat, data]) => {
@@ -192,26 +230,17 @@ export function DashboardClient({ deals }: DashboardClientProps) {
                           return (
                             <button
                               key={subCat}
-                              onClick={() => setSelectedCategory(isSubSelected ? 'all' : fullCategoryName)}
-                              className={`w-full p-3 pl-8 text-left transition-all border-b border-slate-200 last:border-0 ${
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedCategory(isSubSelected ? mainCat.mainCategory : fullCategoryName)
+                              }}
+                              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
                                 isSubSelected
-                                  ? 'bg-emerald-100 border-l-4 border-l-emerald-600'
-                                  : 'hover:bg-slate-100'
+                                  ? 'bg-emerald-600 text-white shadow-sm'
+                                  : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
                               }`}
                             >
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <p className={`text-xs font-semibold ${isSubSelected ? 'text-emerald-900' : 'text-slate-700'}`}>
-                                    {subCat}
-                                  </p>
-                                  <p className={`text-xs ${isSubSelected ? 'text-emerald-700' : 'text-slate-500'} mt-0.5`}>
-                                    {data.count} deal{data.count !== 1 ? 's' : ''}
-                                  </p>
-                                </div>
-                                <p className={`text-sm font-bold ${isSubSelected ? 'text-emerald-900' : 'text-slate-900'}`}>
-                                  {formatAmount(data.total)}
-                                </p>
-                              </div>
+                              {subCat}
                             </button>
                           )
                         })}
