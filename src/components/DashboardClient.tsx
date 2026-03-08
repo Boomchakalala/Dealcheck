@@ -223,23 +223,6 @@ export function DashboardClient({ deals }: DashboardClientProps) {
           </div>
         </div>
       )}
-                  selectedCategory === category
-                    ? 'border-emerald-500 bg-emerald-50'
-                    : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wide">
-                    {category}
-                  </span>
-                  <span className="text-xs text-slate-400">{count} deal{count !== 1 ? 's' : ''}</span>
-                </div>
-                <p className="text-xl font-bold text-slate-900">{formatAmount(total)}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Filter indicator */}
       {selectedCategory !== 'all' && (
