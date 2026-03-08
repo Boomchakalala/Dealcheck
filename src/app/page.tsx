@@ -95,10 +95,11 @@ export default function LandingPage() {
 
                 {/* Preview sections — labels match real OutputDisplay */}
                 <div className="p-6 space-y-4">
-                  {/* Verdict */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">Negotiate before signing</span>
+                  {/* Verdict with category */}
+                  <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full border border-amber-200">Negotiate before signing</span>
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">SaaS Infra</span>
                     </div>
                     <div className="space-y-2">
                       <div className="h-2 bg-amber-200 rounded w-full" />
@@ -106,37 +107,48 @@ export default function LandingPage() {
                     </div>
                   </div>
 
-                  {/* Watch out */}
-                  <div className="bg-white border border-red-200 rounded-xl p-4">
+                  {/* Red flags to address */}
+                  <div className="bg-white border-2 border-red-200 rounded-xl p-4">
                     <p className="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
-                      <span className="text-amber-600">&#9888;</span> What's costing you
-                      <span className="text-[10px] font-bold text-red-700 bg-red-100 px-1.5 py-0.5 rounded-full border border-red-200 ml-1">4 flags</span>
+                      <span className="text-red-600">&#9888;</span> Red flags to address
+                      <span className="text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full border-2 border-red-200">3 issues</span>
                     </p>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
                         <div className="h-2 bg-slate-200 rounded flex-1" />
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
-                        <div className="h-2 bg-slate-200 rounded flex-1" />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
                         <div className="h-2 bg-slate-200 rounded flex-1" />
                       </div>
                     </div>
                   </div>
 
-                  {/* Email builder */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-4">
+                  {/* Potential savings */}
+                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-4">
                     <p className="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
-                      <span className="text-emerald-600">&#9993;</span> Email builder
+                      <span className="text-emerald-600">&#128176;</span> Potential savings
                     </p>
-                    <div className="flex gap-1 mb-3">
-                      <span className="text-[10px] font-semibold px-2 py-1 rounded-md bg-white shadow-sm border border-slate-200 text-slate-900">Friendly</span>
-                      <span className="text-[10px] font-semibold px-2 py-1 rounded-md bg-slate-100 text-slate-500">Direct</span>
-                      <span className="text-[10px] font-semibold px-2 py-1 rounded-md bg-slate-100 text-slate-500">Urgent</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="h-2 bg-emerald-200 rounded w-2/3" />
+                      <div className="h-2 bg-emerald-300 rounded w-16 font-bold" />
+                    </div>
+                    <div className="bg-gradient-to-br from-emerald-600 to-green-600 rounded-lg p-2 flex items-center justify-between">
+                      <div className="h-1.5 bg-white/40 rounded w-1/2" />
+                      <div className="h-2 bg-white rounded w-12" />
+                    </div>
+                  </div>
+
+                  {/* Email builder */}
+                  <div className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-xl p-4 shadow-sm">
+                    <p className="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
+                      <span className="text-emerald-600">&#9993;</span> Email drafts
+                    </p>
+                    <div className="flex gap-1.5 mb-3 bg-slate-100 rounded-xl p-1">
+                      <span className="text-[10px] font-bold px-3 py-1.5 rounded-lg bg-white shadow-md border border-slate-200 text-slate-900">Friendly</span>
+                      <span className="text-[10px] font-semibold px-3 py-1.5 rounded-lg text-slate-500">Direct</span>
+                      <span className="text-[10px] font-semibold px-3 py-1.5 rounded-lg text-slate-500">Firm</span>
                     </div>
                     <div className="space-y-2">
                       <div className="h-2 bg-slate-200 rounded w-full" />
@@ -205,7 +217,7 @@ export default function LandingPage() {
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  What's costing you
+                  Red flags to address
                 </button>
                 <button
                   onClick={() => setActiveTab('terms')}
@@ -215,7 +227,7 @@ export default function LandingPage() {
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  Negotiation plan
+                  Push for these
                 </button>
                 <button
                   onClick={() => setActiveTab('emails')}
@@ -225,7 +237,7 @@ export default function LandingPage() {
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  Email builder
+                  Email drafts
                 </button>
               </div>
 
