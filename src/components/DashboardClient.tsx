@@ -267,7 +267,7 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
                 >
                   {/* Main category */}
                   <button
-                    onClick={() => setSelectedCategory(isSelected ? 'all' : mainCat.mainCategory)}
+                    onClick={() => handleCategoryChange(isSelected ? 'all' : mainCat.mainCategory)}
                     className="w-full p-5 text-left"
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
@@ -332,7 +332,7 @@ export function DashboardClient({ deals, userId, baseCurrency: initialBaseCurren
                               key={subCat}
                               onClick={(e) => {
                                 e.stopPropagation()
-                                setSelectedCategory(isSubSelected ? mainCat.mainCategory : fullCategoryName)
+                                handleCategoryChange(isSubSelected ? mainCat.mainCategory : fullCategoryName)
                               }}
                               className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
                                 isSubSelected
