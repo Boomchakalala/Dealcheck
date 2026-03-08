@@ -347,7 +347,33 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         )}
       </div>
 
-      {/* ── Section 6: Email Builder (Simplified) ── */}
+      {/* ── Section 6: Potential Savings ── */}
+      {output.potential_savings && output.potential_savings.length > 0 && (
+        <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl border-2 border-purple-200 p-4 sm:p-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="p-1.5 bg-purple-100 rounded-lg">
+              <TrendingDown className="w-5 h-5 text-purple-600" />
+            </div>
+            <h2 className="text-lg font-bold text-slate-900">Potential savings</h2>
+          </div>
+          <p className="text-xs text-purple-700/70 mb-4 font-medium">Estimated dollar impact if you negotiate these items.</p>
+
+          <div className="space-y-3">
+            {output.potential_savings.map((saving, idx) => (
+              <div key={idx} className="bg-white rounded-lg border-2 border-purple-200 p-4 flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <p className="text-sm text-slate-800 font-semibold leading-relaxed">{saving.ask}</p>
+                </div>
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-lg font-bold text-purple-700">{saving.annual_impact}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Section 7: Email Builder (Simplified) ── */}
       <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden" id="email-builder">
         <div className="px-4 sm:px-6 py-5 border-b border-slate-200 bg-slate-50/50">
           <div className="flex items-center justify-between">
@@ -504,7 +530,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         </div>
       </div>
 
-      {/* ── Section 7: Assumptions & Disclaimer ── */}
+      {/* ── Section 8: Assumptions & Disclaimer ── */}
       <div className="rounded-xl border border-slate-200 overflow-hidden">
         <button
           onClick={() => setShowAssumptions(!showAssumptions)}
