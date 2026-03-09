@@ -47,7 +47,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">1. Who We Are</h2>
               <p className="mb-2">TermLift is operated by its founding team. Company registration is in progress.</p>
-              <p className="text-xs text-slate-600">Contact: <a href="mailto:privacy@termlift.app" className="text-emerald-600 hover:underline">privacy@termlift.app</a></p>
+              <p className="text-xs text-slate-600">Contact: <a href="mailto:privacy@termlift.com" className="text-emerald-600 hover:underline">privacy@termlift.com</a></p>
             </section>
 
             <section>
@@ -139,7 +139,7 @@ export default function PrivacyPage() {
                 <li>• <span className="font-medium">Export:</span> Get your data in portable format</li>
                 <li>• <span className="font-medium">Object:</span> Object to certain processing</li>
               </ul>
-              <p className="mt-3 text-sm">To exercise these rights: <a href="mailto:privacy@termlift.app" className="text-emerald-600 hover:underline">privacy@termlift.app</a></p>
+              <p className="mt-3 text-sm">To exercise these rights: <a href="mailto:privacy@termlift.com" className="text-emerald-600 hover:underline">privacy@termlift.com</a></p>
             </section>
 
             <section>
@@ -182,8 +182,8 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">11. Contact</h2>
               <div className="bg-slate-50 rounded-lg border border-slate-200 p-5">
-                <p className="text-sm"><span className="font-medium">Privacy questions:</span> <a href="mailto:privacy@termlift.app" className="text-emerald-600 hover:underline">privacy@termlift.app</a></p>
-                <p className="text-sm mt-1"><span className="font-medium">General support:</span> <a href="mailto:support@termlift.app" className="text-emerald-600 hover:underline">support@termlift.app</a></p>
+                <p className="text-sm"><span className="font-medium">Privacy questions:</span> <a href="mailto:privacy@termlift.com" className="text-emerald-600 hover:underline">privacy@termlift.com</a></p>
+                <p className="text-sm mt-1"><span className="font-medium">General support:</span> <a href="mailto:support@termlift.com" className="text-emerald-600 hover:underline">support@termlift.com</a></p>
               </div>
             </section>
 

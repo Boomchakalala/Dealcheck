@@ -63,10 +63,10 @@ export default function HelpPage() {
             <p className="text-base font-semibold text-slate-900 mb-2">Still have questions?</p>
             <p className="text-sm text-slate-500 mb-5">We're here to help.</p>
             <a
-              href="mailto:support@termlift.app"
+              href="mailto:support@termlift.com"
               className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800 transition-colors group"
             >
-              support@termlift.app
+              support@termlift.com
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>

@@ -198,8 +198,8 @@ export default function TermsPage() {
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">14. Contact</h2>
               <div className="bg-slate-50 rounded-lg border border-slate-200 p-5">
-                <p className="text-sm"><span className="font-medium">Questions about Terms:</span> <a href="mailto:support@termlift.app" className="text-emerald-600 hover:underline">support@termlift.app</a></p>
-                <p className="text-sm mt-1"><span className="font-medium">Legal notices:</span> <a href="mailto:legal@termlift.app" className="text-emerald-600 hover:underline">legal@termlift.app</a></p>
+                <p className="text-sm"><span className="font-medium">Questions about Terms:</span> <a href="mailto:support@termlift.com" className="text-emerald-600 hover:underline">support@termlift.com</a></p>
+                <p className="text-sm mt-1"><span className="font-medium">Legal notices:</span> <a href="mailto:legal@termlift.com" className="text-emerald-600 hover:underline">legal@termlift.com</a></p>
               </div>
             </section>
 

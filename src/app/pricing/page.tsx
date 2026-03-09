@@ -97,7 +97,7 @@ export default function PricingPage() {
                 </ul>
 
                 <a
-                  href="mailto:hello@termlift.app?subject=Interested in TermLift Pro"
+                  href="mailto:hello@termlift.com?subject=Interested in TermLift Pro"
                   className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 transition-all shadow-sm hover:shadow-md"
                 >
                   Contact us about Pro
@@ -124,7 +124,7 @@ export default function PricingPage() {
               { q: 'Can I use TermLift without signing up?', a: 'Yes. You can try a one-off analysis on the homepage without creating an account. To save deals and track rounds, you\'ll need to sign up (free).' },
               { q: 'What do I get for free?', a: '2 free AI analyses including red flags, negotiation plan, and email drafts. After that, you\'ll need a Pro plan to continue.' },
               { q: 'What counts as an "analysis"?', a: 'Each time you submit a quote or document for AI analysis counts as one. This includes initial analyses and follow-up rounds on existing deals.' },
-              { q: 'When will Pro launch?', a: 'Soon. Contact us at hello@termlift.app and we\'ll notify you. Pro will include unlimited analyses and priority processing.' },
+              { q: 'When will Pro launch?', a: 'Soon. Contact us at hello@termlift.com and we\'ll notify you. Pro will include unlimited analyses and priority processing.' },
             ].map((item, i) => (
               <details key={i} className="group border-b border-slate-200/60">
                 <summary className="flex items-center justify-between cursor-pointer py-6 text-left">
