@@ -35,7 +35,7 @@ export type AnalyticsEvent =
   | { name: 'round_added'; properties: { roundNumber: number; hasNote: boolean; hasGoal: boolean } }
 
   // Email drafts
-  | { name: 'email_generated'; properties: { emailType: 'direct' | 'competitive' | 'final'; hasCustomPrompt: boolean } }
+  | { name: 'email_generated'; properties: { emailType: 'clarify' | 'negotiate' | 'revise' | 'accept' | 'direct' | 'competitive' | 'final'; hasCustomPrompt: boolean } }
   | { name: 'email_copied'; properties: { emailType: string } }
 
   // Dashboard
