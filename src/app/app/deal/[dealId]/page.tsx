@@ -204,12 +204,12 @@ export default async function DealPage({
                 <div className="p-4 bg-white rounded-xl border border-slate-200">
                   <p className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Summary</p>
                   <div className="text-sm text-slate-700 leading-relaxed">
-                    {deal.close_summary.split('\n').map((line, i) => {
+                    {deal.close_summary.split('\n').map((line: string, i: number) => {
                       // Convert markdown bold (**text**) to actual bold
                       const parts = line.split(/(\*\*[^*]+\*\*)/g)
                       return (
                         <p key={i} className="mb-2">
-                          {parts.map((part, j) => {
+                          {parts.map((part: string, j: number) => {
                             if (part.startsWith('**') && part.endsWith('**')) {
                               return <strong key={j} className="font-bold text-slate-900">{part.slice(2, -2)}</strong>
                             }
