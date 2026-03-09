@@ -89,10 +89,10 @@ Update `package.json`:
 If you have email forwarding set up for termlift.app:
 - Set up the same for termlift.app:
   - hello@termlift.com
-  - support@termlift.com
-  - legal@termlift.com
-  - privacy@termlift.com
-  - security@termlift.com
+  - hello@termlift.com
+  - hello@termlift.com
+  - hello@termlift.com
+  - hello@termlift.com
 
 ---
 

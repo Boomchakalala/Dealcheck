@@ -142,7 +142,7 @@ export default function SecurityPage() {
                 <li className="flex gap-2"><span>•</span> No formal incident response plan</li>
               </ul>
               <p className="text-sm text-slate-700 mt-3">
-                We&apos;re continuously improving. Questions? Email <a href="mailto:security@termlift.com" className="text-emerald-600 hover:underline font-medium">security@termlift.com</a>
+                We&apos;re continuously improving. Questions? Email <a href="mailto:hello@termlift.com" className="text-emerald-600 hover:underline font-medium">hello@termlift.com</a>
               </p>
             </div>
           </div>
@@ -153,9 +153,9 @@ export default function SecurityPage() {
 
             <div className="bg-white rounded-xl border border-slate-200 p-6">
               <div className="space-y-2 text-sm">
-                <p><span className="font-semibold text-slate-900">Security:</span> <a href="mailto:security@termlift.com" className="text-emerald-600 hover:underline">security@termlift.com</a></p>
-                <p><span className="font-semibold text-slate-900">Privacy:</span> <a href="mailto:privacy@termlift.com" className="text-emerald-600 hover:underline">privacy@termlift.com</a></p>
-                <p><span className="font-semibold text-slate-900">Support:</span> <a href="mailto:support@termlift.com" className="text-emerald-600 hover:underline">support@termlift.com</a></p>
+                <p><span className="font-semibold text-slate-900">Security:</span> <a href="mailto:hello@termlift.com" className="text-emerald-600 hover:underline">hello@termlift.com</a></p>
+                <p><span className="font-semibold text-slate-900">Privacy:</span> <a href="mailto:hello@termlift.com" className="text-emerald-600 hover:underline">hello@termlift.com</a></p>
+                <p><span className="font-semibold text-slate-900">Support:</span> <a href="mailto:hello@termlift.com" className="text-emerald-600 hover:underline">hello@termlift.com</a></p>
               </div>
             </div>
           </div>
