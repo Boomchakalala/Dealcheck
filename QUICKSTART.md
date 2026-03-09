@@ -1,4 +1,4 @@
-# Quick Start Guide - DealCheck V1
+# Quick Start Guide - TermLift V1
 
 ## Prerequisites Checklist
 

@@ -6,7 +6,7 @@ Implementation completed on: 2026-03-07
 
 ## Overview
 
-Successfully migrated DealCheck from V1 (comprehensive analysis) to V2 (selective, issue-driven analysis). Both versions coexist - V1 rounds remain readable, all new rounds use V2.
+Successfully migrated TermLift from V1 (comprehensive analysis) to V2 (selective, issue-driven analysis). Both versions coexist - V1 rounds remain readable, all new rounds use V2.
 
 ## Key Changes Implemented
 

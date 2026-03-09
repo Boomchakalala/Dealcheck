@@ -1,4 +1,4 @@
-# DealCheck UI Redesign - Implementation Summary
+# TermLift UI Redesign - Implementation Summary
 
 ## Files Changed
 

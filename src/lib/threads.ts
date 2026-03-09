@@ -30,8 +30,8 @@ export interface Thread {
   messages: Message[];
 }
 
-const STORAGE_KEY = 'dealcheck_threads_v1';
-const CURRENT_THREAD_KEY = 'dealcheck_current_thread';
+const STORAGE_KEY = 'termlift_threads_v1';
+const CURRENT_THREAD_KEY = 'termlift_current_thread';
 
 // Load all threads from localStorage
 export function loadThreads(): Thread[] {

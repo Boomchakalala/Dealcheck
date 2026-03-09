@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DealCheck — Turn supplier quotes into better deals",
+  title: "TermLift — Turn supplier quotes into better deals",
   description: "Paste a vendor email or upload a quote. Get back where you're overpaying, what to ask for, and a reply you can send today.",
 };
 

@@ -28,14 +28,14 @@ export default function TermsPage() {
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">1. Acceptance</h2>
               <p>
-                By using DealCheck, you agree to these Terms. If you don&apos;t agree, don&apos;t use the service.
+                By using TermLift, you agree to these Terms. If you don&apos;t agree, don&apos;t use the service.
               </p>
             </section>
 
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">2. The Service</h2>
               <p>
-                DealCheck analyzes supplier quotes and contracts using AI. You upload documents, we extract text, send it to OpenAI for analysis, and return negotiation insights. Files are deleted after processing.
+                TermLift analyzes supplier quotes and contracts using AI. You upload documents, we extract text, send it to OpenAI for analysis, and return negotiation insights. Files are deleted after processing.
               </p>
             </section>
 
@@ -68,7 +68,7 @@ export default function TermsPage() {
               <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-5 space-y-3">
                 <div>
                   <p className="font-semibold text-slate-900 mb-1">NOT Legal or Professional Advice</p>
-                  <p className="text-sm">DealCheck provides information, not advice. Don&apos;t make business decisions solely based on our analysis. Consult licensed professionals for legal, financial, or tax advice.</p>
+                  <p className="text-sm">TermLift provides information, not advice. Don&apos;t make business decisions solely based on our analysis. Consult licensed professionals for legal, financial, or tax advice.</p>
                 </div>
 
                 <div>
@@ -109,10 +109,10 @@ export default function TermsPage() {
               <h2 className="text-lg font-semibold text-slate-900 mb-3">6. Intellectual Property</h2>
 
               <p className="font-medium text-slate-900 mb-2">Your content:</p>
-              <p className="mb-3">You own your uploaded content. By using DealCheck, you grant us permission to process it for the service (extract text, send to OpenAI, generate analysis). We don&apos;t use your content for anything else.</p>
+              <p className="mb-3">You own your uploaded content. By using TermLift, you grant us permission to process it for the service (extract text, send to OpenAI, generate analysis). We don&apos;t use your content for anything else.</p>
 
               <p className="font-medium text-slate-900 mb-2">Our content:</p>
-              <p>DealCheck&apos;s interface, branding, and prompts are our property. The AI analysis outputs are provided to you, but you can&apos;t claim we created them—they&apos;re AI-generated.</p>
+              <p>TermLift&apos;s interface, branding, and prompts are our property. The AI analysis outputs are provided to you, but you can&apos;t claim we created them—they&apos;re AI-generated.</p>
             </section>
 
             <section>
@@ -160,7 +160,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">10. Indemnification</h2>
               <p>
-                You agree to indemnify DealCheck from claims arising from your use of the service, your content, or your violation of these Terms.
+                You agree to indemnify TermLift from claims arising from your use of the service, your content, or your violation of these Terms.
               </p>
             </section>
 
@@ -198,8 +198,8 @@ export default function TermsPage() {
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">14. Contact</h2>
               <div className="bg-slate-50 rounded-lg border border-slate-200 p-5">
-                <p className="text-sm"><span className="font-medium">Questions about Terms:</span> <a href="mailto:support@dealcheck.app" className="text-emerald-600 hover:underline">support@dealcheck.app</a></p>
-                <p className="text-sm mt-1"><span className="font-medium">Legal notices:</span> <a href="mailto:legal@dealcheck.app" className="text-emerald-600 hover:underline">legal@dealcheck.app</a></p>
+                <p className="text-sm"><span className="font-medium">Questions about Terms:</span> <a href="mailto:support@termlift.app" className="text-emerald-600 hover:underline">support@termlift.app</a></p>
+                <p className="text-sm mt-1"><span className="font-medium">Legal notices:</span> <a href="mailto:legal@termlift.app" className="text-emerald-600 hover:underline">legal@termlift.app</a></p>
               </div>
             </section>
 
@@ -210,7 +210,7 @@ export default function TermsPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200/60 bg-slate-50/50">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm font-semibold text-slate-400">DealCheck</p>
+          <p className="text-sm font-semibold text-slate-400">TermLift</p>
           <div className="flex items-center gap-8 text-sm text-slate-400">
             <Link href="/pricing" className="hover:text-slate-600 transition-colors">Pricing</Link>
             <Link href="/help" className="hover:text-slate-600 transition-colors">Help</Link>

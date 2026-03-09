@@ -1,4 +1,4 @@
-# ✅ DealCheck - NO LIMITS MODE
+# ✅ TermLift - NO LIMITS MODE
 
 ## What I Changed
 

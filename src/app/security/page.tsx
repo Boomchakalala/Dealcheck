@@ -142,7 +142,7 @@ export default function SecurityPage() {
                 <li className="flex gap-2"><span>•</span> No formal incident response plan</li>
               </ul>
               <p className="text-sm text-slate-700 mt-3">
-                We&apos;re continuously improving. Questions? Email <a href="mailto:security@dealcheck.app" className="text-emerald-600 hover:underline font-medium">security@dealcheck.app</a>
+                We&apos;re continuously improving. Questions? Email <a href="mailto:security@termlift.app" className="text-emerald-600 hover:underline font-medium">security@termlift.app</a>
               </p>
             </div>
           </div>
@@ -153,9 +153,9 @@ export default function SecurityPage() {
 
             <div className="bg-white rounded-xl border border-slate-200 p-6">
               <div className="space-y-2 text-sm">
-                <p><span className="font-semibold text-slate-900">Security:</span> <a href="mailto:security@dealcheck.app" className="text-emerald-600 hover:underline">security@dealcheck.app</a></p>
-                <p><span className="font-semibold text-slate-900">Privacy:</span> <a href="mailto:privacy@dealcheck.app" className="text-emerald-600 hover:underline">privacy@dealcheck.app</a></p>
-                <p><span className="font-semibold text-slate-900">Support:</span> <a href="mailto:support@dealcheck.app" className="text-emerald-600 hover:underline">support@dealcheck.app</a></p>
+                <p><span className="font-semibold text-slate-900">Security:</span> <a href="mailto:security@termlift.app" className="text-emerald-600 hover:underline">security@termlift.app</a></p>
+                <p><span className="font-semibold text-slate-900">Privacy:</span> <a href="mailto:privacy@termlift.app" className="text-emerald-600 hover:underline">privacy@termlift.app</a></p>
+                <p><span className="font-semibold text-slate-900">Support:</span> <a href="mailto:support@termlift.app" className="text-emerald-600 hover:underline">support@termlift.app</a></p>
               </div>
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function SecurityPage() {
         <div className="bg-gradient-to-r from-emerald-600 to-emerald-700">
           <div className="max-w-4xl mx-auto px-5 sm:px-8 py-16 text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-              Ready to Try DealCheck?
+              Ready to Try TermLift?
             </h2>
             <p className="text-emerald-50 text-sm sm:text-base mb-8 max-w-2xl mx-auto">
               Your files are deleted after processing. Only the AI insights you choose to save are stored.
@@ -175,7 +175,7 @@ export default function SecurityPage() {
               href="/try"
               className="inline-flex items-center gap-2 px-8 py-4 bg-white text-emerald-700 rounded-xl font-semibold hover:bg-emerald-50 transition-all shadow-lg hover:shadow-xl"
             >
-              Try DealCheck
+              Try TermLift
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -185,7 +185,7 @@ export default function SecurityPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200/60 bg-slate-50/50">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm font-semibold text-slate-400">DealCheck</p>
+          <p className="text-sm font-semibold text-slate-400">TermLift</p>
           <div className="flex items-center gap-8 text-sm text-slate-400">
             <Link href="/pricing" className="hover:text-slate-600 transition-colors">Pricing</Link>
             <Link href="/help" className="hover:text-slate-600 transition-colors">Help</Link>

@@ -1,8 +1,8 @@
-# DealCheck V1 - Implementation Summary
+# TermLift V1 - Implementation Summary
 
 ## Overview
 
-Complete rebuild of DealCheck as a **procurement quote/contract negotiation copilot** with proper Supabase authentication, Deal → Rounds model (NOT chat), file uploads with transient processing, and structured AI outputs.
+Complete rebuild of TermLift as a **procurement quote/contract negotiation copilot** with proper Supabase authentication, Deal → Rounds model (NOT chat), file uploads with transient processing, and structured AI outputs.
 
 ## What Was Built
 
@@ -367,7 +367,7 @@ Potential features:
 
 ## Summary
 
-DealCheck V1 is a **complete, production-ready** procurement copilot with:
+TermLift V1 is a **complete, production-ready** procurement copilot with:
 
 - ✅ Proper auth and database architecture
 - ✅ Privacy-first file processing

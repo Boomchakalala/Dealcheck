@@ -79,9 +79,9 @@ export default function DashboardPage() {
       })
 
       // Check for pending trial import (localStorage with 24h TTL)
-      const pendingTrial = localStorage.getItem('dealcheck_trial')
+      const pendingTrial = localStorage.getItem('termlift_trial')
       if (pendingTrial) {
-        localStorage.removeItem('dealcheck_trial')
+        localStorage.removeItem('termlift_trial')
         try {
           const trialData = JSON.parse(pendingTrial)
           const savedAt = trialData._savedAt || 0

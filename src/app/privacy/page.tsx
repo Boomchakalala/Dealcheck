@@ -46,8 +46,8 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">1. Who We Are</h2>
-              <p className="mb-2">DealCheck is operated by its founding team. Company registration is in progress.</p>
-              <p className="text-xs text-slate-600">Contact: <a href="mailto:privacy@dealcheck.app" className="text-emerald-600 hover:underline">privacy@dealcheck.app</a></p>
+              <p className="mb-2">TermLift is operated by its founding team. Company registration is in progress.</p>
+              <p className="text-xs text-slate-600">Contact: <a href="mailto:privacy@termlift.app" className="text-emerald-600 hover:underline">privacy@termlift.app</a></p>
             </section>
 
             <section>
@@ -139,7 +139,7 @@ export default function PrivacyPage() {
                 <li>• <span className="font-medium">Export:</span> Get your data in portable format</li>
                 <li>• <span className="font-medium">Object:</span> Object to certain processing</li>
               </ul>
-              <p className="mt-3 text-sm">To exercise these rights: <a href="mailto:privacy@dealcheck.app" className="text-emerald-600 hover:underline">privacy@dealcheck.app</a></p>
+              <p className="mt-3 text-sm">To exercise these rights: <a href="mailto:privacy@termlift.app" className="text-emerald-600 hover:underline">privacy@termlift.app</a></p>
             </section>
 
             <section>
@@ -171,7 +171,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">9. Children</h2>
-              <p>DealCheck is not for users under 18. We don't knowingly collect data from children.</p>
+              <p>TermLift is not for users under 18. We don't knowingly collect data from children.</p>
             </section>
 
             <section>
@@ -182,8 +182,8 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">11. Contact</h2>
               <div className="bg-slate-50 rounded-lg border border-slate-200 p-5">
-                <p className="text-sm"><span className="font-medium">Privacy questions:</span> <a href="mailto:privacy@dealcheck.app" className="text-emerald-600 hover:underline">privacy@dealcheck.app</a></p>
-                <p className="text-sm mt-1"><span className="font-medium">General support:</span> <a href="mailto:support@dealcheck.app" className="text-emerald-600 hover:underline">support@dealcheck.app</a></p>
+                <p className="text-sm"><span className="font-medium">Privacy questions:</span> <a href="mailto:privacy@termlift.app" className="text-emerald-600 hover:underline">privacy@termlift.app</a></p>
+                <p className="text-sm mt-1"><span className="font-medium">General support:</span> <a href="mailto:support@termlift.app" className="text-emerald-600 hover:underline">support@termlift.app</a></p>
               </div>
             </section>
 
@@ -194,7 +194,7 @@ export default function PrivacyPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200/60 bg-slate-50/50">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm font-semibold text-slate-400">DealCheck</p>
+          <p className="text-sm font-semibold text-slate-400">TermLift</p>
           <div className="flex items-center gap-8 text-sm text-slate-400">
             <Link href="/pricing" className="hover:text-slate-600 transition-colors">Pricing</Link>
             <Link href="/help" className="hover:text-slate-600 transition-colors">Help</Link>

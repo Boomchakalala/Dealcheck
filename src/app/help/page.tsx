@@ -7,11 +7,11 @@ export default function HelpPage() {
     { q: 'What can I upload?', a: 'PDFs, images (PNG, JPG, WEBP), or just paste text directly. Forward a vendor email, drop in a quote PDF, or screenshot a pricing page — all work.' },
     { q: 'How does the analysis work?', a: 'Your document is sent to an AI model prompted specifically for procurement analysis. It reads the full text, identifies pricing risks and contract traps, builds a negotiation strategy with specific asks, and drafts reply emails — all in one pass. The analysis is based solely on what\'s in your document. We do not use proprietary benchmark data.' },
     { q: 'Is my data private?', a: 'Your document is processed securely over encrypted connections (TLS) and is not stored permanently unless you sign in and explicitly save a deal. We do not sell your data or use it for advertising. See our Privacy Policy for details on sub-processors.' },
-    { q: 'Do I need procurement experience?', a: 'No. DealCheck is built for founders, ops leads, and finance teams who negotiate vendor deals but don\'t do it full-time. The output is plain English with specific, copy-paste actions — not generic advice.' },
-    { q: 'Is there a usage limit?', a: 'You get 2 free AI analyses to try DealCheck. After that, you\'ll need a Pro plan for unlimited analyses. Sign in to save deals and track negotiations over time.' },
+    { q: 'Do I need procurement experience?', a: 'No. TermLift is built for founders, ops leads, and finance teams who negotiate vendor deals but don\'t do it full-time. The output is plain English with specific, copy-paste actions — not generic advice.' },
+    { q: 'Is there a usage limit?', a: 'You get 2 free AI analyses to try TermLift. After that, you\'ll need a Pro plan for unlimited analyses. Sign in to save deals and track negotiations over time.' },
     { q: 'Can I export the analysis?', a: 'You can copy individual sections (red flags, email drafts, asks) using the copy buttons in the output. Full PDF export is planned for the Pro tier.' },
-    { q: 'Is the AI always accurate?', a: 'No. AI analysis can contain errors, miss details, or misinterpret terms. DealCheck is a starting point for negotiation — not a substitute for legal or financial advice. Always review outputs before acting on them.' },
-    { q: 'What if I upload confidential documents?', a: 'Treat DealCheck like any cloud-based tool: don\'t upload documents you\'re contractually prohibited from sharing with third-party services. Your text is sent to our AI provider (OpenAI) for processing. See our Terms for full details.' },
+    { q: 'Is the AI always accurate?', a: 'No. AI analysis can contain errors, miss details, or misinterpret terms. TermLift is a starting point for negotiation — not a substitute for legal or financial advice. Always review outputs before acting on them.' },
+    { q: 'What if I upload confidential documents?', a: 'Treat TermLift like any cloud-based tool: don\'t upload documents you\'re contractually prohibited from sharing with third-party services. Your text is sent to our AI provider (OpenAI) for processing. See our Terms for full details.' },
   ]
 
   return (
@@ -38,7 +38,7 @@ export default function HelpPage() {
               Frequently asked questions
             </h1>
             <p className="text-lg text-slate-500 leading-relaxed max-w-xl mb-16">
-              How DealCheck works, what to expect, and how we handle your data.
+              How TermLift works, what to expect, and how we handle your data.
             </p>
           </div>
         </div>
@@ -63,10 +63,10 @@ export default function HelpPage() {
             <p className="text-base font-semibold text-slate-900 mb-2">Still have questions?</p>
             <p className="text-sm text-slate-500 mb-5">We're here to help.</p>
             <a
-              href="mailto:support@dealcheck.app"
+              href="mailto:support@termlift.app"
               className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800 transition-colors group"
             >
-              support@dealcheck.app
+              support@termlift.app
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
@@ -76,7 +76,7 @@ export default function HelpPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200/60 bg-slate-50/50 mt-20">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm font-semibold text-slate-400">DealCheck</p>
+          <p className="text-sm font-semibold text-slate-400">TermLift</p>
           <div className="flex items-center gap-8 text-sm text-slate-400">
             <Link href="/pricing" className="hover:text-slate-600 transition-colors">Pricing</Link>
             <Link href="/help" className="hover:text-slate-600 transition-colors">Help</Link>

@@ -55,7 +55,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
         </svg>
       </div>
-      <span className="text-lg font-bold text-slate-900">DealCheck</span>
+      <span className="text-lg font-bold text-slate-900">TermLift</span>
     </Link>
   )
 

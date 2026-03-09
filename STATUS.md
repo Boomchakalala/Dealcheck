@@ -1,4 +1,4 @@
-# 🎉 DealCheck - FULLY WORKING
+# 🎉 TermLift - FULLY WORKING
 
 ## ✅ What's Working Now
 
@@ -49,7 +49,7 @@
 ### Method 3: Direct Text
 ```
 1. Copy text from anywhere
-2. Paste into DealCheck
+2. Paste into TermLift
 3. Click "Analyze"
 ```
 

@@ -31,7 +31,7 @@ export default function PricingPage() {
                 Try free. Pay when you&apos;re ready.
               </h1>
               <p className="text-lg text-slate-500 leading-relaxed max-w-xl mx-auto">
-                Get 2 free analyses to see if DealCheck works for you.
+                Get 2 free analyses to see if TermLift works for you.
               </p>
             </div>
 
@@ -43,7 +43,7 @@ export default function PricingPage() {
                   <span className="text-5xl font-bold text-slate-900 tracking-tight">$0</span>
                 </div>
                 <p className="text-sm text-slate-500 mb-8 leading-relaxed">
-                  2 free analyses to try DealCheck risk-free. No credit card needed.
+                  2 free analyses to try TermLift risk-free. No credit card needed.
                 </p>
                 <ul className="space-y-3.5 mb-8">
                   {[
@@ -97,7 +97,7 @@ export default function PricingPage() {
                 </ul>
 
                 <a
-                  href="mailto:hello@dealcheck.app?subject=Interested in DealCheck Pro"
+                  href="mailto:hello@termlift.app?subject=Interested in TermLift Pro"
                   className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 transition-all shadow-sm hover:shadow-md"
                 >
                   Contact us about Pro
@@ -121,10 +121,10 @@ export default function PricingPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-12 text-center">Pricing FAQ</h2>
           <div className="space-y-0 border-t border-slate-200/60">
             {[
-              { q: 'Can I use DealCheck without signing up?', a: 'Yes. You can try a one-off analysis on the homepage without creating an account. To save deals and track rounds, you\'ll need to sign up (free).' },
+              { q: 'Can I use TermLift without signing up?', a: 'Yes. You can try a one-off analysis on the homepage without creating an account. To save deals and track rounds, you\'ll need to sign up (free).' },
               { q: 'What do I get for free?', a: '2 free AI analyses including red flags, negotiation plan, and email drafts. After that, you\'ll need a Pro plan to continue.' },
               { q: 'What counts as an "analysis"?', a: 'Each time you submit a quote or document for AI analysis counts as one. This includes initial analyses and follow-up rounds on existing deals.' },
-              { q: 'When will Pro launch?', a: 'Soon. Contact us at hello@dealcheck.app and we\'ll notify you. Pro will include unlimited analyses and priority processing.' },
+              { q: 'When will Pro launch?', a: 'Soon. Contact us at hello@termlift.app and we\'ll notify you. Pro will include unlimited analyses and priority processing.' },
             ].map((item, i) => (
               <details key={i} className="group border-b border-slate-200/60">
                 <summary className="flex items-center justify-between cursor-pointer py-6 text-left">
@@ -141,7 +141,7 @@ export default function PricingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200/60 bg-slate-50/50">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm font-semibold text-slate-400">DealCheck</p>
+          <p className="text-sm font-semibold text-slate-400">TermLift</p>
           <div className="flex items-center gap-8 text-sm text-slate-400">
             <Link href="/pricing" className="hover:text-slate-600 transition-colors">Pricing</Link>
             <Link href="/help" className="hover:text-slate-600 transition-colors">Help</Link>

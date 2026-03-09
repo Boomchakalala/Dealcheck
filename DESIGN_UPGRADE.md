@@ -1,4 +1,4 @@
-# DealCheck UI Premium Design Upgrade
+# TermLift UI Premium Design Upgrade
 
 ## 1. DIAGNOSIS - Root Causes of Grey/Washed Look
 
@@ -26,7 +26,7 @@
 ## 2. DESIGN SYSTEM
 
 ```typescript
-// DealCheck Premium Design Tokens
+// TermLift Premium Design Tokens
 
 const colors = {
   // Primary (Green)

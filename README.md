@@ -1,10 +1,10 @@
-# DealCheck V1
+# TermLift V1
 
 **Clarity before commitment** — A procurement quote/contract negotiation copilot for non-procurement professionals.
 
 ## Product Overview
 
-DealCheck helps founders, ops managers, and first-time buyers analyze supplier emails, quotes, and commercial proposals. It provides structured guidance with:
+TermLift helps founders, ops managers, and first-time buyers analyze supplier emails, quotes, and commercial proposals. It provides structured guidance with:
 
 - 💡 **Deal Reality Check** - High-level assessment
 - 🚩 **Red Flags** - Commercial, legal, and operational risks
@@ -52,7 +52,7 @@ DealCheck helps founders, ops managers, and first-time buyers analyze supplier e
 
 ```bash
 git clone <your-repo>
-cd dealcheck
+cd termlift
 bun install
 ```
 
@@ -167,7 +167,7 @@ All tables have RLS policies ensuring users can only access their own data.
 
 ## Compliance & Disclaimers
 
-### What DealCheck Does NOT Do
+### What TermLift Does NOT Do
 
 - ❌ Provide legal advice
 - ❌ Access proprietary pricing benchmarks

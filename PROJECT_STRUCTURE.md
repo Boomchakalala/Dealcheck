@@ -1,7 +1,7 @@
-# DealCheck V1 - Project Structure
+# TermLift V1 - Project Structure
 
 ```
-dealcheck/
+termlift/
 ├── src/
 │   ├── app/
 │   │   ├── api/

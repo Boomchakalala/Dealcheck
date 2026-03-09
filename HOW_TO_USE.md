@@ -1,4 +1,4 @@
-# How to Use DealCheck (ChatGPT-Style)
+# How to Use TermLift (ChatGPT-Style)
 
 ## ✅ WORKING: Screenshot Paste (Recommended)
 
@@ -7,17 +7,17 @@
 2. **Take a screenshot**:
    - Mac: `Shift + Cmd + 4` (drag to select area)
    - Windows: `Win + Shift + S`
-3. **Paste directly in DealCheck**: `Cmd/Ctrl + V`
+3. **Paste directly in TermLift**: `Cmd/Ctrl + V`
 4. Click **Analyze**
 
 ### For Images:
 1. **Copy any image** with supplier info (emails, Slack messages, quotes)
-2. **Paste in DealCheck**: `Cmd/Ctrl + V`
+2. **Paste in TermLift**: `Cmd/Ctrl + V`
 3. Click **Analyze**
 
 ### For Text:
 1. **Copy text** from emails, PDFs, websites
-2. **Paste in DealCheck**
+2. **Paste in TermLift**
 3. Click **Analyze**
 
 ---
@@ -30,7 +30,7 @@ PDF upload is **temporarily disabled** due to server-side limitations.
 
 ---
 
-## What DealCheck Analyzes:
+## What TermLift Analyzes:
 
 ✅ Supplier quotes
 ✅ Contract terms

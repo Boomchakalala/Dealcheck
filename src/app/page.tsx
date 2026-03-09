@@ -162,7 +162,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How DealCheck Works */}
+      {/* How TermLift Works */}
       <section id="how-it-works" className="py-24 sm:py-32 bg-gradient-to-b from-white via-slate-50/30 to-white relative overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute top-20 right-0 w-96 h-96 bg-emerald-100 rounded-full blur-3xl opacity-20 pointer-events-none" />
@@ -447,7 +447,7 @@ export default function LandingPage() {
       <footer className="border-t border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-slate-500">&copy; 2026 DealCheck. All rights reserved.</p>
+            <p className="text-sm text-slate-500">&copy; 2026 TermLift. All rights reserved.</p>
             <div className="flex items-center flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
               <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
                 Pricing

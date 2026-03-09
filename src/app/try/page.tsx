@@ -11,7 +11,7 @@ import { Package, AlertTriangle, BadgeDollarSign } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
 import type { DealOutput } from '@/types'
 
-const TRIAL_STORAGE_KEY = 'dealcheck_trial'
+const TRIAL_STORAGE_KEY = 'termlift_trial'
 const TRIAL_TTL_MS = 24 * 60 * 60 * 1000 // 24 hours
 
 function saveTrialToStorage(data: Record<string, unknown>) {

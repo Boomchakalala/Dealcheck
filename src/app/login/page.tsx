@@ -100,7 +100,7 @@ function LoginForm() {
               <Shield className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">
-              {isSignUp ? 'Create your account' : 'Sign in to DealCheck'}
+              {isSignUp ? 'Create your account' : 'Sign in to TermLift'}
             </h1>
             <p className="text-sm text-slate-500 leading-relaxed">
               {fromTrial

@@ -1,11 +1,11 @@
-# DealCheck → TermLift Rebrand Plan
+# TermLift → TermLift Rebrand Plan
 
 ## Scope Assessment
 
 **Total Changes:**
-- 91 code occurrences of "DealCheck"/"dealcheck"
+- 91 code occurrences of "TermLift"/"termlift"
 - 28 files affected
-- 21 domain references (dealcheck.app → termlift.app)
+- 21 domain references (termlift.app → termlift.app)
 
 **Messiness Level:** 🟢 **Low-Medium** (Clean, systematic rebrand - 30-45 min)
 
@@ -18,18 +18,18 @@ Run these find-and-replace commands:
 
 ```bash
 # In source files
-find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's/DealCheck/TermLift/g' {} +
-find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's/dealcheck/termlift/g' {} +
+find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's/TermLift/TermLift/g' {} +
+find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's/termlift/termlift/g' {} +
 
 # In documentation files
-find . -maxdepth 1 -name "*.md" -exec sed -i 's/DealCheck/TermLift/g' {} +
-find . -maxdepth 1 -name "*.md" -exec sed -i 's/dealcheck/termlift/g' {} +
+find . -maxdepth 1 -name "*.md" -exec sed -i 's/TermLift/TermLift/g' {} +
+find . -maxdepth 1 -name "*.md" -exec sed -i 's/termlift/termlift/g' {} +
 ```
 
 ### 1.2 Domain Replacements
 ```bash
 # Replace all email domains
-find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.md" \) ! -path "*/node_modules/*" ! -path "*/.next/*" -exec sed -i 's/dealcheck\.app/termlift.app/g' {} +
+find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.md" \) ! -path "*/node_modules/*" ! -path "*/.next/*" -exec sed -i 's/termlift\.app/termlift.app/g' {} +
 ```
 
 ### 1.3 Package Name (Optional)
@@ -58,7 +58,7 @@ Update `package.json`:
 
 ### 2.2 Vercel Project Rename
 1. Go to https://vercel.com/dashboard
-2. Find your DealCheck project
+2. Find your TermLift project
 3. **Settings** → **General**
 4. Change project name to: `termlift`
 5. **Save**
@@ -69,7 +69,7 @@ Update `package.json`:
 
 ### 2.3 Domain Setup (If you have termlift.app)
 
-**Current domain:** dealcheck.app (mentioned in code, may not be registered)
+**Current domain:** termlift.app (mentioned in code, may not be registered)
 **New domain:** termlift.app
 
 #### If you own/will buy termlift.app:
@@ -77,7 +77,7 @@ Update `package.json`:
 2. In Vercel: **Settings** → **Domains**
 3. Add `termlift.app` and `www.termlift.app`
 4. Update DNS as instructed by Vercel
-5. Remove old dealcheck.app domain (if it exists)
+5. Remove old termlift.app domain (if it exists)
 
 #### If you DON'T have a domain yet:
 - Just use the Vercel URL for now: `termlift.vercel.app`
@@ -86,7 +86,7 @@ Update `package.json`:
 ---
 
 ### 2.4 Email Setup
-If you have email forwarding set up for dealcheck.app:
+If you have email forwarding set up for termlift.app:
 - Set up the same for termlift.app:
   - hello@termlift.app
   - support@termlift.app
@@ -140,16 +140,16 @@ Run this single command to do Phase 1 automatically:
 git stash
 
 # Run all replacements
-find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's/DealCheck/TermLift/g' {} + && \
-find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's/dealcheck/termlift/g' {} + && \
-find . -maxdepth 1 -name "*.md" -exec sed -i 's/DealCheck/TermLift/g' {} + && \
-find . -maxdepth 1 -name "*.md" -exec sed -i 's/dealcheck/termlift/g' {} + && \
-find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.md" \) ! -path "*/node_modules/*" ! -path "*/.next/*" -exec sed -i 's/dealcheck\.app/termlift.app/g' {} + && \
+find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's/TermLift/TermLift/g' {} + && \
+find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) -exec sed -i 's/termlift/termlift/g' {} + && \
+find . -maxdepth 1 -name "*.md" -exec sed -i 's/TermLift/TermLift/g' {} + && \
+find . -maxdepth 1 -name "*.md" -exec sed -i 's/termlift/termlift/g' {} + && \
+find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.md" \) ! -path "*/node_modules/*" ! -path "*/.next/*" -exec sed -i 's/termlift\.app/termlift.app/g' {} + && \
 echo "✅ Rebrand complete! Review changes with: git diff"
 
 # Commit changes
 git add -A
-git commit -m "Rebrand from DealCheck to TermLift"
+git commit -m "Rebrand from TermLift to TermLift"
 git push origin main
 ```
 
@@ -165,9 +165,9 @@ git push origin main
 - ✅ Vercel project name (auto-redirects)
 
 ### Medium Risk (Test thoroughly):
-- ⚠️ localStorage keys (dealcheck_trial_count → termlift_trial_count)
+- ⚠️ localStorage keys (termlift_trial_count → termlift_trial_count)
   - **Impact:** Users will lose trial count (could be a feature - resets everyone's trial)
-- ⚠️ AI prompts mentioning "DealCheck"
+- ⚠️ AI prompts mentioning "TermLift"
   - **Impact:** Minimal - AI still generates good output
 
 ### Zero Risk (No changes needed):

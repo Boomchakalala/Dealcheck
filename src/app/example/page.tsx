@@ -162,7 +162,7 @@ export default function ExamplePage() {
             <div className="flex-1">
               <h2 className="text-lg font-bold text-blue-900 mb-1">Demo Analysis</h2>
               <p className="text-sm text-blue-800 mb-3">
-                This is an example analysis showing how DealCheck evaluates vendor quotes. The data below is fictional but representative of a typical SaaS renewal.
+                This is an example analysis showing how TermLift evaluates vendor quotes. The data below is fictional but representative of a typical SaaS renewal.
               </p>
               <div className="flex items-center gap-3">
                 <Link

@@ -7,8 +7,8 @@ export default function ResetPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Clear all DealCheck data from localStorage
-    localStorage.removeItem('dealcheck_trial_count')
+    // Clear all TermLift data from localStorage
+    localStorage.removeItem('termlift_trial_count')
     console.log('✅ Trial counter cleared')
 
     // Redirect to home

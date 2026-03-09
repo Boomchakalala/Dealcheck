@@ -7,7 +7,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 })
 
-const SYSTEM_PROMPT = `You are DealCheck's core quote analysis engine - a sharp procurement copilot.
+const SYSTEM_PROMPT = `You are TermLift's core quote analysis engine - a sharp procurement copilot.
 
 ==================================================
 ABSOLUTE RULES - DO NOT VIOLATE
@@ -780,7 +780,7 @@ export async function regenerateEmailDrafts(
   extractedText: string,
   currentOutput: DealOutput
 ): Promise<DealOutputType['email_drafts']> {
-  const prompt = `You are DealCheck's email generation engine. Write 3 supplier-facing email variations based on the completed analysis below.
+  const prompt = `You are TermLift's email generation engine. Write 3 supplier-facing email variations based on the completed analysis below.
 
 CORE RULE: Write only emails that match the analysis.
 - Do NOT invent extra asks
@@ -900,7 +900,7 @@ export async function generateEmailV2(
 ): Promise<{ subject: string; body: string }> {
   const { tone_preference, supplier_relationship, email_goal, user_notes } = emailControls
 
-  const prompt = `You are DealCheck's V2 email generation engine. Write a single supplier-facing email based on the analysis and user preferences.
+  const prompt = `You are TermLift's V2 email generation engine. Write a single supplier-facing email based on the analysis and user preferences.
 
 ANALYSIS CONTEXT:
 Supplier: ${analysisOutput.commercial_facts.supplier}
