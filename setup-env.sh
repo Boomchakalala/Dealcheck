@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 DealCheck Environment Setup"
+echo "🚀 TermLift Environment Setup"
 echo "================================"
 echo ""
 echo "I'll ask you for your API keys one by one."

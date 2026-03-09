@@ -1,4 +1,4 @@
--- DealCheck V1 Initial Schema
+-- TermLift V1 Initial Schema
 -- Run this in your Supabase SQL Editor
 
 -- Enable UUID extension
