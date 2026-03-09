@@ -65,11 +65,12 @@ export default async function DealPage({
   const potentialSavings = (latestOutput as DealOutput)?.potential_savings?.reduce((sum, saving) => {
     const match = saving.annual_impact.match(/\$[\d,]+(?:K|k)?/)
     if (match) {
-      let amount = match[0].replace(/[$,]/g, '')
-      if (amount.toLowerCase().includes('k')) {
-        amount = parseFloat(amount.replace(/k/i, '')) * 1000
+      let amountStr = match[0].replace(/[$,]/g, '')
+      let amount: number
+      if (amountStr.toLowerCase().includes('k')) {
+        amount = parseFloat(amountStr.replace(/k/i, '')) * 1000
       } else {
-        amount = parseFloat(amount)
+        amount = parseFloat(amountStr)
       }
       return sum + (isNaN(amount) ? 0 : amount)
     }
