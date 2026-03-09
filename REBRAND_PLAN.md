@@ -46,7 +46,7 @@ Update `package.json`:
 ## Phase 2: External Services (Manual - 15 minutes)
 
 ### 2.1 GitHub Repo Rename
-1. Go to https://github.com/Boomchakalaka/Dealcheck
+1. Go to https://github.com/Boomchakalala/TermLift
 2. **Settings** → **General**
 3. Scroll to "Repository name"
 4. Change to: `TermLift`
