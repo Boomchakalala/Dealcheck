@@ -2,7 +2,7 @@
 
 import { type DealOutput } from '@/types'
 import { CopyButton } from './CopyButton'
-import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, Shield, TrendingDown, Zap, RefreshCw, Loader2, Sparkles, BadgeDollarSign } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, Shield, TrendingDown, TrendingUp, Zap, RefreshCw, Loader2, Sparkles, BadgeDollarSign, Clock, DollarSign, Calendar, Target, Layers, Info, AlertCircle } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
 interface OutputDisplayProps {
@@ -16,7 +16,13 @@ type RiskLevel = 'safe' | 'balanced' | 'aggressive'
 export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
   const [expandedFlags, setExpandedFlags] = useState<number[]>([0])
   const [showAssumptions, setShowAssumptions] = useState(false)
+  const [showSolid, setShowSolid] = useState(true)
+  const [showRedFlags, setShowRedFlags] = useState(true)
+  const [showStrategy, setShowStrategy] = useState(true)
+  const [showSavings, setShowSavings] = useState(true)
+  const [showEmails, setShowEmails] = useState(true)
   const [activeEmailTab, setActiveEmailTab] = useState(0)
+  const [selectedFlagTab, setSelectedFlagTab] = useState<Record<number, 'ask' | 'fallback'>>({})
 
   // Email editing state
   const [emailSubjects, setEmailSubjects] = useState([
