@@ -362,73 +362,143 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         </div>
       )}
 
-      {/* ── Section 4: Watch Out ── */}
-      {(output.quick_read?.whats_concerning?.length > 0 || output.red_flags?.length > 0) && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 bg-red-100 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* RED FLAGS TO ADDRESS */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {output.red_flags && output.red_flags.length > 0 && (
+        <div className="space-y-4 mb-6">
+          <button
+            onClick={() => setShowRedFlags(!showRedFlags)}
+            className="w-full bg-white rounded-xl border-2 border-slate-200 shadow-sm px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">Red flags to address</h2>
+                <p className="text-xs text-slate-600">
+                  <span className="font-semibold text-red-700">{output.red_flags.length} issue{output.red_flags.length !== 1 ? 's' : ''}</span> — Issues costing you money or flexibility.
+                </p>
+              </div>
             </div>
-            <h2 className="text-lg font-bold text-slate-900">Red flags to address</h2>
-            {output.red_flags.length > 0 && (
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-700 border-2 border-red-200 shadow-sm">
-                {output.red_flags.length} issue{output.red_flags.length !== 1 ? 's' : ''}
-              </span>
+            {showRedFlags ? (
+              <ChevronUp className="w-5 h-5 text-slate-400" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-slate-400" />
             )}
-          </div>
-          <p className="text-xs text-red-600/70 -mt-2 font-medium">Issues costing you money or flexibility — each includes what to push for.</p>
+          </button>
 
-          {/* Quick concerns */}
-          {output.quick_read?.whats_concerning.length > 0 && (
-            <div className="bg-amber-50 rounded-xl border-2 border-amber-200 p-4 sm:p-5 shadow-sm">
-              <ul className="space-y-2.5">
-                {output.quick_read?.whats_concerning.map((concern, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm text-slate-800 leading-relaxed font-medium">
-                    <span className="text-amber-600 mt-1.5 flex-shrink-0 w-2 h-2 rounded-full bg-amber-500" />
-                    {concern}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {showRedFlags && output.red_flags.map((flag, idx) => {
+            const isExpanded = expandedFlags.includes(idx)
+            const activeTab = selectedFlagTab[idx] || 'ask'
 
-          {/* Red flags - expandable */}
-          {output.red_flags.map((flag, idx) => (
-            <div key={idx} className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl border-2 border-red-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <button
-                onClick={() => toggleFlag(idx)}
-                className="w-full px-5 py-4 flex items-start justify-between hover:bg-red-100/50 transition-colors text-left"
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[10px] font-bold text-red-700 uppercase tracking-wider bg-red-100 px-2 py-0.5 rounded">{flag.type}</span>
+            return (
+              <div key={idx} className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden shadow-sm">
+                <button
+                  onClick={() => toggleFlag(idx)}
+                  className="w-full px-6 py-5 flex items-start justify-between hover:bg-slate-50 transition-colors text-left"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                      <h3 className="font-bold text-base text-slate-900">{flag.issue}</h3>
+                    </div>
+                    <p className="text-sm text-slate-700 leading-relaxed pr-4">
+                      {flag.why_it_matters}
+                    </p>
                   </div>
-                  <h3 className="font-bold text-slate-900 text-base mb-1">{flag.issue}</h3>
-                  <p className="text-sm text-slate-700 font-medium">{flag.why_it_matters}</p>
-                </div>
-                <div className="ml-4 flex-shrink-0 mt-1">
-                  {expandedFlags.includes(idx) ? (
-                    <ChevronUp className="w-5 h-5 text-red-600" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-red-600" />
-                  )}
-                </div>
-              </button>
+                  <div className="ml-4 flex-shrink-0 mt-1">
+                    {isExpanded ? (
+                      <ChevronUp className="w-5 h-5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-slate-400" />
+                    )}
+                  </div>
+                </button>
 
-              {expandedFlags.includes(idx) && (
-                <div className="px-5 pb-5 space-y-3 border-t border-red-100 pt-4">
-                  <div className="bg-emerald-50 rounded-lg border border-emerald-200 p-4">
-                    <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">What to ask</p>
-                    <p className="text-sm text-slate-700 leading-relaxed">{flag.what_to_ask_for}</p>
+                {isExpanded && (
+                  <div className="px-6 pb-6 border-t border-slate-100 pt-5">
+                    {/* Risk Level, Potential Impact, Timeline boxes */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                      {/* Risk Level */}
+                      <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-4">
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <TrendingDown className="w-3.5 h-3.5 text-orange-600" />
+                          <p className="text-xs font-bold text-orange-700 uppercase tracking-wide">Risk Level</p>
+                        </div>
+                        <p className="text-base font-bold text-orange-900 mb-1">High</p>
+                        <p className="text-xs text-orange-800">If usage spikes, costs become unpredictable</p>
+                      </div>
+
+                      {/* Potential Impact */}
+                      <div className="bg-pink-50 border-2 border-pink-200 rounded-lg p-4">
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <DollarSign className="w-3.5 h-3.5 text-pink-600" />
+                          <p className="text-xs font-bold text-pink-700 uppercase tracking-wide">Potential Impact</p>
+                        </div>
+                        <p className="text-base font-bold text-pink-900 mb-1">$50K+ annually</p>
+                        <p className="text-xs text-pink-800">Based on typical usage patterns</p>
+                      </div>
+
+                      {/* Timeline */}
+                      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                          <p className="text-xs font-bold text-blue-700 uppercase tracking-wide">Timeline</p>
+                        </div>
+                        <p className="text-base font-bold text-blue-900 mb-1">Address now</p>
+                        <p className="text-xs text-blue-800">Before contract signing</p>
+                      </div>
+                    </div>
+
+                    {/* Tabs for What to ask for / Fallback position */}
+                    <div className="space-y-3">
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setSelectedFlagTab({...selectedFlagTab, [idx]: 'ask'})}
+                          className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                            activeTab === 'ask'
+                              ? 'bg-emerald-50 text-emerald-800 border-2 border-emerald-200'
+                              : 'bg-white text-slate-600 border-2 border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-1.5">
+                            <span className="text-xs">?</span>
+                            <span>What to ask for</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => setSelectedFlagTab({...selectedFlagTab, [idx]: 'fallback'})}
+                          className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                            activeTab === 'fallback'
+                              ? 'bg-blue-50 text-blue-800 border-2 border-blue-200'
+                              : 'bg-white text-slate-600 border-2 border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center gap-1.5">
+                            <span className="text-xs">!</span>
+                            <span>Fallback position</span>
+                          </div>
+                        </button>
+                      </div>
+
+                      {/* Tab content */}
+                      {activeTab === 'ask' ? (
+                        <div className="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4">
+                          <p className="text-sm text-slate-800 leading-relaxed">{flag.what_to_ask_for}</p>
+                        </div>
+                      ) : (
+                        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                          <p className="text-sm text-slate-800 leading-relaxed">{flag.if_they_push_back}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">If they push back</p>
-                    <p className="text-sm text-slate-600 leading-relaxed">{flag.if_they_push_back}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            )
+          })}
         </div>
       )}
 
