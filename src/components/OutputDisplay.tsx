@@ -258,7 +258,12 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           <div>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Vendor</p>
             <p className="text-sm font-semibold text-slate-900">
-              {output.snapshot?.vendor_product || output.vendor || 'N/A'}
+              {(() => {
+                const vendorProduct = output.snapshot?.vendor_product || output.vendor || 'N/A'
+                // Extract just the vendor name (before "/" if present)
+                const vendorName = vendorProduct.split('/')[0].trim()
+                return vendorName
+              })()}
             </p>
             {output.description && (
               <p className="text-xs text-slate-600 mt-0.5">{output.description}</p>
