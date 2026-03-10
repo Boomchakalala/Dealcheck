@@ -322,28 +322,45 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         </div>
       </div>
 
-      {/* ── Section 3: What's Working ── */}
-      <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200 p-4 sm:p-6 shadow-sm">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="p-1.5 bg-emerald-100 rounded-lg">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-          </div>
-          <h2 className="text-lg font-bold text-slate-900">What's already solid</h2>
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* WHAT'S ALREADY SOLID */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {output.quick_read?.whats_solid && output.quick_read.whats_solid.length > 0 && (
+        <div className="bg-white rounded-xl border-2 border-slate-200 shadow-sm mb-6 overflow-hidden">
+          <button
+            onClick={() => setShowSolid(!showSolid)}
+            className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">What's already solid</h2>
+                <p className="text-xs text-slate-600">Good aspects in this deal — build on these.</p>
+              </div>
+            </div>
+            {showSolid ? (
+              <ChevronUp className="w-5 h-5 text-slate-400" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-slate-400" />
+            )}
+          </button>
+
+          {showSolid && (
+            <div className="px-6 pb-6 space-y-3">
+              {output.quick_read.whats_solid.map((item, idx) => (
+                <div key={idx} className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  </div>
+                  <p className="text-sm text-slate-800 leading-relaxed font-medium flex-1">{item}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        <p className="text-xs text-emerald-700/70 mb-4 font-medium">Good aspects in this deal — build on these.</p>
-        <ul className="space-y-2.5">
-          {output.quick_read?.whats_solid?.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-3 text-sm text-slate-800 leading-relaxed font-medium">
-              <span className="text-emerald-600 mt-1 flex-shrink-0">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              </span>
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
+      )}
 
       {/* ── Section 4: Watch Out ── */}
       {(output.quick_read?.whats_concerning?.length > 0 || output.red_flags?.length > 0) && (
