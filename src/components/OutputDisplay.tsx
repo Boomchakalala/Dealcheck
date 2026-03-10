@@ -592,7 +592,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* SECTION 2: SAVINGS IMPACT */}
+      {/* SECTION 2: SAVINGS IMPACT - Simplified */}
       {/* ══════════════════════════════════════════════════════════════ */}
       {output.potential_savings && output.potential_savings.length > 0 && (
         <div className="mb-8">
@@ -604,64 +604,53 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             <ChevronDown className="w-5 h-5 text-slate-400" />
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200 p-6 shadow-sm">
+          <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm">
             {/* Header with total */}
-            <div className="flex items-start justify-between mb-6 pb-6 border-b-2 border-emerald-200">
+            <div className="flex items-start justify-between mb-6 pb-6 border-b-2 border-slate-200">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md">
-                  <TrendingUp className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">Potential savings</h3>
-                  <p className="text-xs text-emerald-700 font-medium">Estimated impact if you negotiate recommended items</p>
+                  <h3 className="text-lg font-bold text-slate-900">Potential savings</h3>
+                  <p className="text-xs text-slate-600">Estimated impact if you negotiate recommended items</p>
                 </div>
               </div>
-              <div className="text-right bg-white/60 backdrop-blur rounded-xl px-5 py-3 border border-emerald-300 shadow-sm">
+              <div className="text-right bg-emerald-50 rounded-lg px-5 py-3 border-2 border-emerald-200">
                 <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">Total Opportunity</p>
-                <p className="text-4xl font-bold text-emerald-700">{formatSavings(totalSavings)}</p>
+                <p className="text-3xl font-bold text-emerald-700">{formatSavings(totalSavings)}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Savings breakdown - LEFT */}
+              {/* Savings breakdown */}
               <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <ChevronDown className="w-4 h-4 text-emerald-700" />
-                  <h4 className="text-sm font-bold text-slate-900">Savings breakdown</h4>
-                </div>
+                <h4 className="text-sm font-bold text-slate-900 mb-4">Savings breakdown</h4>
                 <div className="space-y-2.5">
                   {output.potential_savings.map((saving, idx) => (
-                    <div key={idx} className="bg-white/80 backdrop-blur border-2 border-emerald-200 rounded-lg p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex items-start gap-3 flex-1">
-                        <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-emerald-700 font-bold text-xs">•</span>
-                        </div>
-                        <span className="text-sm text-slate-800 font-medium leading-relaxed">{saving.ask}</span>
-                      </div>
-                      <span className="text-base font-bold text-emerald-700 ml-4">{saving.annual_impact}</span>
+                    <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4 flex items-center justify-between">
+                      <span className="text-sm text-slate-800 font-medium flex-1 pr-3">{saving.ask}</span>
+                      <span className="text-sm font-bold text-emerald-700">{saving.annual_impact}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Your top priorities - RIGHT */}
+              {/* Your top priorities */}
               <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Target className="w-4 h-4 text-blue-600" />
-                  <h4 className="text-sm font-bold text-slate-900">Your top priorities</h4>
-                </div>
+                <h4 className="text-sm font-bold text-slate-900 mb-4">Your top priorities</h4>
                 <div className="space-y-2.5">
                   {output.what_to_ask_for?.must_have?.slice(0, 2).map((item, idx) => (
-                    <div key={idx} className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-4 flex items-start gap-3 shadow-sm">
-                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-md">
-                        <span className="text-white text-sm font-bold">{idx + 1}</span>
+                    <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4 flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-lg bg-emerald-600 flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-xs font-bold">{idx + 1}</span>
                       </div>
                       <span className="text-sm text-slate-800 leading-relaxed font-medium pt-0.5">{item}</span>
                     </div>
                   ))}
                   {output.what_to_ask_for?.must_have && output.what_to_ask_for.must_have.length > 2 && (
                     <div className="text-center py-2">
-                      <span className="text-xs text-slate-600 font-medium">
+                      <span className="text-xs text-slate-600">
                         +{output.what_to_ask_for.must_have.length - 2} more in strategy section
                       </span>
                     </div>
