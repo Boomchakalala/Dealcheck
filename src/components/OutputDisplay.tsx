@@ -257,7 +257,9 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
           <div>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Vendor</p>
-            <p className="text-sm font-semibold text-slate-900">{output.snapshot?.vendor_product || output.vendor || 'N/A'}</p>
+            <p className="text-sm font-semibold text-slate-900">
+              {output.snapshot?.vendor_product || output.vendor || 'N/A'}
+            </p>
             {output.description && (
               <p className="text-xs text-slate-600 mt-0.5">{output.description}</p>
             )}
