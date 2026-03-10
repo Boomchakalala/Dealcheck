@@ -517,9 +517,9 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         </div>
 
         <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm">
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-              <Target className="w-5 h-5 text-purple-600" />
+              <Zap className="w-5 h-5 text-purple-600" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-900">Your negotiation strategy</h3>
@@ -527,68 +527,76 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* Your Leverage */}
-            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                  <DollarSign className="w-4 h-4 text-emerald-700" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {/* Push For - LEFT */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md">
+                  <Target className="w-5 h-5 text-white" />
                 </div>
-                <h4 className="text-sm font-bold text-emerald-900">Your Leverage</h4>
+                <h4 className="text-base font-bold text-blue-900">Push For</h4>
               </div>
-              <ul className="space-y-3">
-                {output.negotiation_plan?.leverage_you_have?.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-slate-800 leading-relaxed">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Push For */}
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <Target className="w-4 h-4 text-blue-700" />
-                </div>
-                <h4 className="text-sm font-bold text-blue-900">Push For</h4>
-              </div>
-              <ul className="space-y-3">
+              <div className="space-y-3">
                 {output.what_to_ask_for?.must_have?.map((item, idx) => (
-                  <li key={idx} className="space-y-1">
+                  <div key={idx} className="space-y-2">
                     {idx === 0 && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-600 text-white mb-1">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-600 text-white shadow-sm">
                         MUST-HAVE
                       </span>
                     )}
-                    <p className="text-sm text-slate-800 leading-relaxed font-medium">{item}</p>
-                  </li>
+                    <div className="bg-white/70 border border-blue-200 rounded-lg p-3">
+                      <p className="text-sm text-slate-800 leading-relaxed font-medium">{item}</p>
+                    </div>
+                  </div>
                 ))}
                 {output.what_to_ask_for?.nice_to_have?.slice(0, 1).map((item, idx) => (
-                  <li key={idx} className="space-y-1">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-600 text-white mb-1">
+                  <div key={idx} className="space-y-2">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-400 text-white shadow-sm">
                       NICE-TO-HAVE
                     </span>
-                    <p className="text-sm text-slate-800 leading-relaxed">{item}</p>
+                    <div className="bg-white/70 border border-blue-200 rounded-lg p-3">
+                      <p className="text-sm text-slate-700 leading-relaxed">{item}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Your Leverage - MIDDLE */}
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md">
+                  <Zap className="w-5 h-5 text-white" />
+                </div>
+                <h4 className="text-base font-bold text-emerald-900">Your Leverage</h4>
+              </div>
+              <ul className="space-y-3">
+                {output.negotiation_plan?.leverage_you_have?.map((item, idx) => (
+                  <li key={idx} className="bg-white/70 border border-emerald-200 rounded-lg p-3 flex items-start gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    </div>
+                    <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Can Offer */}
-            <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                  <Layers className="w-4 h-4 text-purple-700" />
+            {/* Can Offer - RIGHT */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-md">
+                  <Layers className="w-5 h-5 text-white" />
                 </div>
-                <h4 className="text-sm font-bold text-purple-900">Can Offer</h4>
+                <h4 className="text-base font-bold text-purple-900">Can Offer</h4>
               </div>
               <ul className="space-y-3">
                 {output.negotiation_plan?.trades_you_can_offer?.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-purple-600 mt-1 flex-shrink-0 text-lg">↔</span>
-                    <span className="text-sm text-slate-800 leading-relaxed">{item}</span>
+                  <li key={idx} className="bg-white/70 border border-purple-200 rounded-lg p-3 flex items-start gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-purple-600 font-bold text-xs">↔</span>
+                    </div>
+                    <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
                   </li>
                 ))}
               </ul>
