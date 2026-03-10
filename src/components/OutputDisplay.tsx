@@ -595,69 +595,74 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         </div>
       </div>
 
-      {/* ── Section 6: Potential Savings ── */}
-      {output.potential_savings && output.potential_savings.length > 0 && (() => {
-        // Calculate total savings by parsing dollar amounts
-        const totalSavings = output.potential_savings.reduce((sum, saving) => {
-          // Extract numbers from strings like "$7,500 saved" or "Up to $50K protected"
-          const match = saving.annual_impact.match(/\$[\d,]+(?:K|k)?/)
-          if (match) {
-            let amountStr = match[0].replace(/[$,]/g, '')
-            let amount: number
-            if (amountStr.toLowerCase().includes('k')) {
-              amount = parseFloat(amountStr.replace(/k/i, '')) * 1000
-            } else {
-              amount = parseFloat(amountStr)
-            }
-            return sum + (isNaN(amount) ? 0 : amount)
-          }
-          return sum
-        }, 0)
-
-        const formatTotal = (amount: number) => {
-          if (amount >= 1000) {
-            return `$${(amount / 1000).toFixed(1)}K`
-          }
-          return `$${amount.toLocaleString()}`
-        }
-
-        return (
-          <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200 p-4 sm:p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="p-1.5 bg-emerald-100 rounded-lg">
-                <BadgeDollarSign className="w-5 h-5 text-emerald-600" />
-              </div>
-              <h2 className="text-lg font-bold text-slate-900">Potential savings</h2>
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* SECTION 2: SAVINGS IMPACT */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {output.potential_savings && output.potential_savings.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
+              <span className="text-white font-bold text-sm">2</span>
             </div>
-            <p className="text-xs text-emerald-700/70 mb-4 font-medium">Estimated dollar impact if you negotiate these items.</p>
+            <h2 className="text-xl font-bold text-slate-900 uppercase tracking-wide text-sm">Savings Impact</h2>
+            <ChevronDown className="w-5 h-5 text-slate-400" />
+          </div>
 
-            <div className="space-y-3">
-              {output.potential_savings.map((saving, idx) => (
-                <div key={idx} className="bg-white rounded-lg border-2 border-emerald-200 p-4 flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <p className="text-sm text-slate-800 font-semibold leading-relaxed">{saving.ask}</p>
-                  </div>
-                  <div className="flex-shrink-0 text-right">
-                    <p className="text-base font-bold text-emerald-700">{saving.annual_impact}</p>
-                  </div>
+          <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm">
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-emerald-600" />
                 </div>
-              ))}
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">Potential savings</h3>
+                  <p className="text-xs text-slate-600">Estimated impact if you negotiate the recommended items.</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Total Opportunity</p>
+                <p className="text-3xl font-bold text-emerald-700">{formatSavings(totalSavings)}</p>
+              </div>
+            </div>
 
-              {/* Total savings */}
-              {totalSavings > 0 && (
-                <div className="bg-gradient-to-br from-emerald-600 to-green-600 rounded-lg p-4 flex items-center justify-between gap-4 mt-4 shadow-md">
-                  <div className="flex-1">
-                    <p className="text-sm font-bold text-white">Total potential savings</p>
-                  </div>
-                  <div className="flex-shrink-0 text-right">
-                    <p className="text-2xl font-bold text-white">{formatTotal(totalSavings)}</p>
-                  </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Savings breakdown */}
+              <div>
+                <button className="flex items-center gap-2 mb-3 text-left">
+                  <ChevronDown className="w-4 h-4 text-slate-600" />
+                  <h4 className="text-sm font-bold text-slate-800">Savings breakdown</h4>
+                </button>
+                <div className="space-y-2">
+                  {output.potential_savings.map((saving, idx) => (
+                    <div key={idx} className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 flex items-center justify-between">
+                      <span className="text-sm text-slate-800 font-medium flex-1">{saving.ask}</span>
+                      <span className="text-sm font-bold text-emerald-700 ml-3">{saving.annual_impact}</span>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
+
+              {/* Your top priorities */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Target className="w-4 h-4 text-blue-600" />
+                  <h4 className="text-sm font-bold text-slate-800">Your top priorities</h4>
+                </div>
+                <div className="space-y-2">
+                  {output.what_to_ask_for?.must_have?.slice(0, 2).map((item, idx) => (
+                    <div key={idx} className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs font-bold">{idx + 1}</span>
+                      </div>
+                      <span className="text-sm text-slate-800 leading-relaxed">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        )
-      })()}
+        </div>
+      )}
 
       {/* ── Section 7: Email Builder (Premium) ── */}
       <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden shadow-md" id="email-builder">
