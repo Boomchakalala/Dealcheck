@@ -155,7 +155,7 @@ export const saasEmailExample: DealOutput = {
   vendor: "Mailchimp",
   category: "SaaS - Marketing",
   description: "Email marketing and automation platform",
-  verdict: "You're overpaying for contacts you don't use. Downgrade tier to save $1,400/year.",
+  verdict: "You're overpaying for contacts you don't use. Downgrade tier to save $1,440/year.",
   verdict_type: "negotiate",
   price_insight: "At $299/month for 10,000 contacts but only using 6,200, downgrade to 5,000-contact tier at $179/month and save $1,440/year.",
   snapshot: {
