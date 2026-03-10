@@ -1,17 +1,13 @@
 'use client'
 
 import { type DealOutput } from '@/types'
-import { CopyButton } from './CopyButton'
-import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, Shield, TrendingDown, TrendingUp, Zap, RefreshCw, Loader2, Sparkles, BadgeDollarSign, Clock, DollarSign, Calendar, Target, Layers, Info, AlertCircle } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, TrendingDown, TrendingUp, Zap, Loader2, Sparkles, Clock, DollarSign, Calendar, Target, Layers, Info, AlertCircle } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
 interface OutputDisplayProps {
   output: DealOutput
   roundId?: string // Optional - only available in authenticated flow
 }
-
-type ToneKey = 'neutral' | 'firm' | 'final'
-type RiskLevel = 'safe' | 'balanced' | 'aggressive'
 
 export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
   const [expandedFlags, setExpandedFlags] = useState<number[]>([0])
@@ -44,9 +40,9 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
   const [showCustomPrompt, setShowCustomPrompt] = useState(false)
 
   const emailTabs = [
-    { label: 'Friendly', desc: 'Warm & collaborative', key: 'neutral' as ToneKey },
-    { label: 'Direct', desc: 'Clear & focused', key: 'firm' as ToneKey },
-    { label: 'Firm', desc: 'Urgent & deadline-driven', key: 'final' as ToneKey }
+    { label: 'Friendly', desc: 'Warm & collaborative' },
+    { label: 'Direct', desc: 'Clear & focused' },
+    { label: 'Firm', desc: 'Urgent & deadline-driven' }
   ]
 
   // Calculate total savings
