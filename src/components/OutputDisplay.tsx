@@ -622,11 +622,11 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Savings breakdown */}
+            <div className="space-y-6">
+              {/* Savings breakdown - FULL WIDTH TOP */}
               <div>
                 <h4 className="text-sm font-bold text-slate-900 mb-4">Savings breakdown</h4>
-                <div className="space-y-2.5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                   {output.potential_savings.map((saving, idx) => (
                     <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4 flex items-center justify-between">
                       <span className="text-sm text-slate-800 font-medium flex-1 pr-3">{saving.ask}</span>
@@ -636,10 +636,10 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 </div>
               </div>
 
-              {/* Your top priorities */}
+              {/* Your top priorities - FULL WIDTH BOTTOM */}
               <div>
                 <h4 className="text-sm font-bold text-slate-900 mb-4">Your top priorities</h4>
-                <div className="space-y-2.5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                   {output.what_to_ask_for?.must_have?.slice(0, 2).map((item, idx) => (
                     <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4 flex items-start gap-3">
                       <div className="w-6 h-6 rounded-lg bg-emerald-600 flex items-center justify-center flex-shrink-0">
@@ -648,14 +648,14 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                       <span className="text-sm text-slate-800 leading-relaxed font-medium pt-0.5">{item}</span>
                     </div>
                   ))}
-                  {output.what_to_ask_for?.must_have && output.what_to_ask_for.must_have.length > 2 && (
-                    <div className="text-center py-2">
-                      <span className="text-xs text-slate-600">
-                        +{output.what_to_ask_for.must_have.length - 2} more in strategy section
-                      </span>
-                    </div>
-                  )}
                 </div>
+                {output.what_to_ask_for?.must_have && output.what_to_ask_for.must_have.length > 2 && (
+                  <div className="text-center py-3 mt-2">
+                    <span className="text-xs text-slate-600">
+                      +{output.what_to_ask_for.must_have.length - 2} more in strategy section
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
