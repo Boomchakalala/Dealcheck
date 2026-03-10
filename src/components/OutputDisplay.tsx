@@ -947,55 +947,89 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       {/* ══════════════════════════════════════════════════════════════ */}
       {/* ANALYSIS HISTORY */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm mb-6">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-            <Clock className="w-5 h-5 text-slate-600" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-lg font-bold text-slate-900">Analysis History</h2>
-          </div>
-          <span className="text-sm text-slate-600">1 round completed</span>
-        </div>
-
-        <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-5">
-          <div className="flex items-start justify-between mb-4">
+      <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden shadow-sm mb-6">
+        <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b-2 border-slate-200">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold">H1</span>
+              <div className="w-9 h-9 rounded-lg bg-slate-200 flex items-center justify-center">
+                <Clock className="w-5 h-5 text-slate-600" />
               </div>
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-bold text-slate-900">Latest Analysis</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
-                    ACTION REQUIRED
-                  </span>
-                </div>
-                <p className="text-xs text-slate-600">{output.vendor} — {output.snapshot?.deal_type} — {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                <h2 className="text-base font-bold text-slate-900">Analysis History</h2>
+                <p className="text-xs text-slate-600">Track your negotiation rounds over time</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-bold text-slate-900">{output.snapshot?.total_commitment || 'N/A'}</p>
-              <p className="text-xs text-slate-600">Total Commitment</p>
+            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700 border border-slate-300">
+              1 round completed
+            </span>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="relative pl-8 pb-6 border-l-2 border-emerald-300">
+            <div className="absolute -left-[13px] top-0 w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md ring-4 ring-white">
+              <span className="text-white font-bold text-xs">1</span>
+            </div>
+
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-5 shadow-sm ml-4">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base font-bold text-slate-900">Round 1 — Initial Analysis</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                        ACTION REQUIRED
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-700">
+                      <span className="font-semibold">{output.vendor}</span>
+                      {output.snapshot?.deal_type && (
+                        <span className="text-slate-500"> • {output.snapshot.deal_type}</span>
+                      )}
+                      <span className="text-slate-500"> • {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right bg-white/60 backdrop-blur rounded-lg px-4 py-2 border border-emerald-300">
+                  <p className="text-xs font-semibold text-slate-600 mb-0.5">Total Value</p>
+                  <p className="text-lg font-bold text-slate-900">{output.snapshot?.total_commitment || 'N/A'}</p>
+                </div>
+              </div>
+
+              {/* Key insights */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                <div className="bg-white/60 backdrop-blur rounded-lg p-3 border border-emerald-200">
+                  <p className="text-xs font-semibold text-slate-600 mb-1">Category</p>
+                  <p className="text-sm font-bold text-slate-900">{output.category || output.description || 'SaaS'}</p>
+                </div>
+                <div className="bg-white/60 backdrop-blur rounded-lg p-3 border border-red-200">
+                  <p className="text-xs font-semibold text-slate-600 mb-1">Issues Found</p>
+                  <p className="text-sm font-bold text-red-700">{output.red_flags?.length || 0} red flags</p>
+                </div>
+                <div className="bg-white/60 backdrop-blur rounded-lg p-3 border border-emerald-300">
+                  <p className="text-xs font-semibold text-slate-600 mb-1">Savings Potential</p>
+                  <p className="text-sm font-bold text-emerald-700">{formatSavings(totalSavings) || '$816'}</p>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="bg-white/60 backdrop-blur rounded-lg border border-emerald-200 p-4">
+                <div className="flex items-start gap-2 mb-2">
+                  <Info className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs font-bold text-emerald-900 uppercase tracking-wide">Analysis Summary</p>
+                </div>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {output.verdict || output.quick_read?.conclusion || 'Quote analyzed with considerations for pricing, terms, and negotiation leverage points.'}
+                </p>
+              </div>
             </div>
           </div>
 
-          <p className="text-sm text-slate-800 leading-relaxed mb-3">
-            {output.category && <span className="font-semibold">{output.category}</span>}
-            {output.description && <span> - {output.description}</span>}
-          </p>
-
-          <p className="text-sm text-slate-700 leading-relaxed mb-3">
-            {output.verdict || output.quick_read?.conclusion || 'Analysis complete'}
-          </p>
-
-          <div className="bg-white/60 rounded-lg border border-emerald-200 p-3">
-            <div className="flex items-start gap-2">
-              <Info className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-slate-700">
-                Quote analyzed with considerations for pricing, terms, and negotiation leverage points.
-              </p>
-            </div>
+          {/* Future rounds placeholder */}
+          <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-xl">
+            <p className="text-sm text-slate-500 font-medium mb-2">No additional rounds yet</p>
+            <p className="text-xs text-slate-400">Upload vendor responses to track negotiation progress</p>
           </div>
         </div>
       </div>
