@@ -44,10 +44,36 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
   const [showCustomPrompt, setShowCustomPrompt] = useState(false)
 
   const emailTabs = [
-    { label: 'Friendly', desc: 'Warm & collaborative' },
-    { label: 'Direct', desc: 'Clear & focused' },
-    { label: 'Firm', desc: 'Urgent & deadline-driven' }
+    { label: 'Friendly', desc: 'Warm & collaborative', key: 'neutral' as ToneKey },
+    { label: 'Direct', desc: 'Clear & focused', key: 'firm' as ToneKey },
+    { label: 'Firm', desc: 'Urgent & deadline-driven', key: 'final' as ToneKey }
   ]
+
+  // Calculate total savings
+  const totalSavings = useMemo(() => {
+    if (!output.potential_savings || output.potential_savings.length === 0) return 0
+    return output.potential_savings.reduce((sum, saving) => {
+      const match = saving.annual_impact.match(/\$[\d,]+(?:K|k)?/)
+      if (match) {
+        let amountStr = match[0].replace(/[$,]/g, '')
+        let amount: number
+        if (amountStr.toLowerCase().includes('k')) {
+          amount = parseFloat(amountStr.replace(/k/i, '')) * 1000
+        } else {
+          amount = parseFloat(amountStr)
+        }
+        return sum + (isNaN(amount) ? 0 : amount)
+      }
+      return sum
+    }, 0)
+  }, [output.potential_savings])
+
+  const formatSavings = (amount: number) => {
+    if (amount >= 1000) {
+      return `$${(amount / 1000).toFixed(0)}`
+    }
+    return `$${amount.toLocaleString()}`
+  }
 
   const handleRegenerateEmails = async () => {
     if (!roundId) {
