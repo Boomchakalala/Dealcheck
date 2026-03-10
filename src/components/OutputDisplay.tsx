@@ -13,7 +13,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
   const [expandedFlags, setExpandedFlags] = useState<number[]>([0])
   const [showAssumptions, setShowAssumptions] = useState(false)
   const [showSolid, setShowSolid] = useState(true)
-  const [showRedFlags, setShowRedFlags] = useState(true)
+  const [showRedFlags, setShowRedFlags] = useState(true) // Always visible by default
   const [showStrategy, setShowStrategy] = useState(true)
   const [showSavings, setShowSavings] = useState(true)
   const [showEmails, setShowEmails] = useState(true)
@@ -769,109 +769,114 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               />
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-3 pt-2">
-              <button className="flex-1 px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold text-sm bg-gradient-to-br from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 transition-all shadow-md hover:shadow-lg">
-                <Mail className="w-4 h-4" />
-                <span>Open in email client</span>
-              </button>
-              <button className="px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold text-sm bg-white text-slate-700 border-2 border-slate-200 hover:bg-slate-50 transition-all">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                <span>Copy email</span>
-              </button>
-            </div>
-
-            {/* Regenerate with AI - Collapsible section */}
-            {roundId && (
-              <div className="pt-5 border-t-2 border-slate-200 mt-5">
-                <button
-                  onClick={() => setShowCustomPrompt(!showCustomPrompt)}
-                  className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors text-left group"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
-                    <span className="text-sm font-semibold text-slate-700 group-hover:text-slate-900">Regenerate emails with AI</span>
-                    {remainingRegens > 0 && (
-                      <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
-                        {remainingRegens} left
-                      </span>
-                    )}
-                  </div>
-                  {showCustomPrompt ? (
-                    <ChevronUp className="w-4 h-4 text-slate-400" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-slate-400" />
-                  )}
+            {/* Action Buttons + Custom Instructions */}
+            <div className="space-y-4 pt-2">
+              {/* Main action buttons */}
+              <div className="flex items-center gap-3">
+                <button className="flex-1 px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold text-sm bg-gradient-to-br from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 transition-all shadow-md hover:shadow-lg">
+                  <Mail className="w-4 h-4" />
+                  <span>Open in email client</span>
                 </button>
+                <button className="px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold text-sm bg-white text-slate-700 border-2 border-slate-200 hover:bg-slate-50 transition-all">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  <span>Copy email</span>
+                </button>
+              </div>
 
-                {showCustomPrompt && (
-                  <div className="mt-3 space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                    <div>
-                      <label className="text-xs font-bold text-slate-700 mb-2 block uppercase tracking-wide">
-                        Custom instructions (optional)
-                      </label>
-                      <textarea
-                        value={customPrompt}
-                        onChange={(e) => setCustomPrompt(e.target.value)}
-                        rows={2}
-                        className="w-full px-4 py-2.5 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none shadow-sm bg-white"
-                        placeholder='e.g., "Make it more assertive" or "Add a 10% discount request"'
-                      />
-                      <p className="text-xs text-slate-500 mt-1.5">Tell AI how to adjust all 3 email tones.</p>
+              {/* Regenerate with AI section */}
+              {roundId && (
+                <div className="border-2 border-slate-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setShowCustomPrompt(!showCustomPrompt)}
+                    className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Sparkles className="w-5 h-5 text-emerald-600" />
+                      <div>
+                        <span className="text-sm font-bold text-slate-900">Regenerate with custom instructions</span>
+                        {remainingRegens > 0 && (
+                          <p className="text-xs text-slate-600 mt-0.5">
+                            {remainingRegens} AI regeneration{remainingRegens !== 1 ? 's' : ''} remaining
+                          </p>
+                        )}
+                      </div>
                     </div>
-
-                    <button
-                      onClick={handleRegenerateEmails}
-                      disabled={regenerating || remainingRegens <= 0}
-                      className={`w-full px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold text-sm transition-all ${
-                        regenerating || remainingRegens <= 0
-                          ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-2 border-slate-200'
-                          : 'bg-gradient-to-br from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 shadow-md hover:shadow-lg'
-                      }`}
-                    >
-                      {regenerating ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Regenerating all 3 tones...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-4 h-4" />
-                          <span>
-                            {remainingRegens <= 0 ? 'No regenerations left' : 'Regenerate all 3 email tones'}
-                          </span>
-                        </>
-                      )}
-                    </button>
-
-                    {remainingRegens <= 0 && (
-                      <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
-                        You've used all 3 AI regenerations for this round. You can still edit emails manually above.
-                      </p>
+                    {showCustomPrompt ? (
+                      <ChevronUp className="w-5 h-5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-slate-400" />
                     )}
-                  </div>
-                )}
-              </div>
-            )}
+                  </button>
 
-            {/* Regeneration info/errors */}
-            {regenError && (
-              <div className="p-3 bg-red-50 border-2 border-red-200 rounded-lg text-sm text-red-800">
-                {regenError}
-              </div>
-            )}
-            {!roundId && (
-              <div className="p-3.5 bg-blue-50 border-2 border-blue-200 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-blue-900">
-                    <span className="font-semibold">AI-generated based on your analysis</span>
-                  </p>
+                  {showCustomPrompt && (
+                    <div className="p-4 bg-white border-t-2 border-slate-200 space-y-3">
+                      <div>
+                        <label className="text-xs font-bold text-slate-700 mb-2 block uppercase tracking-wide">
+                          Custom instructions (optional)
+                        </label>
+                        <textarea
+                          value={customPrompt}
+                          onChange={(e) => setCustomPrompt(e.target.value)}
+                          rows={3}
+                          className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none shadow-sm bg-white"
+                          placeholder='e.g., "Make it more assertive" or "Add a 10% discount request"'
+                        />
+                        <p className="text-xs text-slate-500 mt-2">Tell AI how to adjust all 3 email tones.</p>
+                      </div>
+
+                      <button
+                        onClick={handleRegenerateEmails}
+                        disabled={regenerating || remainingRegens <= 0}
+                        className={`w-full px-5 py-3 rounded-lg flex items-center justify-center gap-2 font-bold text-sm transition-all ${
+                          regenerating || remainingRegens <= 0
+                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-2 border-slate-200'
+                            : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md hover:shadow-lg'
+                        }`}
+                      >
+                        {regenerating ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Regenerating all 3 tones...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            <span>
+                              {remainingRegens <= 0 ? 'No regenerations left' : 'Regenerate all 3 email tones'}
+                            </span>
+                          </>
+                        )}
+                      </button>
+
+                      {remainingRegens <= 0 && (
+                        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                          You've used all 3 AI regenerations for this round. You can still edit emails manually above.
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Info messages */}
+              {regenError && (
+                <div className="p-3 bg-red-50 border-2 border-red-200 rounded-lg text-sm text-red-800">
+                  {regenError}
+                </div>
+              )}
+              {!roundId && (
+                <div className="p-3 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-blue-900">
+                      Sign up to save this deal and unlock AI email regeneration (3 per round).
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
