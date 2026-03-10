@@ -360,7 +360,7 @@ export const officeSuppliesExample: DealOutput = {
       what_to_ask_for: "Lock in pricing on top 20 SKUs (paper, toner, cleaning supplies) for 12-month term. If prices decrease, you get the lower rate.",
       if_they_push_back: "Accept quarterly price reviews with 30-day notice before increases. Or lock in pricing on just top 10 high-volume SKUs.",
     },
-  },
+  ],
   negotiation_plan: {
     leverage_you_have: [
       "You're a reliable customer with consistent $30K annual spend",
