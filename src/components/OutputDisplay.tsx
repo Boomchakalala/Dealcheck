@@ -828,15 +828,17 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         </div>
       </div>
 
-      {/* ── Section 8: Assumptions & Disclaimer ── */}
-      <div className="rounded-xl border-2 border-slate-200 overflow-hidden shadow-sm">
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* ASSUMPTIONS & DISCLAIMER */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+      <div className="bg-blue-50 rounded-xl border-2 border-blue-200 overflow-hidden shadow-sm mb-6">
         <button
           onClick={() => setShowAssumptions(!showAssumptions)}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors text-left"
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-blue-100/50 transition-colors text-left"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 bg-slate-100 rounded-lg">
-              <Shield className="w-5 h-5 text-slate-500" />
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+              <Info className="w-5 h-5 text-blue-600" />
             </div>
             <h2 className="text-lg font-bold text-slate-900">Assumptions & disclaimer</h2>
           </div>
@@ -848,25 +850,117 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         </button>
 
         {showAssumptions && (
-          <div className="px-6 pb-5 space-y-4 border-t border-slate-100 pt-4">
-            {output.assumptions.length > 0 && (
+          <div className="px-6 pb-6 border-t border-blue-100 pt-5 space-y-4">
+            {output.assumptions && output.assumptions.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-slate-600 mb-2">Assumptions made</p>
-                <ul className="space-y-1.5">
+                <p className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Assumptions made</p>
+                <ul className="space-y-2">
                   {output.assumptions.map((assumption, idx) => (
-                    <li key={idx} className="text-sm text-slate-600 flex items-start gap-2">
-                      <span className="text-slate-400 mt-1.5 w-1 h-1 rounded-full bg-slate-400 flex-shrink-0" />
+                    <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0"></span>
                       {assumption}
                     </li>
                   ))}
                 </ul>
               </div>
             )}
-            <div className="bg-slate-50 rounded-lg p-4">
-              <p className="text-xs text-slate-500 leading-relaxed">{output.disclaimer}</p>
+            <div className="bg-white rounded-lg border border-blue-200 p-4">
+              <p className="text-xs text-slate-600 leading-relaxed">{output.disclaimer}</p>
             </div>
           </div>
         )}
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* ANALYSIS HISTORY */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+      <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm mb-6">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+            <Clock className="w-5 h-5 text-slate-600" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-lg font-bold text-slate-900">Analysis History</h2>
+          </div>
+          <span className="text-sm text-slate-600">1 round completed</span>
+        </div>
+
+        <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-5">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center shadow-sm">
+                <span className="text-white font-bold">H1</span>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-bold text-slate-900">Latest Analysis</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                    ACTION REQUIRED
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600">{output.vendor} — {output.snapshot?.deal_type} — {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-bold text-slate-900">{output.snapshot?.total_commitment || 'N/A'}</p>
+              <p className="text-xs text-slate-600">Total Commitment</p>
+            </div>
+          </div>
+
+          <p className="text-sm text-slate-800 leading-relaxed mb-3">
+            {output.category && <span className="font-semibold">{output.category}</span>}
+            {output.description && <span> - {output.description}</span>}
+          </p>
+
+          <p className="text-sm text-slate-700 leading-relaxed mb-3">
+            {output.verdict || output.quick_read?.conclusion || 'Analysis complete'}
+          </p>
+
+          <div className="bg-white/60 rounded-lg border border-emerald-200 p-3">
+            <div className="flex items-start gap-2">
+              <Info className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-slate-700">
+                Quote analyzed with considerations for pricing, terms, and negotiation leverage points.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* BOTTOM ACTION BAR - Fixed */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-slate-200 shadow-2xl z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-900">Ready to negotiate</p>
+              <p className="text-xs text-slate-600">Your analysis is complete</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button className="px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm bg-white text-slate-700 border-2 border-slate-200 hover:bg-slate-50 transition-all">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Export report</span>
+            </button>
+            <button className="px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm bg-white text-slate-700 border-2 border-slate-200 hover:bg-slate-50 transition-all">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span>New analysis round</span>
+            </button>
+            <button className="px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm bg-gradient-to-br from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 transition-all shadow-md">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Mark deal as closed</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
