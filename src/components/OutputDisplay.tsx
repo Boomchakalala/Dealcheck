@@ -502,79 +502,97 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
         </div>
       )}
 
-      {/* ── Section 5: Your Negotiation Plan ── */}
-      <div className="bg-white rounded-xl border-2 border-slate-200 p-4 sm:p-6 space-y-5 shadow-sm">
-        <div>
-          <h2 className="text-lg font-bold text-slate-900 mb-1">Your negotiation plan</h2>
-          <p className="text-xs text-slate-600 font-medium">Your leverage, what to push for, and what you can trade.</p>
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* SECTION 1: YOUR NEGOTIATION STRATEGY */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
+            <span className="text-white font-bold text-sm">1</span>
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 uppercase tracking-wide text-sm">Strategy</h2>
+          <ChevronDown className="w-5 h-5 text-slate-400" />
         </div>
 
-        {/* Leverage */}
-        {output.negotiation_plan?.leverage_you_have.length > 0 && (
-          <div>
-            <h3 className="text-sm font-bold text-slate-800 mb-3">Leverage you have</h3>
-            <ul className="space-y-2">
-              {output.negotiation_plan?.leverage_you_have.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
-                  <span className="text-emerald-600 mt-1 flex-shrink-0">
-                    <Zap className="w-4 h-4" />
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Must-have asks */}
-        {output.what_to_ask_for?.must_have?.length > 0 && (
-        <div>
-          <div className="flex items-center gap-2.5 mb-3">
-            <h3 className="text-base font-bold text-slate-900">Push for these</h3>
-            <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2.5 py-1 rounded-full border border-blue-200">Must-have</span>
-          </div>
-          <div className="space-y-3">
-            {output.what_to_ask_for.must_have.map((ask, idx) => (
-              <div key={idx} className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 shadow-sm">
-                <p className="text-sm text-slate-800 font-semibold leading-relaxed">{ask}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        )}
-
-        {/* Nice-to-have asks */}
-        {output.what_to_ask_for?.nice_to_have?.length > 0 && (
-          <div>
-            <h3 className="text-sm font-bold text-slate-800 mb-3">Nice-to-have asks</h3>
-            <div className="space-y-2.5">
-              {output.what_to_ask_for.nice_to_have.map((ask, idx) => (
-                <div key={idx} className="p-3.5 bg-slate-50 rounded-lg border border-slate-200">
-                  <p className="text-sm text-slate-700 font-medium">{ask}</p>
-                </div>
-              ))}
+        <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <Target className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900">Your negotiation strategy</h3>
+              <p className="text-xs text-slate-600">Leverage what you have, push for what matters, offer strategic trades.</p>
             </div>
           </div>
-        )}
 
-        {/* Trades */}
-        {output.negotiation_plan?.trades_you_can_offer.length > 0 && (
-          <div>
-            <h3 className="text-sm font-bold text-slate-800 mb-3">Trades you can offer</h3>
-            <ul className="space-y-2">
-              {output.negotiation_plan?.trades_you_can_offer.map((trade, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
-                  <span className="text-slate-400 mt-1 flex-shrink-0">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
-                  </span>
-                  {trade}
-                </li>
-              ))}
-            </ul>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Your Leverage */}
+            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <DollarSign className="w-4 h-4 text-emerald-700" />
+                </div>
+                <h4 className="text-sm font-bold text-emerald-900">Your Leverage</h4>
+              </div>
+              <ul className="space-y-3">
+                {output.negotiation_plan?.leverage_you_have?.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-slate-800 leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Push For */}
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <Target className="w-4 h-4 text-blue-700" />
+                </div>
+                <h4 className="text-sm font-bold text-blue-900">Push For</h4>
+              </div>
+              <ul className="space-y-3">
+                {output.what_to_ask_for?.must_have?.map((item, idx) => (
+                  <li key={idx} className="space-y-1">
+                    {idx === 0 && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-600 text-white mb-1">
+                        MUST-HAVE
+                      </span>
+                    )}
+                    <p className="text-sm text-slate-800 leading-relaxed font-medium">{item}</p>
+                  </li>
+                ))}
+                {output.what_to_ask_for?.nice_to_have?.slice(0, 1).map((item, idx) => (
+                  <li key={idx} className="space-y-1">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-600 text-white mb-1">
+                      NICE-TO-HAVE
+                    </span>
+                    <p className="text-sm text-slate-800 leading-relaxed">{item}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Can Offer */}
+            <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <Layers className="w-4 h-4 text-purple-700" />
+                </div>
+                <h4 className="text-sm font-bold text-purple-900">Can Offer</h4>
+              </div>
+              <ul className="space-y-3">
+                {output.negotiation_plan?.trades_you_can_offer?.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="text-purple-600 mt-1 flex-shrink-0 text-lg">↔</span>
+                    <span className="text-sm text-slate-800 leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* ── Section 6: Potential Savings ── */}
