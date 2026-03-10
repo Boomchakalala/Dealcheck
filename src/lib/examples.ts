@@ -8,15 +8,14 @@ export const marketingAgencyExample: DealOutput = {
   description: "Full-service digital marketing agency for B2B lead generation",
   verdict: "Request clear performance KPIs, reduce ad spend markup, and clarify deliverables before signing.",
   verdict_type: "negotiate",
-  price_insight: "At $8,000/month retainer, you're paying premium agency rates. Comparable agencies charge $6,000-6,500/month for similar scope.",
+  price_insight: "At $8,000/month retainer plus 15% ad markup, you could save $6,000/year by negotiating standard 10% ad markup.",
   snapshot: {
     vendor_product: "Brightwave Marketing / Full-Service Digital Marketing",
     term: "12 months",
     total_commitment: "$96,000",
     billing_payment: "Monthly $8,000",
-    pricing_model: "Monthly retainer",
+    pricing_model: "Monthly retainer + 15% ad spend markup",
     deal_type: "New",
-    renewal_date: "Auto-renews unless 60 days notice",
   },
   quick_read: {
     whats_solid: [
@@ -35,51 +34,47 @@ export const marketingAgencyExample: DealOutput = {
     {
       type: "Commercial",
       issue: "15% markup on ad spend vs industry standard 10%",
-      why_it_matters: "If you spend $10,000/month on ads, you're paying $1,500/month in agency fees vs $1,000 industry standard. That's $6,000/year extra on a $120K annual ad budget.",
-      what_to_ask_for: "Reduce ad spend markup to 10% (saves $6,000 annually on $120K ad budget). Or cap fees at $1,000/month regardless of ad spend.",
-      if_they_push_back: "Accept 12% markup (saves $3,600/year) or request transparent ad spend reporting to justify the 15%.",
+      why_it_matters: "If you spend $10,000/month on ads, you're paying $1,500/month in fees vs $1,000 industry standard. That's $500/month or $6,000/year extra.",
+      what_to_ask_for: "Reduce ad spend markup to 10% (saves $6,000 annually on $10K/month ad budget).",
+      if_they_push_back: "Accept 12% markup (saves $3,000/year) or request transparent ad spend reporting to justify the 15%.",
     },
     {
       type: "Legal",
       issue: "No performance KPIs or deliverable minimums",
       why_it_matters: "Contract says 'up to 8 blog posts/month' but no minimum. If they deliver 4 posts, you still pay $8,000. You have no recourse if performance doesn't meet expectations.",
-      what_to_ask_for: "Add quarterly KPIs: minimum 6 blog posts/month, 20% increase in qualified leads within 6 months, monthly performance dashboard. Include clause for renegotiation if KPIs aren't met.",
-      if_they_push_back: "Accept monthly minimums: 5 blog posts, 3 social campaigns, 2 client meetings. No performance targets, but clear deliverable floor.",
+      what_to_ask_for: "Add minimum deliverables: 6 blog posts/month, 3 social campaigns, 2 client meetings. Include quarterly performance review with renegotiation clause if targets aren't met.",
+      if_they_push_back: "Accept monthly minimums only (5 blog posts, 2 social campaigns, 2 meetings) without performance targets.",
     },
   ],
   negotiation_plan: {
     leverage_you_have: [
       "You're a new client - they want to win this business",
-      "Annual commitment gives you negotiating power for better rates",
-      "You can compare with 2-3 other agencies who quoted $6,500/month",
+      "Annual commitment gives you negotiating power",
+      "You can compare with 2-3 other agencies who quoted lower",
     ],
     must_have_asks: [],
     nice_to_have_asks: [],
     trades_you_can_offer: [
-      "Sign 18-month contract if they reduce monthly rate to $7,000",
-      "Provide testimonial and case study after 6 months of success",
-      "Introduce them to 2 similar-sized companies in your network",
+      "Sign 18-month contract if they reduce markup to 10%",
+      "Provide testimonial and case study after 6 months",
+      "Introduce them to 2 similar companies in your network",
     ],
   },
   what_to_ask_for: {
     must_have: [
-      "Reduce ad spend markup from 15% to 10% (saves $6,000/year on $120K ad budget)",
+      "Reduce ad spend markup from 15% to 10% (saves $6,000/year on projected ad spend)",
       "Add minimum deliverables: 6 blog posts/month, 3 social campaigns, 2 strategy sessions",
-      "Include quarterly KPI review with option to renegotiate if targets aren't met",
+      "Include quarterly performance review with renegotiation option",
     ],
     nice_to_have: [
-      "Reduce monthly retainer to $7,000/month (saves $12,000/year)",
+      "Reduce monthly retainer to $7,500/month (saves $6,000/year)",
       "Cap 30-day cancellation notice instead of 60 days",
     ],
   },
   potential_savings: [
     {
-      ask: "Reduce ad markup to 10%",
+      ask: "Reduce ad markup from 15% to 10%",
       annual_impact: "$6,000 saved",
-    },
-    {
-      ask: "Reduce retainer to $7,000/month",
-      annual_impact: "$12,000 saved",
     },
   ],
   email_drafts: {

@@ -11,9 +11,9 @@ export default function ExamplePage() {
   const [selectedExample, setSelectedExample] = useState<ExampleType>('marketing')
 
   const exampleTypes = [
-    { id: 'marketing' as ExampleType, label: 'Marketing Agency', description: '$96K/year retainer' },
-    { id: 'saas' as ExampleType, label: 'SaaS Tool', description: 'Email marketing platform' },
-    { id: 'supplies' as ExampleType, label: 'Office Supplies', description: '$30K/year contract' },
+    { id: 'marketing' as ExampleType, label: 'Marketing Agency', description: '$96K annual retainer' },
+    { id: 'saas' as ExampleType, label: 'SaaS Tool', description: '$3.6K annual email platform' },
+    { id: 'supplies' as ExampleType, label: 'Office Supplies', description: '$30K annual contract' },
   ]
 
   return (
