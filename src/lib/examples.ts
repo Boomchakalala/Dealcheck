@@ -200,7 +200,7 @@ export const saasEmailExample: DealOutput = {
       what_to_ask_for: "Prepay annually for 10% discount (saves $359/year). Or commit to 2-year term for 15% total discount (saves ~$538/year).",
       if_they_push_back: "Accept annual prepay only (10% discount). Skip multi-year commitment but lock in current pricing.",
     },
-  },
+  ],
   negotiation_plan: {
     leverage_you_have: [
       "You're an existing customer - renewal is lower cost than acquiring new customers",
