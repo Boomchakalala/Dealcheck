@@ -50,11 +50,13 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
   // Logo component
   const logo = (
     <Link href="/" className="flex items-center gap-2.5">
-      <svg width="40" height="32" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Navy T shape */}
-        <path d="M0 8C0 3.58172 3.58172 0 8 0H40C44.4183 0 48 3.58172 48 8V16H32V64H16V16H0V8Z" fill="#1e293b"/>
-        {/* Green upward arrow/lift */}
-        <path d="M48 40L64 24L80 40V56C80 60.4183 76.4183 64 72 64H56C51.5817 64 48 60.4183 48 56V40Z" fill="#10b981"/>
+      <svg width="44" height="36" viewBox="0 0 220 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Navy T with angular cut */}
+        <path d="M0 30C0 13.4315 13.4315 0 30 0H130C146.569 0 160 13.4315 160 30V50H120V180H80V50H0V30Z" fill="#1e3a5f"/>
+        {/* White swoosh cut through T */}
+        <path d="M85 65L165 25L165 155C165 169.912 152.912 182 138 182H110L85 155V65Z" fill="white"/>
+        {/* Green L with lift swoosh */}
+        <path d="M90 70L170 30L170 150C170 164.912 157.912 177 143 177H115C105.059 177 97 168.941 97 159L90 70Z" fill="#10b981"/>
       </svg>
       <div className="flex items-baseline gap-0">
         <span className="text-xl font-bold text-slate-900">Term</span>
