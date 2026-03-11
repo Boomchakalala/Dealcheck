@@ -42,7 +42,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
         How it works
       </Link>
       <Link href="/example" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-        Example
+        Examples
       </Link>
     </>
   )
@@ -87,7 +87,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
         className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
         onClick={() => setShowMobileMenu(false)}
       >
-        Example
+        Examples
       </Link>
       <div className="border-t border-slate-200 my-2" />
       <Link
