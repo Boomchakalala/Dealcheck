@@ -49,6 +49,20 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
     { label: 'Firm', desc: 'Urgent & deadline-driven' }
   ]
 
+  // Show bottom bar on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowBottomBar(true)
+      } else {
+        setShowBottomBar(false)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   // Calculate total savings
   const totalSavings = useMemo(() => {
     if (!output.potential_savings || output.potential_savings.length === 0) return 0
