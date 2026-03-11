@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ExtractedQuoteSchema } from './extract-structured'
 
 // Zod schema for strict validation of OpenAI output
 export const RedFlagSchema = z.object({
@@ -73,11 +74,12 @@ export const CreateDealSchema = z.object({
     base64: z.string(),
     mimeType: z.string(),
   }).optional(),
+  structuredQuote: ExtractedQuoteSchema.optional(), // NEW: Structured extraction from PDF
   saveExtractedText: z.boolean().default(false),
   isDemoText: z.boolean().default(false), // Flag for demo text (don't count against usage)
 }).refine(
-  (data) => (data.extractedText && data.extractedText.length >= 10) || data.imageData,
-  { message: 'Either extractedText (min 10 chars) or imageData must be provided' }
+  (data) => (data.extractedText && data.extractedText.length >= 10) || data.imageData || data.structuredQuote,
+  { message: 'Either extractedText (min 10 chars), imageData, or structuredQuote must be provided' }
 )
 
 export const AddRoundSchema = z.object({
