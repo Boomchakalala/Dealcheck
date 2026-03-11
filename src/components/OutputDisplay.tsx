@@ -249,10 +249,20 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Potential Savings</p>
           </div>
           <p className="text-3xl font-bold text-emerald-700 mb-1">
-            {totalSavings > 0 ? formatSavings(totalSavings) : '$816'}
+            {totalSavings > 0 ? formatSavings(totalSavings) : 'N/A'}
           </p>
           <p className="text-sm text-emerald-700">
-            5% achievable discount
+            {totalSavings > 0 && output.snapshot?.total_commitment ? (
+              (() => {
+                const totalCommitment = output.snapshot.total_commitment.replace(/[^0-9.]/g, '')
+                const commitmentNum = parseFloat(totalCommitment)
+                if (!isNaN(commitmentNum) && commitmentNum > 0) {
+                  const percentage = ((totalSavings / commitmentNum) * 100).toFixed(0)
+                  return `${percentage}% potential savings`
+                }
+                return 'Identified savings opportunities'
+              })()
+            ) : 'No savings calculated'}
           </p>
         </div>
       </div>
@@ -296,9 +306,6 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           <div>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Total</p>
             <p className="text-sm font-semibold text-slate-900">{output.snapshot?.total_commitment || 'N/A'}</p>
-            {output.snapshot?.billing_payment && (
-              <p className="text-xs text-slate-600 mt-0.5">Per subscription/month</p>
-            )}
           </div>
 
           <div>
@@ -311,11 +318,6 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           <div>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Pricing Model</p>
             <p className="text-sm font-semibold text-slate-900">{output.snapshot?.pricing_model || 'N/A'}</p>
-          </div>
-
-          <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Current Discount</p>
-            <p className="text-sm font-semibold text-emerald-700">10% on committed</p>
           </div>
 
           {output.snapshot?.renewal_date && (
