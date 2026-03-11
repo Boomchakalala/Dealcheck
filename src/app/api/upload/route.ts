@@ -27,19 +27,26 @@ export async function POST(request: Request) {
       )
     }
 
-    // For images and PDFs, return as base64 to use OpenAI vision API
-    // Vision API can read PDFs and images directly, preserving layout and tables
-    const buffer = Buffer.from(await file.arrayBuffer())
-    const base64 = buffer.toString('base64')
+    // For images, use vision API to preserve layout and tables
+    if (file.type.startsWith('image/')) {
+      const buffer = Buffer.from(await file.arrayBuffer())
+      const base64 = buffer.toString('base64')
+
+      return NextResponse.json({
+        useVision: true,
+        imageData: {
+          base64,
+          mimeType: file.type,
+        },
+      })
+    }
+
+    // For PDFs, extract text (vision API doesn't handle PDF base64 reliably)
+    const extractedText = await extractText(file)
 
     return NextResponse.json({
-      useVision: true,
-      imageData: {
-        base64,
-        mimeType: file.type,
-      },
-      // Also extract text as fallback if vision fails
-      extractedText: file.type === 'application/pdf' ? await extractText(file).catch(() => '') : undefined,
+      extractedText,
+      useVision: false,
     })
   } catch (error) {
     console.error('Upload error:', error)
