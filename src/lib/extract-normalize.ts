@@ -1,8 +1,10 @@
-import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
 })
+
+const CLAUDE_MODEL = 'claude-sonnet-4-20250514'
 
 export interface ExtractedQuote {
   supplier: string | null
@@ -51,40 +53,30 @@ export async function extractAndNormalize(
   imageData?: { base64: string; mimeType: string }
 ): Promise<ExtractedQuote> {
   try {
-    const messages: any[] = [
-      { role: 'system', content: EXTRACTION_PROMPT },
-    ]
-
-    // Handle image input
-    if (imageData) {
-      messages.push({
-        role: 'user',
-        content: [
-          { type: 'text', text: 'Extract commercial facts from this quote/document:' },
+    const userContent: Anthropic.MessageParam['content'] = imageData
+      ? [
+          { type: 'text', text: `Extract commercial facts from this quote/document:\n\n${rawText || '(see image)'}` },
           {
-            type: 'image_url',
-            image_url: {
-              url: `data:${imageData.mimeType};base64,${imageData.base64}`,
+            type: 'image' as const,
+            source: {
+              type: 'base64' as const,
+              media_type: imageData.mimeType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+              data: imageData.base64,
             },
           },
-        ],
-      })
-    } else {
-      messages.push({
-        role: 'user',
-        content: `Extract commercial facts from this quote:\n\n${rawText}`,
-      })
-    }
+        ]
+      : `Extract commercial facts from this quote:\n\n${rawText}`
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Fast and cheap for extraction
-      messages,
-      response_format: { type: 'json_object' },
-      temperature: 0.3, // Lower temp for factual extraction
+    const response = await anthropic.messages.create({
+      model: CLAUDE_MODEL,
       max_tokens: 800,
+      system: EXTRACTION_PROMPT,
+      messages: [{ role: 'user', content: userContent }],
+      temperature: 0.3,
     })
 
-    const content = completion.choices[0]?.message?.content
+    const textBlock = response.content.find((b): b is Anthropic.TextBlock => b.type === 'text')
+    const content = textBlock?.text ?? ''
     if (!content) {
       throw new Error('No response from extraction')
     }

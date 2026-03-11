@@ -32,6 +32,14 @@ function checkTrialRateLimit(ip: string): { allowed: boolean; remaining: number 
 
 export async function POST(request: Request) {
   try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error('Trial route: ANTHROPIC_API_KEY is not set')
+      return NextResponse.json(
+        { error: 'Analysis failed. Please try again or contact support.' },
+        { status: 503 }
+      )
+    }
+
     const body = await request.json()
     const { extractedText, dealType, goal, notes, imageData, structuredQuote } = body
 
@@ -53,6 +61,13 @@ export async function POST(request: Request) {
       )
     }
 
+    // Only pass imageData if it has required fields and a supported type (Anthropic accepts jpeg/png/gif/webp only)
+    const supportedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    const validImageData =
+      imageData?.base64 && imageData?.mimeType && supportedImageTypes.includes(imageData.mimeType)
+        ? { base64: imageData.base64, mimeType: imageData.mimeType }
+        : undefined
+
     // Analyze with V1 (full text analysis - catches everything)
     const output = await analyzeDeal(
       extractedText,
@@ -60,7 +75,7 @@ export async function POST(request: Request) {
       goal,
       notes,
       undefined,
-      imageData
+      validImageData
     )
 
     return NextResponse.json({

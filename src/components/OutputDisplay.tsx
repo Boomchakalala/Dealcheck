@@ -48,23 +48,24 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
     { label: 'Firm', desc: 'Urgent & deadline-driven' }
   ]
 
-  // Calculate total savings
+  // Parse a single annual_impact string to a number (handles $1,000, $2.5K, $1.2M, "3,000 saved", etc.)
+  const parseSavingsAmount = (text: string): number => {
+    if (!text || typeof text !== 'string') return 0
+    // Match $ or optional currency, then digits/commas/dots, then optional K/k/M/m
+    const match = text.match(/[\$£€]?\s*([\d,]+(?:\.\d+)?)\s*(K|k|M|m)?/i)
+    if (!match) return 0
+    let amount = parseFloat(match[1].replace(/,/g, ''))
+    if (isNaN(amount)) return 0
+    const suffix = (match[2] || '').toLowerCase()
+    if (suffix === 'k') amount *= 1000
+    else if (suffix === 'm') amount *= 1_000_000
+    return amount
+  }
+
+  // Calculate total savings from all savings breakdown items
   const totalSavings = useMemo(() => {
     if (!output.potential_savings || output.potential_savings.length === 0) return 0
-    return output.potential_savings.reduce((sum, saving) => {
-      const match = saving.annual_impact.match(/\$[\d,]+(?:K|k)?/)
-      if (match) {
-        let amountStr = match[0].replace(/[$,]/g, '')
-        let amount: number
-        if (amountStr.toLowerCase().includes('k')) {
-          amount = parseFloat(amountStr.replace(/k/i, '')) * 1000
-        } else {
-          amount = parseFloat(amountStr)
-        }
-        return sum + (isNaN(amount) ? 0 : amount)
-      }
-      return sum
-    }, 0)
+    return output.potential_savings.reduce((sum, saving) => sum + parseSavingsAmount(saving.annual_impact), 0)
   }, [output.potential_savings])
 
   const formatSavings = (amount: number) => {

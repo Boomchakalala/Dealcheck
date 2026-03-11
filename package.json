@@ -9,13 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.39.7",
     "clsx": "^2.1.1",
     "lucide-react": "^0.575.0",
     "mammoth": "^1.11.0",
     "next": "16.1.6",
-    "openai": "^6.25.0",
     "pdf-parse": "1.1.1",
     "posthog-js": "^1.359.1",
     "react": "19.2.3",

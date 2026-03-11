@@ -1,8 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import { getClaudeResponse } from '@/lib/openai'
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 const MAX_REGENERATIONS = 3
 
@@ -95,20 +93,12 @@ Return ONLY valid JSON (no markdown, no code fences):
   ]
 }`
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a procurement negotiation expert. Write professional, effective emails. Return only valid JSON.'
-        },
-        { role: 'user', content: basePrompt }
-      ],
+    const raw = (await getClaudeResponse({
+      system: 'You are a procurement negotiation expert. Write professional, effective emails. Return only valid JSON.',
+      userContent: basePrompt,
       temperature: 0.7,
       max_tokens: 2000,
-    })
-
-    const raw = completion.choices[0].message.content?.trim() || '{}'
+    })).trim() || '{}'
 
     let result
     try {

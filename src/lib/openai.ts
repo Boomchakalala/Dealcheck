@@ -1,11 +1,58 @@
-import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
 import { DealOutputSchema, DealOutputSchemaV2, type DealOutputType, type DealOutputTypeV2 } from './schemas'
 import type { DealOutput, DealOutputV2 } from '@/types'
 import type { ExtractedQuote } from './extract-normalize'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
 })
+
+const CLAUDE_MODEL = 'claude-sonnet-4-20250514'
+
+export const CLAUDE_MODEL_ID = CLAUDE_MODEL
+
+type ClaudeImageMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
+
+export type ClaudeUserContent =
+  | string
+  | Array<
+      | { type: 'text'; text: string }
+      | { type: 'image'; source: { type: 'base64'; media_type: ClaudeImageMediaType; data: string } }
+    >
+
+const SUPPORTED_IMAGE_MIME_TYPES: ClaudeImageMediaType[] = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+
+function getResponseText(response: Anthropic.Message): string {
+  const textBlock = response.content.find((block): block is Anthropic.TextBlock => block.type === 'text')
+  return textBlock?.text ?? ''
+}
+
+/** Parse JSON from AI response, stripping optional markdown code fences. */
+function parseJsonFromContent(content: string): unknown {
+  const trimmed = content.trim()
+  const stripped = trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
+  return JSON.parse(stripped)
+}
+
+/** Shared helper for Claude API calls. Use from routes or extract-normalize. */
+export async function getClaudeResponse(params: {
+  system: string
+  userContent: ClaudeUserContent
+  max_tokens?: number
+  temperature?: number
+}): Promise<string> {
+  const { system, userContent, max_tokens = 1024, temperature = 0.7 } = params
+  const response = await anthropic.messages.create({
+    model: CLAUDE_MODEL,
+    max_tokens,
+    system,
+    messages: [{ role: 'user', content: userContent }],
+    temperature,
+  })
+  const text = getResponseText(response)
+  if (!text) throw new Error('No response from AI')
+  return text
+}
 
 const SYSTEM_PROMPT = `You are TermLift's core quote analysis engine - a sharp procurement copilot.
 
@@ -672,49 +719,42 @@ export async function analyzeDeal(
     : contextParts.join('\n\n') + `\n\nSupplier Document/Quote:\n${extractedText}`
 
   try {
-    const messages: any[] = [
-      { role: 'system', content: SYSTEM_PROMPT },
-    ]
-
-    // If we have image data, use vision API
-    if (imageData) {
-      messages.push({
-        role: 'user',
-        content: [
+    const useVision = imageData && SUPPORTED_IMAGE_MIME_TYPES.includes(imageData.mimeType as ClaudeImageMediaType)
+    const userContent: Anthropic.MessageParam['content'] = useVision
+      ? [
           { type: 'text', text: userPrompt },
           {
-            type: 'image_url',
-            image_url: {
-              url: `data:${imageData.mimeType};base64,${imageData.base64}`,
+            type: 'image' as const,
+            source: {
+              type: 'base64' as const,
+              media_type: imageData!.mimeType as ClaudeImageMediaType,
+              data: imageData!.base64,
             },
           },
-        ],
-      })
-    } else {
-      messages.push({ role: 'user', content: userPrompt })
-    }
+        ]
+      : userPrompt
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages,
-      response_format: { type: 'json_object' },
-      temperature: 0.7,
+    const response = await anthropic.messages.create({
+      model: CLAUDE_MODEL,
       max_tokens: 3500,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: userContent }],
+      temperature: 0.7,
     })
 
-    const content = completion.choices[0]?.message?.content
+    const content = getResponseText(response)
     if (!content) {
-      throw new Error('No response from OpenAI')
+      throw new Error('No response from AI')
     }
 
-    // Parse and validate JSON
-    const parsed = JSON.parse(content)
+    // Parse and validate JSON (strip markdown code fences if present)
+    const parsed = parseJsonFromContent(content)
     const validated = DealOutputSchema.parse(parsed)
 
     return validated
   } catch (error) {
     // CRITICAL: Never expose raw error messages - they may contain API keys in headers
-    console.error('OpenAI analysis error:', error)
+    console.error('AI analysis error:', error)
     throw new Error('AI analysis failed. Please try again or contact support.')
   }
 }
@@ -759,32 +799,27 @@ export async function analyzeDealV2(
     }, null, 2)}`
 
   try {
-    const messages: any[] = [
-      { role: 'system', content: SYSTEM_PROMPT_V2 },
-      { role: 'user', content: userPrompt },
-    ]
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages,
-      response_format: { type: 'json_object' },
+    const response = await anthropic.messages.create({
+      model: CLAUDE_MODEL,
+      max_tokens: 2000,
+      system: SYSTEM_PROMPT_V2,
+      messages: [{ role: 'user', content: userPrompt }],
       temperature: 0.7,
-      max_tokens: 2000, // Reduced from 3500 (extraction is separate now)
     })
 
-    const content = completion.choices[0]?.message?.content
+    const content = getResponseText(response)
     if (!content) {
-      throw new Error('No response from OpenAI')
+      throw new Error('No response from AI')
     }
 
-    // Parse and validate JSON
-    const parsed = JSON.parse(content)
+    // Parse and validate JSON (strip markdown code fences if present)
+    const parsed = parseJsonFromContent(content)
     const validated = DealOutputSchemaV2.parse(parsed)
 
     return validated
   } catch (error) {
     // CRITICAL: Never expose raw error messages - they may contain API keys in headers
-    console.error('OpenAI V2 analysis error:', error)
+    console.error('AI V2 analysis error:', error)
     throw new Error('AI analysis failed. Please try again or contact support.')
   }
 }
@@ -873,26 +908,20 @@ Return ONLY JSON with this structure:
 }`
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails that match the provided analysis. Be concise and specific. Return only valid JSON.'
-        },
-        { role: 'user', content: prompt },
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.7,
+    const response = await anthropic.messages.create({
+      model: CLAUDE_MODEL,
       max_tokens: 2000,
+      system: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails that match the provided analysis. Be concise and specific. Return only valid JSON.',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
     })
 
-    const content = completion.choices[0]?.message?.content
+    const content = getResponseText(response)
     if (!content) {
-      throw new Error('No response from OpenAI')
+      throw new Error('No response from AI')
     }
 
-    const parsed = JSON.parse(content)
+    const parsed = parseJsonFromContent(content) as { email_drafts: DealOutputType['email_drafts'] }
     return parsed.email_drafts
   } catch (error) {
     // CRITICAL: Never expose raw error messages - they may contain API keys
@@ -997,26 +1026,20 @@ Return ONLY JSON:
 }`
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Use mini for cost efficiency
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails. Adapt to user preferences. Be concise and specific. Return only valid JSON.'
-        },
-        { role: 'user', content: prompt },
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.7,
+    const response = await anthropic.messages.create({
+      model: CLAUDE_MODEL,
       max_tokens: 1500,
+      system: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails. Adapt to user preferences. Be concise and specific. Return only valid JSON.',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
     })
 
-    const content = completion.choices[0]?.message?.content
+    const content = getResponseText(response)
     if (!content) {
-      throw new Error('No response from OpenAI')
+      throw new Error('No response from AI')
     }
 
-    const parsed = JSON.parse(content)
+    const parsed = parseJsonFromContent(content) as { subject: string; body: string }
     return { subject: parsed.subject, body: parsed.body }
   } catch (error) {
     console.error('V2 email generation error:', error)

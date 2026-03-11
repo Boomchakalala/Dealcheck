@@ -1,8 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import { getClaudeResponse } from '@/lib/openai'
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 export async function POST(
   request: Request,
@@ -41,7 +39,7 @@ export async function POST(
     const latestRound = sortedRounds[0]
     const baseTotal = latestRound?.output_json?.snapshot?.total_commitment
 
-    // Generate close summary using OpenAI
+    // Generate close summary using Claude
     let closeSummary = null
     if (latestRound?.output_json && outcome === 'won') {
       try {
@@ -59,17 +57,12 @@ ${latestRound.output_json.what_to_ask_for?.must_have?.slice(0, 3).join('\n') || 
 
 Generate 3-5 concise bullet points covering: starting position, final terms, savings (if any), key wins, and next action.`
 
-        const completion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: 'You are a procurement analyst. Generate concise, factual close summaries in 3-5 bullet points.' },
-            { role: 'user', content: summaryPrompt }
-          ],
+        closeSummary = await getClaudeResponse({
+          system: 'You are a procurement analyst. Generate concise, factual close summaries in 3-5 bullet points.',
+          userContent: summaryPrompt,
           temperature: 0.3,
           max_tokens: 300,
         })
-
-        closeSummary = completion.choices[0].message.content
       } catch (err) {
         console.error('Failed to generate close summary:', err)
         // Continue without summary

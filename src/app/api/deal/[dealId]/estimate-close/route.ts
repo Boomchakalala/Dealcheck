@@ -1,8 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import { getClaudeResponse } from '@/lib/openai'
 import { NextResponse } from 'next/server'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 export async function POST(
   request: Request,
@@ -86,20 +84,12 @@ Return ONLY valid JSON (no markdown, no code fences):
   "summary": "<2-3 sentence summary>"
 }`
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a procurement analyst. Return only valid JSON, no markdown formatting or code fences.'
-        },
-        { role: 'user', content: prompt }
-      ],
+    const raw = (await getClaudeResponse({
+      system: 'You are a procurement analyst. Return only valid JSON, no markdown formatting or code fences.',
+      userContent: prompt,
       temperature: 0.3,
       max_tokens: 500,
-    })
-
-    const raw = completion.choices[0].message.content?.trim() || '{}'
+    })).trim() || '{}'
 
     let result
     try {
