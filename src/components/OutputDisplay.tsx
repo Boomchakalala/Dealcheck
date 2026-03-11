@@ -456,7 +456,13 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                               {flag.type === 'Commercial' ? 'High' : flag.type === 'Legal' ? 'Medium' : 'Medium'}
                             </p>
                             <p className="text-xs text-orange-800 leading-relaxed">
-                              {flag.why_it_matters.split('.')[0]}
+                              {(() => {
+                                // Get first sentence but remove any small dollar amounts that are unit prices
+                                let firstSentence = flag.why_it_matters.split('.')[0]
+                                // Remove unit prices like $0.10/GB, $3/unit, etc (amounts with / or per after them)
+                                firstSentence = firstSentence.replace(/\$\d+(?:\.\d+)?(?:\/\w+|per\s+\w+)/gi, '[unit price]')
+                                return firstSentence
+                              })()}
                             </p>
                           </div>
 
@@ -1088,7 +1094,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       {/* BOTTOM ACTION BAR - Fixed */}
       {/* ══════════════════════════════════════════════════════════════ */}
       {showBottomBar && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-slate-200 shadow-2xl z-50 animate-in slide-in-from-bottom duration-300">
+        <div data-component="bottom-action-bar" className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-slate-200 shadow-2xl z-50 animate-in slide-in-from-bottom duration-300">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
