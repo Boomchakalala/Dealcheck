@@ -33,7 +33,7 @@ function checkTrialRateLimit(ip: string): { allowed: boolean; remaining: number 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { extractedText, dealType, goal, notes, imageData } = body
+    const { extractedText, dealType, goal, notes, imageData, structuredQuote } = body
 
     // IP-based rate limiting for trial route
     const clientIP = getClientIP(request)
@@ -54,13 +54,15 @@ export async function POST(request: Request) {
     }
 
     // Analyze with V1 (full text analysis - catches everything)
+    // Now with optional structured quote data for better table comprehension
     const output = await analyzeDeal(
       extractedText,
       dealType || 'New',
       goal,
       notes,
       undefined,
-      imageData
+      imageData,
+      structuredQuote
     )
 
     return NextResponse.json({
