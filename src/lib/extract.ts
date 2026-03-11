@@ -30,6 +30,37 @@ if (typeof window === 'undefined') {
   }
 }
 
+/**
+ * Clean and normalize extracted text to preserve table structure
+ * This helps the AI understand pricing tables and structured data
+ */
+function normalizeExtractedText(rawText: string): string {
+  let text = rawText
+
+  // Preserve table-like structures by maintaining spacing
+  // Look for patterns like: "Item    $500    Monthly"
+  const lines = text.split('\n')
+  const processedLines = lines.map(line => {
+    // If line has multiple spaces (potential table columns), preserve them
+    if (/\s{2,}/.test(line)) {
+      // Replace multiple spaces with tab for better structure
+      return line.replace(/\s{2,}/g, '\t')
+    }
+    return line
+  })
+
+  text = processedLines.join('\n')
+
+  // Remove excessive blank lines (more than 2 consecutive)
+  text = text.replace(/\n{3,}/g, '\n\n')
+
+  // Preserve currency and number formatting
+  // Ensure there's space between currency symbols and numbers for clarity
+  text = text.replace(/(\$|€|£)(\d)/g, '$1 $2')
+
+  return text.trim()
+}
+
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
     console.log('📄 Starting PDF extraction...')
@@ -42,10 +73,10 @@ export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
       max: 0, // Parse all pages
     })
 
-    const text = data.text.trim()
-    console.log(`✅ Extracted ${text.length} characters from PDF (${data.numpages} pages)`)
+    const rawText = data.text.trim()
+    console.log(`✅ Extracted ${rawText.length} characters from PDF (${data.numpages} pages)`)
 
-    if (text.length < 50) {
+    if (rawText.length < 50) {
       throw new Error(
         'PDF appears to contain mostly images or is empty.\n\n' +
         'Please try:\n' +
@@ -54,7 +85,11 @@ export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
       )
     }
 
-    return text
+    // Normalize text to preserve table structure
+    const normalizedText = normalizeExtractedText(rawText)
+    console.log('✅ Text normalized to preserve table structure')
+
+    return normalizedText
   } catch (error) {
     console.error('PDF extraction error:', error)
 
@@ -87,10 +122,10 @@ export async function extractTextFromImage(buffer: Buffer): Promise<string> {
       }
     })
 
-    const cleanedText = text.trim()
-    console.log(`✅ Extracted ${cleanedText.length} characters from image`)
+    const rawText = text.trim()
+    console.log(`✅ Extracted ${rawText.length} characters from image`)
 
-    if (cleanedText.length < 30) {
+    if (rawText.length < 30) {
       throw new Error(
         'Could not extract enough text from the image.\n\n' +
         'Tips:\n' +
@@ -100,7 +135,11 @@ export async function extractTextFromImage(buffer: Buffer): Promise<string> {
       )
     }
 
-    return cleanedText
+    // Normalize text to preserve structure (tables, pricing layouts)
+    const normalizedText = normalizeExtractedText(rawText)
+    console.log('✅ OCR text normalized to preserve structure')
+
+    return normalizedText
   } catch (error) {
     if (error instanceof Error && error.message.includes('not extract enough')) {
       throw error
