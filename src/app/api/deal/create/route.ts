@@ -57,13 +57,15 @@ export async function POST(request: Request) {
     const validated = CreateDealSchema.parse(body)
 
     // Analyze with V1 (full text analysis - catches everything)
+    // Now with optional structured quote data for better table comprehension
     const output = await analyzeDeal(
       validated.extractedText || '',
       validated.dealType,
       validated.goal || undefined,
       validated.notes || undefined,
       undefined,
-      validated.imageData
+      validated.imageData,
+      validated.structuredQuote
     )
 
     // Auto-detect vendor
