@@ -49,16 +49,16 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
 
   // Logo component
   const logo = (
-    <Link href="/" className="flex items-center gap-2">
-      <svg width="48" height="40" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Navy T letter */}
-        <path d="M0 15C0 6.71573 6.71573 0 15 0H75C83.2843 0 90 6.71573 90 15V25H65V100H40V25H0V15Z" fill="#1e3a5f"/>
-        {/* White diagonal swoosh/cut */}
-        <path d="M45 35L95 5V85C95 92.1797 89.1797 98 82 98H50L45 85V35Z" fill="white" opacity="0.3"/>
-        {/* Green lift (L shape angled upward) */}
-        <path d="M50 40L100 10V80C100 88.8366 92.8366 96 84 96H62C54.268 96 48 89.732 48 82L50 40Z" fill="#10b981"/>
+    <Link href="/" className="flex items-center gap-2.5">
+      <svg width="42" height="36" viewBox="0 0 100 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Navy T base */}
+        <path d="M0 12C0 5.37258 5.37258 0 12 0H52C58.6274 0 64 5.37258 64 12V20H48V85H28V20H0V12Z" fill="#1e3a5f"/>
+        {/* White swoosh cut creating the lift effect */}
+        <path d="M30 28L75 0L75 70C75 78.2843 68.2843 85 60 85H38L30 70V28Z" fill="white"/>
+        {/* Green L with upward lift */}
+        <path d="M32 32L80 2L80 68C80 77.3888 72.3888 85 63 85H42C35.3726 85 30 79.6274 30 73V32H32Z" fill="#10b981"/>
       </svg>
-      <div className="flex items-baseline gap-0">
+      <div className="flex items-baseline">
         <span className="text-xl font-bold text-slate-900">Term</span>
         <span className="text-xl font-bold text-emerald-600">Lift</span>
       </div>
