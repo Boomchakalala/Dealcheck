@@ -1011,8 +1011,49 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* BOTTOM ACTION BAR - Removed (use DealActionBar instead) */}
+      {/* BOTTOM ACTION BAR - Shows on scroll */}
       {/* ══════════════════════════════════════════════════════════════ */}
+      {showBottomBar && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-slate-200 shadow-2xl z-50">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-900">Ready to negotiate</p>
+                <p className="text-xs text-slate-600">Your analysis is complete</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button className="px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm bg-white text-slate-700 border-2 border-slate-200 hover:bg-slate-50 transition-all">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Export report</span>
+              </button>
+              <button
+                onClick={() => {
+                  const addRoundElement = document.getElementById('add-round')
+                  if (addRoundElement) {
+                    addRoundElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                  }
+                }}
+                className="px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm bg-white text-slate-700 border-2 border-slate-200 hover:bg-slate-50 transition-all">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span>New analysis round</span>
+              </button>
+              <button className="px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm bg-gradient-to-br from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 transition-all shadow-md">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Mark deal as closed</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
