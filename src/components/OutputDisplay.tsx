@@ -2,7 +2,7 @@
 
 import { type DealOutput } from '@/types'
 import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, TrendingDown, TrendingUp, Zap, Loader2, Sparkles, Clock, DollarSign, Calendar, Target, Layers, Info, AlertCircle } from 'lucide-react'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 
 interface OutputDisplayProps {
   output: DealOutput
@@ -157,7 +157,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
   const vc = verdictConfig[verdictType]
 
   return (
-    <div className="max-w-7xl mx-auto pb-32">
+    <div className="max-w-7xl mx-auto pb-6">
       {/* ══════════════════════════════════════════════════════════════ */}
       {/* TOP SECTION: Title + Metadata */}
       {/* ══════════════════════════════════════════════════════════════ */}
