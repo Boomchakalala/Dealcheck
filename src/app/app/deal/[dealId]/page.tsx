@@ -309,18 +309,6 @@ export default async function DealPage({
           <p className="text-slate-600">No rounds yet. Add a round above to start.</p>
         </Card>
       )}
-
-      {/* Sticky Action Bar */}
-      <DealActionBar
-        dealId={dealId}
-        currentTotal={
-          isV2
-            ? `${(latestOutput as DealOutputV2)?.commercial_facts?.total_value} ${(latestOutput as DealOutputV2)?.commercial_facts?.currency}`
-            : (latestOutput as DealOutput)?.snapshot?.total_commitment
-        }
-        dealStatus={deal.status}
-        roundCount={sortedRounds.length}
-      />
     </div>
   )
 }
