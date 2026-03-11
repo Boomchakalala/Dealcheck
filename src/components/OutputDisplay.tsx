@@ -1005,36 +1005,15 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-900">Ready to negotiate</p>
-              <p className="text-xs text-slate-600">Your analysis is complete</p>
+              <p className="text-sm font-bold text-slate-900">Analysis complete</p>
+              <p className="text-xs text-slate-600">Review the findings above or close this deal</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button className="px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm bg-white text-slate-700 border-2 border-slate-200 hover:bg-slate-50 transition-all">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <span>Export report</span>
-            </button>
-            <button
-              onClick={() => {
-                const addRoundElement = document.getElementById('add-round')
-                if (addRoundElement) {
-                  addRoundElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                }
-              }}
-              className="px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm bg-white text-slate-700 border-2 border-slate-200 hover:bg-slate-50 transition-all">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              <span>New analysis round</span>
-            </button>
-            <button className="px-5 py-2.5 rounded-lg flex items-center gap-2 font-semibold text-sm bg-gradient-to-br from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 transition-all shadow-md">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Mark deal as closed</span>
-            </button>
-          </div>
+          <button className="px-6 py-3 rounded-lg flex items-center gap-2 font-semibold text-sm bg-gradient-to-br from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 transition-all shadow-md">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Mark deal as closed</span>
+          </button>
         </div>
       </div>
     </div>
