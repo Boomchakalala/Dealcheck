@@ -27,26 +27,19 @@ export async function POST(request: Request) {
       )
     }
 
-    // For images, use vision API to preserve layout and tables
-    if (file.type.startsWith('image/')) {
-      const buffer = Buffer.from(await file.arrayBuffer())
-      const base64 = buffer.toString('base64')
-
-      return NextResponse.json({
-        useVision: true,
-        imageData: {
-          base64,
-          mimeType: file.type,
-        },
-      })
-    }
-
-    // For PDFs, extract text (vision API doesn't handle PDF base64 reliably)
-    const extractedText = await extractText(file)
+    // For images and PDFs, use vision API to preserve layout and tables
+    // Vision API can "see" the document structure like a human
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const base64 = buffer.toString('base64')
 
     return NextResponse.json({
-      extractedText,
-      useVision: false,
+      useVision: true,
+      imageData: {
+        base64,
+        mimeType: file.type,
+      },
+      // Also provide extracted text as fallback for PDFs
+      extractedText: file.type === 'application/pdf' ? await extractText(file).catch(() => '') : undefined,
     })
   } catch (error) {
     console.error('Upload error:', error)
