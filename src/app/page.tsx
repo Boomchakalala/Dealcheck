@@ -4,9 +4,13 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Upload, Search, Send, Lock, ShieldCheck, Globe } from 'lucide-react'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
+import { examples } from '@/lib/examples'
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<'price' | 'terms' | 'emails'>('price')
+  const [selectedExample, setSelectedExample] = useState<'marketing' | 'saas' | 'supplies'>('marketing')
+
+  const currentExample = examples[selectedExample]
 
   return (
     <div className="min-h-screen bg-white relative">
