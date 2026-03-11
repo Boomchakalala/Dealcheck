@@ -467,13 +467,13 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                             </div>
                             <p className="text-base font-bold text-pink-900 mb-1">
                               {(() => {
-                                // Extract dollar amounts - find all matches and pick the largest
-                                const matches = flag.why_it_matters.match(/\$[\d,]+(?:,\d{3})*(?:K|k|M|m)?(?:\+)?/g)
+                                // Extract dollar amounts - improved regex to handle decimals
+                                const matches = flag.why_it_matters.match(/\$[\d,]+(?:\.\d+)?[KkMm]?(?:\+)?/g)
                                 if (!matches || matches.length === 0) return 'Cost exposure'
 
-                                // Convert to numbers and find max
+                                // Convert to numbers and find max, filtering out small unit prices
                                 const amounts = matches.map(m => {
-                                  let num = m.replace(/[$,]/g, '')
+                                  let num = m.replace(/[\$,\+]/g, '')
                                   if (num.match(/[Kk]/)) {
                                     num = parseFloat(num.replace(/[Kk]/g, '')) * 1000
                                   } else if (num.match(/[Mm]/)) {
@@ -482,16 +482,18 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                                     num = parseFloat(num)
                                   }
                                   return { original: m, value: num }
-                                })
+                                }).filter(a => a.value >= 100) // Filter out unit prices like $0.10/GB
+
+                                if (amounts.length === 0) return 'Cost exposure'
 
                                 const largest = amounts.reduce((max, curr) => curr.value > max.value ? curr : max)
                                 let display = largest.original
 
                                 // Add context from surrounding text
-                                if (flag.why_it_matters.includes('annually') || flag.why_it_matters.includes('/year')) {
+                                if (flag.why_it_matters.toLowerCase().includes('annually') || flag.why_it_matters.toLowerCase().includes('/year')) {
                                   display += ' annually'
-                                } else if (flag.why_it_matters.includes('monthly') || flag.why_it_matters.includes('/month')) {
-                                  display += ' monthly'
+                                } else if (flag.why_it_matters.toLowerCase().includes('per month') || flag.why_it_matters.toLowerCase().includes('/month')) {
+                                  display += '/month'
                                 }
 
                                 return display
