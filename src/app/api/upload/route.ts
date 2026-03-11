@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { extractText } from '@/lib/extract'
-import { extractStructuredQuote } from '@/lib/extract-structured'
+import { uploadPDFToStorage, deleteTempPDF } from '@/lib/storage'
+import { parsePDFWithLlamaParse } from '@/lib/llamaparse'
 
 // CRITICAL: pdf-parse requires Node.js runtime
 export const runtime = 'nodejs'
@@ -30,24 +31,33 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer())
 
-    // NEW PIPELINE: For PDFs, convert to images and extract structured data
+    // NEW ARCHITECTURE: For PDFs, use LlamaParse for table extraction
     if (file.type === 'application/pdf') {
       try {
-        const structuredQuote = await extractStructuredQuote(buffer)
+        // Step 1: Upload PDF to Supabase Storage
+        const fileUrl = await uploadPDFToStorage(buffer, file.name)
 
+        // Step 2: Parse with LlamaParse (preserves tables)
+        const parsed = await parsePDFWithLlamaParse(fileUrl)
+
+        // Step 3: Clean up uploaded file (async, don't wait)
+        deleteTempPDF(fileUrl).catch(err => console.error('Cleanup error:', err))
+
+        // Step 4: Return parsed markdown with table structure
         return NextResponse.json({
-          useStructuredExtraction: true,
-          structuredQuote,
-          // Fallback text extraction in case vision fails
-          extractedText: await extractText(file).catch(() => ''),
+          extractedText: parsed.markdown,
+          useStructuredParsing: true,
+          source: 'llamaparse',
         })
       } catch (error) {
-        console.error('Structured extraction failed, falling back to text:', error)
-        // Fallback to old text extraction if vision fails
+        console.error('LlamaParse failed, using fallback:', error)
+
+        // Fallback to basic text extraction if LlamaParse fails
         const extractedText = await extractText(file)
         return NextResponse.json({
-          useStructuredExtraction: false,
           extractedText,
+          useStructuredParsing: false,
+          source: 'fallback',
         })
       }
     }
