@@ -210,25 +210,42 @@ export default function LandingPage() {
 
           {/* Premium Demo Card with Tabs */}
           <div className="max-w-4xl mx-auto">
-            {/* Example Selector */}
-            <div className="flex justify-center gap-2 mb-4">
-              {[
-                { key: 'marketing', label: 'Marketing Agency' },
-                { key: 'saas', label: 'SaaS Tool' },
-                { key: 'supplies', label: 'Office Supplies' },
-              ].map((ex) => (
-                <button
-                  key={ex.key}
-                  onClick={() => setSelectedExample(ex.key as any)}
-                  className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
-                    selectedExample === ex.key
-                      ? 'bg-emerald-600 text-white shadow-md'
-                      : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  {ex.label}
-                </button>
-              ))}
+            {/* Example Selector with clear labels */}
+            <div className="text-center mb-6">
+              <p className="text-sm font-semibold text-slate-700 mb-3">See how it works with real examples:</p>
+              <div className="flex justify-center gap-2">
+                {[
+                  { key: 'marketing', label: 'Marketing Agency', desc: '$96K annual contract' },
+                  { key: 'saas', label: 'Email SaaS', desc: '$3.6K renewal' },
+                  { key: 'supplies', label: 'Office Supplies', desc: '$30K annual spend' },
+                ].map((ex) => (
+                  <button
+                    key={ex.key}
+                    onClick={() => setSelectedExample(ex.key as any)}
+                    className={`px-4 py-3 text-sm font-semibold rounded-lg transition-all ${
+                      selectedExample === ex.key
+                        ? 'bg-emerald-600 text-white shadow-md'
+                        : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <div>{ex.label}</div>
+                    <div className="text-xs opacity-75">{ex.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Current example info */}
+            <div className="bg-slate-50 rounded-lg border-2 border-slate-200 p-4 mb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">{currentExample.title}</h3>
+                  <p className="text-sm text-slate-600 mt-1">{currentExample.vendor} • {currentExample.snapshot.total_commitment}</p>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                  Example {selectedExample === 'marketing' ? '1' : selectedExample === 'saas' ? '2' : '3'}
+                </span>
+              </div>
             </div>
 
             <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden">
@@ -252,7 +269,7 @@ export default function LandingPage() {
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  Push for these
+                  Negotiation plan
                 </button>
                 <button
                   onClick={() => setActiveTab('emails')}
@@ -279,7 +296,7 @@ export default function LandingPage() {
                         <h3 className="font-bold text-slate-900 text-sm mb-1">{flag.issue}</h3>
                         <p className="text-xs text-slate-600">{flag.why_it_matters}</p>
                         <div className="mt-3 bg-emerald-50 rounded-lg border border-emerald-200 p-3">
-                          <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">What to ask</p>
+                          <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">What to ask for</p>
                           <p className="text-sm text-slate-700">{flag.what_to_ask_for}</p>
                         </div>
                       </div>
@@ -292,9 +309,24 @@ export default function LandingPage() {
 
                 {activeTab === 'terms' && (
                   <div>
-                    {/* Styled to match real negotiation plan section */}
+                    {/* Must-have asks */}
                     <div className="mb-5">
-                      <h3 className="text-sm font-semibold text-slate-700 mb-2">Leverage you have</h3>
+                      <div className="flex items-center gap-2 mb-3">
+                        <h3 className="text-base font-semibold text-slate-900">What to push for</h3>
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">Must-have</span>
+                      </div>
+                      <div className="space-y-2">
+                        {currentExample.what_to_ask_for.must_have.map((ask, idx) => (
+                          <div key={idx} className="p-4 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200 shadow-sm">
+                            <p className="text-sm text-slate-800 font-medium leading-relaxed">{ask}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Leverage section */}
+                    <div className="mb-5">
+                      <h3 className="text-sm font-semibold text-slate-700 mb-2">Your leverage</h3>
                       <ul className="space-y-1.5">
                         {currentExample.negotiation_plan.leverage_you_have.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
@@ -306,21 +338,9 @@ export default function LandingPage() {
                         ))}
                       </ul>
                     </div>
-                    <div className="mb-5">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-sm font-semibold text-slate-900">Push for these</h3>
-                        <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-200">Must-have</span>
-                      </div>
-                      <div className="space-y-2">
-                        {currentExample.what_to_ask_for.must_have.map((ask, idx) => (
-                          <div key={idx} className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 shadow-sm">
-                            <p className="text-sm text-slate-800 font-semibold">{ask}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+
                     <p className="text-sm text-slate-500 italic">
-                      Plus nice-to-have asks and trades you can offer to close faster.
+                      Plus trades you can offer to make it easier for them to say yes.
                     </p>
                   </div>
                 )}
@@ -329,7 +349,7 @@ export default function LandingPage() {
                   <div>
                     {/* Styled to match real email builder */}
                     <div className="mb-4">
-                      <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">Tone</label>
+                      <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">Email tone selector</label>
                       <div className="flex gap-1.5 bg-slate-100 rounded-xl p-1.5 max-w-xs shadow-inner">
                         <span className="flex-1 px-3 py-2 text-xs font-bold rounded-lg bg-white text-slate-900 shadow-md border border-slate-200 text-center">Friendly</span>
                         <span className="flex-1 px-3 py-2 text-xs font-semibold rounded-lg text-slate-500 text-center">Direct</span>
@@ -341,14 +361,14 @@ export default function LandingPage() {
                         <p className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Subject line</p>
                         <p className="text-sm font-semibold text-slate-900">{currentExample.email_drafts.neutral.subject}</p>
                       </div>
-                      <div className="p-5">
+                      <div className="p-5 max-h-64 overflow-y-auto">
                         <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                          {currentExample.email_drafts.neutral.body.slice(0, 300)}...
+                          {currentExample.email_drafts.neutral.body}
                         </p>
                       </div>
                     </div>
                     <p className="text-sm text-slate-500 mt-6 italic">
-                      Pick your tone, edit directly, and copy. Ready in 30 seconds.
+                      All 3 tones ready to copy. Edit directly or regenerate with AI.
                     </p>
                   </div>
                 )}
