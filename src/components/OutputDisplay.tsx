@@ -606,11 +606,14 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               {/* Savings breakdown - FULL WIDTH TOP */}
               <div>
                 <h4 className="text-sm font-bold text-slate-900 mb-4">Savings breakdown</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {output.potential_savings.map((saving, idx) => (
-                    <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4 flex items-center justify-between">
-                      <span className="text-sm text-slate-800 font-medium flex-1 pr-3">{saving.ask}</span>
-                      <span className="text-sm font-bold text-emerald-700">{saving.annual_impact}</span>
+                    <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between gap-4 mb-2">
+                        <span className="text-lg font-bold text-emerald-700 whitespace-nowrap flex-shrink-0">{saving.annual_impact}</span>
+                        <span className="text-xs text-slate-500 text-right">per year</span>
+                      </div>
+                      <p className="text-sm text-slate-800 font-medium leading-relaxed">{saving.ask}</p>
                     </div>
                   ))}
                 </div>
