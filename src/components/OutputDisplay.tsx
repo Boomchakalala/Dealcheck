@@ -428,6 +428,56 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
                     {isExpanded && (
                       <div className="px-5 pb-5 border-t-2 border-slate-200 pt-5 bg-white">
+                        {/* Risk Level, Potential Impact, Timeline boxes */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                          <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <TrendingDown className="w-4 h-4 text-orange-600" />
+                              <p className="text-xs font-bold text-orange-800 uppercase tracking-wide">Risk Level</p>
+                            </div>
+                            <p className="text-base font-bold text-orange-900 mb-1">
+                              {flag.type === 'Commercial' ? 'High' : flag.type === 'Legal' ? 'Medium' : 'Medium'}
+                            </p>
+                            <p className="text-xs text-orange-800 leading-relaxed">
+                              {flag.why_it_matters.split('.')[0]}
+                            </p>
+                          </div>
+
+                          <div className="bg-pink-50 border-2 border-pink-200 rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <DollarSign className="w-4 h-4 text-pink-600" />
+                              <p className="text-xs font-bold text-pink-800 uppercase tracking-wide">Potential Impact</p>
+                            </div>
+                            <p className="text-base font-bold text-pink-900 mb-1">
+                              {(() => {
+                                // Extract dollar amounts from why_it_matters
+                                const dollarMatch = flag.why_it_matters.match(/\$[\d,]+[KkMm]?(?:\+)?(?:\/(?:year|month|annually))?/)
+                                return dollarMatch ? dollarMatch[0].replace('/year', ' annually').replace('/month', ' monthly') : 'Cost exposure'
+                              })()}
+                            </p>
+                            <p className="text-xs text-pink-800 leading-relaxed">
+                              {flag.type === 'Commercial' ? 'Financial impact' : 'Operational impact'}
+                            </p>
+                          </div>
+
+                          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Clock className="w-4 h-4 text-blue-600" />
+                              <p className="text-xs font-bold text-blue-800 uppercase tracking-wide">Timeline</p>
+                            </div>
+                            <p className="text-base font-bold text-blue-900 mb-1">
+                              {flag.what_to_ask_for.toLowerCase().includes('before signing') || flag.what_to_ask_for.toLowerCase().includes('immediately')
+                                ? 'Address now'
+                                : 'Before renewal'}
+                            </p>
+                            <p className="text-xs text-blue-800 leading-relaxed">
+                              {flag.what_to_ask_for.toLowerCase().includes('before signing')
+                                ? 'Before contract signing'
+                                : 'During negotiation'}
+                            </p>
+                          </div>
+                        </div>
+
                         {/* Tabs */}
                         <div className="space-y-3">
                           <div className="flex gap-3">
