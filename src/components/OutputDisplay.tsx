@@ -1031,7 +1031,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 </div>
                 <div className="bg-white/60 backdrop-blur rounded-lg p-3 border border-emerald-300">
                   <p className="text-xs font-semibold text-slate-600 mb-1">Savings Potential</p>
-                  <p className="text-sm font-bold text-emerald-700">{formatSavings(totalSavings) || '$816'}</p>
+                  <p className="text-sm font-bold text-emerald-700">{totalSavings > 0 ? formatSavings(totalSavings) : 'N/A'}</p>
                 </div>
               </div>
 
