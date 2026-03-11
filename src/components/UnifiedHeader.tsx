@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { HelpCircle, ChevronDown, User, LogOut, Menu, X, Settings, Zap, Crown } from 'lucide-react'
@@ -49,19 +50,15 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
 
   // Logo component
   const logo = (
-    <Link href="/" className="flex items-center gap-2.5">
-      <svg width="44" height="36" viewBox="0 0 220 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Navy T with angular cut */}
-        <path d="M0 30C0 13.4315 13.4315 0 30 0H130C146.569 0 160 13.4315 160 30V50H120V180H80V50H0V30Z" fill="#1e3a5f"/>
-        {/* White swoosh cut through T */}
-        <path d="M85 65L165 25L165 155C165 169.912 152.912 182 138 182H110L85 155V65Z" fill="white"/>
-        {/* Green L with lift swoosh */}
-        <path d="M90 70L170 30L170 150C170 164.912 157.912 177 143 177H115C105.059 177 97 168.941 97 159L90 70Z" fill="#10b981"/>
-      </svg>
-      <div className="flex items-baseline gap-0">
-        <span className="text-xl font-bold text-slate-900">Term</span>
-        <span className="text-xl font-bold text-emerald-600">Lift</span>
-      </div>
+    <Link href="/" className="flex items-center gap-2">
+      <Image
+        src="/termlift-logo.png"
+        alt="TermLift"
+        width={180}
+        height={60}
+        className="h-8 w-auto"
+        priority
+      />
     </Link>
   )
 
