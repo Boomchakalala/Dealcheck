@@ -54,15 +54,13 @@ export async function POST(request: Request) {
     }
 
     // Analyze with V1 (full text analysis - catches everything)
-    // Now with optional structured quote data for better table comprehension
     const output = await analyzeDeal(
       extractedText,
       dealType || 'New',
       goal,
       notes,
       undefined,
-      imageData,
-      structuredQuote
+      imageData
     )
 
     return NextResponse.json({
