@@ -285,12 +285,12 @@ This quote expires in 14 days.`
     <div className="min-h-screen bg-white">
       <UnifiedHeader variant="public" />
 
-      <main className="max-w-4xl mx-auto px-5 sm:px-8 py-12">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">
+      <main className="max-w-4xl mx-auto px-4 sm:px-5 md:px-8 py-8 sm:py-12">
+        <div className="text-center mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
             Analyze a quote — free, no signup
           </h1>
-          <p className="text-base text-slate-600">
+          <p className="text-sm sm:text-base text-slate-600">
             Drop a file or paste text. We&apos;ll extract pricing + terms and generate a negotiation strategy.
           </p>
         </div>
@@ -315,17 +315,17 @@ This quote expires in 14 days.`
         />
 
         {/* Demo text + example links */}
-        <div className="my-5 flex items-center justify-center gap-3">
+        <div className="my-4 sm:my-5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
           <button
             onClick={handleUseDemoText}
             disabled={uploading || analyzing}
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 disabled:opacity-50 transition-all"
+            className="w-full sm:w-auto px-4 py-2 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 disabled:opacity-50 transition-all"
           >
             Try with demo text
           </button>
           <Link
             href="/example"
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all"
+            className="w-full sm:w-auto px-4 py-2 text-xs sm:text-sm font-medium rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all text-center"
           >
             See a demo first
           </Link>
