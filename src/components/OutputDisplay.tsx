@@ -10,7 +10,10 @@ interface OutputDisplayProps {
 }
 
 export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
-  const [expandedFlags, setExpandedFlags] = useState<number[]>([0])
+  const [expandedFlags, setExpandedFlags] = useState<number[]>(
+    // Expand all flags by default
+    Array.from({ length: output.red_flags?.length || 0 }, (_, i) => i)
+  )
   const [showAssumptions, setShowAssumptions] = useState(false)
   const [showSolid, setShowSolid] = useState(true)
   const [showRedFlags, setShowRedFlags] = useState(true) // Always visible by default
