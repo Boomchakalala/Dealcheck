@@ -467,9 +467,34 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                             </div>
                             <p className="text-base font-bold text-pink-900 mb-1">
                               {(() => {
-                                // Extract dollar amounts from why_it_matters
-                                const dollarMatch = flag.why_it_matters.match(/\$[\d,]+[KkMm]?(?:\+)?(?:\/(?:year|month|annually))?/)
-                                return dollarMatch ? dollarMatch[0].replace('/year', ' annually').replace('/month', ' monthly') : 'Cost exposure'
+                                // Extract dollar amounts - find all matches and pick the largest
+                                const matches = flag.why_it_matters.match(/\$[\d,]+(?:,\d{3})*(?:K|k|M|m)?(?:\+)?/g)
+                                if (!matches || matches.length === 0) return 'Cost exposure'
+
+                                // Convert to numbers and find max
+                                const amounts = matches.map(m => {
+                                  let num = m.replace(/[$,]/g, '')
+                                  if (num.match(/[Kk]/)) {
+                                    num = parseFloat(num.replace(/[Kk]/g, '')) * 1000
+                                  } else if (num.match(/[Mm]/)) {
+                                    num = parseFloat(num.replace(/[Mm]/g, '')) * 1000000
+                                  } else {
+                                    num = parseFloat(num)
+                                  }
+                                  return { original: m, value: num }
+                                })
+
+                                const largest = amounts.reduce((max, curr) => curr.value > max.value ? curr : max)
+                                let display = largest.original
+
+                                // Add context from surrounding text
+                                if (flag.why_it_matters.includes('annually') || flag.why_it_matters.includes('/year')) {
+                                  display += ' annually'
+                                } else if (flag.why_it_matters.includes('monthly') || flag.why_it_matters.includes('/month')) {
+                                  display += ' monthly'
+                                }
+
+                                return display
                               })()}
                             </p>
                             <p className="text-xs text-pink-800 leading-relaxed">
