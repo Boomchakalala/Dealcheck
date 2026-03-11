@@ -66,7 +66,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
   const formatSavings = (amount: number) => {
     if (amount >= 1000) {
-      return `$${(amount / 1000).toFixed(0)}`
+      return `$${(amount / 1000).toFixed(1)}K`
     }
     return `$${amount.toLocaleString()}`
   }
@@ -428,36 +428,6 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
                     {isExpanded && (
                       <div className="px-5 pb-5 border-t-2 border-slate-200 pt-5 bg-white">
-                        {/* Risk Level, Potential Impact, Timeline boxes */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-                          <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <TrendingDown className="w-4 h-4 text-orange-600" />
-                              <p className="text-xs font-bold text-orange-800 uppercase tracking-wide">Risk Level</p>
-                            </div>
-                            <p className="text-base font-bold text-orange-900 mb-1">High</p>
-                            <p className="text-xs text-orange-800 leading-relaxed">If usage spikes, costs become unpredictable</p>
-                          </div>
-
-                          <div className="bg-pink-50 border-2 border-pink-200 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <DollarSign className="w-4 h-4 text-pink-600" />
-                              <p className="text-xs font-bold text-pink-800 uppercase tracking-wide">Potential Impact</p>
-                            </div>
-                            <p className="text-base font-bold text-pink-900 mb-1">$50K+ annually</p>
-                            <p className="text-xs text-pink-800 leading-relaxed">Based on typical usage patterns</p>
-                          </div>
-
-                          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Clock className="w-4 h-4 text-blue-600" />
-                              <p className="text-xs font-bold text-blue-800 uppercase tracking-wide">Timeline</p>
-                            </div>
-                            <p className="text-base font-bold text-blue-900 mb-1">Address now</p>
-                            <p className="text-xs text-blue-800 leading-relaxed">Before contract signing</p>
-                          </div>
-                        </div>
-
                         {/* Tabs */}
                         <div className="space-y-3">
                           <div className="flex gap-3">
