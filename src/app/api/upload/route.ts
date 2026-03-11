@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { extractText } from '@/lib/extract'
+import { extractStructuredQuote } from '@/lib/extract-structured'
 
 // CRITICAL: pdf-parse requires Node.js runtime
 export const runtime = 'nodejs'
@@ -27,23 +28,41 @@ export async function POST(request: Request) {
       )
     }
 
-    // For images and PDFs, use vision API to preserve layout and tables
-    // Vision API can "see" the document structure like a human
     const buffer = Buffer.from(await file.arrayBuffer())
-    const base64 = buffer.toString('base64')
 
+    // NEW PIPELINE: For PDFs, convert to images and extract structured data
+    if (file.type === 'application/pdf') {
+      try {
+        const structuredQuote = await extractStructuredQuote(buffer)
+
+        return NextResponse.json({
+          useStructuredExtraction: true,
+          structuredQuote,
+          // Fallback text extraction in case vision fails
+          extractedText: await extractText(file).catch(() => ''),
+        })
+      } catch (error) {
+        console.error('Structured extraction failed, falling back to text:', error)
+        // Fallback to old text extraction if vision fails
+        const extractedText = await extractText(file)
+        return NextResponse.json({
+          useStructuredExtraction: false,
+          extractedText,
+        })
+      }
+    }
+
+    // For images, send directly to vision API
+    const base64 = buffer.toString('base64')
     return NextResponse.json({
       useVision: true,
       imageData: {
         base64,
         mimeType: file.type,
       },
-      // Also provide extracted text as fallback for PDFs
-      extractedText: file.type === 'application/pdf' ? await extractText(file).catch(() => '') : undefined,
     })
   } catch (error) {
     console.error('Upload error:', error)
-    // Log full error for debugging, but don't expose to client
     return NextResponse.json({
       error: 'Failed to process file. Please try a different file or contact support.'
     }, { status: 500 })

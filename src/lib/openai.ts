@@ -1,7 +1,8 @@
 import OpenAI from 'openai'
 import { DealOutputSchema, DealOutputSchemaV2, type DealOutputType, type DealOutputTypeV2 } from './schemas'
 import type { DealOutput, DealOutputV2 } from '@/types'
-import type { ExtractedQuote } from './extract-normalize'
+import type { ExtractedQuote } from './extract-normalized'
+import type { ExtractedQuote as StructuredQuote } from './extract-structured'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
