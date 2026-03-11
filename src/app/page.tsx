@@ -213,16 +213,16 @@ export default function LandingPage() {
             {/* Example Selector with clear labels */}
             <div className="text-center mb-6">
               <p className="text-sm font-semibold text-slate-700 mb-3">See how it works with real examples:</p>
-              <div className="flex justify-center gap-2">
+              <div className="flex flex-col sm:flex-row justify-center gap-2 px-4 sm:px-0">
                 {[
-                  { key: 'marketing', label: 'Marketing Agency', desc: '$96K annual contract' },
+                  { key: 'marketing', label: 'Marketing Agency', desc: '$96K annual' },
                   { key: 'saas', label: 'Email SaaS', desc: '$3.6K renewal' },
-                  { key: 'supplies', label: 'Office Supplies', desc: '$30K annual spend' },
+                  { key: 'supplies', label: 'Office Supplies', desc: '$30K annual' },
                 ].map((ex) => (
                   <button
                     key={ex.key}
                     onClick={() => setSelectedExample(ex.key as any)}
-                    className={`px-4 py-3 text-sm font-semibold rounded-lg transition-all ${
+                    className={`flex-1 sm:flex-initial px-4 py-3 text-sm font-semibold rounded-lg transition-all ${
                       selectedExample === ex.key
                         ? 'bg-emerald-600 text-white shadow-md'
                         : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-300'
@@ -236,19 +236,19 @@ export default function LandingPage() {
             </div>
 
             {/* Current example info */}
-            <div className="bg-slate-50 rounded-lg border-2 border-slate-200 p-4 mb-4">
-              <div className="flex items-center justify-between">
+            <div className="bg-slate-50 rounded-lg border-2 border-slate-200 p-3 sm:p-4 mb-4 mx-4 sm:mx-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                 <div>
-                  <h3 className="font-bold text-slate-900 text-base">{currentExample.title}</h3>
-                  <p className="text-sm text-slate-600 mt-1">{currentExample.vendor} • {currentExample.snapshot.total_commitment}</p>
+                  <h3 className="font-bold text-slate-900 text-sm sm:text-base">{currentExample.title}</h3>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1">{currentExample.vendor} • {currentExample.snapshot.total_commitment}</p>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 whitespace-nowrap">
                   Example {selectedExample === 'marketing' ? '1' : selectedExample === 'saas' ? '2' : '3'}
                 </span>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden">
+            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden mx-4 sm:mx-0">
               {/* Tab Headers */}
               <div className="flex border-b border-slate-200 bg-slate-50">
                 <button
@@ -259,7 +259,8 @@ export default function LandingPage() {
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  Red flags to address
+                  <span className="hidden sm:inline">Red flags to address</span>
+                  <span className="sm:hidden">Red flags</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('terms')}
@@ -269,7 +270,8 @@ export default function LandingPage() {
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  Negotiation plan
+                  <span className="hidden sm:inline">Negotiation plan</span>
+                  <span className="sm:hidden">Strategy</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('emails')}
@@ -279,29 +281,30 @@ export default function LandingPage() {
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  Email drafts
+                  <span className="hidden sm:inline">Email drafts</span>
+                  <span className="sm:hidden">Email</span>
                 </button>
               </div>
 
               {/* Tab Content */}
-              <div className="p-4 sm:p-8">
+              <div className="p-3 sm:p-8">
                 {activeTab === 'price' && (
                   <div>
                     {/* Styled to match real red flag cards in OutputDisplay */}
                     {currentExample.red_flags.slice(0, 2).map((flag, idx) => (
-                      <div key={idx} className={`bg-white rounded-xl border border-red-200 p-5 ${idx === 0 ? 'mb-4' : ''}`}>
+                      <div key={idx} className={`bg-white rounded-xl border border-red-200 p-4 sm:p-5 ${idx === 0 ? 'mb-3 sm:mb-4' : ''}`}>
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">{flag.type}</span>
                         </div>
-                        <h3 className="font-bold text-slate-900 text-sm mb-1">{flag.issue}</h3>
-                        <p className="text-xs text-slate-600">{flag.why_it_matters}</p>
+                        <h3 className="font-bold text-slate-900 text-xs sm:text-sm mb-1">{flag.issue}</h3>
+                        <p className="text-xs text-slate-600 leading-relaxed">{flag.why_it_matters}</p>
                         <div className="mt-3 bg-emerald-50 rounded-lg border border-emerald-200 p-3">
                           <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">What to ask for</p>
-                          <p className="text-sm text-slate-700">{flag.what_to_ask_for}</p>
+                          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">{flag.what_to_ask_for}</p>
                         </div>
                       </div>
                     ))}
-                    <p className="text-sm text-slate-500 mt-6 italic">
+                    <p className="text-xs sm:text-sm text-slate-500 mt-4 sm:mt-6 italic">
                       Every flag comes with exactly what to say — and a fallback if they push back.
                     </p>
                   </div>
@@ -310,76 +313,76 @@ export default function LandingPage() {
                 {activeTab === 'terms' && (
                   <div>
                     {/* 3-column grid matching OutputDisplay exactly */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
                       {/* Push For - LEFT */}
-                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
-                        <div className="flex items-center gap-2.5 mb-4">
-                          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 sm:p-5">
+                        <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
+                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
-                          <h4 className="text-base font-bold text-slate-900">Push For</h4>
+                          <h4 className="text-sm sm:text-base font-bold text-slate-900">Push For</h4>
                         </div>
-                        <div className="space-y-2.5">
+                        <div className="space-y-2 sm:space-y-2.5">
                           {currentExample.what_to_ask_for.must_have.map((item, idx) => (
-                            <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3">
+                            <div key={idx} className="bg-white border border-slate-200 rounded-lg p-2.5 sm:p-3">
                               {idx === 0 && (
                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white mb-2">
                                   MUST-HAVE
                                 </span>
                               )}
-                              <p className="text-sm text-slate-800 leading-relaxed font-medium">{item}</p>
+                              <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">{item}</p>
                             </div>
                           ))}
                           {currentExample.what_to_ask_for.nice_to_have?.slice(0, 1).map((item, idx) => (
-                            <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3">
+                            <div key={idx} className="bg-white border border-slate-200 rounded-lg p-2.5 sm:p-3">
                               <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-400 text-white mb-2">
                                 NICE-TO-HAVE
                               </span>
-                              <p className="text-sm text-slate-700 leading-relaxed">{item}</p>
+                              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">{item}</p>
                             </div>
                           ))}
                         </div>
                       </div>
 
                       {/* Your Leverage - MIDDLE */}
-                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
-                        <div className="flex items-center gap-2.5 mb-4">
-                          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 sm:p-5">
+                        <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
+                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
                           </div>
-                          <h4 className="text-base font-bold text-slate-900">Your Leverage</h4>
+                          <h4 className="text-sm sm:text-base font-bold text-slate-900">Your Leverage</h4>
                         </div>
-                        <ul className="space-y-2.5">
+                        <ul className="space-y-2 sm:space-y-2.5">
                           {currentExample.negotiation_plan.leverage_you_have.map((item, idx) => (
-                            <li key={idx} className="bg-white border border-slate-200 rounded-lg p-3 flex items-start gap-2.5">
-                              <svg className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <li key={idx} className="bg-white border border-slate-200 rounded-lg p-2.5 sm:p-3 flex items-start gap-2.5">
+                              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                               </svg>
-                              <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
+                              <span className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
 
                       {/* Can Offer - RIGHT */}
-                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
-                        <div className="flex items-center gap-2.5 mb-4">
-                          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 sm:p-5">
+                        <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
+                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
                           </div>
-                          <h4 className="text-base font-bold text-slate-900">Can Offer</h4>
+                          <h4 className="text-sm sm:text-base font-bold text-slate-900">Can Offer</h4>
                         </div>
-                        <ul className="space-y-2.5">
+                        <ul className="space-y-2 sm:space-y-2.5">
                           {currentExample.negotiation_plan.trades_you_can_offer.map((item, idx) => (
-                            <li key={idx} className="bg-white border border-slate-200 rounded-lg p-3 flex items-start gap-2.5">
-                              <span className="text-slate-400 mt-0.5 flex-shrink-0 text-base">↔</span>
-                              <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
+                            <li key={idx} className="bg-white border border-slate-200 rounded-lg p-2.5 sm:p-3 flex items-start gap-2.5">
+                              <span className="text-slate-400 mt-0.5 flex-shrink-0 text-sm sm:text-base">↔</span>
+                              <span className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
                             </li>
                           ))}
                         </ul>
@@ -389,14 +392,14 @@ export default function LandingPage() {
                 )}
 
                 {activeTab === 'emails' && (
-                  <div className="space-y-5">
+                  <div className="space-y-4 sm:space-y-5">
                     {/* Email Tone Selector - matching OutputDisplay */}
                     <div>
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-1">
                         <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email Tone</label>
                         <span className="text-xs text-slate-600">Choose your approach</span>
                       </div>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
                         {[
                           { label: 'Friendly', desc: 'Warm & collaborative' },
                           { label: 'Direct', desc: 'Clear & focused' },
@@ -404,19 +407,19 @@ export default function LandingPage() {
                         ].map((tab, idx) => (
                           <button
                             key={idx}
-                            className={`relative px-4 py-3.5 rounded-lg border-2 transition-all ${
+                            className={`relative px-2 sm:px-4 py-2.5 sm:py-3.5 rounded-lg border-2 transition-all ${
                               idx === 0
                                 ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-200'
                                 : 'bg-white border-slate-200 hover:border-slate-300'
                             }`}
                           >
                             <div className="text-center">
-                              <div className="text-sm font-bold text-slate-900 mb-0.5">{tab.label}</div>
-                              <div className="text-xs text-slate-600">{tab.desc}</div>
+                              <div className="text-xs sm:text-sm font-bold text-slate-900 mb-0.5">{tab.label}</div>
+                              <div className="text-[10px] sm:text-xs text-slate-600 hidden sm:block">{tab.desc}</div>
                             </div>
                             {idx === 0 && (
-                              <div className="absolute top-2 right-2">
-                                <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <div className="absolute top-1 right-1 sm:top-2 sm:right-2">
+                                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                               </div>
@@ -433,30 +436,31 @@ export default function LandingPage() {
                         type="text"
                         value={currentExample.email_drafts.neutral.subject}
                         readOnly
-                        className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg shadow-sm bg-white font-medium"
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm border-2 border-slate-200 rounded-lg shadow-sm bg-white font-medium"
                       />
                     </div>
 
                     {/* Email Body */}
                     <div>
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-2">
                         <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email Body</label>
                         <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                           </svg>
-                          Copy to clipboard
+                          <span className="hidden sm:inline">Copy to clipboard</span>
+                          <span className="sm:hidden">Copy</span>
                         </button>
                       </div>
                       <textarea
                         value={currentExample.email_drafts.neutral.body}
                         readOnly
-                        rows={12}
-                        className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg resize-none leading-relaxed shadow-sm bg-white"
+                        rows={10}
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm border-2 border-slate-200 rounded-lg resize-none leading-relaxed shadow-sm bg-white"
                       />
                     </div>
 
-                    <p className="text-sm text-slate-500 italic">
+                    <p className="text-xs sm:text-sm text-slate-500 italic">
                       All 3 tones ready to copy. Edit directly or regenerate with AI.
                     </p>
                   </div>
