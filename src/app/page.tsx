@@ -210,6 +210,27 @@ export default function LandingPage() {
 
           {/* Premium Demo Card with Tabs */}
           <div className="max-w-4xl mx-auto">
+            {/* Example Selector */}
+            <div className="flex justify-center gap-2 mb-4">
+              {[
+                { key: 'marketing', label: 'Marketing Agency' },
+                { key: 'saas', label: 'SaaS Tool' },
+                { key: 'supplies', label: 'Office Supplies' },
+              ].map((ex) => (
+                <button
+                  key={ex.key}
+                  onClick={() => setSelectedExample(ex.key as any)}
+                  className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                    selectedExample === ex.key
+                      ? 'bg-emerald-600 text-white shadow-md'
+                      : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-300'
+                  }`}
+                >
+                  {ex.label}
+                </button>
+              ))}
+            </div>
+
             <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden">
               {/* Tab Headers */}
               <div className="flex border-b border-slate-200 bg-slate-50">
@@ -250,24 +271,19 @@ export default function LandingPage() {
                 {activeTab === 'price' && (
                   <div>
                     {/* Styled to match real red flag cards in OutputDisplay */}
-                    <div className="bg-white rounded-xl border border-red-200 p-5 mb-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Commercial</span>
+                    {currentExample.red_flags.slice(0, 2).map((flag, idx) => (
+                      <div key={idx} className={`bg-white rounded-xl border border-red-200 p-5 ${idx === 0 ? 'mb-4' : ''}`}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">{flag.type}</span>
+                        </div>
+                        <h3 className="font-bold text-slate-900 text-sm mb-1">{flag.issue}</h3>
+                        <p className="text-xs text-slate-600">{flag.why_it_matters}</p>
+                        <div className="mt-3 bg-emerald-50 rounded-lg border border-emerald-200 p-3">
+                          <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">What to ask</p>
+                          <p className="text-sm text-slate-700">{flag.what_to_ask_for}</p>
+                        </div>
                       </div>
-                      <h3 className="font-bold text-slate-900 text-sm mb-1">No volume discount at 200+ users</h3>
-                      <p className="text-xs text-slate-600">You're paying full $12.50/user list price at 200 users. A 20% volume discount would save $6,000/year.</p>
-                      <div className="mt-3 bg-emerald-50 rounded-lg border border-emerald-200 p-3">
-                        <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">What to ask</p>
-                        <p className="text-sm text-slate-700">Request 20% volume discount for 200+ user commitment. Target $10/user/month.</p>
-                      </div>
-                    </div>
-                    <div className="bg-white rounded-xl border border-red-200 p-5">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">Commercial</span>
-                      </div>
-                      <h3 className="font-bold text-slate-900 text-sm mb-1">Paying for 200 seats regardless of actual usage</h3>
-                      <p className="text-xs text-slate-600">If 40 seats are underutilized, that's $6,000/year wasted on inactive licenses. Switch to quarterly true-up where you pay for active users only.</p>
-                    </div>
+                    ))}
                     <p className="text-sm text-slate-500 mt-6 italic">
                       Every flag comes with exactly what to say — and a fallback if they push back.
                     </p>
@@ -280,11 +296,7 @@ export default function LandingPage() {
                     <div className="mb-5">
                       <h3 className="text-sm font-semibold text-slate-700 mb-2">Leverage you have</h3>
                       <ul className="space-y-1.5">
-                        {[
-                          "You're an existing customer — they want to keep your revenue and won't risk losing you",
-                          "Microsoft Teams included with Office 365 — credible alternative at no additional cost",
-                          'Renewal timing gives you leverage (they need to hit quarter targets)',
-                        ].map((item, idx) => (
+                        {currentExample.negotiation_plan.leverage_you_have.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
                             <svg className="w-3.5 h-3.5 text-emerald-600 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -300,11 +312,7 @@ export default function LandingPage() {
                         <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-200">Must-have</span>
                       </div>
                       <div className="space-y-2">
-                        {[
-                          'Negotiate 20% volume discount at 200-user commitment — target $10/user/month (saves $6K annually)',
-                          'Request quarterly true-up instead of fixed seats — pay only for active users (eliminates seat waste)',
-                          'Lock in 2-year pricing — prevents future price increases',
-                        ].map((ask, idx) => (
+                        {currentExample.what_to_ask_for.must_have.map((ask, idx) => (
                           <div key={idx} className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200 shadow-sm">
                             <p className="text-sm text-slate-800 font-semibold">{ask}</p>
                           </div>
@@ -331,13 +339,11 @@ export default function LandingPage() {
                     <div className="rounded-xl border-2 border-slate-200 overflow-hidden bg-gradient-to-br from-slate-50 to-white shadow-sm">
                       <div className="px-5 py-3 bg-slate-50 border-b-2 border-slate-200">
                         <p className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Subject line</p>
-                        <p className="text-sm font-semibold text-slate-900">Slack Business+ Renewal - Pricing Discussion</p>
+                        <p className="text-sm font-semibold text-slate-900">{currentExample.email_drafts.neutral.subject}</p>
                       </div>
                       <div className="p-5">
-                        <p className="text-sm text-slate-700 leading-relaxed">
-                          Hi [Account Manager],<br /><br />
-                          Thanks for the Slack renewal quote. We're planning to continue, but I'd like to discuss the pricing before we finalize. At $12.50/user for 200 users, could we revisit this? We'd expect something closer to $10/user at this commitment level...<br /><br />
-                          <span className="text-slate-400">[Volume discount and seat flexibility requests included]</span>
+                        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                          {currentExample.email_drafts.neutral.body.slice(0, 300)}...
                         </p>
                       </div>
                     </div>
