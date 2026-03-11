@@ -658,8 +658,7 @@ export async function analyzeDeal(
   goal?: string,
   notes?: string,
   previousRoundOutput?: DealOutput,
-  imageData?: { base64: string; mimeType: string },
-  structuredQuote?: StructuredQuote
+  imageData?: { base64: string; mimeType: string }
 ): Promise<DealOutputType> {
   const contextParts = [
     `Deal Type: ${dealType}`,
@@ -668,39 +667,9 @@ export async function analyzeDeal(
     previousRoundOutput && `Previous Round Context: ${JSON.stringify(previousRoundOutput, null, 2)}`,
   ].filter(Boolean)
 
-  // If we have structured extraction, format it nicely for analysis
-  let quoteContent = extractedText
-
-  if (structuredQuote) {
-    quoteContent = `STRUCTURED QUOTE DATA:
-
-Vendor: ${structuredQuote.vendor_name}
-${structuredQuote.quote_date ? `Quote Date: ${structuredQuote.quote_date}` : ''}
-${structuredQuote.contract_length ? `Contract Length: ${structuredQuote.contract_length}` : ''}
-
-PRICING TABLE:
-${structuredQuote.pricing_table_items.map((item, idx) =>
-  `${idx + 1}. ${item.item_name}${item.quantity ? ` (Qty: ${item.quantity})` : ''}
-   ${item.description ? `   Description: ${item.description}` : ''}
-   ${item.unit_price ? `Unit Price: ${item.unit_price} | ` : ''}Total: ${item.total_price}${item.billing_frequency ? ` (${item.billing_frequency})` : ''}`
-).join('\n\n')}
-
-TOTALS:
-${structuredQuote.totals.subtotal ? `Subtotal: ${structuredQuote.totals.subtotal}` : ''}
-${structuredQuote.totals.tax ? `Tax: ${structuredQuote.totals.tax}` : ''}
-Total: ${structuredQuote.totals.total} ${structuredQuote.totals.currency || ''}
-
-${structuredQuote.payment_terms ? `Payment Terms: ${structuredQuote.payment_terms}` : ''}
-${structuredQuote.additional_terms && structuredQuote.additional_terms.length > 0 ? `Additional Terms:\n${structuredQuote.additional_terms.map(t => `• ${t}`).join('\n')}` : ''}
-${structuredQuote.validity_period ? `Quote Validity: ${structuredQuote.validity_period}` : ''}
-
----
-Original extracted text (fallback):\n${extractedText}`
-  }
-
   const userPrompt = imageData
     ? contextParts.join('\n\n') + '\n\nPlease analyze the quote/contract shown in the image.'
-    : contextParts.join('\n\n') + `\n\nSupplier Document/Quote:\n${quoteContent}`
+    : contextParts.join('\n\n') + `\n\nSupplier Document/Quote:\n${extractedText}`
 
   try {
     const messages: any[] = [
