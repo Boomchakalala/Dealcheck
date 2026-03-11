@@ -1,6 +1,13 @@
-import { pdfToPng } from 'pdf-to-png-converter'
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf'
 import OpenAI from 'openai'
 import { z } from 'zod'
+
+// Set worker path for pdfjs
+if (typeof window === 'undefined') {
+  // Server-side: use built-in worker
+  const pdfjsWorker = require('pdfjs-dist/legacy/build/pdf.worker.entry')
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
+}
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -37,27 +44,44 @@ export const ExtractedQuoteSchema = z.object({
 export type ExtractedQuote = z.infer<typeof ExtractedQuoteSchema>
 
 /**
- * Convert PDF to images (one per page)
+ * Convert PDF to images (one per page) using PDF.js
  */
 export async function pdfToImages(pdfBuffer: Buffer): Promise<string[]> {
   try {
-    console.log('📄 Converting PDF to images...')
+    console.log('📄 Converting PDF to images with PDF.js...')
 
-    const pngPages = await pdfToPng(pdfBuffer, {
-      disableFontFace: false,
-      useSystemFonts: false,
-      viewportScale: 2.0, // Higher quality
-    })
+    const loadingTask = pdfjsLib.getDocument({ data: pdfBuffer })
+    const pdfDocument = await loadingTask.promise
 
-    const base64Images = pngPages.map((page) => {
-      return page.content.toString('base64')
-    })
+    const numPages = pdfDocument.numPages
+    const images: string[] = []
 
-    console.log(`✅ Converted PDF to ${base64Images.length} images`)
-    return base64Images
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      const page = await pdfDocument.getPage(pageNum)
+      const viewport = page.getViewport({ scale: 2.0 }) // Higher scale = better quality
+
+      // Create canvas
+      const canvas = {
+        width: viewport.width,
+        height: viewport.height,
+      }
+
+      // For server-side, we'll use PDF.js text layer instead
+      // Vision API works better with actual renders, but this is a simplified approach
+      // In production, you'd want to use a proper canvas library or cloud rendering service
+
+      console.log(`Processed page ${pageNum}/${numPages}`)
+
+      // For now, since we can't easily render in serverless, let's fall back to text extraction
+      // and enhance it with better structure preservation
+      throw new Error('PDF rendering not available in serverless - using fallback extraction')
+    }
+
+    console.log(`✅ Converted PDF to ${images.length} images`)
+    return images
   } catch (error) {
     console.error('PDF to image conversion error:', error)
-    throw new Error('Failed to convert PDF to images')
+    throw error
   }
 }
 
@@ -131,11 +155,7 @@ Return structured JSON only.`,
  * Main function: convert PDF to structured quote data
  */
 export async function extractStructuredQuote(pdfBuffer: Buffer): Promise<ExtractedQuote> {
-  // Step 1: Convert PDF pages to images
-  const images = await pdfToImages(pdfBuffer)
-
-  // Step 2: Use GPT-4 Vision to extract structured data
-  const structured = await extractStructuredFromImages(images)
-
-  return structured
+  // For now, we can't easily render PDFs to images in serverless without canvas
+  // This will throw and trigger the fallback in the upload route
+  throw new Error('PDF-to-image rendering not available in serverless environment - using fallback text extraction')
 }
