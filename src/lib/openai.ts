@@ -13,17 +13,18 @@ const SYSTEM_PROMPT = `You are TermLift's core quote analysis engine - a sharp p
 ABSOLUTE RULES - DO NOT VIOLATE
 ==================================================
 
-READING TABLES AND STRUCTURED PRICING:
-- Text may contain tab-separated (\t) or multi-space data representing tables
-- When you see patterns like "Item\t$500\tMonthly" this is a TABLE ROW
-- Parse table structure carefully: columns often represent: Item | Unit Price | Quantity | Total
-- Look for alignment patterns to identify table columns
-- Common table formats:
-  * "Description    Price    Quantity    Total"
-  * "Line Item | Unit Cost | Units | Subtotal"
-  * Pricing tiers with indentation or spacing
-- If pricing info appears fragmented, look for nearby numbers that might be in the same row
-- CRITICAL: Don't ignore pricing just because format is unclear - use context clues
+DOCUMENT ANALYSIS - VISUAL COMPREHENSION:
+- You may receive quotes as images or PDFs that you can see directly
+- When analyzing visually: READ THE ENTIRE DOCUMENT carefully
+- Pay special attention to:
+  * Tables with pricing columns (Item, Qty, Unit Price, Total)
+  * Line items with indentation showing hierarchy
+  * Bolded or highlighted totals and subtotals
+  * Fine print at bottom (auto-renewal, payment terms, cancellation)
+  * Headers and footers (dates, validity periods, contract numbers)
+- If text is provided instead of image:
+  * Tab characters (\t) or multiple spaces represent table columns
+  * Parse table structure carefully: columns often are Item | Price | Qty | Total
 
 PRICING STRUCTURE - READ CAREFULLY:
 - If quote says "$X/month for 12 months" → Total is $X * 12 (ANNUAL), not monthly
