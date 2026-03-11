@@ -309,65 +309,154 @@ export default function LandingPage() {
 
                 {activeTab === 'terms' && (
                   <div>
-                    {/* Must-have asks */}
-                    <div className="mb-5">
-                      <div className="flex items-center gap-2 mb-3">
-                        <h3 className="text-base font-semibold text-slate-900">What to push for</h3>
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">Must-have</span>
-                      </div>
-                      <div className="space-y-2">
-                        {currentExample.what_to_ask_for.must_have.map((ask, idx) => (
-                          <div key={idx} className="p-4 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200 shadow-sm">
-                            <p className="text-sm text-slate-800 font-medium leading-relaxed">{ask}</p>
+                    {/* 3-column grid matching OutputDisplay exactly */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                      {/* Push For - LEFT */}
+                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
+                        <div className="flex items-center gap-2.5 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
                           </div>
-                        ))}
+                          <h4 className="text-base font-bold text-slate-900">Push For</h4>
+                        </div>
+                        <div className="space-y-2.5">
+                          {currentExample.what_to_ask_for.must_have.map((item, idx) => (
+                            <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3">
+                              {idx === 0 && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white mb-2">
+                                  MUST-HAVE
+                                </span>
+                              )}
+                              <p className="text-sm text-slate-800 leading-relaxed font-medium">{item}</p>
+                            </div>
+                          ))}
+                          {currentExample.what_to_ask_for.nice_to_have?.slice(0, 1).map((item, idx) => (
+                            <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-400 text-white mb-2">
+                                NICE-TO-HAVE
+                              </span>
+                              <p className="text-sm text-slate-700 leading-relaxed">{item}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Leverage section */}
-                    <div className="mb-5">
-                      <h3 className="text-sm font-semibold text-slate-700 mb-2">Your leverage</h3>
-                      <ul className="space-y-1.5">
-                        {currentExample.negotiation_plan.leverage_you_have.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-slate-600 leading-relaxed">
-                            <svg className="w-3.5 h-3.5 text-emerald-600 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      {/* Your Leverage - MIDDLE */}
+                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
+                        <div className="flex items-center gap-2.5 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                          </div>
+                          <h4 className="text-base font-bold text-slate-900">Your Leverage</h4>
+                        </div>
+                        <ul className="space-y-2.5">
+                          {currentExample.negotiation_plan.leverage_you_have.map((item, idx) => (
+                            <li key={idx} className="bg-white border border-slate-200 rounded-lg p-3 flex items-start gap-2.5">
+                              <svg className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                              <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
 
-                    <p className="text-sm text-slate-500 italic">
-                      Plus trades you can offer to make it easier for them to say yes.
-                    </p>
+                      {/* Can Offer - RIGHT */}
+                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
+                        <div className="flex items-center gap-2.5 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                          </div>
+                          <h4 className="text-base font-bold text-slate-900">Can Offer</h4>
+                        </div>
+                        <ul className="space-y-2.5">
+                          {currentExample.negotiation_plan.trades_you_can_offer.map((item, idx) => (
+                            <li key={idx} className="bg-white border border-slate-200 rounded-lg p-3 flex items-start gap-2.5">
+                              <span className="text-slate-400 mt-0.5 flex-shrink-0 text-base">↔</span>
+                              <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {activeTab === 'emails' && (
-                  <div>
-                    {/* Styled to match real email builder */}
-                    <div className="mb-4">
-                      <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">Email tone selector</label>
-                      <div className="flex gap-1.5 bg-slate-100 rounded-xl p-1.5 max-w-xs shadow-inner">
-                        <span className="flex-1 px-3 py-2 text-xs font-bold rounded-lg bg-white text-slate-900 shadow-md border border-slate-200 text-center">Friendly</span>
-                        <span className="flex-1 px-3 py-2 text-xs font-semibold rounded-lg text-slate-500 text-center">Direct</span>
-                        <span className="flex-1 px-3 py-2 text-xs font-semibold rounded-lg text-slate-500 text-center">Firm</span>
+                  <div className="space-y-5">
+                    {/* Email Tone Selector - matching OutputDisplay */}
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email Tone</label>
+                        <span className="text-xs text-slate-600">Choose your approach</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3">
+                        {[
+                          { label: 'Friendly', desc: 'Warm & collaborative' },
+                          { label: 'Direct', desc: 'Clear & focused' },
+                          { label: 'Firm', desc: 'Urgent & deadline-driven' }
+                        ].map((tab, idx) => (
+                          <button
+                            key={idx}
+                            className={`relative px-4 py-3.5 rounded-lg border-2 transition-all ${
+                              idx === 0
+                                ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-200'
+                                : 'bg-white border-slate-200 hover:border-slate-300'
+                            }`}
+                          >
+                            <div className="text-center">
+                              <div className="text-sm font-bold text-slate-900 mb-0.5">{tab.label}</div>
+                              <div className="text-xs text-slate-600">{tab.desc}</div>
+                            </div>
+                            {idx === 0 && (
+                              <div className="absolute top-2 right-2">
+                                <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                            )}
+                          </button>
+                        ))}
                       </div>
                     </div>
-                    <div className="rounded-xl border-2 border-slate-200 overflow-hidden bg-gradient-to-br from-slate-50 to-white shadow-sm">
-                      <div className="px-5 py-3 bg-slate-50 border-b-2 border-slate-200">
-                        <p className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">Subject line</p>
-                        <p className="text-sm font-semibold text-slate-900">{currentExample.email_drafts.neutral.subject}</p>
-                      </div>
-                      <div className="p-5 max-h-64 overflow-y-auto">
-                        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                          {currentExample.email_drafts.neutral.body}
-                        </p>
-                      </div>
+
+                    {/* Subject Line */}
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 block">Subject Line</label>
+                      <input
+                        type="text"
+                        value={currentExample.email_drafts.neutral.subject}
+                        readOnly
+                        className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg shadow-sm bg-white font-medium"
+                      />
                     </div>
-                    <p className="text-sm text-slate-500 mt-6 italic">
+
+                    {/* Email Body */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email Body</label>
+                        <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copy to clipboard
+                        </button>
+                      </div>
+                      <textarea
+                        value={currentExample.email_drafts.neutral.body}
+                        readOnly
+                        rows={12}
+                        className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg resize-none leading-relaxed shadow-sm bg-white"
+                      />
+                    </div>
+
+                    <p className="text-sm text-slate-500 italic">
                       All 3 tones ready to copy. Edit directly or regenerate with AI.
                     </p>
                   </div>
