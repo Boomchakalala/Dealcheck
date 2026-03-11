@@ -25,138 +25,138 @@ export default function LandingPage() {
       <UnifiedHeader variant="landing" />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-24 pb-20 sm:pt-32 sm:pb-28">
+      <section className="relative overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-20 md:pt-32 md:pb-28">
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/30 via-white to-white pointer-events-none" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.08)_0%,transparent_70%)] pointer-events-none" />
 
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 relative">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-5 md:px-8 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
             {/* Left: Content */}
             <div>
-              <h1 className="text-3xl sm:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-6 leading-[1.15]">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-4 sm:mb-6 leading-[1.15]">
                 Better terms in minutes, not weeks.
               </h1>
-              <p className="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed">
                 Drop in a vendor quote. Get back exactly where you're overpaying, what to push for, and a ready-to-send email — before your next call.
               </p>
 
               {/* Benefits */}
-              <div className="space-y-3 mb-10">
+              <div className="space-y-2.5 sm:space-y-3 mb-8 sm:mb-10">
                 {[
                   'See exactly where you can save — hidden fees, inflated rates, unfavorable clauses',
                   'Get a negotiation playbook with the asks that actually move the needle',
                   'Send a polished supplier email in your tone, ready to copy and go',
                 ].map((text) => (
-                  <div key={text} className="flex items-center gap-3">
-                    <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div key={text} className="flex items-start gap-2.5 sm:gap-3">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-slate-700">{text}</span>
+                    <span className="text-sm sm:text-base text-slate-700">{text}</span>
                   </div>
                 ))}
               </div>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Link
                   href="/try"
-                  className="group inline-flex items-center justify-center px-8 py-4 text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                  className="group inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Analyze a quote free
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/example"
-                  className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border-2 border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md"
+                  className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border-2 border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md"
                 >
                   See a real example
                 </Link>
               </div>
 
-              <p className="text-xs text-slate-500 mt-4">No signup needed. Results in under 60 seconds.</p>
+              <p className="text-xs text-slate-500 mt-3 sm:mt-4">No signup needed. Results in under 60 seconds.</p>
             </div>
 
             {/* Right: Product Preview */}
-            <div className="relative lg:pl-8">
+            <div className="relative lg:pl-8 mt-8 lg:mt-0">
               {/* Decorative blur orbs */}
-              <div className="absolute -top-10 -right-10 w-64 h-64 bg-emerald-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
-              <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-teal-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
+              <div className="absolute -top-10 -right-10 w-40 h-40 sm:w-64 sm:h-64 bg-emerald-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 sm:w-64 sm:h-64 bg-teal-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
 
-              <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/60 overflow-hidden hover:shadow-[0_20px_70px_-10px_rgba(0,0,0,0.15)] transition-shadow duration-500">
+              <div className="relative bg-white rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200/60 overflow-hidden hover:shadow-[0_20px_70px_-10px_rgba(0,0,0,0.15)] transition-shadow duration-500">
                 {/* Mock browser chrome */}
-                <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-6 border-b border-slate-200">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                    <div className="w-3 h-3 rounded-full bg-green-400" />
+                <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 border-b border-slate-200">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400" />
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400" />
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400" />
                   </div>
-                  <div className="space-y-3">
-                    <div className="h-3 bg-slate-300 rounded w-3/4" />
-                    <div className="h-3 bg-slate-300 rounded w-1/2" />
+                  <div className="space-y-2 sm:space-y-3">
+                    <div className="h-2 sm:h-3 bg-slate-300 rounded w-3/4" />
+                    <div className="h-2 sm:h-3 bg-slate-300 rounded w-1/2" />
                   </div>
                 </div>
 
                 {/* Preview sections — labels match real OutputDisplay */}
-                <div className="p-6 space-y-4">
+                <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                   {/* Verdict with category */}
-                  <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full border border-amber-200">Negotiate before signing</span>
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">SaaS - Infrastructure</span>
+                  <div className="bg-amber-50 border-2 border-amber-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                      <span className="text-[9px] sm:text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 sm:py-1 rounded-full border border-amber-200">Negotiate before signing</span>
+                      <span className="text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">SaaS - Infrastructure</span>
                     </div>
-                    <div className="space-y-2">
-                      <div className="h-2 bg-amber-200 rounded w-full" />
-                      <div className="h-2 bg-amber-200 rounded w-4/5" />
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <div className="h-1.5 sm:h-2 bg-amber-200 rounded w-full" />
+                      <div className="h-1.5 sm:h-2 bg-amber-200 rounded w-4/5" />
                     </div>
                   </div>
 
                   {/* Red flags to address */}
-                  <div className="bg-white border-2 border-red-200 rounded-xl p-4">
-                    <p className="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
+                  <div className="bg-white border-2 border-red-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                    <p className="text-[10px] sm:text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
                       <span className="text-red-600">&#9888;</span> Red flags to address
-                      <span className="text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full border-2 border-red-200">3 issues</span>
+                      <span className="text-[9px] sm:text-[10px] font-bold text-red-700 bg-red-100 px-1.5 sm:px-2 py-0.5 rounded-full border-2 border-red-200">3 issues</span>
                     </p>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5 sm:space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                        <div className="h-2 bg-slate-200 rounded flex-1" />
+                        <div className="h-1.5 sm:h-2 bg-slate-200 rounded flex-1" />
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                        <div className="h-2 bg-slate-200 rounded flex-1" />
+                        <div className="h-1.5 sm:h-2 bg-slate-200 rounded flex-1" />
                       </div>
                     </div>
                   </div>
 
                   {/* Potential savings */}
-                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl p-4">
-                    <p className="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
+                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                    <p className="text-[10px] sm:text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
                       <span className="text-emerald-600">&#128176;</span> Potential savings
                     </p>
                     <div className="flex items-center justify-between mb-2">
-                      <div className="h-2 bg-emerald-200 rounded w-2/3" />
-                      <div className="h-2 bg-emerald-300 rounded w-16 font-bold" />
+                      <div className="h-1.5 sm:h-2 bg-emerald-200 rounded w-2/3" />
+                      <div className="h-1.5 sm:h-2 bg-emerald-300 rounded w-12 sm:w-16 font-bold" />
                     </div>
                     <div className="bg-gradient-to-br from-emerald-600 to-green-600 rounded-lg p-2 flex items-center justify-between">
-                      <div className="h-1.5 bg-white/40 rounded w-1/2" />
-                      <div className="h-2 bg-white rounded w-12" />
+                      <div className="h-1 sm:h-1.5 bg-white/40 rounded w-1/2" />
+                      <div className="h-1.5 sm:h-2 bg-white rounded w-10 sm:w-12" />
                     </div>
                   </div>
 
                   {/* Email builder */}
-                  <div className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-xl p-4 shadow-sm">
-                    <p className="text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
+                  <div className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm">
+                    <p className="text-[10px] sm:text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
                       <span className="text-emerald-600">&#9993;</span> Email drafts
                     </p>
-                    <div className="flex gap-1.5 mb-3 bg-slate-100 rounded-xl p-1">
-                      <span className="text-[10px] font-bold px-3 py-1.5 rounded-lg bg-white shadow-md border border-slate-200 text-slate-900">Friendly</span>
-                      <span className="text-[10px] font-semibold px-3 py-1.5 rounded-lg text-slate-500">Direct</span>
-                      <span className="text-[10px] font-semibold px-3 py-1.5 rounded-lg text-slate-500">Firm</span>
+                    <div className="flex gap-1 sm:gap-1.5 mb-2 sm:mb-3 bg-slate-100 rounded-lg sm:rounded-xl p-0.5 sm:p-1">
+                      <span className="text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg bg-white shadow-md border border-slate-200 text-slate-900">Friendly</span>
+                      <span className="text-[9px] sm:text-[10px] font-semibold px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-slate-500">Direct</span>
+                      <span className="text-[9px] sm:text-[10px] font-semibold px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-slate-500">Firm</span>
                     </div>
-                    <div className="space-y-2">
-                      <div className="h-2 bg-slate-200 rounded w-full" />
-                      <div className="h-2 bg-slate-200 rounded w-3/4" />
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <div className="h-1.5 sm:h-2 bg-slate-200 rounded w-full" />
+                      <div className="h-1.5 sm:h-2 bg-slate-200 rounded w-3/4" />
                     </div>
                   </div>
                 </div>
