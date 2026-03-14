@@ -220,7 +220,14 @@ function LoginForm() {
               </div>
 
               <div>
-                <Label htmlFor="password" className="text-sm font-medium text-slate-700">{t('login.password')}</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-sm font-medium text-slate-700">{t('login.password')}</Label>
+                  {!isSignUp && (
+                    <Link href="/reset-password" className="text-xs text-emerald-600 hover:text-emerald-700 transition-colors">
+                      {t('login.password') === 'Mot de passe' ? 'Mot de passe oublié ?' : 'Forgot password?'}
+                    </Link>
+                  )}
+                </div>
                 <Input
                   id="password"
                   type="password"

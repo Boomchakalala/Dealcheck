@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { SettingsClient } from '@/components/SettingsClient'
 import { formatCurrency, type Currency } from '@/lib/currency'
+import { getTranslations } from 'next-intl/server'
+import { cookies } from 'next/headers'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -10,6 +12,8 @@ export default async function SettingsPage() {
   if (!user) {
     redirect('/login')
   }
+
+  const t = await getTranslations()
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -51,7 +55,14 @@ export default async function SettingsPage() {
   const createdAt = new Date(user.created_at)
   const now = new Date()
   const monthsAgo = (now.getFullYear() - createdAt.getFullYear()) * 12 + (now.getMonth() - createdAt.getMonth())
-  const joinedAgo = monthsAgo === 0 ? 'This month' : monthsAgo === 1 ? '1 month ago' : `${monthsAgo} months ago`
+  const joinedAgo = monthsAgo === 0
+    ? t('time.thisMonth')
+    : monthsAgo === 1
+      ? t('time.oneMonthAgo')
+      : t('time.monthsAgo', { count: monthsAgo })
+
+  // Get locale for date formatting
+  const locale = (await cookies()).get('termlift_lang')?.value === 'fr' ? 'fr-FR' : 'en-US'
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
@@ -69,7 +80,7 @@ export default async function SettingsPage() {
         isAdmin={profile?.is_admin || false}
         baseCurrency={baseCurrency}
         totalSavings={formatCurrency(totalSavingsIdentified, baseCurrency)}
-        memberSince={createdAt.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+        memberSince={createdAt.toLocaleDateString(locale, { month: 'long', year: 'numeric' })}
         joinedAgo={joinedAgo}
         locale={profile?.locale || 'en'}
       />

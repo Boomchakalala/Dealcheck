@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
-import Link from 'next/link'
+import { AppFooter } from '@/components/AppFooter'
+import { FeedbackWidget } from '@/components/FeedbackWidget'
 
 export default async function AppLayout({
   children,
@@ -38,6 +39,8 @@ export default async function AppLayout({
       <main className="max-w-7xl mx-auto px-5 sm:px-8 py-10 flex-1 w-full">
         {children}
       </main>
+      <AppFooter />
+      <FeedbackWidget />
     </div>
   )
 }

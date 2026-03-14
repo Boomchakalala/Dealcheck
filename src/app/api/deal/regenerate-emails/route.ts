@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import { getClaudeResponse } from '@/lib/openai'
+import { getClaudeResponse, getLanguageInstruction } from '@/lib/openai'
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 const MAX_REGENERATIONS = 3
 
@@ -93,8 +94,12 @@ Return ONLY valid JSON (no markdown, no code fences):
   ]
 }`
 
+    // Determine locale from cookie
+    const locale = (await cookies()).get('termlift_lang')?.value || 'en'
+    const langInstruction = getLanguageInstruction(locale)
+
     const raw = (await getClaudeResponse({
-      system: 'You are a procurement negotiation expert. Write professional, effective emails. Return only valid JSON.',
+      system: 'You are a procurement negotiation expert. Write professional, effective emails. Return only valid JSON.' + langInstruction,
       userContent: basePrompt,
       temperature: 0.7,
       max_tokens: 2000,

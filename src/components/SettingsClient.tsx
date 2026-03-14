@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Loader2, AlertTriangle, Check } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
+import { ManageSubscriptionButton } from '@/components/UpgradeButton'
 
 interface SettingsClientProps {
   email: string
@@ -33,7 +34,7 @@ export function SettingsClient({
 }: SettingsClientProps) {
   const router = useRouter()
   const supabase = createClient()
-  const { locale, setLocale } = useI18n()
+  const { t, locale, setLocale } = useI18n()
 
   // Profile
   const [firstName, setFirstName] = useState(initFirst)
@@ -135,7 +136,7 @@ export function SettingsClient({
             }`}>
               {planLabel}
             </span>
-            <span className="text-xs text-slate-400">Member since {memberSince}</span>
+            <span className="text-xs text-slate-400">{t('settingsClient.memberSince', { date: memberSince })}</span>
             <span className="text-[10px] text-slate-300">{joinedAgo}</span>
           </div>
         </div>
@@ -143,25 +144,25 @@ export function SettingsClient({
 
       {/* Profile */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">Profile</h2>
+        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">{t('settingsClient.profile')}</h2>
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
-            <label className="text-xs font-medium text-slate-700 mb-1 block">First name</label>
+            <label className="text-xs font-medium text-slate-700 mb-1 block">{t('settingsClient.firstName')}</label>
             <input
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              placeholder="First name"
+              placeholder={t('settingsClient.firstName')}
               className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-slate-700 mb-1 block">Last name</label>
+            <label className="text-xs font-medium text-slate-700 mb-1 block">{t('settingsClient.lastName')}</label>
             <input
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              placeholder="Last name"
+              placeholder={t('settingsClient.lastName')}
               className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
             />
           </div>
@@ -171,27 +172,27 @@ export function SettingsClient({
           disabled={nameSaving}
           className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all disabled:opacity-50"
         >
-          {nameSaved ? <><Check className="w-3 h-3" /> Saved</> : nameSaving ? 'Saving...' : 'Save name'}
+          {nameSaved ? <><Check className="w-3 h-3" /> {t('settingsClient.saved')}</> : nameSaving ? t('settingsClient.saving') : t('settingsClient.saveName')}
         </button>
 
         <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-700">Email</p>
+              <p className="text-sm text-slate-700">{t('settingsClient.email')}</p>
               <p className="text-xs text-slate-400">{email}</p>
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-700">Password</p>
+            <p className="text-sm text-slate-700">{t('settingsClient.password')}</p>
             {resetSent ? (
-              <span className="text-xs font-medium text-emerald-600">Reset email sent</span>
+              <span className="text-xs font-medium text-emerald-600">{t('settingsClient.resetEmailSent')}</span>
             ) : (
               <button
                 onClick={handlePasswordReset}
                 disabled={resetLoading}
                 className="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors disabled:opacity-50"
               >
-                {resetLoading ? 'Sending...' : 'Send reset email'}
+                {resetLoading ? t('settingsClient.sending') : t('settingsClient.sendResetEmail')}
               </button>
             )}
           </div>
@@ -200,40 +201,40 @@ export function SettingsClient({
 
       {/* Usage Stats */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">Usage</h2>
+        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">{t('settingsClient.usage')}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3 bg-slate-50 rounded-lg text-center">
             <p className="text-xl font-bold text-slate-900">{usageCount}</p>
-            <p className="text-[10px] text-slate-500">Analyses total</p>
+            <p className="text-[10px] text-slate-500">{t('settingsClient.analysesTotal')}</p>
             {!isPaid && !isAdmin && (
-              <p className="text-[10px] text-emerald-600 font-medium">{remaining} remaining</p>
+              <p className="text-[10px] text-emerald-600 font-medium">{t('settingsClient.remaining', { count: remaining })}</p>
             )}
           </div>
           <div className="p-3 bg-slate-50 rounded-lg text-center">
             <p className="text-xl font-bold text-slate-900">{roundCount}</p>
-            <p className="text-[10px] text-slate-500">Rounds created</p>
+            <p className="text-[10px] text-slate-500">{t('settingsClient.roundsCreated')}</p>
           </div>
           <div className="p-3 bg-slate-50 rounded-lg text-center">
             <p className="text-xl font-bold text-slate-900">{activeDeals}</p>
-            <p className="text-[10px] text-slate-500">Active deals</p>
+            <p className="text-[10px] text-slate-500">{t('settingsClient.activeDeals')}</p>
           </div>
           <div className="p-3 bg-slate-50 rounded-lg text-center">
             <p className="text-xl font-bold text-slate-900">{closedDeals}</p>
-            <p className="text-[10px] text-slate-500">Closed deals</p>
+            <p className="text-[10px] text-slate-500">{t('settingsClient.closedDeals')}</p>
           </div>
         </div>
         <div className="mt-3 p-3 bg-emerald-50 rounded-lg flex items-center justify-between">
-          <p className="text-xs text-emerald-700 font-medium">Total savings identified</p>
+          <p className="text-xs text-emerald-700 font-medium">{t('settingsClient.totalSavingsIdentified')}</p>
           <p className="text-sm font-bold text-emerald-900">{totalSavings}</p>
         </div>
       </div>
 
       {/* Subscription */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">Subscription</h2>
+        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">{t('settingsClient.subscription')}</h2>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-700">Current plan</span>
+            <span className="text-sm font-medium text-slate-700">{t('settingsClient.currentPlan')}</span>
             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
               isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
             }`}>
@@ -246,22 +247,22 @@ export function SettingsClient({
             href="/pricing"
             className="inline-flex items-center px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
           >
-            Upgrade plan
+            {t('settingsClient.upgradePlan')}
           </Link>
         )}
         {isPaid && (
-          <p className="text-xs text-slate-400">Manage subscription — coming soon</p>
+          <ManageSubscriptionButton label={locale === 'fr' ? 'Gérer l\'abonnement' : 'Manage subscription'} />
         )}
       </div>
 
       {/* Display Preferences */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">Display Preferences</h2>
+        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">{t('settingsClient.displayPreferences')}</h2>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-900">Base Currency</p>
-              <p className="text-xs text-slate-500">Dashboard totals converted to this currency</p>
+              <p className="text-sm font-medium text-slate-900">{t('settingsClient.baseCurrency')}</p>
+              <p className="text-xs text-slate-500">{t('settingsClient.baseCurrencyDesc')}</p>
             </div>
             <div className="flex items-center gap-2">
               <select
@@ -276,13 +277,13 @@ export function SettingsClient({
                   </option>
                 ))}
               </select>
-              {currencySaving && <span className="text-[10px] text-emerald-600">Saving...</span>}
+              {currencySaving && <span className="text-[10px] text-emerald-600">{t('settingsClient.saving')}</span>}
             </div>
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-900">Language</p>
-              <p className="text-xs text-slate-500">Interface and analysis language</p>
+              <p className="text-sm font-medium text-slate-900">{t('settingsClient.language')}</p>
+              <p className="text-xs text-slate-500">{t('settingsClient.languageDesc')}</p>
             </div>
             <select
               value={locale}
@@ -290,7 +291,7 @@ export function SettingsClient({
               className="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               <option value="en">English</option>
-              <option value="fr">Français</option>
+              <option value="fr">Fran{'\u00e7'}ais</option>
             </select>
           </div>
         </div>
@@ -298,17 +299,17 @@ export function SettingsClient({
 
       {/* Privacy Preferences */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">Privacy Preferences</h2>
+        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4">{t('settingsClient.privacyPreferences')}</h2>
         <div className="space-y-4">
           <ToggleRow
-            label="Save extracted text from uploads"
-            description="Allows faster re-analysis but stores your document text"
+            label={t('settingsClient.saveExtractedText')}
+            description={t('settingsClient.saveExtractedTextDesc')}
             value={saveExtractedText}
             onChange={setSaveExtractedText}
           />
           <ToggleRow
-            label="Receive product update emails"
-            description="New features, improvements, and plan updates. No spam."
+            label={t('settingsClient.receiveEmails')}
+            description={t('settingsClient.receiveEmailsDesc')}
             value={productEmails}
             onChange={setProductEmails}
           />
@@ -317,13 +318,13 @@ export function SettingsClient({
 
       {/* Danger Zone */}
       <div className="rounded-xl border-2 border-red-200 bg-white p-5">
-        <h2 className="text-xs font-bold text-red-600 uppercase tracking-wide mb-2">Danger Zone</h2>
-        <p className="text-sm text-slate-600 mb-4">Permanently delete your account and all data. This cannot be undone.</p>
+        <h2 className="text-xs font-bold text-red-600 uppercase tracking-wide mb-2">{t('settingsClient.dangerZone')}</h2>
+        <p className="text-sm text-slate-600 mb-4">{t('settingsClient.dangerZoneDesc')}</p>
         <button
           onClick={() => setShowDeleteModal(true)}
           className="px-4 py-2 text-sm font-semibold rounded-lg border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all"
         >
-          Delete account
+          {t('settingsClient.deleteAccount')}
         </button>
       </div>
 
@@ -335,15 +336,15 @@ export function SettingsClient({
               <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Delete account?</h3>
+              <h3 className="text-lg font-bold text-slate-900">{t('settingsClient.deleteModalTitle')}</h3>
             </div>
-            <p className="text-sm text-slate-600 mb-2">This will permanently delete:</p>
+            <p className="text-sm text-slate-600 mb-2">{t('settingsClient.deleteWillDelete')}</p>
             <ul className="text-sm text-slate-600 mb-5 space-y-1 ml-4">
-              <li>- All deals and analyses ({dealCount} deals, {roundCount} rounds)</li>
-              <li>- Your account and profile data</li>
-              <li>- All saved email drafts</li>
+              <li>- {t('settingsClient.deleteBullet1', { dealCount, roundCount })}</li>
+              <li>- {t('settingsClient.deleteBullet2')}</li>
+              <li>- {t('settingsClient.deleteBullet3')}</li>
             </ul>
-            <p className="text-sm font-semibold text-red-700 mb-5">This cannot be undone.</p>
+            <p className="text-sm font-semibold text-red-700 mb-5">{t('settingsClient.deleteCannotUndo')}</p>
 
             {deleteError && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">{deleteError}</div>
@@ -355,14 +356,14 @@ export function SettingsClient({
                 disabled={deleteLoading}
                 className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all disabled:opacity-50"
               >
-                Cancel
+                {t('settingsClient.cancel')}
               </button>
               <button
                 onClick={handleDeleteAccount}
                 disabled={deleteLoading}
                 className="flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {deleteLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Deleting...</> : 'Yes, delete my account'}
+                {deleteLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('settingsClient.deleting')}</> : t('settingsClient.yesDelete')}
               </button>
             </div>
           </div>

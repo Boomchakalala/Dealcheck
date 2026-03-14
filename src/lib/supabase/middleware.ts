@@ -77,5 +77,22 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(new URL('/app', request.url))
   }
 
+  // Sync locale from Supabase profile if user is logged in and no cookie set
+  if (user && !request.cookies.get('termlift_lang')?.value) {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('locale')
+        .eq('id', user.id)
+        .single()
+      if (profile?.locale && (profile.locale === 'en' || profile.locale === 'fr')) {
+        response.cookies.set('termlift_lang', profile.locale, {
+          path: '/',
+          maxAge: 31536000,
+        })
+      }
+    } catch {}
+  }
+
   return response
 }

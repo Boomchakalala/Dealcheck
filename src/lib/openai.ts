@@ -34,6 +34,14 @@ function parseJsonFromContent(content: string): unknown {
   return JSON.parse(stripped)
 }
 
+/** Get the language instruction to append to system prompts based on user locale. */
+export function getLanguageInstruction(locale: string): string {
+  if (locale === 'fr') {
+    return '\n\nIMPORTANT: The user\'s language preference is French. Generate ALL output text in French. This includes: verdict, red flag descriptions, negotiation advice, strategy text, email drafts (subject and body), savings descriptions, and all other user-facing text. Use professional French business/procurement terminology. Keep proper nouns, product names, and currency amounts as-is.'
+  }
+  return '\n\nIMPORTANT: Generate ALL output text in English.'
+}
+
 /** Shared helper for Claude API calls. Use from routes or extract-normalize. */
 export async function getClaudeResponse(params: {
   system: string
@@ -799,7 +807,7 @@ export async function analyzeDeal(
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: 3500,
-      system: SYSTEM_PROMPT,
+      system: SYSTEM_PROMPT + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: userContent }],
       temperature: 0.7,
     })
@@ -829,7 +837,8 @@ export async function analyzeDealV2(
     goal?: string
     notes?: string
     previousAnalysis?: DealOutputV2
-  }
+  },
+  userLocale?: string
 ): Promise<DealOutputTypeV2> {
 
   // Build context from extracted structured data (not raw text)
@@ -864,7 +873,7 @@ export async function analyzeDealV2(
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: 2000,
-      system: SYSTEM_PROMPT_V2,
+      system: SYSTEM_PROMPT_V2 + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: userPrompt }],
       temperature: 0.7,
     })
@@ -888,7 +897,8 @@ export async function analyzeDealV2(
 
 export async function regenerateEmailDrafts(
   extractedText: string,
-  currentOutput: DealOutput
+  currentOutput: DealOutput,
+  userLocale?: string
 ): Promise<DealOutputType['email_drafts']> {
   const prompt = `You are TermLift's email generation engine. Write 3 supplier-facing email variations based on the completed analysis below.
 
@@ -973,7 +983,7 @@ Return ONLY JSON with this structure:
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: 2000,
-      system: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails that match the provided analysis. Be concise and specific. Return only valid JSON.',
+      system: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails that match the provided analysis. Be concise and specific. Return only valid JSON.' + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
     })
@@ -1000,7 +1010,8 @@ export async function generateEmailV2(
     supplier_relationship: 'new' | 'existing' | 'renewal' | 'unknown'
     email_goal: 'clarify' | 'negotiate' | 'revise' | 'accept'
     user_notes?: string
-  }
+  },
+  userLocale?: string
 ): Promise<{ subject: string; body: string }> {
   const { tone_preference, supplier_relationship, email_goal, user_notes } = emailControls
 
@@ -1091,7 +1102,7 @@ Return ONLY JSON:
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: 1500,
-      system: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails. Adapt to user preferences. Be concise and specific. Return only valid JSON.',
+      system: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails. Adapt to user preferences. Be concise and specific. Return only valid JSON.' + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
     })

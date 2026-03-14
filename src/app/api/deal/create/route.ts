@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { CreateDealSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/openai'
@@ -56,6 +57,9 @@ export async function POST(request: Request) {
     const body = await request.json()
     const validated = CreateDealSchema.parse(body)
 
+    // Determine locale from cookie or request body
+    const locale = (await cookies()).get('termlift_lang')?.value || (body as any).locale || 'en'
+
     // Analyze with V1 (full text analysis - catches everything)
     const output = await analyzeDeal(
       validated.extractedText || '',
@@ -65,7 +69,7 @@ export async function POST(request: Request) {
       undefined,
       validated.imageData,
       (body as any).allPages || undefined,
-      (body as any).locale || undefined
+      locale
     )
 
     // Auto-detect vendor

@@ -4,7 +4,23 @@ import Link from 'next/link'
 import { Plus, TrendingUp, DollarSign, BarChart3, Users, Target, ArrowRight, AlertTriangle, CheckCircle2, Lock } from 'lucide-react'
 import { parseMoney, formatCurrency, convertCurrency, type Currency } from '@/lib/currency'
 import { cookies } from 'next/headers'
+import { getTranslations } from 'next-intl/server'
 import { DashboardCharts } from '@/components/DashboardCharts'
+
+const CATEGORIES = ['SaaS & Software', 'Professional Services', 'Marketing & Advertising', 'Office & Facilities', 'IT & Infrastructure', 'Logistics & Delivery', 'Legal & Finance', 'Events & Hospitality', 'Other']
+
+function normalizeCategory(raw: string): string {
+  const lower = raw.toLowerCase()
+  if (lower.includes('saas') || lower.includes('software') || lower.includes('crm') || lower.includes('cloud') || lower.includes('platform') || lower.includes('tool') || lower.includes('app')) return 'SaaS & Software'
+  if (lower.includes('marketing') || lower.includes('advertising') || lower.includes('agency') || lower.includes('media') || lower.includes('seo') || lower.includes('content')) return 'Marketing & Advertising'
+  if (lower.includes('consult') || lower.includes('professional') || lower.includes('advisory') || lower.includes('accounting') || lower.includes('design') || lower.includes('freelance')) return 'Professional Services'
+  if (lower.includes('office') || lower.includes('supplies') || lower.includes('facilities') || lower.includes('cleaning') || lower.includes('maintenance') || lower.includes('furniture')) return 'Office & Facilities'
+  if (lower.includes('it ') || lower.includes('infrastructure') || lower.includes('hosting') || lower.includes('server') || lower.includes('network') || lower.includes('telecom') || lower.includes('hardware')) return 'IT & Infrastructure'
+  if (lower.includes('logistics') || lower.includes('shipping') || lower.includes('delivery') || lower.includes('courier') || lower.includes('freight') || lower.includes('warehouse')) return 'Logistics & Delivery'
+  if (lower.includes('legal') || lower.includes('finance') || lower.includes('insurance') || lower.includes('banking') || lower.includes('audit') || lower.includes('compliance')) return 'Legal & Finance'
+  if (lower.includes('event') || lower.includes('hospitality') || lower.includes('catering') || lower.includes('venue') || lower.includes('travel') || lower.includes('hotel')) return 'Events & Hospitality'
+  return 'Other'
+}
 
 async function convertDealAmount(totalStr: string, dealCurrency: Currency | undefined, baseCurrency: Currency): Promise<number> {
   const { amount, currency } = parseMoney(totalStr)
@@ -21,13 +37,8 @@ function parseSavingsAmount(str?: string): number {
 
 export default async function DashboardPage() {
   const cookieStore = await cookies()
-  const locale = (cookieStore.get('termlift_lang')?.value || 'en') as 'en' | 'fr'
-  const messages: Record<string, Record<string, string>> = { en: require('@/i18n/en.json'), fr: require('@/i18n/fr.json') }
-  const t = (key: string, vars?: Record<string, string | number>) => {
-    let text = messages[locale]?.[key] || messages.en[key] || key
-    if (vars) Object.entries(vars).forEach(([k, v]) => { text = text.replace(`{${k}}`, String(v)) })
-    return text
-  }
+  const locale = cookieStore.get('termlift_lang')?.value || 'en'
+  const t = await getTranslations()
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -73,7 +84,8 @@ export default async function DashboardPage() {
         return s + parseSavingsAmount(item.annual_impact)
       }, 0)
 
-      const category = output?.category || 'Uncategorized'
+      const rawCategory = output?.category || 'Uncategorized'
+      const category = normalizeCategory(rawCategory)
       const vendor = deal.vendor || output?.vendor || 'Unknown'
       const redFlagCount = output?.red_flags?.length || 0
 
@@ -90,7 +102,7 @@ export default async function DashboardPage() {
     })
   )
 
-  const fmt = (n: number) => formatCurrency(n, baseCurrency)
+  const fmt = (n: number) => formatCurrency(Math.round(n), baseCurrency)
 
   // KPIs
   const totalSpend = enrichedDeals.reduce((s, d) => s + d._amount, 0)
@@ -100,6 +112,10 @@ export default async function DashboardPage() {
   const activeDeals = enrichedDeals.filter(d => !d.status?.startsWith('closed_'))
   const uniqueVendors = new Set(enrichedDeals.map(d => d._vendor)).size
   const avgDealSize = enrichedDeals.length > 0 ? totalSpend / enrichedDeals.length : 0
+
+  // Win rate
+  const wonDeals = closedDeals.filter(d => d.status === 'closed_won' || d.status === 'closed_paused')
+  const winRate = closedDeals.length > 0 ? (wonDeals.length / closedDeals.length) * 100 : 0
 
   // Category breakdown
   const categoryMap = new Map<string, { spend: number; count: number; identified: number; achieved: number }>()
@@ -116,11 +132,12 @@ export default async function DashboardPage() {
     .sort((a, b) => b.spend - a.spend)
 
   // Top suppliers
-  const vendorMap = new Map<string, { spend: number; count: number }>()
+  const vendorMap = new Map<string, { spend: number; count: number; savings: number }>()
   enrichedDeals.forEach(d => {
-    const existing = vendorMap.get(d._vendor) || { spend: 0, count: 0 }
+    const existing = vendorMap.get(d._vendor) || { spend: 0, count: 0, savings: 0 }
     existing.spend += d._amount
     existing.count += 1
+    existing.savings += d._potentialSavings
     vendorMap.set(d._vendor, existing)
   })
   const topSuppliers = Array.from(vendorMap.entries())
@@ -184,7 +201,7 @@ export default async function DashboardPage() {
       )}
 
       {/* 6 Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
@@ -254,8 +271,35 @@ export default async function DashboardPage() {
 
       {/* Currency note */}
       <p className="text-[10px] text-slate-400 text-right -mt-2">
-        Converted to {baseCurrency} at today&apos;s rates
+        {locale === 'fr' ? `Converti en ${baseCurrency} aux taux du jour` : `Converted to ${baseCurrency} at today's rates`}
       </p>
+
+      {/* Savings Summary Card */}
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <h3 className="text-sm font-bold text-slate-900 mb-4">{locale === 'fr' ? 'Résumé des économies' : 'Savings Summary'}</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="text-center p-3 bg-amber-50 rounded-lg">
+            <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Identifiées' : 'Identified'}</p>
+            <p className="text-lg font-bold text-slate-900">{fmt(savingsIdentified)}</p>
+            <p className="text-[10px] text-slate-400">{locale === 'fr' ? 'potentiel total' : 'total potential'}</p>
+          </div>
+          <div className="text-center p-3 bg-emerald-50 rounded-lg">
+            <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Réalisées' : 'Achieved'}</p>
+            <p className="text-lg font-bold text-emerald-900">{savingsAchieved > 0 ? fmt(savingsAchieved) : '—'}</p>
+            <p className="text-[10px] text-slate-400">{locale === 'fr' ? 'contrats clôturés' : 'from closed deals'}</p>
+          </div>
+          <div className="text-center p-3 bg-blue-50 rounded-lg">
+            <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Taux de conversion' : 'Conversion Rate'}</p>
+            <p className="text-lg font-bold text-slate-900">{savingsIdentified > 0 ? `${Math.round((savingsAchieved / savingsIdentified) * 100)}%` : '—'}</p>
+            <p className="text-[10px] text-slate-400">{locale === 'fr' ? 'identifiées → réalisées' : 'identified → achieved'}</p>
+          </div>
+          <div className="text-center p-3 bg-slate-50 rounded-lg">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Moyenne par contrat' : 'Avg per Deal'}</p>
+            <p className="text-lg font-bold text-slate-900">{enrichedDeals.length > 0 ? fmt(savingsIdentified / enrichedDeals.length) : '—'}</p>
+            <p className="text-[10px] text-slate-400">{locale === 'fr' ? 'économies identifiées' : 'savings identified'}</p>
+          </div>
+        </div>
+      </div>
 
       {/* Charts — Client Component */}
       <DashboardCharts
@@ -269,11 +313,16 @@ export default async function DashboardPage() {
           status: d.status || 'active',
           redFlags: d._redFlagCount,
           updatedAt: d.updated_at,
+          potentialSavings: d._potentialSavings,
+          achievedSavings: d._achievedSavings,
         }))}
         baseCurrency={baseCurrency}
         savingsAchieved={savingsAchieved}
         isPro={isPro}
         isAdmin={isAdmin}
+        winRate={winRate}
+        closedDealCount={closedDeals.length}
+        wonDealCount={wonDeals.length}
       />
     </div>
   )

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Lock, X, ArrowRight, Check } from 'lucide-react'
 import { type FeatureId, type Plan, FEATURE_LABELS, TIERS, hasFeature, getRequiredPlanForFeature } from '@/lib/tiers'
 import { useT } from '@/i18n/context'
+import { UpgradeButton } from '@/components/UpgradeButton'
 
 interface FeatureGateProps {
   feature: FeatureId
@@ -124,13 +125,11 @@ export function PaywallModal({ feature, onClose }: { feature: FeatureId; onClose
         </div>
 
         {/* CTA */}
-        <Link
-          href="/pricing"
-          onClick={onClose}
+        <UpgradeButton
+          plan="pro"
+          label={t('gate.viewPricing')}
           className="block w-full text-center px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md"
-        >
-          {t('gate.viewPricing')}
-        </Link>
+        />
         <button
           onClick={onClose}
           className="block w-full text-center mt-2 text-xs text-slate-400 hover:text-slate-600 transition-colors py-2"

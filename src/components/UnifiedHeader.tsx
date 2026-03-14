@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { HelpCircle, ChevronDown, User, LogOut, Menu, X, Settings, Zap, Crown } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { UpgradeButton } from '@/components/UpgradeButton'
 import { useT } from '@/i18n/context'
 
 interface UnifiedHeaderProps {
@@ -23,262 +24,140 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
 
-  // App navigation items
   const appNavItems = [
-    { href: '/app', label: 'Deals' },
-    { href: '/app/dashboard', label: 'Dashboard' },
+    { href: '/app', label: t('nav.deals') },
+    { href: '/app/dashboard', label: t('nav.dashboard') },
   ]
 
   const isActive = (href: string) => {
-    if (href === '/app') {
-      return pathname === '/app'
-    }
+    if (href === '/app') return pathname === '/app'
     return pathname.startsWith(href)
   }
 
-  // Marketing nav links (shared between landing and public)
-  const marketingNavLinks = (
-    <>
-      <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-        {t('nav.pricing')}
-      </Link>
-      <Link href="/#how-it-works" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-        {t('nav.howItWorks')}
-      </Link>
-      <Link href="/example" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-        {t('nav.examples')}
-      </Link>
-    </>
-  )
+  const closeMobile = () => setShowMobileMenu(false)
 
-  // Logo component
+  // Logo
   const logo = (
-    <Link href="/" className="flex items-center gap-2.5">
+    <Link href="/" className="flex items-center gap-2.5 mr-2 flex-shrink-0">
       <Image src="/logo-icon.png" alt="TermLift" width={36} height={36} className="flex-shrink-0" priority />
       <div className="flex items-baseline">
-        <span className="text-xl font-bold text-slate-900">Term</span>
-        <span className="text-xl font-bold text-emerald-600">Lift</span>
+        <span className="text-xl font-bold text-slate-900 tracking-tight">Term</span>
+        <span className="text-xl font-bold text-emerald-600 tracking-tight">Lift</span>
       </div>
     </Link>
   )
 
-  // Marketing mobile menu (shared between landing and public)
-  const marketingMobileMenu = showMobileMenu && (
-    <div className="md:hidden border-t border-slate-200 py-3 space-y-1">
-      <Link
-        href="/pricing"
-        className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
-        onClick={() => setShowMobileMenu(false)}
-      >
-        {t('nav.pricing')}
-      </Link>
-      <Link
-        href="/#how-it-works"
-        className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
-        onClick={() => setShowMobileMenu(false)}
-      >
-        {t('nav.howItWorks')}
-      </Link>
-      <Link
-        href="/example"
-        className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
-        onClick={() => setShowMobileMenu(false)}
-      >
-        {t('nav.examples')}
-      </Link>
-      <div className="border-t border-slate-200 my-2" />
-      <Link
-        href="/login"
-        className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
-        onClick={() => setShowMobileMenu(false)}
-      >
-        {t('nav.signIn')}
-      </Link>
-      <Link
-        href="/try"
-        className="block mx-4 mt-2 px-4 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center"
-        onClick={() => setShowMobileMenu(false)}
-      >
-        {t('nav.tryFree')}
-      </Link>
-    </div>
+  // Marketing nav links (desktop)
+  const marketingNavLinks = (
+    <>
+      <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-medium">{t('nav.pricing')}</Link>
+      <Link href="/#how-it-works" className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-medium">{t('nav.howItWorks')}</Link>
+      <Link href="/example" className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-medium">{t('nav.examples')}</Link>
+    </>
   )
 
-  // Landing page header
-  if (variant === 'landing') {
+  // Hamburger button
+  const hamburger = (
+    <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="md:hidden p-2.5 -mr-1 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors">
+      {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+    </button>
+  )
+
+  // LANDING & PUBLIC headers
+  if (variant === 'landing' || variant === 'public') {
     return (
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8">
-          <div className="flex items-center justify-between h-16">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8">
+          <div className="flex items-center justify-between h-[3.75rem] sm:h-[4.25rem]">
             {logo}
 
-            {/* Navigation */}
             <nav className="hidden md:flex items-center gap-8">
               {marketingNavLinks}
             </nav>
 
-            {/* Right side (desktop) */}
-            <div className="hidden md:flex items-center gap-3">
-              <LanguageSwitcher variant="compact" />
-              <Link
-                href="/login"
-                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                {t('nav.signIn')}
-              </Link>
-              <Link
-                href="/try"
-                className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
-              >
-                {t('nav.tryFree')}
-              </Link>
+            {/* Desktop: lang | sign in | CTA */}
+            <div className="hidden md:flex items-center gap-1">
+              <LanguageSwitcher variant="inline" />
+              <span className="text-slate-300 mx-2">|</span>
+              <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">{t('nav.signIn')}</Link>
+              <Link href="/try" className="ml-4 px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm">{t('nav.tryFree')}</Link>
             </div>
 
-            {/* Mobile: CTA + Hamburger */}
-            <div className="flex md:hidden items-center gap-2">
-              <Link
-                href="/try"
-                className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
-              >
-                {t('nav.tryFree')}
-              </Link>
-              <button
-                onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
-              >
-                {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
+            {/* Mobile: just hamburger */}
+            {hamburger}
           </div>
 
           {/* Mobile menu */}
-          {marketingMobileMenu}
+          {showMobileMenu && (
+            <div className="md:hidden border-t border-slate-200/80 py-2 pb-4 bg-white -mx-4 px-4 sm:-mx-8 sm:px-8">
+              <Link href="/pricing" className="block py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900" onClick={closeMobile}>{t('nav.pricing')}</Link>
+              <Link href="/#how-it-works" className="block py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900" onClick={closeMobile}>{t('nav.howItWorks')}</Link>
+              <Link href="/example" className="block py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900" onClick={closeMobile}>{t('nav.examples')}</Link>
+              <div className="border-t border-slate-100 my-2" />
+              <div className="flex items-center justify-between py-2">
+                <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900" onClick={closeMobile}>{t('nav.signIn')}</Link>
+                <LanguageSwitcher variant="inline" />
+              </div>
+              <Link href="/try" className="block mt-2 px-4 py-3 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center" onClick={closeMobile}>{t('nav.tryFree')}</Link>
+            </div>
+          )}
         </div>
       </header>
     )
   }
 
-  // Public pages header (login, try, help, pricing, etc.)
-  if (variant === 'public') {
-    return (
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8">
-          <div className="flex items-center justify-between h-16">
-            {logo}
-
-            {/* Navigation - same marketing links */}
-            <nav className="hidden md:flex items-center gap-8">
-              {marketingNavLinks}
-            </nav>
-
-            {/* Right side (desktop) */}
-            <div className="hidden md:flex items-center gap-3">
-              <LanguageSwitcher variant="compact" />
-              <Link
-                href="/login"
-                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                {t('nav.signIn')}
-              </Link>
-              <Link
-                href="/try"
-                className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
-              >
-                {t('nav.tryFree')}
-              </Link>
-            </div>
-
-            {/* Mobile: Hamburger */}
-            <button
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="md:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
-            >
-              {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-
-          {/* Mobile menu */}
-          {marketingMobileMenu}
-        </div>
-      </header>
-    )
-  }
-
-  // App header (authenticated pages)
+  // APP header (authenticated)
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Left: Logo */}
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="flex items-center justify-between h-[3.75rem] sm:h-[4.25rem]">
           {logo}
 
-          {/* Center: Nav items (desktop) */}
+          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
             {appNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`px-4 py-2 text-sm font-medium transition-colors relative ${
-                  isActive(item.href)
-                    ? 'text-slate-900'
-                    : 'text-slate-600 hover:text-slate-900'
+                  isActive(item.href) ? 'text-slate-900' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {item.label}
-                {isActive(item.href) && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />
-                )}
+                {isActive(item.href) && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />}
               </Link>
             ))}
           </nav>
 
-          {/* Right: Lang + Help + Usage + Upgrade + User dropdown (desktop) */}
-          <div className="hidden md:flex items-center gap-3">
-            <LanguageSwitcher variant="compact" />
-            {/* Help link */}
-            <Link
-              href="/help"
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-            >
+          {/* Desktop right side */}
+          <div className="hidden md:flex items-center gap-2">
+            <LanguageSwitcher variant="inline" />
+            <span className="text-slate-300 mx-1">|</span>
+            <Link href="/help" className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
               <HelpCircle className="w-4 h-4" />
               <span className="hidden lg:inline">{t('nav.help')}</span>
             </Link>
 
-            {/* Usage indicator (skip for admins) */}
             {!isAdmin && (
-              <>
-                {isUpgraded ? (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200">
-                    <Crown className="w-3.5 h-3.5 text-purple-600" />
-                    <span className="text-xs font-bold text-purple-900">Pro</span>
-                  </div>
-                ) : (
-                  <Link
-                    href="/app/dashboard"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors"
-                    title="Free plan usage"
-                  >
-                    <Zap className="w-3.5 h-3.5 text-slate-600" />
-                    <span className="text-xs font-bold text-slate-900">{usageCount}/4</span>
-                  </Link>
-                )}
-              </>
+              isUpgraded ? (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200">
+                  <Crown className="w-3.5 h-3.5 text-purple-600" />
+                  <span className="text-xs font-bold text-purple-900">Pro</span>
+                </div>
+              ) : (
+                <Link href="/app/dashboard" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors" title="Free plan usage">
+                  <Zap className="w-3.5 h-3.5 text-slate-600" />
+                  <span className="text-xs font-bold text-slate-900">{usageCount}/4</span>
+                </Link>
+              )
             )}
 
-            {/* Upgrade button (if not upgraded) */}
             {!isUpgraded && !isAdmin && (
-              <Link
-                href="/pricing"
-                onClick={() => {
-                  trackEvent({
-                    name: 'upgrade_clicked',
-                    properties: { source: 'header' }
-                  })
-                }}
-                className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
-              >
-                {t('nav.upgrade')}
-              </Link>
+              <UpgradeButton
+                plan="pro"
+                label={t('nav.upgrade')}
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+              />
             )}
 
             {/* User dropdown */}
@@ -287,41 +166,23 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
               >
-                <span className="max-w-[150px] truncate">{userEmail || 'User'}</span>
+                <span className="max-w-[120px] truncate">{userEmail || 'User'}</span>
                 <ChevronDown className="w-4 h-4" />
               </button>
-
               {showUserMenu && (
                 <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setShowUserMenu(false)}
-                  />
+                  <div className="fixed inset-0 z-10" onClick={() => setShowUserMenu(false)} />
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-20">
-                    <Link
-                      href="/app/settings"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      <User className="w-4 h-4" />
-                      {t('nav.profile')}
+                    <Link href="/app/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors" onClick={() => setShowUserMenu(false)}>
+                      <User className="w-4 h-4" />{t('nav.profile')}
                     </Link>
-                    <Link
-                      href="/app/settings"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      <Settings className="w-4 h-4" />
-                      {t('nav.settings')}
+                    <Link href="/app/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors" onClick={() => setShowUserMenu(false)}>
+                      <Settings className="w-4 h-4" />{t('nav.settings')}
                     </Link>
                     <div className="border-t border-slate-200 my-1" />
                     <form action="/auth/signout" method="post">
-                      <button
-                        type="submit"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors w-full text-left"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        {t('nav.signOut')}
+                      <button type="submit" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors w-full text-left">
+                        <LogOut className="w-4 h-4" />{t('nav.signOut')}
                       </button>
                     </form>
                   </div>
@@ -330,89 +191,69 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
             </div>
           </div>
 
-          {/* Mobile: Hamburger menu */}
-          <button
-            onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="md:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
-          >
-            {showMobileMenu ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
+          {/* Mobile hamburger */}
+          {hamburger}
         </div>
 
-        {/* Mobile menu */}
+        {/* App mobile menu */}
         {showMobileMenu && (
-          <div className="md:hidden border-t border-slate-200 py-4 space-y-1">
+          <div className="md:hidden border-t border-slate-200/80 py-2 pb-4 bg-white -mx-4 px-4 sm:-mx-8 sm:px-8">
             {appNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`block px-4 py-2.5 text-sm font-medium transition-colors ${
-                  isActive(item.href)
-                    ? 'text-emerald-600 bg-emerald-50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                className={`block py-2.5 text-sm font-medium transition-colors ${
+                  isActive(item.href) ? 'text-emerald-600' : 'text-slate-600 hover:text-slate-900'
                 }`}
-                onClick={() => setShowMobileMenu(false)}
-              >
-                {item.label}
-              </Link>
+                onClick={closeMobile}
+              >{item.label}</Link>
             ))}
-            <div className="border-t border-slate-200 my-2" />
 
-            {/* Usage indicator (mobile) */}
+            <div className="border-t border-slate-100 my-2" />
+
+            <Link href="/help" className="flex items-center gap-2 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900" onClick={closeMobile}>
+              <HelpCircle className="w-4 h-4" />{t('nav.help')}
+            </Link>
+
             {!isAdmin && (
-              <div className="px-4 py-2">
+              <div className="py-2">
                 {isUpgraded ? (
                   <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200">
                     <Crown className="w-3.5 h-3.5 text-purple-600" />
-                    <span className="text-xs font-bold text-purple-900">Pro Plan</span>
+                    <span className="text-xs font-bold text-purple-900">Pro</span>
                   </div>
                 ) : (
                   <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100">
                     <Zap className="w-3.5 h-3.5 text-slate-600" />
-                    <span className="text-xs font-bold text-slate-900">{usageCount} of 4 analyses used</span>
+                    <span className="text-xs font-bold text-slate-900">{t('time.analysesUsed', { count: usageCount })}</span>
                   </div>
                 )}
               </div>
             )}
 
-            <Link
-              href="/help"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              onClick={() => setShowMobileMenu(false)}
-            >
-              <HelpCircle className="w-4 h-4" />
-              {t('nav.help')}
-            </Link>
             {!isUpgraded && !isAdmin && (
-              <Link
-                href="/pricing"
-                className="mx-4 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center block"
-                onClick={() => setShowMobileMenu(false)}
-              >
-                {t('nav.upgrade')}
-              </Link>
+              <UpgradeButton
+                plan="pro"
+                label={t('nav.upgrade')}
+                className="block mt-1 w-full px-4 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center"
+              />
             )}
-            <div className="border-t border-slate-200 my-2" />
-            <Link
-              href="/app/settings"
-              className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              onClick={() => setShowMobileMenu(false)}
-            >
-              <User className="w-4 h-4" />
-              Profile
-            </Link>
-            <div className="px-4 py-2 text-sm text-slate-500 truncate">{userEmail || 'User'}</div>
+
+            <div className="border-t border-slate-100 my-2" />
+
+            {/* Profile + Language on same row */}
+            <div className="flex items-center justify-between py-2">
+              <Link href="/app/settings" className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900" onClick={closeMobile}>
+                <User className="w-4 h-4" />{t('nav.settings')}
+              </Link>
+              <LanguageSwitcher variant="inline" />
+            </div>
+
+            <div className="py-1 text-xs text-slate-400 truncate">{userEmail}</div>
+
             <form action="/auth/signout" method="post">
-              <button
-                type="submit"
-                className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors w-full text-left"
-              >
-                <LogOut className="w-4 h-4" />
-                {t('nav.signOut')}
+              <button type="submit" className="flex items-center gap-2 py-2.5 text-sm font-medium text-red-600 hover:text-red-700 w-full text-left">
+                <LogOut className="w-4 h-4" />{t('nav.signOut')}
               </button>
             </form>
           </div>

@@ -1,8 +1,17 @@
 import Link from 'next/link'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
+import { MarketingFooter } from '@/components/MarketingFooter'
 import { CheckCircle2, Sparkles, ArrowRight, X } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
+import { UpgradeButton } from '@/components/UpgradeButton'
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const t = await getTranslations()
+
+  const starterFeatures = t.raw('pricingPage.starterFeatures') as string[]
+  const proFeatures = t.raw('pricingPage.proFeatures') as string[]
+  const businessFeatures = t.raw('pricingPage.businessFeatures') as string[]
+
   return (
     <div className="min-h-screen bg-white flex flex-col relative">
       {/* Noise texture overlay */}
@@ -25,13 +34,13 @@ export default function PricingPage() {
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-emerald-200/60 shadow-sm mb-6">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-xs font-semibold text-emerald-700 tracking-wide">Simple, transparent pricing</span>
+                <span className="text-xs font-semibold text-emerald-700 tracking-wide">{t('pricingPage.transparentPricing')}</span>
               </div>
               <h1 className="text-[2.25rem] sm:text-[3rem] leading-[1.08] font-bold text-slate-900 tracking-tight mb-4 max-w-xl mx-auto">
-                Start free. Scale when ready.
+                {t('pricing.title')}
               </h1>
               <p className="text-lg text-slate-500 leading-relaxed max-w-xl mx-auto">
-                Try your first analysis with no signup. Upgrade as your negotiation needs grow.
+                {t('pricing.subtitle')}
               </p>
             </div>
 
@@ -40,23 +49,16 @@ export default function PricingPage() {
 
               {/* Starter (Free) */}
               <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-7 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300">
-                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">Starter</p>
+                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">{t('pricing.starter')}</p>
                 <div className="mb-5">
                   <span className="text-5xl font-bold text-slate-900 tracking-tight">€0</span>
                 </div>
                 <p className="text-sm text-slate-500 mb-7 leading-relaxed">
-                  1 analysis free, no signup. Sign up for 3 more.
+                  {t('pricingPage.starterDesc')}
                 </p>
                 <ul className="space-y-3 mb-8">
-                  {[
-                    '1 free analysis — no signup needed',
-                    '3 more after creating an account',
-                    'Red flags + negotiation plan',
-                    '3 email tones per analysis',
-                    'PDF, image, and text input',
-                    'Basic deal list view',
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
+                  {starterFeatures.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                       {item}
                     </li>
@@ -66,7 +68,7 @@ export default function PricingPage() {
                   href="/try"
                   className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl border border-slate-200 text-slate-700 hover:border-slate-300 hover:text-slate-900 hover:shadow-sm transition-all"
                 >
-                  Try free — no card needed
+                  {t('pricingPage.starterCta')}
                 </Link>
               </div>
 
@@ -74,63 +76,45 @@ export default function PricingPage() {
               <div className="rounded-2xl border-2 border-emerald-500/60 p-7 relative bg-gradient-to-b from-emerald-50/50 to-white shadow-lg shadow-emerald-100/50 hover:shadow-2xl hover:shadow-emerald-100/60 transition-all duration-300">
                 <div className="absolute -top-3.5 left-6">
                   <span className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold rounded-full tracking-wide shadow-lg">
-                    MOST POPULAR
+                    {t('pricing.mostPopular').toUpperCase()}
                   </span>
                 </div>
-                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">Pro</p>
+                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">{t('pricing.pro')}</p>
                 <div className="mb-5">
                   <span className="text-5xl font-bold text-slate-900 tracking-tight">€39</span>
-                  <span className="text-slate-500 ml-1.5 text-lg">/mo</span>
+                  <span className="text-slate-500 ml-1.5 text-lg">{t('pricingPage.proPerMo')}</span>
                 </div>
                 <p className="text-sm text-slate-500 mb-7 leading-relaxed">
-                  Unlimited analyses with full spend tracking.
+                  {t('pricingPage.proDesc')}
                 </p>
                 <ul className="space-y-3 mb-8">
-                  {[
-                    'Unlimited AI analyses',
-                    'Multi-round deal tracking',
-                    'Full red flags, plan & 3 email tones',
-                    'Personal spend dashboard',
-                    'Savings identified vs achieved',
-                    '90-day deal history',
-                    'PDF, image, and text input',
-                    '1 user seat',
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
+                  {proFeatures.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                       {item}
                     </li>
                   ))}
                 </ul>
-                <button
-                  disabled
-                  className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl bg-emerald-700 text-white opacity-80 cursor-not-allowed transition-all shadow-sm"
-                >
-                  Coming soon
-                </button>
+                <UpgradeButton
+                  plan="pro"
+                  label={t('nav.upgrade')}
+                  className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+                />
               </div>
 
               {/* Business (€149/mo) */}
               <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-7 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300">
-                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">Business</p>
+                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">{t('pricing.business')}</p>
                 <div className="mb-5">
                   <span className="text-5xl font-bold text-slate-900 tracking-tight">€149</span>
-                  <span className="text-slate-500 ml-1.5 text-lg">/mo</span>
+                  <span className="text-slate-500 ml-1.5 text-lg">{t('pricingPage.proPerMo')}</span>
                 </div>
                 <p className="text-sm text-slate-500 mb-7 leading-relaxed">
-                  Shared workspace for procurement teams.
+                  {t('pricingPage.businessDesc')}
                 </p>
                 <ul className="space-y-3 mb-8">
-                  {[
-                    'Everything in Pro',
-                    'Up to 3 user seats',
-                    'Shared company workspace',
-                    'Company-wide spend dashboard',
-                    'Export analysis to PDF',
-                    '1-year deal history',
-                    'Priority AI processing',
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
+                  {businessFeatures.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                       {item}
                     </li>
@@ -138,9 +122,9 @@ export default function PricingPage() {
                 </ul>
                 <button
                   disabled
-                  className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl border border-slate-200 text-slate-500 opacity-80 cursor-not-allowed transition-all"
+                  className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl border border-slate-200 text-slate-400 opacity-80 cursor-not-allowed transition-all"
                 >
-                  Coming soon
+                  {t('pricing.comingSoon')}
                 </button>
               </div>
             </div>
@@ -149,7 +133,7 @@ export default function PricingPage() {
           {/* Example link */}
           <div className="text-center mt-8 pb-8">
             <Link href="/example" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors group">
-              See an example analysis before you decide
+              {t('pricingPage.seeExample')}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -157,31 +141,31 @@ export default function PricingPage() {
 
         {/* Feature Comparison */}
         <div className="max-w-4xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-10 text-center">Compare plans</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-10 text-center">{t('pricingPage.comparePlans')}</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b-2 border-slate-200">
-                  <th className="text-left py-4 pr-4 font-semibold text-slate-900">Feature</th>
-                  <th className="text-center py-4 px-4 font-semibold text-slate-900">Starter</th>
-                  <th className="text-center py-4 px-4 font-semibold text-emerald-700 bg-emerald-50/50 rounded-t-lg">Pro</th>
-                  <th className="text-center py-4 pl-4 font-semibold text-slate-900">Business</th>
+                  <th className="text-left py-4 pr-4 font-semibold text-slate-900">{t('pricingPage.feature')}</th>
+                  <th className="text-center py-4 px-4 font-semibold text-slate-900">{t('pricing.starter')}</th>
+                  <th className="text-center py-4 px-4 font-semibold text-emerald-700 bg-emerald-50/50 rounded-t-lg">{t('pricing.pro')}</th>
+                  <th className="text-center py-4 pl-4 font-semibold text-slate-900">{t('pricing.business')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {[
-                  { feature: 'AI analyses', starter: '4 total', pro: 'Unlimited', business: 'Unlimited' },
-                  { feature: 'Red flags & negotiation plan', starter: true, pro: true, business: true },
-                  { feature: 'Email drafts (3 tones)', starter: true, pro: true, business: true },
-                  { feature: 'PDF, image & text input', starter: true, pro: true, business: true },
-                  { feature: 'Multi-round deal tracking', starter: false, pro: true, business: true },
-                  { feature: 'Personal spend dashboard', starter: false, pro: true, business: true },
-                  { feature: 'Savings tracking', starter: false, pro: true, business: true },
-                  { feature: 'Deal history', starter: 'None', pro: '90 days', business: '1 year' },
-                  { feature: 'User seats', starter: '1', pro: '1', business: 'Up to 3' },
-                  { feature: 'Shared workspace', starter: false, pro: false, business: true },
-                  { feature: 'Export to PDF', starter: false, pro: false, business: true },
-                  { feature: 'Priority AI processing', starter: false, pro: false, business: true },
+                  { feature: t('pricingPage.aiAnalyses'), starter: t('pricingPage.fourTotal'), pro: t('pricingPage.unlimited'), business: t('pricingPage.unlimited') },
+                  { feature: t('pricingPage.redFlagsNegotiation'), starter: true, pro: true, business: true },
+                  { feature: t('pricingPage.emailDrafts3Tones'), starter: true, pro: true, business: true },
+                  { feature: t('pricingPage.pdfImageTextInput'), starter: true, pro: true, business: true },
+                  { feature: t('pricingPage.multiRoundTracking'), starter: false, pro: true, business: true },
+                  { feature: t('pricingPage.personalDashboard'), starter: false, pro: true, business: true },
+                  { feature: t('pricingPage.savingsTracking'), starter: false, pro: true, business: true },
+                  { feature: t('pricingPage.dealHistory'), starter: t('pricingPage.none'), pro: t('pricingPage.ninetyDays'), business: t('pricingPage.oneYear') },
+                  { feature: t('pricingPage.userSeats'), starter: t('pricingPage.one'), pro: t('pricingPage.one'), business: t('pricingPage.upTo3') },
+                  { feature: t('pricingPage.sharedWorkspace'), starter: false, pro: false, business: true },
+                  { feature: t('pricingPage.exportPdf'), starter: false, pro: false, business: true },
+                  { feature: t('pricingPage.priorityAi'), starter: false, pro: false, business: true },
                 ].map((row) => (
                   <tr key={row.feature}>
                     <td className="py-3.5 pr-4 text-slate-700 font-medium">{row.feature}</td>
@@ -209,15 +193,15 @@ export default function PricingPage() {
 
         {/* FAQ */}
         <div className="max-w-3xl mx-auto px-5 sm:px-8 py-20 sm:py-28">
-          <p className="text-xs font-semibold tracking-widest text-emerald-700 uppercase mb-3 text-center">Common questions</p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-12 text-center">Pricing FAQ</h2>
+          <p className="text-xs font-semibold tracking-widest text-emerald-700 uppercase mb-3 text-center">{t('pricingPage.commonQuestions')}</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-12 text-center">{t('pricingPage.faqTitle')}</h2>
           <div className="space-y-0 border-t border-slate-200/60">
             {[
-              { q: 'Can I use TermLift without signing up?', a: 'Yes. You get 1 free analysis with no signup required. After that, create a free account to unlock 3 more analyses (4 total on the Starter plan).' },
-              { q: 'What happens after I use my 4 free analyses?', a: 'You\'ll see a paywall prompting you to upgrade to Pro (€39/mo) for unlimited analyses, full spend tracking, and deal management.' },
-              { q: 'What counts as an "analysis"?', a: 'Each time you submit a quote or document for AI analysis counts as one. This includes initial analyses and follow-up rounds on existing deals.' },
-              { q: 'What\'s the difference between Pro and Business?', a: 'Pro is for individual negotiators — 1 seat with full spend tracking. Business adds team collaboration with up to 3 seats, a shared workspace, PDF export, and 1-year deal history.' },
-              { q: 'When will Pro and Business launch?', a: 'Soon. We\'re integrating payments now. Start with the free Starter plan and you\'ll be first to know when paid plans go live.' },
+              { q: t('pricingPage.faq1q'), a: t('pricingPage.faq1a') },
+              { q: t('pricingPage.faq2q'), a: t('pricingPage.faq2a') },
+              { q: t('pricingPage.faq3q'), a: t('pricingPage.faq3a') },
+              { q: t('pricingPage.faq4q'), a: t('pricingPage.faq4a') },
+              { q: t('pricingPage.faq5q'), a: t('pricingPage.faq5a') },
             ].map((item, i) => (
               <details key={i} className="group border-b border-slate-200/60">
                 <summary className="flex items-center justify-between cursor-pointer py-6 text-left">
@@ -231,19 +215,7 @@ export default function PricingPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200/60 bg-slate-50/50">
-        <div className="max-w-4xl mx-auto px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm font-semibold text-slate-400">TermLift</p>
-          <div className="flex items-center gap-8 text-sm text-slate-400">
-            <Link href="/pricing" className="hover:text-slate-600 transition-colors">Pricing</Link>
-            <Link href="/help" className="hover:text-slate-600 transition-colors">Help</Link>
-            <Link href="/terms" className="hover:text-slate-600 transition-colors">Terms</Link>
-            <Link href="/privacy" className="hover:text-slate-600 transition-colors">Privacy</Link>
-            <Link href="/security" className="hover:text-slate-600 transition-colors">Security</Link>
-          </div>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   )
 }

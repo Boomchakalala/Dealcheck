@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { analyzeDeal } from '@/lib/openai'
 
 // Guest trial - no auth required, uses V1 schema (full text analysis)
@@ -75,6 +76,9 @@ export async function POST(request: Request) {
       p.base64 && p.mimeType && supportedImageTypes.includes(p.mimeType)
     ) || undefined
 
+    // Determine locale from cookie or request body
+    const resolvedLocale = (await cookies()).get('termlift_lang')?.value || locale || 'en'
+
     // Analyze with V1 (full text analysis - catches everything)
     const output = await analyzeDeal(
       extractedText || '',
@@ -84,7 +88,7 @@ export async function POST(request: Request) {
       undefined,
       validImageData,
       validAllPages && validAllPages.length > 0 ? validAllPages : undefined,
-      locale || undefined
+      resolvedLocale
     )
 
     return NextResponse.json({

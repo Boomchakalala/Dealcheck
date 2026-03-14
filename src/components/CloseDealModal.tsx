@@ -39,7 +39,7 @@ type Outcome = 'won' | 'lost'
 
 const outcomeDescriptions: Record<Outcome, string> = {
   won: 'Record what you achieved and how much you saved.',
-  lost: 'No problem — this helps track your negotiation history.',
+  lost: 'No savings this time — signed at original terms.',
 }
 
 export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, onSuccess }: CloseDealModalProps) {
@@ -47,7 +47,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
   const originalAmount = parseMoney(currentTotal || '')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [outcome, setOutcome] = useState<Outcome | null>(null)
+  const [outcome, setOutcome] = useState<Outcome>('won')
   const [finalTotal, setFinalTotal] = useState('')
   const [whatChanged, setWhatChanged] = useState<string[]>([])
   const [notes, setNotes] = useState('')
@@ -66,7 +66,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
   const savingsPercent = originalAmount > 0 && savingsAmount > 0 ? (savingsAmount / originalAmount) * 100 : 0
 
   const isLost = outcome === 'lost'
-  const canSubmit = outcome !== null && (isLost || (finalTotal.trim() && whatChanged.length > 0))
+  const canSubmit = isLost || (finalTotal.trim() && whatChanged.length > 0)
 
   const changeOptions = ['Price', 'Payment terms', 'Term length', 'Cancellation policy', 'Auto-renewal', 'Scope', 'SLA/Support', 'Other']
 
@@ -154,7 +154,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-[560px] shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-2xl w-full max-w-[560px] mx-4 sm:mx-auto shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="px-7 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10 rounded-t-2xl">
           <h3 className="text-lg font-bold text-slate-900">Close Deal</h3>
@@ -168,23 +168,30 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
           <div>
             <p className="text-sm font-semibold text-slate-900 mb-3">How did this deal end?</p>
             <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl">
-              {([
-                { id: 'won' as Outcome, label: 'Negotiated', selectedBg: 'bg-emerald-600 text-white shadow-sm', selectedRing: 'ring-emerald-200' },
-                { id: 'lost' as Outcome, label: 'Signed as-is', selectedBg: 'bg-slate-600 text-white shadow-sm', selectedRing: 'ring-slate-200' },
-              ]).map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => setOutcome(opt.id)}
-                  className={`px-3 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-                    outcome === opt.id
-                      ? `${opt.selectedBg} ring-2 ${opt.selectedRing}`
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
+              <button
+                type="button"
+                onClick={() => setOutcome('won')}
+                className={`px-3 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                  outcome === 'won'
+                    ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                Negotiated
+              </button>
+              <button
+                type="button"
+                onClick={() => setOutcome('lost')}
+                className={`px-3 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                  outcome === 'lost'
+                    ? 'bg-red-500 text-white shadow-sm ring-2 ring-red-200'
+                    : 'text-slate-400 hover:text-slate-600 hover:bg-white/40'
+                }`}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M18 12H6" /></svg>
+                Signed as-is
+              </button>
             </div>
             {outcome && (
               <p className="text-xs text-slate-500 mt-2.5 text-center">{outcomeDescriptions[outcome]}</p>
@@ -299,7 +306,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
           {!isLost && (
             <div>
               <p className="text-sm font-semibold text-slate-900 mb-2.5">What changed? <span className="text-red-500">*</span></p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {changeOptions.map((opt) => (
                   <label key={opt} className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
                     <input

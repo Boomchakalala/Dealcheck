@@ -1,15 +1,28 @@
 'use client'
 
-import { useI18n, type Locale } from '@/i18n/context'
+import { useI18n } from '@/i18n/context'
 
-export function LanguageSwitcher({ variant = 'default' }: { variant?: 'default' | 'compact' }) {
+export function LanguageSwitcher({ variant = 'default' }: { variant?: 'default' | 'compact' | 'inline' }) {
   const { locale, setLocale } = useI18n()
+
+  // Inline variant: just text, no border, sits next to other nav items
+  if (variant === 'inline') {
+    return (
+      <button
+        onClick={() => setLocale(locale === 'en' ? 'fr' : 'en')}
+        className="text-sm text-slate-500 hover:text-slate-900 transition-colors"
+        title={locale === 'en' ? 'Passer en français' : 'Switch to English'}
+      >
+        {locale === 'en' ? 'FR' : 'EN'}
+      </button>
+    )
+  }
 
   if (variant === 'compact') {
     return (
       <button
         onClick={() => setLocale(locale === 'en' ? 'fr' : 'en')}
-        className="px-2 py-1 text-xs font-semibold rounded-md border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all uppercase"
+        className="text-sm text-slate-500 hover:text-slate-900 transition-colors"
         title={locale === 'en' ? 'Passer en français' : 'Switch to English'}
       >
         {locale === 'en' ? 'FR' : 'EN'}

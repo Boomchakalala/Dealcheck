@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { AddRoundSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/openai'
@@ -84,13 +85,19 @@ export async function POST(
     const nextRoundNumber = lastRound ? lastRound.round_number + 1 : 1
     const previousOutput = lastRound?.output_json
 
+    // Determine locale from cookie
+    const locale = (await cookies()).get('termlift_lang')?.value || 'en'
+
     // Analyze with context from previous round
     const output = await analyzeDeal(
       validated.extractedText,
       deal.deal_type,
       deal.goal || undefined,
       validated.note || undefined,
-      previousOutput
+      previousOutput,
+      undefined,
+      undefined,
+      locale
     )
 
     // Create new round

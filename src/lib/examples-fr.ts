@@ -146,156 +146,155 @@ Cordialement,
   disclaimer: "Cette analyse est fournie à titre informatif uniquement et ne constitue pas un conseil juridique, financier ou professionnel. Vérifiez toutes les informations de manière indépendante et consultez des conseillers agréés avant de prendre des décisions d'approvisionnement.",
 }
 
-// Exemple 2 : Outil SaaS — HubSpot Marketing Hub, gaspillage de capacité évident
+// Exemple 2 : CRM SaaS — Salesforce, négociation réaliste de licences
 // Arithmétique :
-//   Contrat actuel : 100 000 contacts à 2 000 €/mois = 24 000 €/an
-//   Utilisation réelle : 35 000 contacts — 65 % de capacité gaspillée
-//   Palier 50 000 contacts : 1 200 €/mois = 14 400 €/an
-//   Économie palier : 24 000 € − 14 400 € = 9 600 €/an
-//   Remise facturation annuelle (~15 %) : 15 % × 14 400 € = 2 160 €
-//   Coût annuel après remise : 14 400 € − 2 160 € = 12 240 €/an
-//   Économie totale : 24 000 € − 12 240 € = 11 760 €/an (49 % du contrat actuel)
+//   Contrat actuel : 40 licences × 75 €/utilisateur/mois = 3 000 €/mois = 36 000 €/an
+//   Utilisation réelle : 28 utilisateurs actifs — 12 licences inutilisées (30 % de gaspillage)
+//   Redimensionnement à 32 licences : 32 × 75 € = 2 400 €/mois = 28 800 €/an
+//   Économie licences : 36 000 € − 28 800 € = 7 200 €/an
+//   Remise engagement 2 ans (~8 %) : 8 % × 28 800 € = 2 304 €
+//   Coût annuel après remise : 28 800 € − 2 304 € = 26 496 €/an
+//   Économie totale : 36 000 € − 26 496 € = 9 504 €/an (~26 %)
 export const saasEmailExampleFr: DealOutput = {
-  title: "HubSpot Marketing Hub - Renouvellement Plan Professionnel",
-  vendor: "HubSpot",
-  category: "SaaS - Marketing",
-  description: "Plateforme d'automatisation marketing, emailing et CRM",
-  verdict: "Vous payez pour 100 000 contacts mais n'en utilisez que 35 000 — vous gaspillez 65 % de votre capacité. Descendre au palier 50 000 et passer à la facturation annuelle vous fait économiser 11 760 €/an.",
+  title: "Salesforce Sales Cloud · Professional · Renouvellement annuel",
+  vendor: "Salesforce",
+  category: "SaaS - CRM",
+  description: "Plateforme CRM — gestion de pipeline, prévisions et automatisation commerciale",
+  verdict: "Vous payez pour 40 licences mais seules 28 sont actives. Redimensionner à 32 licences et s'engager sur 2 ans permet d'économiser 9 500 €/an — une réduction de 26 %.",
   verdict_type: "negotiate",
-  price_insight: "Vous payez 2 000 €/mois pour le palier 100 000 contacts. Le palier 50 000 à 1 200 €/mois couvre largement vos 35 000 contacts avec de la marge, et la facturation annuelle ajoute 15 % de remise supplémentaire.",
+  price_insight: "À 75 €/utilisateur/mois pour 40 licences, vous dépensez 3 000 €/mois. Avec seulement 28 utilisateurs actifs, 12 licences sont inutilisées. Passer à 32 licences (avec une marge) et s'engager sur 2 ans vous donne une remise significative.",
   snapshot: {
-    vendor_product: "HubSpot / Marketing Hub Professional",
+    vendor_product: "Salesforce / Sales Cloud Professional",
     term: "12 mois",
-    total_commitment: "24 000 €",
-    billing_payment: "Mensuel 2 000 €",
-    pricing_model: "Par palier selon le nombre de contacts — 100 000 contacts",
+    total_commitment: "36 000 €",
+    billing_payment: "Annuel 36 000 € (40 licences × 75 €/utilisateur/mois)",
+    pricing_model: "Par licence, facturation annuelle",
     deal_type: "Renewal",
-    renewal_date: "1er mai 2026",
+    renewal_date: "1er juin 2026",
   },
   quick_read: {
     whats_solid: [
-      "Toutes les fonctionnalités Professional : automatisation, tests A/B, reporting avancé",
-      "Intégration CRM déjà en place avec votre équipe commerciale",
-      "Support réactif et ressources d'onboarding complètes",
+      "CRM de référence — votre équipe commerciale est formée dessus",
+      "Intégrations solides avec votre stack marketing et votre ERP",
+      "Disponibilité fiable et sécurité de niveau entreprise",
     ],
     whats_concerning: [
-      "Vous payez pour 100 000 contacts mais n'en utilisez que 35 000 — 65 % de capacité gaspillée",
-      "Aucune remise pour facturation annuelle — vous payez au tarif mensuel plein",
-      "Renouvellement automatique au même palier surdimensionné si vous n'agissez pas",
+      "12 des 40 licences sont inactives — 30 % de gaspillage à 75 €/licence/mois",
+      "Aucune remise multi-annuelle malgré 3 ans d'ancienneté client",
+      "Le renouvellement automatique vous bloque au même nombre de licences et au même tarif",
     ],
-    conclusion: "Bon outil, mauvais palier. Descendez à 50 000 contacts et passez à la facturation annuelle pour économiser 11 760 €/an.",
+    conclusion: "Bon outil, trop de licences. Passez de 40 à 32, engagez-vous sur 2 ans pour une remise, et économisez 9 500 €/an.",
   },
   red_flags: [
     {
       type: "Commercial",
-      issue: "Vous payez pour 100 000 contacts alors que vous n'en utilisez que 35 000",
-      why_it_matters: "Vous payez 2 000 €/mois pour le palier 100 000 contacts mais n'en avez que 35 000. Le palier 50 000 contacts coûte 1 200 €/mois — il couvre largement votre base actuelle avec 43 % de marge de croissance. Vous gaspillez 800 €/mois = 9 600 €/an.",
-      what_to_ask_for: "Descendre au palier 50 000 contacts à 1 200 €/mois. Économie de 800 €/mois = 9 600 €/an. Vous pouvez remonter au palier supérieur à tout moment si vous dépassez les 50 000 contacts.",
-      if_they_push_back: "Demander un palier intermédiaire personnalisé à 40 000 contacts à 1 000 €/mois, ou rester à 50 000.",
+      issue: "Vous payez pour 40 licences mais seules 28 sont actives — 12 inutilisées",
+      why_it_matters: "Chaque licence inutilisée coûte 75 €/mois. Soit 12 × 75 € = 900 €/mois = 10 800 €/an de gaspillage. Même en gardant une marge de 4 licences supplémentaires (32 au total), vous économiseriez 600 €/mois = 7 200 €/an.",
+      what_to_ask_for: "Réduire de 40 à 32 licences. Économie de 600 €/mois = 7 200 €/an. Vous gardez 4 licences de marge au-delà de vos 28 utilisateurs actifs, et pouvez en ajouter à tout moment.",
+      if_they_push_back: "Accepter 35 licences (économie de 375 €/mois = 4 500 €/an). Ça supprime déjà le gaspillage pur.",
     },
     {
       type: "Commercial",
-      issue: "Pas de remise pour facturation annuelle — 2 160 € laissés sur la table",
-      why_it_matters: "HubSpot offre environ 15 % de remise pour un engagement annuel prépayé. Sur le palier 50 000 contacts (1 200 €/mois = 14 400 €/an), la facturation annuelle coûterait 12 240 €/an. Soit 2 160 € d'économies supplémentaires en plus du changement de palier.",
-      what_to_ask_for: "Passer à la facturation annuelle sur le palier 50 000 contacts. Payer 12 240 €/an au lieu de 14 400 €. Combiné au changement de palier, économie totale = 11 760 €/an par rapport au contrat actuel de 24 000 €.",
-      if_they_push_back: "Accepter la facturation mensuelle sur le palier 50 000 contacts — économie tout de même de 9 600 €/an par rapport au contrat actuel.",
+      issue: "Aucune remise de fidélité après 3 ans en tant que client",
+      why_it_matters: "Salesforce propose régulièrement 8 à 12 % de remise pour les engagements pluriannuels, surtout pour les renouvellements. Sur 32 licences à 28 800 €/an, une remise de 8 % représente 2 304 €/an d'économies. Vous ne l'obtenez pas parce que vous n'avez pas demandé.",
+      what_to_ask_for: "S'engager sur un renouvellement de 2 ans à 8 % de remise. Sur 32 licences (28 800 €/an), cela représente 2 304 €/an d'économies. Combiné au redimensionnement, économie totale = 9 504 €/an par rapport au contrat actuel de 36 000 €.",
+      if_they_push_back: "Accepter 5 % de remise (1 440 €/an d'économies) pour un engagement de 2 ans. Ça reste intéressant pour la stabilité tarifaire.",
     },
   ],
   negotiation_plan: {
     leverage_you_have: [
-      "Vous êtes un client en renouvellement — la fidélisation coûte moins cher que l'acquisition pour HubSpot",
-      "Les concurrents comme ActiveCampaign et Brevo facturent à l'usage réel, pas par paliers surdimensionnés",
-      "Vous avez 2 mois avant le renouvellement — le temps d'évaluer les alternatives",
+      "Client depuis 3 ans — les équipes de fidélisation Salesforce ont le pouvoir de consentir des remises sur les renouvellements",
+      "HubSpot CRM et Pipedrive proposent des fonctionnalités comparables à 40–50 €/utilisateur/mois",
+      "Vous avez 2 mois avant le renouvellement — suffisant pour mener une évaluation concurrentielle",
     ],
     must_have_asks: [],
     nice_to_have_asks: [],
     trades_you_can_offer: [
-      "S'engager sur un plan annuel de 2 ans pour une remise supplémentaire de 10 %",
-      "Rédiger un avis G2 et participer à une étude de cas client",
-      "Ajouter un poste Sales Hub (plus de revenus pour HubSpot) en échange d'un tarif marketing avantageux",
+      "S'engager sur 2 ans en échange d'une remise de 8 % et d'un gel des prix",
+      "Ajouter 2 licences Service Cloud (revenus supplémentaires pour Salesforce) si le tarif par licence passe à 70 €",
+      "Participer à un programme de témoignage client ou une étude de cas",
     ],
   },
   what_to_ask_for: {
     must_have: [
-      "Descendre du palier 100 000 au palier 50 000 contacts — 1 200 €/mois au lieu de 2 000 € (économie de 9 600 €/an)",
-      "Passer à la facturation annuelle pour une remise de 15 % — 12 240 €/an au lieu de 14 400 € (économie supplémentaire de 2 160 €)",
+      "Réduire de 40 à 32 licences — 2 400 €/mois au lieu de 3 000 € (économie de 7 200 €/an)",
+      "Engagement 2 ans avec 8 % de remise — 26 496 €/an au lieu de 28 800 € (économie supplémentaire de 2 304 €)",
     ],
     nice_to_have: [
-      "Gel des prix sur 2 ans pour éviter les augmentations futures",
-      "Session d'onboarding gratuite pour un nouveau membre de l'équipe",
+      "Gel des prix pour toute la durée de l'engagement de 2 ans",
+      "5 heures de formation admin gratuite pour vos nouvelles recrues commerciales",
     ],
   },
   potential_savings: [
     {
-      ask: "Descendre du palier 100 000 au palier 50 000 contacts",
-      annual_impact: "9 600 € économisés",
+      ask: "Redimensionner de 40 à 32 licences",
+      annual_impact: "7 200 € économisés",
     },
     {
-      ask: "Passer à la facturation annuelle (remise de 15 %)",
-      annual_impact: "2 160 € économisés",
+      ask: "Remise engagement 2 ans (8 %)",
+      annual_impact: "2 304 € économisés",
     },
   ],
   email_drafts: {
     neutral: {
-      subject: "Renouvellement HubSpot — Demande d'ajustement de plan",
+      subject: "Renouvellement Salesforce — Ajustement du nombre de licences",
       body: `Bonjour [Nom],
 
-Merci pour le rappel de renouvellement. Nous souhaitons continuer avec HubSpot mais devons ajuster notre plan.
+Merci pour l'avis de renouvellement. Nous souhaitons continuer avec Salesforce — l'équipe l'utilise quotidiennement.
 
-Nous sommes actuellement sur le palier 100 000 contacts à 2 000 €/mois, mais nous n'avons que 35 000 contacts. C'est beaucoup de capacité inutilisée.
+Avant de signer, j'aimerais ajuster notre nombre de licences. Nous avons actuellement 40 licences mais seules 28 sont en utilisation active. Nous aimerions renouveler à 32 licences (2 400 €/mois) pour garder une marge tout en supprimant le gaspillage.
 
-Serait-il possible de passer au palier 50 000 contacts à 1 200 €/mois ? Cela nous laisse encore 43 % de marge de croissance. Et si nous passons à la facturation annuelle, nous aimerions bénéficier de la remise prépaiement.
+Nous aimerions également discuter d'un engagement sur 2 ans en échange d'une remise de fidélité. Nous sommes clients Salesforce depuis 3 ans et souhaitons poursuivre à long terme avec des tarifs qui reflètent cette ancienneté.
 
-Nous sommes prêts à nous engager sur 12 mois. Pouvez-vous nous envoyer le tarif annuel sur le palier 50 000 contacts ?
+Pourriez-vous nous envoyer des conditions révisées pour 32 licences avec une option 2 ans ?
 
 Cordialement,
 [Votre Nom]`,
     },
     firm: {
-      subject: "Renouvellement HubSpot — Ajustement tarifaire nécessaire",
+      subject: "Renouvellement Salesforce — Conditions à revoir",
       body: `Bonjour [Nom],
 
-Nous examinons notre renouvellement HubSpot et les chiffres ne fonctionnent pas au palier actuel.
+Nous examinons notre renouvellement Salesforce et deux ajustements sont nécessaires avant de poursuivre :
 
-Les faits :
-- Nous avons 35 000 contacts
-- Nous payons pour 100 000 contacts (2 000 €/mois)
-- Cela représente 9 600 €/an de capacité inutilisée
+1. Licences : Nous payons pour 40 mais n'en utilisons que 28. Nous devons passer à 32. Soit 7 200 €/an d'économies.
 
-Ce dont nous avons besoin :
-1. Descendre au palier 50 000 contacts (1 200 €/mois)
-2. Facturation annuelle avec la remise standard de 15 %
+2. Tarifs : Après 3 ans en tant que client, nous attendons une remise pluriannuelle. Une réduction de 8 % sur un engagement de 2 ans est la norme — soit 2 304 €/an.
 
-Nous avons étudié ActiveCampaign et Brevo — les deux offrent des fonctionnalités comparables entre 500 et 800 €/mois pour notre volume de contacts. Nous préférons rester sur HubSpot car l'intégration est déjà en place, mais nous avons besoin d'un tarif qui reflète notre utilisation réelle.
+Combinés, ces ajustements font passer notre contrat de 36 000 € à environ 26 500 €/an. C'est cohérent avec ce que HubSpot et Pipedrive nous ont proposé (40 à 50 €/utilisateur pour des fonctionnalités similaires).
 
-Pouvez-vous nous envoyer des conditions révisées ?
+Nous voulons rester sur Salesforce, mais uniquement à un tarif qui reflète notre utilisation réelle et notre fidélité.
+
+Pouvez-vous nous envoyer des conditions révisées cette semaine ?
 
 Cordialement,
 [Votre Nom]`,
     },
     final_push: {
-      subject: "Renouvellement HubSpot — Décision finale requise",
+      subject: "Renouvellement Salesforce — Date limite de décision",
       body: `Bonjour [Nom],
 
-Notre renouvellement est dans 3 semaines et nous devons prendre une décision.
+Notre date limite de renouvellement est dans 2 semaines et nous devons trancher.
 
-Nous avons été satisfaits de HubSpot, mais payer 24 000 €/an pour 35 000 contacts quand les concurrents proposent l'équivalent entre 6 000 et 9 000 € n'a pas de sens.
+Nous avons évalué HubSpot CRM (45 €/utilisateur/mois) en parallèle de Salesforce. Pour 32 utilisateurs, cela représente 17 280 €/an contre nos 36 000 € actuels.
 
-Voici ce qui nous ferait rester :
-- Palier 50 000 contacts avec facturation annuelle (12 240 €/an)
-- Gel des prix sur 2 ans
+Nous préférons rester sur Salesforce — la migration serait laborieuse. Mais les chiffres doivent fonctionner :
 
-Si vous pouvez confirmer d'ici le [date], nous renouvelons immédiatement. Sinon, nous migrons vers ActiveCampaign — ils nous ont déjà proposé des crédits d'onboarding.
+- 32 licences (et non 40)
+- Remise de 8 % sur un engagement de 2 ans
+- Soit environ 26 500 €/an
+
+Si vous pouvez confirmer d'ici le [date], nous signons le renouvellement de 2 ans. C'est 53 000 € de revenus garantis.
 
 Cordialement,
 [Votre Nom]`,
     },
   },
   assumptions: [
-    "Nombre actuel de contacts : 35 000 contacts actifs dans HubSpot",
-    "Tarification standard HubSpot : palier 100 000 = 2 000 €/mois, palier 50 000 = 1 200 €/mois",
-    "Remise pour facturation annuelle d'environ 15 % basée sur les tarifs publiés par HubSpot",
-    "Économie palier : 24 000 € − 14 400 € = 9 600 €/an. Remise annuelle : 15 % × 14 400 € = 2 160 €. Total : 9 600 € + 2 160 € = 11 760 €/an",
+    "Utilisateurs actifs : 28 sur 40 licences d'après un audit des dernières connexions",
+    "Tarif catalogue Salesforce Sales Cloud Professional : 75 €/utilisateur/mois",
+    "Remise pluriannuelle de ~8 % basée sur les négociations typiques de renouvellement Salesforce",
+    "Économie licences : (40 − 32) × 75 € × 12 = 7 200 €/an. Remise pluriannuelle : 8 % × 28 800 € = 2 304 €/an. Total : 9 504 €/an",
   ],
   disclaimer: "Cette analyse est fournie à titre informatif uniquement et ne constitue pas un conseil juridique, financier ou professionnel. Vérifiez toutes les informations de manière indépendante et consultez des conseillers agréés avant de prendre des décisions d'approvisionnement.",
 }

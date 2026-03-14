@@ -1,7 +1,10 @@
+'use client'
+
 import { Thread } from '@/lib/threads';
 import { Plus, Search, X } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/i18n/context';
 
 interface SidebarProps {
   threads: Thread[];
@@ -14,6 +17,7 @@ interface SidebarProps {
 
 export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread, onClose, className }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { t, locale } = useI18n();
 
   const filteredThreads = threads.filter(t => {
     if (!searchQuery) return true;
@@ -32,12 +36,12 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffMins < 1) return t('time.justNow');
+    if (diffMins < 60) return t('time.mAgo', { count: diffMins });
+    if (diffHours < 24) return t('time.hAgo', { count: diffHours });
+    if (diffDays < 7) return t('time.dAgo', { count: diffDays });
 
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' });
   };
 
   return (
@@ -45,7 +49,7 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
       {/* Header */}
       <div className="p-4 border-b border-slate-700">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-white">Deals</h2>
+          <h2 className="text-lg font-bold text-white">{t('sidebar.deals')}</h2>
           {onClose && (
             <button
               onClick={onClose}
@@ -61,7 +65,7 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
           className="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm"
         >
           <Plus className="w-4 h-4" />
-          New Deal
+          {t('sidebar.newDeal')}
         </button>
 
         {/* Search */}
@@ -69,7 +73,7 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input
             type="text"
-            placeholder="Search deals..."
+            placeholder={t('sidebar.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
@@ -81,7 +85,7 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
       <div className="flex-1 overflow-y-auto">
         {filteredThreads.length === 0 ? (
           <div className="p-4 text-center text-slate-500 text-sm">
-            {searchQuery ? 'No deals found' : 'No deals yet. Create one!'}
+            {searchQuery ? t('sidebar.noDealsFound') : t('sidebar.noDealsYet')}
           </div>
         ) : (
           <div className="p-2 space-y-1">
@@ -114,9 +118,9 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
                   <p className="text-xs text-slate-400 truncate">{thread.supplier}</p>
                 )}
                 <div className="flex items-center gap-2 mt-1.5 text-xs text-slate-500">
-                  <span>{thread.docs.length} docs</span>
+                  <span>{t('time.docs', { count: thread.docs.length })}</span>
                   <span>•</span>
-                  <span>{thread.messages.length} msgs</span>
+                  <span>{t('time.msgs', { count: thread.messages.length })}</span>
                 </div>
               </button>
             ))}
@@ -128,10 +132,10 @@ export function Sidebar({ threads, currentThreadId, onSelectThread, onNewThread,
       <div className="p-3 border-t border-slate-700">
         <div className="px-2 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-lg">
           <p className="text-xs text-amber-400">
-            Free plan: 1 deal thread + limited replies
+            {t('sidebar.freePlan')}
           </p>
           <p className="text-xs text-slate-500 mt-0.5">
-            Full access coming soon
+            {t('sidebar.fullAccessSoon')}
           </p>
         </div>
       </div>

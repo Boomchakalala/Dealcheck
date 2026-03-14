@@ -16,9 +16,9 @@ export default function ExamplePage() {
   const currentExamples = locale === 'fr' ? examplesFr : examples
 
   const exampleTypes = [
-    { id: 'marketing' as ExampleType, label: locale === 'fr' ? 'Agence Marketing' : 'Marketing Agency', description: locale === 'fr' ? '110K € — économies 16,8K €/an' : '€110K retainer — saves €16.8K/yr' },
-    { id: 'saas' as ExampleType, label: locale === 'fr' ? 'Outil SaaS' : 'SaaS Tool', description: locale === 'fr' ? '24K € — économies 11,7K €/an' : '€22K renewal — saves €10.4K/yr' },
-    { id: 'supplies' as ExampleType, label: locale === 'fr' ? 'Fournitures Bureau' : 'Office Supplies', description: locale === 'fr' ? '45K € — économies 5,5K €/an' : '€45K contract — saves €5.6K/yr' },
+    { id: 'marketing' as ExampleType, label: locale === 'fr' ? 'Agence Marketing' : 'Marketing Agency', description: locale === 'fr' ? '112K € — économies 16,8K €/an' : '€112K retainer — saves €16.8K/yr' },
+    { id: 'saas' as ExampleType, label: locale === 'fr' ? 'CRM SaaS' : 'SaaS CRM', description: locale === 'fr' ? '36K € — économies 9,5K €/an' : '€36K renewal — saves €9.5K/yr' },
+    { id: 'supplies' as ExampleType, label: locale === 'fr' ? 'Fournitures Bureau' : 'Office Supplies', description: locale === 'fr' ? '43K € — économies 5,5K €/an' : '€43K contract — saves €5.6K/yr' },
   ]
 
   return (

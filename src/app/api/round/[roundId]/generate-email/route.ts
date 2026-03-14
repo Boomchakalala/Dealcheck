@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { generateEmailV2 } from '@/lib/openai'
 import type { DealOutputV2, EmailControls } from '@/types'
@@ -50,8 +51,11 @@ export async function POST(
 
     const output = round.output_json as DealOutputV2
 
+    // Determine locale from cookie
+    const locale = (await cookies()).get('termlift_lang')?.value || 'en'
+
     // Generate email using V2 function
-    const generatedEmail = await generateEmailV2(output, emailControls)
+    const generatedEmail = await generateEmailV2(output, emailControls, locale)
 
     return NextResponse.json(generatedEmail)
   } catch (error) {

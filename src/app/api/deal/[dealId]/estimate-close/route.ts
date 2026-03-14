@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import { getClaudeResponse } from '@/lib/openai'
+import { getClaudeResponse, getLanguageInstruction } from '@/lib/openai'
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function POST(
   request: Request,
@@ -84,8 +85,12 @@ Return ONLY valid JSON (no markdown, no code fences):
   "summary": "<2-3 sentence summary>"
 }`
 
+    // Determine locale from cookie
+    const locale = (await cookies()).get('termlift_lang')?.value || 'en'
+    const langInstruction = getLanguageInstruction(locale)
+
     const raw = (await getClaudeResponse({
-      system: 'You are a procurement analyst. Return only valid JSON, no markdown formatting or code fences.',
+      system: 'You are a procurement analyst. Return only valid JSON, no markdown formatting or code fences.' + langInstruction,
       userContent: prompt,
       temperature: 0.3,
       max_tokens: 500,

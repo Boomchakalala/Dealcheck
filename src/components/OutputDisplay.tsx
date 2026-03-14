@@ -89,10 +89,12 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
   }, [output.potential_savings])
 
   const formatSavings = (amount: number) => {
+    const dealTotal = output.snapshot?.total_commitment || ''
+    const sym = dealTotal.includes('€') ? '€' : dealTotal.includes('£') ? '£' : dealTotal.includes('C$') ? 'C$' : dealTotal.includes('A$') ? 'A$' : dealTotal.match(/[\d]/) ? '€' : '$'
     if (amount >= 1000) {
-      return `$${(amount / 1000).toFixed(1)}K`
+      return `${sym}${(amount / 1000).toFixed(1)}K`
     }
-    return `$${amount.toLocaleString()}`
+    return `${sym}${amount.toLocaleString()}`
   }
 
   const handleRegenerateEmails = async () => {

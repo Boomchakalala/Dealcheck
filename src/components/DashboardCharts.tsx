@@ -1,7 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { AlertTriangle, Lock } from 'lucide-react'
+import { useI18n } from '@/i18n/context'
 
 const CHART_COLORS = [
   '#10b981', '#14b8a6', '#0d9488', '#059669', '#047857',
@@ -24,12 +27,15 @@ interface DealRow {
   status: string
   redFlags: number
   updatedAt: string
+  potentialSavings: number
+  achievedSavings: number
 }
 
 interface Supplier {
   name: string
   spend: number
   count: number
+  savings: number
 }
 
 interface Props {
@@ -40,34 +46,102 @@ interface Props {
   savingsAchieved: number
   isPro: boolean
   isAdmin: boolean
+  winRate: number
+  closedDealCount: number
+  wonDealCount: number
 }
 
-function formatMoney(n: number, currency: string): string {
+function formatMoney(n: number, currency: string, locale: string): string {
   const symbol = currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : currency === 'CAD' ? 'C$' : currency === 'AUD' ? 'A$' : '$'
-  if (n >= 1000000) return `${symbol}${(n / 1000000).toFixed(1)}M`
-  if (n >= 1000) return `${symbol}${Math.round(n).toLocaleString('en-US')}`
+  if (n >= 1000000) return `${symbol}${Math.round(n / 100000) / 10}M`
+  if (n >= 1000) return `${symbol}${Math.round(n).toLocaleString(locale === 'fr' ? 'fr-FR' : 'en-US')}`
   return `${symbol}${Math.round(n)}`
 }
 
-function getTimeAgo(date: string): string {
+function getTimeAgo(date: string, t: (key: string, vars?: Record<string, string | number>) => string, locale: string): string {
   const diffMs = Date.now() - new Date(date).getTime()
   const diffDays = Math.floor(diffMs / 86400000)
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return 'Yesterday'
-  if (diffDays < 7) return `${diffDays}d ago`
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`
-  return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  if (diffDays === 0) return t('time.today')
+  if (diffDays === 1) return t('time.yesterday')
+  if (diffDays < 7) return t('time.dAgo', { count: diffDays })
+  if (diffDays < 30) return t('time.wAgo', { count: Math.floor(diffDays / 7) })
+  return new Date(date).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })
 }
 
-function getStatusLabel(status: string) {
-  if (status === 'closed_won') return { text: 'Won', cls: 'bg-emerald-100 text-emerald-700' }
-  if (status === 'closed_lost') return { text: 'Lost', cls: 'bg-red-100 text-red-700' }
-  if (status?.startsWith('closed')) return { text: 'Closed', cls: 'bg-slate-100 text-slate-600' }
-  return { text: 'Active', cls: 'bg-blue-50 text-blue-700' }
+function getStatusLabel(status: string, t: (key: string, vars?: Record<string, string | number>) => string) {
+  if (status === 'closed_won') return { text: t('charts.won'), cls: 'bg-emerald-100 text-emerald-700' }
+  if (status === 'closed_lost') return { text: t('charts.lost'), cls: 'bg-red-100 text-red-700' }
+  if (status === 'closed_paused' || status === 'closed_partial') return { text: t('charts.partialWin'), cls: 'bg-amber-100 text-amber-700' }
+  if (status?.startsWith('closed')) return { text: t('charts.closed'), cls: 'bg-slate-100 text-slate-600' }
+  return { text: t('charts.active'), cls: 'bg-blue-50 text-blue-700' }
+}
+
+function filterDealsByDateRange(deals: DealRow[], dateRange: 'all' | '30' | '90'): DealRow[] {
+  if (dateRange === 'all') return deals
+  const now = Date.now()
+  const days = dateRange === '30' ? 30 : 90
+  const cutoff = now - days * 86400000
+  return deals.filter(d => new Date(d.updatedAt).getTime() >= cutoff)
+}
+
+function filterCategoriesByDeals(categories: Category[], filteredDeals: DealRow[], allDeals: DealRow[]): Category[] {
+  if (filteredDeals.length === allDeals.length) return categories
+  const activeCats = new Set(filteredDeals.map(d => d.category))
+  return categories.filter(c => activeCats.has(c.name))
+}
+
+// Win Rate circular indicator — only counts formally closed deals
+function WinRateCircle({ closedCount, wonCount, t, locale }: { closedCount: number; wonCount: number; t: (key: string, vars?: Record<string, string | number>) => string; locale: string }) {
+  if (closedCount === 0) {
+    return (
+      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col items-center justify-center h-full">
+        <h3 className="text-sm font-bold text-slate-900 mb-3">{t('charts.winRate')}</h3>
+        <div className="text-xs text-slate-400 text-center">{locale === 'fr' ? 'Aucun contrat clôturé' : 'No closed deals yet'}</div>
+      </div>
+    )
+  }
+  const rate = Math.round((wonCount / closedCount) * 100)
+  const size = 100
+  const strokeWidth = 10
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  const filled = (rate / 100) * circumference
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col items-center justify-center h-full">
+      <h3 className="text-sm font-bold text-slate-900 mb-3">{t('charts.winRate')}</h3>
+      <div className="relative">
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#e2e8f0" strokeWidth={strokeWidth} />
+          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#10b981" strokeWidth={strokeWidth} strokeDasharray={`${filled} ${circumference - filled}`} strokeLinecap="round" className="transition-all duration-700" />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-xl font-bold text-slate-900">{rate}%</span>
+        </div>
+      </div>
+      <p className="text-[10px] text-slate-400 mt-2">
+        {wonCount} {locale === 'fr' ? 'sur' : 'of'} {closedCount} {locale === 'fr' ? (closedCount === 1 ? 'contrat clôturé' : 'contrats clôturés') : (closedCount === 1 ? 'closed deal' : 'closed deals')}
+      </p>
+    </div>
+  )
 }
 
 // SVG Donut Chart
-function DonutChart({ data, currency }: { data: Category[]; currency: string }) {
+function DonutChart({
+  data,
+  currency,
+  t,
+  locale,
+  selectedCategory,
+  onSelectCategory,
+}: {
+  data: Category[]
+  currency: string
+  t: (key: string, vars?: Record<string, string | number>) => string
+  locale: string
+  selectedCategory: string | null
+  onSelectCategory: (name: string | null) => void
+}) {
   const total = data.reduce((s, d) => s + d.spend, 0)
   if (total === 0) return null
 
@@ -85,6 +159,8 @@ function DonutChart({ data, currency }: { data: Category[]; currency: string }) 
           const dashLength = pct * circumference
           const currentOffset = offset
           offset += dashLength
+          const isSelected = selectedCategory === cat.name
+          const isDimmed = selectedCategory !== null && !isSelected
 
           return (
             <circle
@@ -94,11 +170,13 @@ function DonutChart({ data, currency }: { data: Category[]; currency: string }) 
               r={radius}
               fill="none"
               stroke={CHART_COLORS[i % CHART_COLORS.length]}
-              strokeWidth={strokeWidth}
+              strokeWidth={isSelected ? strokeWidth + 4 : strokeWidth}
               strokeDasharray={`${dashLength} ${circumference - dashLength}`}
               strokeDashoffset={-currentOffset}
               strokeLinecap="round"
-              className="transition-all duration-500"
+              className="transition-all duration-300 cursor-pointer"
+              style={{ opacity: isDimmed ? 0.3 : 1 }}
+              onClick={() => onSelectCategory(isSelected ? null : cat.name)}
             />
           )
         })}
@@ -109,7 +187,7 @@ function DonutChart({ data, currency }: { data: Category[]; currency: string }) 
           className="fill-slate-900 text-sm font-bold rotate-90"
           style={{ transformOrigin: 'center' }}
         >
-          {data.length}
+          {formatMoney(total, currency, locale)}
         </text>
         <text
           x={size / 2}
@@ -118,124 +196,197 @@ function DonutChart({ data, currency }: { data: Category[]; currency: string }) 
           className="fill-slate-400 text-[9px] rotate-90"
           style={{ transformOrigin: 'center' }}
         >
-          categories
+          {t('charts.totalSpendLabel')}
         </text>
       </svg>
 
       {/* Legend */}
       <div className="flex-1 space-y-2 w-full">
-        {data.slice(0, 6).map((cat, i) => (
-          <div key={cat.name} className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <div
-                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
-              />
-              <span className="text-xs text-slate-700 truncate">{cat.name}</span>
-              <span className="text-[10px] text-slate-400">{cat.count}</span>
+        {data.slice(0, 6).map((cat, i) => {
+          const isSelected = selectedCategory === cat.name
+          const isDimmed = selectedCategory !== null && !isSelected
+          return (
+            <div
+              key={cat.name}
+              className={`flex items-center justify-between gap-2 cursor-pointer rounded-md px-1.5 py-1 transition-all duration-200 ${
+                isSelected ? 'bg-emerald-50 ring-1 ring-emerald-200' : 'hover:bg-slate-50'
+              }`}
+              style={{ opacity: isDimmed ? 0.4 : 1 }}
+              onClick={() => onSelectCategory(isSelected ? null : cat.name)}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <div
+                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                />
+                <span className="text-xs text-slate-700 truncate">{cat.name}</span>
+                <span className="text-[10px] text-slate-400">{cat.count}</span>
+              </div>
+              <span className="text-xs font-semibold text-slate-900 flex-shrink-0">
+                {formatMoney(cat.spend, currency, locale)}
+              </span>
             </div>
-            <span className="text-xs font-semibold text-slate-900 flex-shrink-0">
-              {formatMoney(cat.spend, currency)}
-            </span>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
 }
 
-// SVG Bar Chart for savings
-function SavingsBarChart({ data, currency }: { data: Category[]; currency: string }) {
+// SVG Bar Chart for savings — Identified vs Achieved
+function SavingsBarChart({ data, currency, t, locale }: { data: Category[]; currency: string; t: (key: string, vars?: Record<string, string | number>) => string; locale: string }) {
   const maxVal = Math.max(...data.map(d => Math.max(d.identified, d.achieved)), 1)
   const catsWithSavings = data.filter(d => d.identified > 0 || d.achieved > 0).slice(0, 5)
 
   if (catsWithSavings.length === 0) {
     return (
       <div className="flex items-center justify-center h-40 text-sm text-slate-400">
-        No savings data yet
+        {t('charts.noSavingsData')}
       </div>
     )
   }
 
   return (
-    <div className="space-y-3">
-      {catsWithSavings.map((cat, i) => (
+    <div className="space-y-4">
+      <p className="text-[10px] text-slate-400">
+        {locale === 'fr'
+          ? 'Identifiées = économies potentielles de l\'analyse. Réalisées = économies confirmées des contrats clôturés.'
+          : 'Identified = potential savings from analysis. Achieved = confirmed savings from closed deals.'}
+      </p>
+      {catsWithSavings.map((cat) => (
         <div key={cat.name}>
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-slate-700 truncate">{cat.name}</span>
-            <span className="text-xs font-semibold text-slate-900">{formatMoney(cat.identified, currency)}</span>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-medium text-slate-700 truncate">{cat.name}</span>
           </div>
-          <div className="flex gap-1.5">
-            {/* Identified */}
-            <div className="flex-1 h-5 bg-slate-100 rounded-md overflow-hidden">
-              <div
-                className="h-full rounded-md bg-emerald-200 transition-all duration-500"
-                style={{ width: `${Math.max((cat.identified / maxVal) * 100, 2)}%` }}
-              />
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-4 bg-slate-100 rounded-md overflow-hidden">
+                <div className="h-full rounded-md bg-emerald-200 transition-all duration-500" style={{ width: `${Math.max((cat.identified / maxVal) * 100, 2)}%` }} />
+              </div>
+              <span className="text-[10px] font-medium text-slate-500 w-24 text-right flex-shrink-0">
+                {formatMoney(cat.identified, currency, locale)}
+              </span>
             </div>
-            {/* Achieved */}
-            <div className="flex-1 h-5 bg-slate-100 rounded-md overflow-hidden">
-              <div
-                className="h-full rounded-md bg-emerald-500 transition-all duration-500"
-                style={{ width: `${Math.max((cat.achieved / maxVal) * 100, cat.achieved > 0 ? 2 : 0)}%` }}
-              />
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-4 bg-slate-100 rounded-md overflow-hidden">
+                {cat.achieved > 0 ? (
+                  <div className="h-full rounded-md bg-emerald-500 transition-all duration-500" style={{ width: `${Math.max((cat.achieved / maxVal) * 100, 2)}%` }} />
+                ) : null}
+              </div>
+              <span className="text-[10px] font-medium text-right w-24 flex-shrink-0">
+                {cat.achieved > 0 ? (
+                  <span className="text-emerald-600">{formatMoney(cat.achieved, currency, locale)}</span>
+                ) : (
+                  <span className="text-slate-300">{locale === 'fr' ? 'Aucun clôturé' : 'No closed deals'}</span>
+                )}
+              </span>
             </div>
           </div>
         </div>
       ))}
-      <div className="flex items-center gap-4 pt-2">
+      <div className="flex items-center gap-4 pt-1">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded bg-emerald-200" />
-          <span className="text-[10px] text-slate-500">Identified</span>
+          <span className="text-[10px] text-slate-500">{t('charts.identified')}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded bg-emerald-500" />
-          <span className="text-[10px] text-slate-500">Achieved</span>
+          <span className="text-[10px] text-slate-500">{t('charts.achieved')}</span>
         </div>
       </div>
     </div>
   )
 }
 
-export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency, savingsAchieved, isPro, isAdmin }: Props) {
+export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency, savingsAchieved, isPro, isAdmin, winRate, closedDealCount, wonDealCount }: Props) {
   const showProLock = !isPro && !isAdmin
+  const { t, locale } = useI18n()
+  const router = useRouter()
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [dateRange, setDateRange] = useState<'all' | '30' | '90'>('all')
+
+  // Filter deals by date range
+  const filteredDeals = filterDealsByDateRange(deals, dateRange)
+  // Filter categories based on filtered deals
+  const filteredCategories = filterCategoriesByDeals(categories, filteredDeals, deals)
+  // Further filter deals by selected category
+  const displayDeals = selectedCategory
+    ? filteredDeals.filter(d => d.category === selectedCategory)
+    : filteredDeals
+
+  const dateRangeOptions: { key: 'all' | '30' | '90'; label: string }[] = [
+    { key: 'all', label: t('charts.allTime') },
+    { key: '30', label: t('charts.last30') },
+    { key: '90', label: t('charts.last90') },
+  ]
 
   return (
     <div className="space-y-6">
-      {/* Middle: Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Spend by Category */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-          <h3 className="text-sm font-bold text-slate-900 mb-4">Spend by Category</h3>
-          {categories.length > 0 ? (
-            <DonutChart data={categories} currency={baseCurrency} />
+      {/* Date Range Filter */}
+      <div className="flex justify-end">
+        <div className="inline-flex items-center bg-slate-100 rounded-lg p-0.5">
+          {dateRangeOptions.map(opt => (
+            <button
+              key={opt.key}
+              onClick={() => setDateRange(opt.key)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 ${
+                dateRange === opt.key
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Middle: Charts + Win Rate */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* Spend by Category — 2 cols */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <h3 className="text-sm font-bold text-slate-900 mb-4">{t('charts.spendByCategory')}</h3>
+          {filteredCategories.length > 0 ? (
+            <DonutChart
+              data={filteredCategories}
+              currency={baseCurrency}
+              t={t}
+              locale={locale}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+            />
           ) : (
             <div className="flex items-center justify-center h-40 text-sm text-slate-400">
-              No category data yet
+              {t('charts.noCategoryData')}
             </div>
           )}
         </div>
 
-        {/* Savings Overview */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm relative">
-          <h3 className="text-sm font-bold text-slate-900 mb-4">Savings Overview</h3>
+        {/* Win Rate — 1 col */}
+        <div className="lg:col-span-1">
+          <WinRateCircle closedCount={closedDealCount} wonCount={wonDealCount} t={t} locale={locale} />
+        </div>
+
+        {/* Savings Overview — 2 cols */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm relative">
+          <h3 className="text-sm font-bold text-slate-900 mb-4">{locale === 'fr' ? 'Économies : identifiées vs réalisées' : 'Savings: Identified vs Achieved'}</h3>
           {showProLock ? (
             <div className="relative">
               <div className="filter blur-[4px] pointer-events-none select-none">
-                <SavingsBarChart data={categories} currency={baseCurrency} />
+                <SavingsBarChart data={filteredCategories} currency={baseCurrency} t={t} locale={locale} />
               </div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <Lock className="w-5 h-5 text-emerald-600 mx-auto mb-1.5" />
-                  <p className="text-xs font-semibold text-slate-900 mb-1">Pro feature</p>
+                  <p className="text-xs font-semibold text-slate-900 mb-1">{t('charts.proFeature')}</p>
                   <Link href="/pricing" className="text-[10px] text-emerald-600 hover:text-emerald-700 font-medium">
-                    Unlock with Pro &rarr;
+                    {t('charts.unlockWithPro')} &rarr;
                   </Link>
                 </div>
               </div>
             </div>
           ) : (
-            <SavingsBarChart data={categories} currency={baseCurrency} />
+            <SavingsBarChart data={filteredCategories} currency={baseCurrency} t={t} locale={locale} />
           )}
         </div>
       </div>
@@ -245,32 +396,53 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
         {/* Recent Deals — 3 cols */}
         <div className="lg:col-span-3 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900">Recent Deals</h3>
+            <div className="flex items-center gap-3">
+              <h3 className="text-sm font-bold text-slate-900">{t('charts.recentDeals')}</h3>
+              {selectedCategory && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  {selectedCategory}
+                  <button
+                    onClick={() => setSelectedCategory(null)}
+                    className="ml-0.5 text-emerald-500 hover:text-emerald-700"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+            </div>
             <Link href="/app" className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
-              View all &rarr;
+              {t('charts.viewAll')} &rarr;
             </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100">
-                  <th className="text-left px-5 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Vendor</th>
-                  <th className="text-left px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">Category</th>
-                  <th className="text-right px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Value</th>
-                  <th className="text-center px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Status</th>
-                  <th className="text-center px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">Flags</th>
-                  <th className="text-right px-5 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">Updated</th>
+                  <th className="text-left px-5 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('charts.vendor')}</th>
+                  <th className="text-left px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{t('charts.category')}</th>
+                  <th className="text-right px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('charts.value')}</th>
+                  <th className="text-center px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('charts.status')}</th>
+                  <th className="text-right px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{locale === 'fr' ? 'Économies' : 'Savings'}</th>
+                  <th className="text-center px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{t('charts.flags')}</th>
+                  <th className="text-right px-5 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{t('charts.updated')}</th>
                 </tr>
               </thead>
               <tbody>
-                {deals.slice(0, 8).map((deal) => {
-                  const status = getStatusLabel(deal.status)
+                {displayDeals.slice(0, 8).map((deal) => {
+                  const status = getStatusLabel(deal.status, t)
                   return (
-                    <tr key={deal.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <tr
+                      key={deal.id}
+                      className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors cursor-pointer"
+                      onClick={() => router.push(`/app/deal/${deal.id}`)}
+                    >
                       <td className="px-5 py-2.5">
-                        <Link href={`/app/deal/${deal.id}`} className="text-xs font-medium text-slate-900 hover:text-emerald-700 transition-colors">
+                        <span
+                          className="text-xs font-medium text-slate-900 hover:text-emerald-700 transition-colors block max-w-[140px] truncate"
+                          title={deal.vendor}
+                        >
                           {deal.vendor}
-                        </Link>
+                        </span>
                       </td>
                       <td className="px-3 py-2.5 hidden sm:table-cell">
                         <span className="text-[10px] text-slate-500">{deal.category}</span>
@@ -283,6 +455,15 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
                           {status.text}
                         </span>
                       </td>
+                      <td className="px-3 py-2.5 text-right hidden sm:table-cell">
+                        {deal.status?.startsWith('closed') && deal.achievedSavings > 0 ? (
+                          <span className="text-[10px] font-semibold text-emerald-600">{formatMoney(deal.achievedSavings, baseCurrency, locale)}</span>
+                        ) : deal.potentialSavings > 0 ? (
+                          <span className="text-[10px] font-medium text-emerald-400">~{formatMoney(deal.potentialSavings, baseCurrency, locale)}</span>
+                        ) : (
+                          <span className="text-[10px] text-slate-300">—</span>
+                        )}
+                      </td>
                       <td className="px-3 py-2.5 text-center hidden sm:table-cell">
                         {deal.redFlags > 0 ? (
                           <span className="inline-flex items-center gap-1 text-[10px] text-red-500 font-medium">
@@ -294,7 +475,7 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
                         )}
                       </td>
                       <td className="px-5 py-2.5 text-right hidden sm:table-cell">
-                        <span className="text-[10px] text-slate-400">{getTimeAgo(deal.updatedAt)}</span>
+                        <span className="text-[10px] text-slate-400">{getTimeAgo(deal.updatedAt, t, locale)}</span>
                       </td>
                     </tr>
                   )
@@ -306,21 +487,22 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
 
         {/* Top Suppliers — 2 cols */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-          <h3 className="text-sm font-bold text-slate-900 mb-4">Top Suppliers by Spend</h3>
+          <h3 className="text-sm font-bold text-slate-900 mb-4">{t('charts.topSuppliers')}</h3>
           {topSuppliers.length > 0 ? (
             <div className="space-y-3">
               {topSuppliers.map((supplier, i) => {
                 const maxSpend = topSuppliers[0]?.spend || 1
+                const tooltipText = `${t('charts.totalSpendLabel')}: ${formatMoney(supplier.spend, baseCurrency, locale)} | ${supplier.count} ${t('charts.dealsLabel')}${supplier.savings > 0 ? ` | ${formatMoney(supplier.savings, baseCurrency, locale)} ${t('charts.savingsLabel')}` : ''}`
                 return (
-                  <div key={supplier.name}>
+                  <div key={supplier.name} className="group relative" title={tooltipText}>
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="text-[10px] font-bold text-slate-400 w-4">{i + 1}</span>
-                        <span className="text-xs text-slate-700 truncate">{supplier.name}</span>
-                        <span className="text-[10px] text-slate-400 flex-shrink-0">{supplier.count} deal{supplier.count !== 1 ? 's' : ''}</span>
+                        <span className="text-xs text-slate-700 truncate max-w-[140px]" title={supplier.name}>{supplier.name}</span>
+                        <span className="text-[10px] text-slate-400 flex-shrink-0">{supplier.count} {supplier.count === 1 ? (locale === 'fr' ? 'contrat' : 'deal') : t('charts.dealsLabel')}</span>
                       </div>
                       <span className="text-xs font-semibold text-slate-900 flex-shrink-0 ml-2">
-                        {formatMoney(supplier.spend, baseCurrency)}
+                        {formatMoney(supplier.spend, baseCurrency, locale)}
                       </span>
                     </div>
                     <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -335,7 +517,7 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
             </div>
           ) : (
             <div className="flex items-center justify-center h-32 text-sm text-slate-400">
-              No supplier data yet
+              {t('charts.noSupplierData')}
             </div>
           )}
         </div>

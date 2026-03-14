@@ -16,6 +16,15 @@ import { AddRoundForm } from './AddRoundForm'
 import type { Plan } from '@/lib/tiers'
 import type { DealOutput, DealOutputV2 } from '@/types'
 
+function parseMoney(str: string): number {
+  if (!str) return 0
+  const cleaned = str.replace(/[^0-9.,KkMm]/g, '')
+  const upper = cleaned.toUpperCase()
+  if (upper.includes('K')) return parseFloat(upper.replace('K', '')) * 1000
+  if (upper.includes('M')) return parseFloat(upper.replace('M', '')) * 1000000
+  return parseFloat(cleaned.replace(/,/g, '')) || 0
+}
+
 export default async function DealPage({
   params,
 }: {
@@ -86,10 +95,11 @@ export default async function DealPage({
     return sum
   }, 0) || 0
 
+  const currencySymbol = totalCommitment?.includes('€') ? '€' : totalCommitment?.includes('£') ? '£' : totalCommitment?.includes('C$') ? 'C$' : totalCommitment?.includes('A$') ? 'A$' : totalCommitment?.includes('$') ? '$' : '€'
   const formatSavings = (amount: number) => {
-    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`
-    if (amount >= 1000) return `$${(amount / 1000).toFixed(1)}K`
-    return `$${amount.toFixed(0)}`
+    if (amount >= 1000000) return `${currencySymbol}${(amount / 1000000).toFixed(1)}M`
+    if (amount >= 1000) return `${currencySymbol}${(amount / 1000).toFixed(1)}K`
+    return `${currencySymbol}${amount.toFixed(0)}`
   }
 
   // Clean title format: replace " - " or " -- " with " · "
@@ -166,7 +176,7 @@ export default async function DealPage({
         </div>
 
         {/* Stats row inside the header card */}
-        <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-slate-100">
           <div className="text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
               <DollarSign className="w-3.5 h-3.5 text-slate-400" />
@@ -197,42 +207,156 @@ export default async function DealPage({
       </Card>
 
       {/* Outcome Card — closed deals */}
-      {deal.status?.startsWith('closed_') && (
-        <Card className="p-5 sm:p-6 bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 border-2 border-emerald-300 shadow-lg">
-          <div className="flex items-start gap-4">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center flex-shrink-0 shadow-md">
-              {deal.status === 'closed_won' && <CheckCircle2 className="w-5 h-5 text-white" />}
-              {deal.status === 'closed_lost' && <TrendingDown className="w-5 h-5 text-white" />}
-              {deal.status === 'closed_paused' && <Minus className="w-5 h-5 text-white" />}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-base font-bold text-slate-900">{t('deal.dealClosed')}</h3>
-                {deal.closed_at && (
-                  <span className="text-[10px] text-slate-600 font-medium px-2.5 py-0.5 bg-white rounded-full border border-slate-200">
-                    {new Date(deal.closed_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
-                )}
+      {deal.status?.startsWith('closed_') && (() => {
+        const dealCurrency = totalCommitment?.includes('€') ? '€' : totalCommitment?.includes('£') ? '£' : totalCommitment?.includes('C$') ? 'C$' : totalCommitment?.includes('A$') ? 'A$' : totalCommitment?.includes('$') ? '$' : '€'
+        const isWon = deal.status === 'closed_won'
+        const isLost = deal.status === 'closed_lost'
+        const locStr = locale === 'fr' ? 'fr-FR' : 'en-US'
+
+        // Parse structured summary — supports v3 (starting_position + wins with description/financial_impact),
+        // v2 (wins with title/impact/cash_value), v1 (key_wins string array), or legacy text
+        type WinItem = { category: string; description: string; financial_impact?: string | null }
+        let startingPosition: string | null = null
+        let wins: WinItem[] = []
+        let parsedWhatChanged: string[] = []
+        let nextAction: string | null = null
+        let legacySummary: string | null = null
+        let parsedOriginal: string | null = null
+        let parsedFinal: string | null = null
+        let parsedCashSavings: number | null = null
+        let parsedCashPercent: number | null = null
+
+        if (deal.close_summary) {
+          try {
+            const parsed = typeof deal.close_summary === 'string' ? JSON.parse(deal.close_summary) : deal.close_summary
+
+            // v3 format: has starting_position + wins with description/financial_impact
+            if (parsed.wins && Array.isArray(parsed.wins) && parsed.starting_position) {
+              startingPosition = parsed.starting_position
+              wins = parsed.wins.map((w: any) => ({
+                category: w.category || 'OTHER',
+                description: w.description || w.title || '',
+                financial_impact: w.financial_impact || w.impact || null,
+              }))
+              parsedWhatChanged = parsed.what_changed || []
+              nextAction = parsed.next_action || null
+              parsedOriginal = parsed.original_amount || null
+              parsedFinal = parsed.final_amount || null
+              parsedCashSavings = parsed.cash_savings_amount ?? null
+              parsedCashPercent = parsed.cash_savings_percent ?? null
+            }
+            // v2 format: has wins with title/impact/cash_value (no starting_position)
+            else if (parsed.wins && Array.isArray(parsed.wins)) {
+              wins = parsed.wins.map((w: any) => ({
+                category: w.category || 'OTHER',
+                description: w.title || w.description || '',
+                financial_impact: w.financial_impact || w.impact || (w.cash_value ? `${dealCurrency}${Math.round(w.cash_value).toLocaleString(locStr)}` : null),
+              }))
+              nextAction = parsed.next_action || null
+              parsedOriginal = parsed.original_amount || null
+              parsedFinal = parsed.final_amount || null
+              parsedCashSavings = parsed.cash_savings_amount ?? null
+              parsedCashPercent = parsed.cash_savings_percent ?? null
+            }
+            // v1 format: has key_wins string array
+            else if (parsed.key_wins && Array.isArray(parsed.key_wins)) {
+              wins = parsed.key_wins.map((w: string) => ({ category: 'OTHER', description: w, financial_impact: null }))
+              nextAction = parsed.next_action || null
+            }
+            else {
+              legacySummary = typeof deal.close_summary === 'string' ? deal.close_summary : JSON.stringify(deal.close_summary)
+            }
+          } catch {
+            legacySummary = (deal.close_summary as string).replace(/\*\*/g, '')
+          }
+        }
+
+        // Merge what_changed: AI-generated tags + user-selected tags
+        const allWhatChanged = [...new Set([
+          ...(parsedWhatChanged || []),
+          ...(deal.what_changed || []),
+        ])]
+
+        const originalAmount = parsedOriginal || totalCommitment || '—'
+        const hasCashSavings = (parsedCashSavings ?? deal.savings_amount ?? 0) > 0
+        const cashSavingsNum = parsedCashSavings ?? deal.savings_amount ?? 0
+        const cashSavingsPct = parsedCashPercent ?? deal.savings_percent ?? null
+        const finalAmount = parsedFinal || (hasCashSavings
+          ? `${dealCurrency}${Math.round(parseMoney(totalCommitment || '0') - cashSavingsNum).toLocaleString(locStr)}`
+          : (locale === 'fr' ? 'Inchangé' : 'Unchanged'))
+
+        const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
+          'PRICE': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+          'CASH FLOW': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+          'PAYMENT TERMS': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+          'LEGAL': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+          'RISK': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
+          'TERMS': { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200' },
+          'SCOPE': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
+          'SLA': { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200' },
+          'OTHER': { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200' },
+        }
+
+        return (
+          <Card className={`overflow-hidden border-2 shadow-lg ${isWon ? 'border-emerald-300' : 'border-slate-300'}`}>
+            {/* Header bar */}
+            <div className={`px-5 sm:px-6 py-4 flex items-center justify-between ${isWon ? 'bg-gradient-to-r from-emerald-600 to-green-600' : 'bg-gradient-to-r from-slate-600 to-slate-700'}`}>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                  {isWon ? <CheckCircle2 className="w-5 h-5 text-white" /> : isLost ? <TrendingDown className="w-5 h-5 text-white" /> : <Minus className="w-5 h-5 text-white" />}
+                </div>
+                <h3 className="text-base font-bold text-white">{t('deal.dealClosed')}</h3>
               </div>
+              {deal.closed_at && (
+                <span className="text-xs text-white/80 font-medium">
+                  {new Date(deal.closed_at).toLocaleDateString(locStr, { month: 'short', day: 'numeric', year: 'numeric' })}
+                </span>
+              )}
+            </div>
 
-              {deal.savings_amount != null && deal.savings_amount > 0 && (() => {
-                const currency = totalCommitment?.includes('€') ? '€' : totalCommitment?.includes('£') ? '£' : '$'
-                return (
-                  <div className="mb-3 p-3 bg-white rounded-xl border-2 border-emerald-300">
-                    <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-wide mb-0.5">{t('deal.totalSavings')}</p>
-                    <div className="flex items-baseline gap-2">
-                      <p className="text-2xl font-bold text-emerald-900">{currency}{Math.round(deal.savings_amount).toLocaleString('en-US')}</p>
-                      {deal.savings_percent != null && <p className="text-base font-bold text-emerald-700">({deal.savings_percent.toFixed(1)}%)</p>}
-                    </div>
+            <div className="px-5 sm:px-6 py-5 space-y-5 bg-gradient-to-b from-slate-50/80 to-white">
+
+              {/* Starting Position — one clean sentence */}
+              {startingPosition && (
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">{locale === 'fr' ? 'Situation initiale' : 'Starting Position'}</p>
+                  <p className="text-sm text-slate-600 leading-relaxed">{startingPosition}</p>
+                </div>
+              )}
+
+              {/* Stats row — 3 boxes */}
+              {isWon && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="bg-white rounded-xl border border-slate-200 p-3.5 text-center">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Devis initial' : 'Original Quote'}</p>
+                    <p className="text-base sm:text-lg font-bold text-slate-900">{originalAmount}</p>
                   </div>
-                )
-              })()}
+                  <div className="bg-white rounded-xl border border-slate-200 p-3.5 text-center">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Montant final' : 'Final Agreed'}</p>
+                    <p className="text-base sm:text-lg font-bold text-slate-900">{finalAmount}</p>
+                  </div>
+                  <div className={`rounded-xl p-3.5 text-center ${hasCashSavings ? 'bg-emerald-50 border-2 border-emerald-200' : 'bg-white border border-slate-200'}`}>
+                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-1 ${hasCashSavings ? 'text-emerald-700' : 'text-slate-400'}`}>
+                      {locale === 'fr' ? 'Économies' : 'Cash Savings'}
+                    </p>
+                    {hasCashSavings ? (
+                      <>
+                        <p className="text-base sm:text-lg font-bold text-emerald-900">{dealCurrency}{Math.round(cashSavingsNum).toLocaleString(locStr)}</p>
+                        {cashSavingsPct != null && <p className="text-xs font-bold text-emerald-600">({cashSavingsPct.toFixed(1)}%)</p>}
+                      </>
+                    ) : (
+                      <p className="text-base sm:text-lg font-bold text-slate-400">—</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
-              {deal.what_changed && deal.what_changed.length > 0 && (
-                <div className="mb-3">
-                  <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1.5">{t('deal.whatChanged')}</p>
+              {/* What Changed — auto-detected + user-selected tag pills */}
+              {allWhatChanged.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-2">{t('deal.whatChanged')}</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {deal.what_changed.map((item: string) => (
+                    {allWhatChanged.map((item: string) => (
                       <span key={item} className="px-2.5 py-1 text-[10px] font-bold bg-white text-emerald-700 rounded-lg border border-emerald-200">
                         {item}
                       </span>
@@ -241,16 +365,76 @@ export default async function DealPage({
                 </div>
               )}
 
-              {deal.close_summary && (
-                <div className="p-3 bg-white rounded-xl border border-slate-200">
-                  <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1">{t('deal.summary')}</p>
-                  <p className="text-sm text-slate-700 leading-relaxed">{deal.close_summary}</p>
+              {/* Wins Secured — individual win cards */}
+              {wins.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <p className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                      {locale === 'fr' ? 'Gains obtenus' : 'Wins secured'}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {wins.map((win, i) => {
+                      const cat = (win.category || 'OTHER').toUpperCase()
+                      const colors = categoryColors[cat] || categoryColors['OTHER']
+                      const hasFinancialImpact = win.financial_impact != null && win.financial_impact.length > 0
+                      return (
+                        <div key={i} className="bg-white rounded-xl border border-slate-200 p-3.5 hover:border-slate-300 transition-colors">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md border ${colors.bg} ${colors.text} ${colors.border}`}>
+                                  {cat}
+                                </span>
+                                {hasFinancialImpact ? (
+                                  <span className="text-xs font-bold text-emerald-600">{win.financial_impact}</span>
+                                ) : (
+                                  <span className="px-1.5 py-0.5 text-[9px] font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded-md">
+                                    {locale === 'fr' ? 'Gain non financier' : 'Non-financial win'}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm text-slate-800">{win.description}</p>
+                            </div>
+                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${hasFinancialImpact ? 'bg-emerald-100' : 'bg-blue-50'}`}>
+                              {hasFinancialImpact
+                                ? <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+                                : <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Legacy text summary — for old deals before structured JSON */}
+              {legacySummary && (
+                <div>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-2">{t('deal.summary')}</p>
+                  <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{legacySummary}</p>
+                </div>
+              )}
+
+              {/* Next Step — clean CTA-style row */}
+              {nextAction && (
+                <div className="flex items-center gap-3 p-3.5 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{locale === 'fr' ? 'Prochaine étape' : 'Next Step'}</p>
+                    <p className="text-sm text-slate-800 mt-0.5">{nextAction}</p>
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-        </Card>
-      )}
+          </Card>
+        )
+      })()}
 
       {/* Analysis Output — no duplicate title section */}
       {latestOutput && (

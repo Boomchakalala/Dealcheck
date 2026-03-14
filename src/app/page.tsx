@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight, Upload, Search, Send, Lock, ShieldCheck, Globe, Check, Users, Building2, ShoppingCart, Zap, FileText, Mail, CreditCard } from 'lucide-react'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
+import { MarketingFooter } from '@/components/MarketingFooter'
 import { useScrollReveal, useCountUp } from '@/hooks/useScrollReveal'
 import { useT } from '@/i18n/context'
 
@@ -612,31 +613,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-slate-500">{t('footer.rights')}</p>
-            <div className="flex items-center flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
-              <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                {t('footer.pricing')}
-              </Link>
-              <Link href="/help" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                {t('footer.help')}
-              </Link>
-              <Link href="/security" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                {t('footer.security')}
-              </Link>
-              <Link href="/terms" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                {t('footer.terms')}
-              </Link>
-              <Link href="/privacy" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                {t('footer.privacy')}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   )
 }

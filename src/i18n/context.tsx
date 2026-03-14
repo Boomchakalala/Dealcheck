@@ -1,12 +1,10 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-import en from './en.json'
-import fr from './fr.json'
+import { createContext, useContext, type ReactNode } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
+import { useRouter } from 'next/navigation'
 
 export type Locale = 'en' | 'fr'
-
-const messages: Record<Locale, Record<string, string>> = { en, fr }
 
 interface I18nContextType {
   locale: Locale
@@ -21,40 +19,31 @@ const I18nContext = createContext<I18nContextType>({
 })
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('en')
-
-  useEffect(() => {
-    // Read from cookie or localStorage
-    const saved = document.cookie.match(/termlift_lang=(\w+)/)?.[1] as Locale | undefined
-    if (saved && (saved === 'en' || saved === 'fr')) {
-      setLocaleState(saved)
-    } else {
-      // Detect browser language
-      const browserLang = navigator.language.toLowerCase()
-      if (browserLang.startsWith('fr')) {
-        setLocaleState('fr')
-        document.cookie = 'termlift_lang=fr;path=/;max-age=31536000'
-      }
-    }
-  }, [])
+  const intlT = useTranslations()
+  const intlLocale = useLocale() as Locale
+  const router = useRouter()
 
   const setLocale = (newLocale: Locale) => {
-    setLocaleState(newLocale)
     document.cookie = `termlift_lang=${newLocale};path=/;max-age=31536000`
+    // Also persist to Supabase profile
+    fetch('/api/user/locale', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ locale: newLocale }),
+    }).catch(() => {})
+    router.refresh()
   }
 
   const t = (key: string, vars?: Record<string, string | number>): string => {
-    let text = messages[locale]?.[key] || messages.en[key] || key
-    if (vars) {
-      Object.entries(vars).forEach(([k, v]) => {
-        text = text.replace(`{${k}}`, String(v))
-      })
+    try {
+      return intlT(key as any, vars as any)
+    } catch {
+      return key
     }
-    return text
   }
 
   return (
-    <I18nContext.Provider value={{ locale, setLocale, t }}>
+    <I18nContext.Provider value={{ locale: intlLocale, setLocale, t }}>
       {children}
     </I18nContext.Provider>
   )
