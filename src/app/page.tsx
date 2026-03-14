@@ -540,12 +540,12 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <button
-                disabled
-                className="block w-full text-center px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white opacity-80 cursor-not-allowed transition-all shadow-md"
+              <Link
+                href="/pricing"
+                className="block w-full text-center px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md"
               >
-                {t('pricing.comingSoon')}
-              </button>
+                Get Pro
+              </Link>
             </div>
 
             {/* Business */}
