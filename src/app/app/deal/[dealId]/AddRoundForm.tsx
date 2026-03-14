@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
 import { Loader2, Plus, ChevronDown, ChevronUp, Upload, X } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
+import { useT } from '@/i18n/context'
 
 interface AddRoundFormProps {
   dealId: string
@@ -15,6 +16,7 @@ interface AddRoundFormProps {
 }
 
 export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
+  const t = useT()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [mode, setMode] = useState<'upload' | 'paste'>('upload')
@@ -124,17 +126,20 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
   const currentText = extractedText || pastedText
 
   return (
-    <Card className="p-0 border-2 border-slate-200 overflow-hidden">
+    <Card className="p-0 border-2 border-slate-200 border-l-4 border-l-emerald-500 overflow-hidden">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full text-left px-6 py-4 hover:bg-slate-50 transition-colors"
+        className="flex items-center justify-between w-full text-left px-6 py-5 hover:bg-emerald-50/30 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
             <Plus className="h-5 w-5 text-emerald-600" />
           </div>
-          <h2 className="text-lg font-bold text-slate-900">Add New Round</h2>
+          <div>
+            <h2 className="text-base font-bold text-slate-900">{t('addRound.title')}</h2>
+            <p className="text-xs text-slate-500">{t('addRound.subtitle')}</p>
+          </div>
         </div>
         {isOpen ? (
           <ChevronUp className="h-5 w-5 text-slate-400" />
@@ -146,8 +151,8 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
       {isOpen && (
         <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-5 border-t border-slate-200">
           <div className="pt-5">
-            <p className="text-sm font-semibold text-slate-900 mb-1">Round {roundNumber} — counter-offer / updated quote</p>
-            <p className="text-xs text-slate-600">Upload a new document or paste updated text from your supplier.</p>
+            <p className="text-sm font-semibold text-slate-900 mb-1">{t('addRound.round', { number: String(roundNumber) })}</p>
+            <p className="text-sm text-slate-600 leading-relaxed">{t('addRound.description')}</p>
           </div>
 
           {/* Segmented Toggle */}
@@ -161,7 +166,7 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Upload file
+              {t('addRound.uploadFile')}
             </button>
             <button
               type="button"
@@ -172,7 +177,7 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Paste text
+              {t('addRound.pasteText')}
             </button>
           </div>
 
@@ -208,9 +213,9 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-slate-900 mb-1">
-                        {loading ? 'Processing file...' : 'Drop file here or browse'}
+                        {loading ? t('upload.processing') : t('upload.dropOrBrowse')}
                       </p>
-                      <p className="text-xs text-slate-500">PDF, PNG, JPG, or WEBP • Max 10MB</p>
+                      <p className="text-xs text-slate-500">{t('upload.formats')} • {t('upload.maxSize')}</p>
                     </div>
                     <button
                       type="button"
@@ -218,7 +223,7 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
                       disabled={loading}
                       className="px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition-all"
                     >
-                      Browse files
+                      {t('upload.browseFiles')}
                     </button>
                   </div>
                 </div>
@@ -257,14 +262,14 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
                   setExtractedText('')
                   setUploadedFile(null)
                 }}
-                placeholder="Paste updated quote or counter-offer text here..."
+                placeholder={t('addRound.pastePlaceholder')}
                 rows={8}
                 disabled={loading}
                 className="resize-none"
               />
               <div className="flex items-center justify-between mt-2">
                 <p className="text-xs text-slate-500">
-                  {pastedText.length > 0 ? `${pastedText.length} characters` : 'Min 100 characters recommended'}
+                  {pastedText.length > 0 ? `${pastedText.length} ${t('addRound.characters')}` : t('addRound.minChars')}
                 </p>
               </div>
             </div>
@@ -275,6 +280,19 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
               {error}
             </div>
           )}
+
+          {/* Notes field */}
+          <div>
+            <label className="text-xs font-semibold text-slate-700 mb-1.5 block">{t('addRound.notesLabel')}</label>
+            <Textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder={t('addRound.notesPlaceholder')}
+              rows={2}
+              disabled={loading}
+              className="resize-none text-sm"
+            />
+          </div>
 
           <div className="flex items-center justify-between pt-3 border-t border-slate-200">
             <button
@@ -290,7 +308,7 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
               disabled={loading}
               className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
             >
-              Cancel
+              {t('addRound.cancel')}
             </button>
             <div className="flex items-center gap-3">
               <Button
@@ -301,10 +319,10 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Analyzing...
+                    {t('addRound.analyzing')}
                   </>
                 ) : (
-                  <>Analyze Round {roundNumber}</>
+                  <>{t('addRound.generateAnalysis', { number: String(roundNumber) })}</>
                 )}
               </Button>
             </div>
@@ -312,7 +330,7 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
 
           <div className="flex items-center justify-center pt-2">
             <p className="text-xs text-slate-500">
-              Processed securely. Deleted after analysis unless you save.
+              {t('addRound.processedSecurely')}
             </p>
           </div>
         </form>

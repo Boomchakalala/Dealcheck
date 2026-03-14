@@ -1,476 +1,448 @@
 import { type DealOutput } from '@/types'
 
-// Example 1: Marketing Agency
+// Example 1: Marketing Agency — clear math, big savings
 export const marketingAgencyExample: DealOutput = {
-  title: "Digital Marketing Retainer - Brightwave Agency - Annual Contract",
+  title: "Marketing Agency Retainer - Brightwave - 12-Month Contract",
   vendor: "Brightwave Marketing",
   category: "Marketing Services",
-  description: "Full-service digital marketing agency for B2B lead generation",
-  verdict: "Request clear performance KPIs, reduce ad spend markup, and clarify deliverables before signing.",
+  description: "Full-service digital marketing agency — SEO, content, paid ads",
+  verdict: "You're overpaying on ad fees and missing basic protections. Two asks could save you €16,800/year.",
   verdict_type: "negotiate",
-  price_insight: "At $8,000/month retainer plus 15% ad markup, you could save $6,000/year by negotiating standard 10% ad markup.",
+  price_insight: "The retainer is €7,500/month but comparable agencies charge €6,000. Combined with an inflated 20% ad fee, you're leaving €16,800/year on the table.",
   snapshot: {
-    vendor_product: "Brightwave Marketing / Full-Service Digital Marketing",
+    vendor_product: "Brightwave Marketing / Full-Service Retainer",
     term: "12 months",
-    total_commitment: "$96,000",
-    billing_payment: "Monthly $8,000",
-    pricing_model: "Monthly retainer + 15% ad spend markup",
+    total_commitment: "€110,000",
+    billing_payment: "Monthly €9,167 (€7,500 retainer + €1,667 ad management)",
+    pricing_model: "Fixed retainer + 20% of ad spend as management fee",
     deal_type: "New",
+    currency: "EUR",
   },
   quick_read: {
     whats_solid: [
-      "Includes dedicated account manager and monthly reporting",
-      "Covers SEO, content, social media, and paid ads",
-      "Agency has relevant B2B SaaS case studies",
+      "Dedicated account manager and monthly reporting included",
+      "Covers SEO, content marketing, social, and paid ads",
+      "Strong B2B SaaS case studies — relevant experience",
     ],
     whats_concerning: [
-      "No clear performance metrics or KPIs in contract",
-      "15% markup on all ad spend (industry standard is 10%)",
-      "Vague deliverables - 'up to 8 blog posts/month' but no minimum guarantee",
+      "20% ad management fee — industry standard is 10-15%",
+      "Retainer of €7,500/month is above market for this scope (€5,500-6,500 typical)",
+      "No minimum deliverables — 'up to 8 blog posts' could mean 2",
     ],
-    conclusion: "Good agency fit, but contract lacks accountability. Negotiate KPIs, reduce ad markup, and lock in clear deliverables.",
+    conclusion: "Good agency, overpriced contract. Negotiate the retainer down and cut the ad fee in half to save €16,800/year.",
   },
   red_flags: [
     {
       type: "Commercial",
-      issue: "15% markup on ad spend vs industry standard 10%",
-      why_it_matters: "If you spend $10,000/month on ads, you're paying $1,500/month in fees vs $1,000 industry standard. That's $500/month or $6,000/year extra.",
-      what_to_ask_for: "Reduce ad spend markup to 10% (saves $6,000 annually on $10K/month ad budget).",
-      if_they_push_back: "Accept 12% markup (saves $3,000/year) or request transparent ad spend reporting to justify the 15%.",
+      issue: "20% ad management fee — double the industry standard",
+      why_it_matters: "You're spending €9,000/month on ads. At 20%, that's €1,800/month in management fees. Industry standard is 10%, which would be €900/month. You're overpaying €900/month = €10,800/year.",
+      what_to_ask_for: "Reduce ad management fee from 20% to 10%. Saves €900/month = €10,800/year.",
+      if_they_push_back: "Accept 15% (€1,350/month) — still saves €450/month = €5,400/year.",
     },
     {
-      type: "Legal",
-      issue: "No performance KPIs or deliverable minimums",
-      why_it_matters: "Contract says 'up to 8 blog posts/month' but no minimum. If they deliver 4 posts, you still pay $8,000. You have no recourse if performance doesn't meet expectations.",
-      what_to_ask_for: "Add minimum deliverables: 6 blog posts/month, 3 social campaigns, 2 client meetings. Include quarterly performance review with renegotiation clause if targets aren't met.",
-      if_they_push_back: "Accept monthly minimums only (5 blog posts, 2 social campaigns, 2 meetings) without performance targets.",
+      type: "Commercial",
+      issue: "Retainer is €7,500/month — above market rate",
+      why_it_matters: "Comparable agencies with this scope typically charge €5,500-6,500/month. At €7,500, you're paying €1,000-2,000/month above market. That's €12,000-24,000/year in excess.",
+      what_to_ask_for: "Reduce retainer from €7,500 to €7,000/month. Saves €500/month = €6,000/year. Still above the low end of market.",
+      if_they_push_back: "Accept €7,250/month (saves €3,000/year) in exchange for a case study after 6 months.",
     },
   ],
   negotiation_plan: {
     leverage_you_have: [
-      "You're a new client - they want to win this business",
-      "Annual commitment gives you negotiating power",
-      "You can compare with 2-3 other agencies who quoted lower",
+      "You're a new client — they want to win the business",
+      "12-month commitment gives you negotiating power",
+      "You have competing quotes from 2 other agencies at €6,000-6,500/month",
     ],
     must_have_asks: [],
     nice_to_have_asks: [],
     trades_you_can_offer: [
-      "Sign 18-month contract if they reduce markup to 10%",
-      "Provide testimonial and case study after 6 months",
-      "Introduce them to 2 similar companies in your network",
+      "Extend to 18 months if they cut ad fee to 10%",
+      "Provide a testimonial and case study after 6 months",
+      "Refer 2 companies in your network if terms are right",
     ],
   },
   what_to_ask_for: {
     must_have: [
-      "Reduce ad spend markup from 15% to 10% (saves $6,000/year on projected ad spend)",
-      "Add minimum deliverables: 6 blog posts/month, 3 social campaigns, 2 strategy sessions",
-      "Include quarterly performance review with renegotiation option",
+      "Cut ad management fee from 20% to 10% (saves €10,800/year)",
+      "Reduce retainer from €7,500 to €7,000/month (saves €6,000/year — meet in the middle at €7,250 if needed)",
+      "Add minimum deliverables: 6 blog posts/month, 2 strategy sessions, monthly reporting",
     ],
     nice_to_have: [
-      "Reduce monthly retainer to $7,500/month (saves $6,000/year)",
-      "Cap 30-day cancellation notice instead of 60 days",
+      "30-day cancellation clause instead of 60 days",
+      "Quarterly performance review with option to renegotiate if targets aren't met",
     ],
   },
   potential_savings: [
     {
-      ask: "Reduce ad markup from 15% to 10%",
-      annual_impact: "$6,000 saved",
+      ask: "Reduce ad fee from 20% to 10%",
+      annual_impact: "€10,800 saved",
+    },
+    {
+      ask: "Reduce retainer from €7,500 to €7,000/month",
+      annual_impact: "€6,000 saved",
     },
   ],
   email_drafts: {
     neutral: {
-      subject: "Brightwave Marketing Proposal - Quick Questions",
-      body: `Hi [Account Manager],
+      subject: "Brightwave Proposal — A Few Questions Before We Sign",
+      body: `Hi [Name],
 
-Thanks for the proposal. We're excited about the potential partnership and think Brightwave is a great fit for our B2B marketing needs.
+Thanks for the proposal — we're keen to move forward with Brightwave.
 
-Before we finalize, I have a couple of questions:
+Before we sign, two things I'd like to align on:
 
-1. Ad Spend Markup: The proposal mentions 15% markup on ad spend. We've seen 10% as industry standard. Would you be open to adjusting this? At our projected $10K/month ad budget, the difference adds up.
+1. Ad management fee: The 20% fee on our €9,000/month ad spend comes to €1,800/month. We've seen 10-15% as the standard range — could we adjust to 10%?
 
-2. Deliverable Minimums: Could we add minimum deliverables (e.g., 6 blog posts/month minimum) so we have a clear baseline? The "up to 8 posts" language makes planning difficult.
+2. Retainer: At €7,500/month, we're a bit above what we've been quoted elsewhere (€6,000-6,500). Would €7,000/month work if we commit to 12 months?
 
-3. KPIs: Can we include quarterly performance metrics (lead growth, content engagement) with a review clause if targets aren't hit?
+These two changes would save us about €16,800/year and make the deal an easy yes on our end.
 
-Happy to discuss these points this week. We're ready to move forward once we align on these details.
+Happy to jump on a call this week.
 
 Thanks,
 [Your Name]`,
     },
     firm: {
-      subject: "Brightwave Proposal - Need Revisions to Move Forward",
-      body: `Hi [Account Manager],
+      subject: "Brightwave Proposal — Revisions Needed to Proceed",
+      body: `Hi [Name],
 
-We've reviewed the marketing retainer proposal and need a few revisions before we can proceed.
+We've reviewed the proposal and need two adjustments before we can move forward:
 
-Here's what we need:
+1. Ad management fee: 20% is above market. We need 10% (€900/month vs €1,800). That's a €10,800/year difference we can't justify internally.
 
-1. **Ad Markup**: Reduce from 15% to 10% (industry standard). At our $120K annual ad budget, this saves us $6K/year and brings pricing in line with competitors.
+2. Retainer: We need €7,000/month, not €7,500. Other agencies quoted €6,000 for comparable scope.
 
-2. **Deliverable Minimums**: Add clear minimums — 6 blog posts/month, 3 social campaigns/month, 2 strategy meetings/month. "Up to 8 posts" is too vague for budget planning.
+Combined, these changes bring the contract from €110,000 to €93,200/year — which is where we need to be to get budget approval.
 
-3. **Performance KPIs**: Include quarterly targets (20% lead growth, engagement metrics) with renegotiation clause if we're not seeing results.
-
-We have budget approved at $8K/month, but need these terms to justify the investment. Other agencies quoted $6.5K/month with similar scope, so we need to see clear value here.
-
-Can you send a revised proposal by Friday?
+We're ready to sign a 12-month contract this week if we can agree on these numbers.
 
 Best,
 [Your Name]`,
     },
     final_push: {
-      subject: "Final Decision - Brightwave Marketing Partnership",
-      body: `Hi [Account Manager],
+      subject: "Final Decision — Brightwave Marketing",
+      body: `Hi [Name],
 
-We need to finalize our marketing agency decision by end of month, and we're evaluating Brightwave alongside two other firms.
+We need to finalize our agency decision by Friday. We're choosing between Brightwave and one other firm.
 
-Your team has the best B2B case studies and we'd prefer to work with you, but the current proposal doesn't align with our budget and risk tolerance.
+We want to go with you — your case studies are stronger. But the numbers need to work:
 
-What we need to move forward:
+- Ad fee: 10% (not 20%) — saves us €10,800/year
+- Retainer: €7,000/month (not €7,500) — saves €6,000/year
 
-• **10% ad markup** (not 15%) — saves $6K/year on our ad budget
-• **Minimum deliverables** — 6 blog posts, 3 social campaigns, 2 meetings per month
-• **Quarterly KPI reviews** with renegotiation clause if performance lags
+If you can confirm these terms, we'll sign an 18-month contract immediately. That's guaranteed revenue of €93,200 vs the 12-month deal at €110,000.
 
-If you can confirm these terms by March 15th, we'll sign an 18-month contract immediately (vs the 12-month you proposed). That gives you revenue certainty and lets us lock in pricing.
-
-Otherwise, we'll need to move forward with Agency B who quoted $7K/month with clearer deliverables.
-
-Let me know if you can escalate this internally.
+Otherwise we'll go with Agency B at €72,000/year.
 
 Thanks,
 [Your Name]`,
     },
   },
   assumptions: [
-    "Ad spend markup comparison based on industry standard 10-12% for digital agencies",
-    "Estimated annual ad spend of $120,000 ($10,000/month average)",
+    "Monthly ad spend of €9,000 used to calculate management fee savings",
+    "Market rate for comparable agencies based on 3 competitive quotes at €6,000-6,500/month",
   ],
   disclaimer: "This analysis is for informational purposes only and does not constitute legal, financial, or professional advice. Verify all claims independently and consult with licensed advisors before making procurement decisions.",
 }
 
-// Example 2: SaaS Email Marketing Tool
+// Example 2: SaaS Tool — bigger contract, believable savings
 export const saasEmailExample: DealOutput = {
-  title: "Mailchimp Essentials Plan - Annual Subscription",
-  vendor: "Mailchimp",
+  title: "HubSpot Marketing Hub · Renewal · May 2026",
+  vendor: "HubSpot",
   category: "SaaS - Marketing",
-  description: "Email marketing and automation platform",
-  verdict: "You're overpaying for contacts you don't use. Downgrade tier to save $1,440/year.",
+  description: "Marketing automation, email, and CRM platform",
+  verdict: "You're paying for 100K contacts but only using 35,000. Downgrading to 50K tier and switching to annual billing saves €10,380/year.",
   verdict_type: "negotiate",
-  price_insight: "At $299/month for 10,000 contacts but only using 6,200, downgrade to 5,000-contact tier at $179/month and save $1,440/year.",
+  price_insight: "At €1,800/month for the 100K tier, you're paying for 65,000 contacts you don't use. The 50K tier at €1,100/month still gives you 43% headroom.",
   snapshot: {
-    vendor_product: "Mailchimp / Essentials Plan",
+    vendor_product: "HubSpot / Marketing Hub Professional",
     term: "12 months",
-    total_commitment: "$3,588",
-    billing_payment: "Monthly $299",
-    pricing_model: "Tiered by contact count: 10,000 contacts",
+    total_commitment: "€22,000",
+    billing_payment: "Monthly €1,800",
+    pricing_model: "Tiered by contact count — 100,000 contacts",
     deal_type: "Renewal",
-    renewal_date: "April 30, 2026",
+    renewal_date: "May 1, 2026",
+    currency: "EUR",
   },
   quick_read: {
     whats_solid: [
-      "All Essentials features included (A/B testing, custom templates, 24/7 support)",
-      "No sending limits within fair use policy",
-      "Easy migration from current setup",
+      "All Professional features: automation, A/B testing, reporting",
+      "CRM integration already set up with your sales team",
+      "Good support and onboarding resources",
     ],
     whats_concerning: [
-      "Paying for 10,000 contacts but only have 6,200 active subscribers",
-      "No annual prepay discount applied (missing 10% savings)",
-      "Monthly billing costs more than annual",
+      "Paying for 100,000 contacts but only using 35,000 — 65% wasted capacity",
+      "No annual discount applied — paying month-to-month rates",
+      "Auto-renewal at the same inflated tier if you don't act",
     ],
-    conclusion: "Good tool, wrong tier. Downgrade to 5,000-contact plan at $179/month to save $1,440/year.",
+    conclusion: "Right tool, wrong tier. Drop to 50K contacts and pay annually to save €10,380/year.",
   },
   red_flags: [
     {
       type: "Commercial",
-      issue: "Paying for 10,000 contacts when you only have 6,200",
-      why_it_matters: "You're paying for 3,800 contacts you don't use. Downgrading to the 5,000-contact tier at $179/month would still give you 20% buffer room and save $120/month = $1,440/year.",
-      what_to_ask_for: "Downgrade to 5,000-contact tier at $179/month. You can upgrade mid-term if you grow past 5,000.",
-      if_they_push_back: "Request 7,500-contact custom tier pricing, or stay at 10K but demand annual prepay discount.",
+      issue: "Paying for 100,000 contacts when you only use 35,000",
+      why_it_matters: "You're paying €1,800/month for 100K contacts but only have 35,000. The 50K tier costs €1,100/month — still 43% headroom above your actual usage. You're wasting €700/month = €8,400/year.",
+      what_to_ask_for: "Downgrade to the 50,000-contact tier at €1,100/month. Saves €700/month = €8,400/year. You can upgrade anytime if you outgrow it.",
+      if_they_push_back: "Ask for a custom 60K tier at €1,300/month, or stay at 50K.",
     },
     {
       type: "Commercial",
-      issue: "Missing annual prepay discount",
-      why_it_matters: "Mailchimp offers 10% discount for annual prepay. On the 5K tier ($179/month = $2,148/year), annual prepay would save you $215/year. By paying monthly, you're leaving money on the table.",
-      what_to_ask_for: "Prepay annually on 5K tier for 10% discount (total cost $1,933/year vs $2,148). Combined with tier downgrade, saves $1,655/year vs current.",
-      if_they_push_back: "Accept monthly billing on 5K tier (still saves $1,440/year from current).",
+      issue: "No annual prepay discount — leaving €1,980 on the table",
+      why_it_matters: "HubSpot offers ~15% off for annual commitment. On the 50K tier (€1,100/month = €13,200/year), annual prepay would cost ~€11,220/year. That's €1,980 saved on top of the tier downgrade.",
+      what_to_ask_for: "Switch to annual billing on the 50K tier. Pay €11,220/year instead of €13,200. Combined with the downgrade, total savings = €10,380/year vs current €21,600.",
+      if_they_push_back: "Accept monthly on 50K tier — still saves €8,400/year from current plan.",
     },
   ],
   negotiation_plan: {
     leverage_you_have: [
-      "You're an existing customer - retention is cheaper than acquisition",
-      "Competitors like Klaviyo offer migration credits",
-      "You have payment history showing you're reliable",
+      "You're a renewing customer — retention is cheaper than acquisition for HubSpot",
+      "Competitors like ActiveCampaign and Brevo price by usage, not inflated tiers",
+      "You have 2 months before renewal — time to evaluate alternatives",
     ],
     must_have_asks: [],
     nice_to_have_asks: [],
     trades_you_can_offer: [
-      "Prepay annually if they give 15% discount (vs standard 10%)",
-      "Commit to 2-year term for locked pricing",
-      "Write a G2 review",
+      "Commit to 2-year annual plan for an additional 10% discount",
+      "Write a G2 review and participate in a case study",
+      "Add a sales seat (more revenue for HubSpot) in exchange for marketing tier pricing",
     ],
   },
   what_to_ask_for: {
     must_have: [
-      "Downgrade to 5,000-contact tier at $179/month (saves $1,440/year)",
-      "Switch to annual prepay for 10% discount (saves additional $215/year)",
+      "Downgrade from 100K to 50K contact tier — €1,100/month instead of €1,800 (saves €8,400/year)",
+      "Switch to annual billing for ~15% discount — €11,220/year instead of €13,200 (saves €1,980 more)",
     ],
     nice_to_have: [
-      "Lock in 2-year pricing to avoid future increases",
-      "Add 1 free user seat for team member",
+      "2-year price lock to avoid future increases",
+      "Free onboarding session for a new team member",
     ],
   },
   potential_savings: [
     {
-      ask: "Downgrade to 5,000-contact tier",
-      annual_impact: "$1,440 saved",
+      ask: "Downgrade from 100K to 50K contacts",
+      annual_impact: "€8,400 saved",
     },
     {
-      ask: "Annual prepay discount (10% on 5K tier)",
-      annual_impact: "$215 saved",
+      ask: "Switch to annual billing (15% discount)",
+      annual_impact: "€1,980 saved",
     },
   ],
   email_drafts: {
     neutral: {
-      subject: "Mailchimp Renewal - Tier Adjustment Request",
-      body: `Hi [Account Manager],
+      subject: "HubSpot Renewal — Plan Adjustment Request",
+      body: `Hi [Name],
 
-Thanks for sending the renewal details. We're planning to continue with Mailchimp, but I'd like to adjust our plan before renewing.
+Thanks for the renewal reminder. We want to continue with HubSpot but need to adjust our plan.
 
-We're currently on the 10,000-contact tier at $299/month, but we only have 6,200 active subscribers. Could we downgrade to the 5,000-contact tier ($179/month)? That still gives us room to grow and would save us $1,440/year.
+We're currently on the 100,000-contact tier at €1,800/month, but we only have 35,000 contacts. That's a lot of unused capacity.
 
-Also, could we switch to annual billing for the 10% discount? Happy to prepay if that unlocks the savings.
+Could we switch to the 50,000-contact tier at €1,100/month? That still gives us plenty of room to grow. And if we switch to annual billing, we'd like the prepay discount.
 
-Let me know if you can process this adjustment for the renewal. We're ready to finalize this week.
+We're happy to commit for 12 months. Let us know what the annual pricing looks like on the 50K tier.
 
 Thanks,
 [Your Name]`,
     },
     firm: {
-      subject: "Mailchimp Renewal - Need Pricing Adjustment",
-      body: `Hi [Account Manager],
+      subject: "HubSpot Renewal — Need Pricing Adjustment",
+      body: `Hi [Name],
 
-We're reviewing our Mailchimp renewal and need to make some adjustments before proceeding.
+We're reviewing our HubSpot renewal and the numbers don't work at the current tier.
 
-Current situation:
-• Paying $299/month for 10,000 contacts
-• Only using 6,200 contacts (3,800 unused)
-• Missing annual prepay discount
+The facts:
+- We have 35,000 contacts
+- We're paying for 100,000 (€1,800/month)
+- That's €8,400/year for capacity we don't use
 
 What we need:
-1. **Downgrade to 5,000-contact tier** ($179/month) — still gives us buffer, saves $1,440/year
-2. **Annual prepay** for 10% discount — saves additional $215/year
+1. Downgrade to 50K tier (€1,100/month)
+2. Annual billing with the standard prepay discount
 
-We've looked at Klaviyo and ActiveCampaign who are offering competitive pricing for migrations. We prefer to stay with Mailchimp since our workflows are already set up, but we need pricing that makes sense for our actual usage.
+We've looked at ActiveCampaign and Brevo — both offer comparable features at €700-900/month for our contact count. We'd rather stay with HubSpot since we're already integrated, but we need pricing that reflects our actual usage.
 
-Can you process these changes for the renewal?
+Can you send updated renewal terms?
 
 Thanks,
 [Your Name]`,
     },
     final_push: {
-      subject: "Final Decision - Mailchimp Renewal",
-      body: `Hi [Account Manager],
+      subject: "HubSpot Renewal — Final Decision Needed",
+      body: `Hi [Name],
 
-We need to finalize our email marketing platform decision by April 15th, and we're evaluating whether to renew Mailchimp or switch to a competitor.
+Our renewal is in 3 weeks and we need to make a decision.
 
-We've been happy with Mailchimp, but we're currently overpaying by about $1,650/year:
-• Paying for 3,800 contacts we don't use
-• Missing annual prepay discount
+We've been happy with HubSpot, but paying €21,600/year for 35,000 contacts when competitors offer the same for €8,000-10,000 doesn't make sense.
 
-What we need to renew:
+Here's what keeps us:
+- 50K tier at annual pricing (~€11,220/year)
+- 2-year price lock
 
-• **5,000-contact tier** at $179/month (not 10,000 at $299)
-• **Annual prepay** with 10% discount
-• **2-year price lock** to avoid future increases
-
-If you can confirm these terms by April 10th, we'll prepay for 2 years immediately. That gives you revenue certainty and we lock in savings.
-
-Otherwise, we'll migrate to ActiveCampaign who quoted $149/month for our contact count with annual billing included.
-
-Let me know if you can make this work.
+If you can confirm this by [date], we'll renew immediately. Otherwise we're migrating to ActiveCampaign — they've already offered us onboarding credits.
 
 Thanks,
 [Your Name]`,
     },
   },
   assumptions: [
-    "Current subscriber count of 6,200 based on typical email list growth patterns",
-    "Mailchimp standard pricing: 10K tier = $299/mo, 5K tier = $179/mo",
-    "Standard 10% discount for annual prepay",
+    "Current contact count: 35,000 active contacts in HubSpot",
+    "HubSpot pricing: 100K tier = €1,800/mo, 50K tier = €1,100/mo",
+    "Annual prepay discount of approximately 15% based on published HubSpot pricing",
   ],
   disclaimer: "This analysis is for informational purposes only and does not constitute legal, financial, or professional advice. Verify all claims independently and consult with licensed advisors before making procurement decisions.",
 }
 
-// Example 3: Office Supplies Contract
+// Example 3: Office Supplies — straightforward volume discount math
 export const officeSuppliesExample: DealOutput = {
-  title: "Office Depot Business Select - Annual Supply Agreement",
-  vendor: "Office Depot",
+  title: "Staples Business Advantage - Annual Supply Contract",
+  vendor: "Staples Business Advantage",
   category: "Office Supplies",
   description: "Annual contract for office supplies, print services, and breakroom items",
-  verdict: "You're paying retail markup on commodity items. Negotiate volume discount and free delivery minimum.",
+  verdict: "You're getting a 5% discount on €45,000 in annual spend. At this volume, 15-20% is standard. You're leaving €4,500-6,750 on the table.",
   verdict_type: "negotiate",
-  price_insight: "At $2,500/month ($30,000/year), you could save $4,000-5,000 by negotiating volume discounts and eliminating delivery fees.",
+  price_insight: "A 5% discount saves you €2,250/year. A 15% discount would save €6,750 — that's €4,500 more per year for one conversation.",
   snapshot: {
-    vendor_product: "Office Depot / Business Select Annual Contract",
+    vendor_product: "Staples Business Advantage / Annual Contract",
     term: "12 months",
-    total_commitment: "$30,000",
-    billing_payment: "Monthly invoicing",
-    pricing_model: "Cost-plus: Retail price + 5% discount",
+    total_commitment: "€42,750",
+    billing_payment: "Monthly invoicing, net 30",
+    pricing_model: "Retail minus 5% across all categories",
     deal_type: "Renewal",
-    renewal_date: "May 31, 2026",
+    renewal_date: "June 1, 2026",
+    currency: "EUR",
   },
   quick_read: {
     whats_solid: [
-      "Next-day delivery on most items",
-      "Online ordering portal with approval workflows",
+      "Next-day delivery on most items, reliable service",
+      "Online ordering portal with department-level approval workflows",
       "Dedicated account rep for large orders",
     ],
     whats_concerning: [
-      "Only 5% off retail prices despite $30K annual spend",
-      "$75 delivery fee on orders under $250 (adds up fast)",
-      "No volume discount tiers or locked pricing",
+      "Only 5% off retail despite €45,000/year in spend — should be 15-20%",
+      "€9 delivery fee on orders under €50 — adds up to €1,080/year on small orders",
+      "No locked pricing — you're exposed to mid-year price increases",
     ],
-    conclusion: "Convenient service, but you're paying retail markup. Negotiate tiered discounts, waive delivery fees, and lock in commodity pricing.",
+    conclusion: "Good service, bad pricing. Push for 15% off retail, free delivery, and locked pricing on your top items. Saves €5,580/year.",
   },
   red_flags: [
     {
       type: "Commercial",
-      issue: "Only 5% off retail despite $30K annual commitment",
-      why_it_matters: "At $30K annual spend, most suppliers offer 15-20% off retail. At 5% discount vs 15% standard, you're overpaying $3,000/year ($30K × 10% difference).",
-      what_to_ask_for: "Negotiate tiered volume discounts: 10% off for $10K-20K/year spend, 15% off for $20K-30K, 20% off above $30K. This saves $3,000-4,500/year.",
-      if_they_push_back: "Accept flat 12% discount (saves $2,100/year) or agree to $35K annual commit for 15% discount tier.",
+      issue: "5% discount on €45,000 spend — should be 15% minimum",
+      why_it_matters: "At €45,000/year, most office supply contracts offer 15-20% off retail. You're getting 5% (€2,250 off). At 15%, you'd save €6,750 — that's €4,500/year more, just by asking.",
+      what_to_ask_for: "Increase discount from 5% to 15% across all categories. On €45,000 retail spend, this saves €4,500/year more than current terms.",
+      if_they_push_back: "Accept 12% (saves €3,150 more than current) or tiered: 10% on general supplies, 20% on high-volume items like paper and toner.",
     },
     {
       type: "Commercial",
-      issue: "$75 delivery fee on orders under $250",
-      why_it_matters: "If you place 2-3 small orders per month under $250, you're paying $1,800-2,700/year in delivery fees. Free delivery is standard for business contracts at this spend level.",
-      what_to_ask_for: "Waive all delivery fees for annual contract customers. Or reduce minimum to $100 for free delivery. This saves $1,800-2,700/year.",
-      if_they_push_back: "Accept $50 delivery fee (vs $75) or free delivery on orders $150+ (vs $250).",
-    },
-    {
-      type: "Commercial",
-      issue: "No price protection on commodity items",
-      why_it_matters: "Paper, toner, and cleaning supplies can fluctuate 10-15% annually. Without locked pricing, you're exposed to mid-contract price increases that could add $1,500-2,000 to your annual costs.",
-      what_to_ask_for: "Lock in pricing on top 20 SKUs (paper, toner, cleaning supplies) for 12-month term. If prices decrease, you get the lower rate.",
-      if_they_push_back: "Accept quarterly price reviews with 30-day notice before increases. Or lock in pricing on just top 10 high-volume SKUs.",
+      issue: "€9 delivery fee on orders under €50",
+      why_it_matters: "Your office places about 10 small orders per month under €50. That's €9 x 10 x 12 = €1,080/year in delivery fees. Free delivery is standard on business contracts at this spend level.",
+      what_to_ask_for: "Waive all delivery fees for contract customers. Saves €1,080/year. This is table stakes for a €45K annual account.",
+      if_they_push_back: "Lower the free delivery threshold from €50 to €25, or cap delivery fees at €5 per order.",
     },
   ],
   negotiation_plan: {
     leverage_you_have: [
-      "You're a reliable customer with consistent $30K annual spend",
-      "Amazon Business and Staples offer better pricing for same items",
-      "You can consolidate multiple suppliers to hit higher volume tiers",
+      "You spend €45,000/year — you're a high-value account they don't want to lose",
+      "Amazon Business offers 15% off + free delivery with no contract",
+      "You can consolidate spending from multiple vendors to hit higher volume",
     ],
     must_have_asks: [],
     nice_to_have_asks: [],
     trades_you_can_offer: [
-      "Commit to $35K annual spend if they upgrade to 15% discount tier",
-      "Consolidate print services with them (additional $5K/year revenue)",
-      "Sign 24-month contract for locked pricing and discounts",
+      "Increase commitment to €55,000/year in exchange for 18% discount",
+      "Consolidate print services (additional €7,500/year revenue for them)",
+      "Sign a 2-year contract for locked pricing and higher discount tier",
     ],
   },
   what_to_ask_for: {
     must_have: [
-      "Increase discount to 15% off retail (saves $3,000/year at current $30K spend)",
-      "Waive all delivery fees for contract customers (saves $1,800/year)",
-      "Lock in pricing on top 20 commodity SKUs for 12 months",
+      "Increase discount from 5% to 15% (saves €4,500/year on €45K spend)",
+      "Waive delivery fees for all contract orders (saves €1,080/year)",
+      "Lock in pricing on your top 20 items (paper, toner, cleaning supplies) for 12 months",
     ],
     nice_to_have: [
-      "Add quarterly business review to optimize spending",
-      "Include free returns on unopened items",
+      "Quarterly business review to optimize spend and identify savings",
+      "Free returns on unopened items within 30 days",
     ],
   },
   potential_savings: [
     {
       ask: "Increase discount from 5% to 15%",
-      annual_impact: "$3,000 saved",
+      annual_impact: "€4,500 saved",
     },
     {
       ask: "Waive delivery fees",
-      annual_impact: "$1,800 saved",
+      annual_impact: "€1,080 saved",
     },
   ],
   email_drafts: {
     neutral: {
-      subject: "Office Depot Contract Renewal - Pricing Discussion",
-      body: `Hi [Account Manager],
+      subject: "Staples Contract Renewal — Pricing Discussion",
+      body: `Hi [Name],
 
-Thanks for sending the renewal terms. We've been happy with Office Depot's service and want to continue, but we need to adjust pricing before we finalize.
+Thanks for sending the renewal terms. We've been happy with the service and want to continue.
 
-At $30K annual spend, we're currently getting 5% off retail. Could we discuss tiered discounts? We'd expect 15% off at this volume level, which is more in line with market rates.
+Before we sign, I'd like to discuss pricing. At €45,000/year, we're currently getting 5% off retail. We've seen 15-20% as standard for this spend level — could we move to 15%?
 
-Also, the $75 delivery fee on orders under $250 adds up quickly for us. Would you waive delivery fees for annual contract customers?
+Also, the €9 delivery fee on small orders adds up. Would you waive delivery fees for contract customers?
 
-Lastly, could we lock in pricing on our top commodity items (paper, toner, cleaning supplies) for the 12-month term?
-
-Happy to discuss these points this week. We're ready to renew once we align on pricing.
+These two changes would make the renewal straightforward on our end. Happy to discuss this week.
 
 Thanks,
 [Your Name]`,
     },
     firm: {
-      subject: "Office Depot Renewal - Need Better Pricing Terms",
-      body: `Hi [Account Manager],
+      subject: "Staples Renewal — Need Better Pricing to Proceed",
+      body: `Hi [Name],
 
-We've reviewed the renewal proposal and need revised pricing before we can proceed.
+We're reviewing our Staples renewal and the pricing isn't competitive.
 
-Here's the issue:
+Current terms:
+- 5% discount on €45,000 annual spend
+- €9 delivery fees on orders under €50 (~€1,080/year)
 
-1. **5% discount is below market**: At $30K annual spend, we should be at 15% off retail minimum. The 10% gap costs us $3,000/year.
+Market comparison:
+- Amazon Business: 15% off, free delivery, no contract required
+- Office Depot: 12% off + free delivery for €35K+ accounts
 
-2. **Delivery fees**: We're paying $1,800/year in delivery fees ($75 per small order). This should be waived for contract customers.
+What we need to renew:
+1. 15% discount (not 5%) — saves us €4,500/year
+2. Free delivery on all orders — saves €1,080/year
+3. Locked pricing on top 20 SKUs for 12 months
 
-3. **No price protection**: Without locked commodity pricing, we're exposed to mid-contract increases.
+We prefer Staples for the account management, but the 10-point pricing gap vs Amazon is hard to justify.
 
-What we need:
-• 15% off retail pricing (standard for our volume)
-• Waived delivery fees for all orders
-• Locked pricing on top 20 SKUs
-
-We've received quotes from Amazon Business and Staples at better rates. We prefer Office Depot for the service, but need competitive pricing.
-
-Can you send a revised proposal by end of week?
+Can you send revised terms by end of week?
 
 Best,
 [Your Name]`,
     },
     final_push: {
-      subject: "Final Decision - Office Depot Contract",
-      body: `Hi [Account Manager],
+      subject: "Final Decision — Staples Contract Renewal",
+      body: `Hi [Name],
 
-We need to finalize our office supplies vendor by May 1st, and we're evaluating Office Depot versus two alternatives.
+We need to finalize our office supplies vendor by May 15th.
 
-You've provided great service, but the current pricing doesn't justify the cost premium:
+We want to stay with Staples, but the current offer is €5,580/year more expensive than Amazon Business:
+- Staples: 5% off + €1,080 in delivery fees
+- Amazon: 15% off + free delivery
 
-Current proposal:
-• 5% discount ($30K spend)
-• $1,800/year in delivery fees
-• No price locks
+To renew, we need:
+- 15% discount across all categories
+- Free delivery
+- Locked pricing on top 20 items
 
-Competitive offers:
-• Amazon Business: 15% off + free delivery
-• Staples: 12% off + no fees + locked pricing
-
-What we need to stay with Office Depot:
-
-• **15% discount** (vs current 5%)
-• **Waived delivery fees** for contract customers
-• **Locked pricing** on top 20 commodity SKUs
-
-If you can confirm these terms by April 25th, we'll sign a 24-month contract (vs 12-month renewal). That gives you revenue certainty and we lock in better pricing.
+If you can confirm by May 10th, we'll sign a 2-year contract — that's €90,000+ in guaranteed revenue.
 
 Otherwise, we'll transition to Amazon Business by June 1st.
-
-Can you escalate this internally and let me know?
 
 Thanks,
 [Your Name]`,
     },
   },
   assumptions: [
-    "Estimated 24 small orders per year under $250 minimum = $1,800 in delivery fees",
-    "Volume discount benchmarks based on typical office supply contracts at $30K spend",
+    "Annual retail spend of €45,000 before discount",
+    "Approximately 120 small orders/year under €50 threshold × €9 = €1,080 in delivery fees",
+    "Volume discount benchmarks based on comparable office supply contracts at €45K annual spend",
   ],
   disclaimer: "This analysis is for informational purposes only and does not constitute legal, financial, or professional advice. Verify all claims independently and consult with licensed advisors before making procurement decisions.",
 }

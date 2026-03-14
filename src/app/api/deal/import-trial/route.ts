@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { renderMarkdown } from '@/lib/render-markdown'
 
-const FREE_ANALYSIS_LIMIT = 5
+const FREE_ANALYSIS_LIMIT = 4
 
 export async function POST(request: Request) {
   try {
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       // Free plan limits
       if (!isPro && profile.usage_count >= FREE_ANALYSIS_LIMIT) {
         return NextResponse.json(
-          { error: `Free plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Pro for unlimited analyses.` },
+          { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Pro (€39/mo) for unlimited analyses.` },
           { status: 403 }
         )
       }

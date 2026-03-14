@@ -9,6 +9,7 @@ import { CloseDealModal } from '@/components/CloseDealModal'
 import { CheckCircle2, TrendingDown, Minus, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { trackEvent } from '@/lib/analytics'
+import { useT } from '@/i18n/context'
 
 interface DealHeaderClientProps {
   dealId: string
@@ -50,6 +51,7 @@ export function DealHeaderClient({
   whatChanged,
 }: DealHeaderClientProps) {
   const router = useRouter()
+  const t = useT()
   const [showCloseModal, setShowCloseModal] = useState(false)
   const [reopening, setReopening] = useState(false)
 
@@ -87,9 +89,9 @@ export function DealHeaderClient({
   }
 
   const getOutcomeBadge = () => {
-    if (outcome === 'won') return { label: 'Closed — Won', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' }
-    if (outcome === 'lost') return { label: 'Closed — Lost', color: 'bg-red-100 text-red-700 border-red-200' }
-    return { label: 'Closed — No change', color: 'bg-slate-100 text-slate-700 border-slate-200' }
+    if (outcome === 'won') return { label: t('dealHeader.closedWon'), color: 'bg-emerald-100 text-emerald-700 border-emerald-200' }
+    if (outcome === 'lost') return { label: t('dealHeader.closedLost'), color: 'bg-red-100 text-red-700 border-red-200' }
+    return { label: t('dealHeader.closedNoChange'), color: 'bg-slate-100 text-slate-700 border-slate-200' }
   }
 
   return (
@@ -106,7 +108,7 @@ export function DealHeaderClient({
               disabled={reopening}
               className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors disabled:opacity-50 px-3 py-2 rounded-lg hover:bg-slate-100"
             >
-              {reopening ? 'Reopening...' : 'Reopen'}
+              {reopening ? t('dealHeader.reopening') : t('dealHeader.reopen')}
             </button>
           </>
         ) : (
@@ -115,7 +117,7 @@ export function DealHeaderClient({
             className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-500/20"
           >
             <CheckCircle2 className="w-4 h-4" />
-            Close deal
+            {t('dealHeader.closeDeal')}
           </Button>
         )}
       </div>

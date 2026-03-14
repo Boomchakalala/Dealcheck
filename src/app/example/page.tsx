@@ -5,15 +5,20 @@ import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { OutputDisplay } from '@/components/OutputDisplay'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { examples, type ExampleType } from '@/lib/examples'
+import { examplesFr } from '@/lib/examples-fr'
+import { useI18n } from '@/i18n/context'
 import Link from 'next/link'
 
 export default function ExamplePage() {
+  const { locale, t } = useI18n()
   const [selectedExample, setSelectedExample] = useState<ExampleType>('marketing')
 
+  const currentExamples = locale === 'fr' ? examplesFr : examples
+
   const exampleTypes = [
-    { id: 'marketing' as ExampleType, label: 'Marketing Agency', description: '$96K annual retainer' },
-    { id: 'saas' as ExampleType, label: 'SaaS Tool', description: '$3.6K annual email platform' },
-    { id: 'supplies' as ExampleType, label: 'Office Supplies', description: '$30K annual contract' },
+    { id: 'marketing' as ExampleType, label: locale === 'fr' ? 'Agence Marketing' : 'Marketing Agency', description: locale === 'fr' ? '110K € — économies 16,8K €/an' : '€110K retainer — saves €16.8K/yr' },
+    { id: 'saas' as ExampleType, label: locale === 'fr' ? 'Outil SaaS' : 'SaaS Tool', description: locale === 'fr' ? '24K € — économies 11,7K €/an' : '€22K renewal — saves €10.4K/yr' },
+    { id: 'supplies' as ExampleType, label: locale === 'fr' ? 'Fournitures Bureau' : 'Office Supplies', description: locale === 'fr' ? '45K € — économies 5,5K €/an' : '€45K contract — saves €5.6K/yr' },
   ]
 
   return (
@@ -85,7 +90,7 @@ export default function ExamplePage() {
           </div>
         </div>
 
-        <OutputDisplay output={examples[selectedExample]} />
+        <OutputDisplay output={currentExamples[selectedExample]} />
 
         {/* Bottom CTA */}
         <div className="mt-12 text-center">

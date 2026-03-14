@@ -53,6 +53,11 @@ export const DealOutputSchema = z.object({
     ask: z.string(),
     annual_impact: z.string(),
   })).optional(),
+  cash_flow_improvements: z.array(z.object({
+    type: z.string(),
+    recommendation: z.string(),
+    category: z.enum(['cash_flow', 'risk_protection', 'liability']),
+  })).optional(),
   email_drafts: z.object({
     neutral: EmailDraftSchema,
     firm: EmailDraftSchema,

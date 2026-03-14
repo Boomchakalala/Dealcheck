@@ -6,26 +6,50 @@ export type Database = {
         Row: {
           id: string
           email: string
+          first_name: string | null
+          last_name: string | null
           created_at: string
-          plan: 'free' | 'pro'
+          plan: 'free' | 'pro' | 'business'
           usage_count: number
           is_admin: boolean
+          base_currency: string | null
+          locale: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
+          subscription_end_date: string | null
         }
         Insert: {
           id: string
           email: string
+          first_name?: string | null
+          last_name?: string | null
           created_at?: string
-          plan?: 'free' | 'pro'
+          plan?: 'free' | 'pro' | 'business'
           usage_count?: number
           is_admin?: boolean
+          base_currency?: string | null
+          locale?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          subscription_end_date?: string | null
         }
         Update: {
           id?: string
           email?: string
+          first_name?: string | null
+          last_name?: string | null
           created_at?: string
-          plan?: 'free' | 'pro'
+          plan?: 'free' | 'pro' | 'business'
           usage_count?: number
           is_admin?: boolean
+          base_currency?: string | null
+          locale?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          subscription_end_date?: string | null
         }
       }
       deals: {
@@ -140,6 +164,7 @@ export type DealOutput = {
     vendor_product: string
     term: string
     total_commitment: string
+    currency?: string
     billing_payment: string
     pricing_model: string
     deal_type: string
@@ -165,6 +190,11 @@ export type DealOutput = {
   potential_savings?: Array<{
     ask: string
     annual_impact: string
+  }>
+  cash_flow_improvements?: Array<{
+    type: string
+    recommendation: string
+    category: 'cash_flow' | 'risk_protection' | 'liability'
   }>
   email_drafts: {
     neutral: EmailDraft

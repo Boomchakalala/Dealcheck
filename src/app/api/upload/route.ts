@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server'
 import { extractText } from '@/lib/extract'
-import { uploadPDFToStorage, deleteTempPDF } from '@/lib/storage'
-import { parsePDFWithLlamaParse } from '@/lib/llamaparse'
 
-// CRITICAL: pdf-parse requires Node.js runtime
+// CRITICAL: pdf-parse and canvas require Node.js runtime
 export const runtime = 'nodejs'
 
 export async function POST(request: Request) {
@@ -31,46 +29,54 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer())
 
-    // NEW ARCHITECTURE: For PDFs, use LlamaParse for table extraction
+    // Images → send directly as vision input
+    if (file.type.startsWith('image/')) {
+      const base64 = buffer.toString('base64')
+      return NextResponse.json({
+        useVision: true,
+        imageData: {
+          base64,
+          mimeType: file.type,
+        },
+      })
+    }
+
+    // PDFs → convert to page images for Claude vision
     if (file.type === 'application/pdf') {
       try {
-        // Step 1: Upload PDF to Supabase Storage
-        const fileUrl = await uploadPDFToStorage(buffer, file.name)
+        const { pdfToImages } = await import('@/lib/pdf-to-images')
+        const pageImages = await pdfToImages(buffer, 10)
 
-        // Step 2: Parse with LlamaParse (preserves tables)
-        const parsed = await parsePDFWithLlamaParse(fileUrl)
-
-        // Step 3: Clean up uploaded file (async, don't wait)
-        deleteTempPDF(fileUrl).catch(err => console.error('Cleanup error:', err))
-
-        // Step 4: Return parsed markdown with table structure
-        return NextResponse.json({
-          extractedText: parsed.markdown,
-          useStructuredParsing: true,
-          source: 'llamaparse',
-        })
+        if (pageImages.length > 0) {
+          return NextResponse.json({
+            useVision: true,
+            imageData: pageImages[0], // Primary page for single-image analysis
+            allPages: pageImages,     // All pages for multi-page docs
+            pageCount: pageImages.length,
+            source: 'pdf-vision',
+          })
+        }
       } catch (error) {
-        console.error('LlamaParse failed, using fallback:', error)
+        console.warn('PDF vision conversion failed, falling back to text extraction:', error)
+      }
 
-        // Fallback to basic text extraction if LlamaParse fails
+      // Fallback: extract text from PDF
+      try {
         const extractedText = await extractText(file)
         return NextResponse.json({
           extractedText,
-          useStructuredParsing: false,
-          source: 'fallback',
+          useVision: false,
+          source: 'text-fallback',
         })
+      } catch (extractError) {
+        console.error('Text extraction also failed:', extractError)
+        return NextResponse.json({
+          error: 'Could not process this PDF. Try pasting the text directly or uploading as an image.'
+        }, { status: 422 })
       }
     }
 
-    // For images, send directly to vision API
-    const base64 = buffer.toString('base64')
-    return NextResponse.json({
-      useVision: true,
-      imageData: {
-        base64,
-        mimeType: file.type,
-      },
-    })
+    return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 })
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json({

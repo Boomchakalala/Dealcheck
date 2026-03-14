@@ -4,7 +4,7 @@ import { CreateDealSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/openai'
 import { checkRateLimit } from '@/lib/rate-limit'
 
-const FREE_ANALYSIS_LIMIT = 5
+const FREE_ANALYSIS_LIMIT = 4
 
 export async function POST(request: Request) {
   try {
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       // Free plan limits (admins bypass)
       if (!isPro && profile.usage_count >= FREE_ANALYSIS_LIMIT) {
         return NextResponse.json(
-          { error: `Free plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Pro for unlimited analyses.` },
+          { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Pro (€39/mo) for unlimited analyses.` },
           { status: 403 }
         )
       }
@@ -63,7 +63,9 @@ export async function POST(request: Request) {
       validated.goal || undefined,
       validated.notes || undefined,
       undefined,
-      validated.imageData
+      validated.imageData,
+      (body as any).allPages || undefined,
+      (body as any).locale || undefined
     )
 
     // Auto-detect vendor
@@ -75,7 +77,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         vendor,
-        title: `${vendor} - ${validated.dealType} - ${new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`,
+        title: `${vendor} · ${validated.dealType === 'New' ? 'New Purchase' : 'Renewal'} · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
         deal_type: validated.dealType,
         goal: validated.goal,
       })

@@ -18,188 +18,206 @@ export default function TermsPage() {
             <h1 className="text-[2.25rem] sm:text-[3rem] leading-[1.08] font-bold text-slate-900 tracking-tight mb-3">
               Terms of Service
             </h1>
-            <p className="text-sm text-slate-400">Last updated: March 5, 2026</p>
+            <p className="text-sm text-slate-400">Last updated: March 13, 2026</p>
           </div>
         </div>
 
         <div className="max-w-3xl mx-auto px-5 sm:px-8 py-12 pb-20">
           <div className="space-y-10 text-sm text-slate-700 leading-relaxed">
 
+            {/* 1. Acceptance */}
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">1. Acceptance</h2>
-              <p>
-                By using TermLift, you agree to these Terms. If you don&apos;t agree, don&apos;t use the service.
-              </p>
+              <p>By accessing or using TermLift, you agree to be bound by these Terms of Service. If you don&apos;t agree, please don&apos;t use the service. These terms apply to all users, whether you have an account or not.</p>
             </section>
 
+            {/* 2. What the Service Is */}
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">2. The Service</h2>
-              <p>
-                TermLift analyzes supplier quotes and contracts using AI. You upload documents, we extract text, send it to OpenAI for analysis, and return negotiation insights. Files are deleted after processing.
-              </p>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">2. What the Service Is</h2>
+              <p className="mb-2">TermLift analyzes vendor quotes and contracts using AI, specifically Anthropic&apos;s Claude. Here&apos;s how it works:</p>
+              <ul className="space-y-2 ml-4">
+                <li>• You upload a document (quote, contract, proposal, etc.)</li>
+                <li>• We extract text from the document</li>
+                <li>• The extracted text is sent to the AI for analysis</li>
+                <li>• You receive negotiation insights including red flags, savings opportunities, negotiation plans, and draft emails</li>
+                <li>• Uploaded files are deleted after processing</li>
+              </ul>
             </section>
 
+            {/* 3. What the Service Is NOT */}
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">3. Pricing & Payment</h2>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-4">
-                <p className="font-medium text-slate-900 mb-2">Trial & Paid Plans:</p>
-                <ul className="space-y-1 ml-4">
-                  <li>• New users get limited free analyses to try the service</li>
-                  <li>• After trial, you must subscribe to continue</li>
-                  <li>• Pricing shown at signup and on our pricing page</li>
-                  <li>• Payments processed via Stripe</li>
-                  <li>• Subscriptions renew automatically until cancelled</li>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">3. What the Service Is NOT</h2>
+              <div className="rounded-xl border border-amber-200/80 bg-gradient-to-br from-amber-50/60 to-white p-6">
+                <p className="font-semibold text-amber-900 mb-3">Important Disclaimers</p>
+                <ul className="space-y-2 text-sm">
+                  {[
+                    'TermLift is NOT legal, financial, or professional advice.',
+                    'TermLift is NOT a guarantee of savings or improved contract terms.',
+                    'AI analysis may be incomplete, inaccurate, or miss important details.',
+                    'Always review outputs yourself and consult licensed professionals before making decisions.',
+                    'Results vary by deal — past analyses don\'t predict future outcomes.',
+                  ].map((item, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="text-amber-600">•</span>
+                      {item}
+                    </li>
+                  ))}
                 </ul>
               </div>
-
-              <p className="font-medium text-slate-900 mb-2">Refunds & Cancellation:</p>
-              <ul className="space-y-1 ml-4">
-                <li>• Cancel anytime from your profile</li>
-                <li>• No refunds for partial months</li>
-                <li>• Access continues until end of billing period</li>
-                <li>• We may change pricing with 30 days notice</li>
-              </ul>
             </section>
 
+            {/* 4. Your Responsibilities */}
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">4. Critical Disclaimers</h2>
-
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-5 space-y-3">
-                <div>
-                  <p className="font-semibold text-slate-900 mb-1">NOT Legal or Professional Advice</p>
-                  <p className="text-sm">TermLift provides information, not advice. Don&apos;t make business decisions solely based on our analysis. Consult licensed professionals for legal, financial, or tax advice.</p>
-                </div>
-
-                <div>
-                  <p className="font-semibold text-slate-900 mb-1">AI Can Make Mistakes</p>
-                  <p className="text-sm">AI analysis may be incomplete, inaccurate, or miss important details. Always review the original documents yourself. We&apos;re not liable for AI errors.</p>
-                </div>
-
-                <div>
-                  <p className="font-semibold text-slate-900 mb-1">No Guarantees</p>
-                  <p className="text-sm">We don&apos;t guarantee savings, improved terms, or any specific outcome. Results vary by deal.</p>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">5. Your Responsibilities</h2>
-
-              <p className="font-medium text-slate-900 mb-2">You agree to:</p>
-              <ul className="space-y-1 ml-4 mb-3">
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">4. Your Responsibilities</h2>
+              <p className="mb-3">When using TermLift, you agree to:</p>
+              <ul className="space-y-2 ml-4">
                 <li>• Provide accurate account information</li>
                 <li>• Keep your password secure</li>
-                <li>• Only upload content you have rights to</li>
+                <li>• Only upload content you have the right to share</li>
                 <li>• Not abuse, hack, or reverse-engineer the service</li>
-                <li>• Not share your account</li>
+                <li>• Not share your account credentials with others</li>
+                <li>• Not use the service for automated bulk processing without our written permission</li>
                 <li>• Comply with all applicable laws</li>
-              </ul>
-
-              <p className="font-medium text-slate-900 mb-2">Prohibited uses:</p>
-              <ul className="space-y-1 ml-4">
-                <li>• Uploading illegal or infringing content</li>
-                <li>• Attempting to extract or scrape our AI models</li>
-                <li>• Reselling or redistributing the service</li>
-                <li>• Automated bulk processing without permission</li>
               </ul>
             </section>
 
+            {/* 5. Pricing & Payment */}
+            <section>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">5. Pricing & Payment</h2>
+
+              <div className="space-y-3 mb-4">
+                <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
+                  <p className="font-medium text-slate-900 mb-1">Starter (Free)</p>
+                  <p className="text-sm">4 total analyses — 1 without signing up, 3 more after creating an account.</p>
+                </div>
+
+                <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
+                  <p className="font-medium text-slate-900 mb-1">Pro — €39/month <span className="text-xs text-slate-400 font-normal">(coming soon)</span></p>
+                  <p className="text-sm">Unlimited analyses for individuals.</p>
+                </div>
+
+                <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
+                  <p className="font-medium text-slate-900 mb-1">Business — €149/month <span className="text-xs text-slate-400 font-normal">(coming soon)</span></p>
+                  <p className="text-sm">Team workspace with unlimited analyses.</p>
+                </div>
+              </div>
+
+              <ul className="space-y-2 ml-4">
+                <li>• When paid plans launch, payments will be processed securely via Stripe</li>
+                <li>• Subscriptions renew automatically until cancelled</li>
+                <li>• You can cancel anytime from your profile</li>
+                <li>• No refunds for partial billing periods</li>
+                <li>• After cancellation, access continues until the end of your current billing period</li>
+                <li>• We may change pricing with at least 30 days notice</li>
+              </ul>
+            </section>
+
+            {/* 6. Intellectual Property */}
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">6. Intellectual Property</h2>
 
-              <p className="font-medium text-slate-900 mb-2">Your content:</p>
-              <p className="mb-3">You own your uploaded content. By using TermLift, you grant us permission to process it for the service (extract text, send to OpenAI, generate analysis). We don&apos;t use your content for anything else.</p>
+              <div className="space-y-4">
+                <div>
+                  <p className="font-medium text-slate-900 mb-1">Your Content</p>
+                  <p>You own what you upload. By using the service, you grant us a limited, temporary license to process your content solely for the purpose of providing the analysis. We don&apos;t claim ownership of your documents.</p>
+                </div>
 
-              <p className="font-medium text-slate-900 mb-2">Our content:</p>
-              <p>TermLift&apos;s interface, branding, and prompts are our property. The AI analysis outputs are provided to you, but you can&apos;t claim we created them—they&apos;re AI-generated.</p>
+                <div>
+                  <p className="font-medium text-slate-900 mb-1">Our Content</p>
+                  <p>TermLift&apos;s interface, branding, design, and proprietary prompts are our property. You may not copy, modify, or redistribute them.</p>
+                </div>
+
+                <div>
+                  <p className="font-medium text-slate-900 mb-1">AI Outputs</p>
+                  <p>Analysis results are provided to you for your use. However, they are AI-generated and should not be treated as professional advice. You&apos;re free to use the outputs, but you do so at your own discretion and risk.</p>
+                </div>
+              </div>
             </section>
 
+            {/* 7. Service Availability */}
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">7. Service Availability</h2>
-
+              <p className="mb-2">TermLift is provided &quot;as is&quot; and &quot;as available.&quot; We do our best to keep things running smoothly, but:</p>
               <ul className="space-y-2 ml-4">
-                <li>• We provide the service &quot;as is&quot; without warranties</li>
-                <li>• We may have downtime, bugs, or interruptions</li>
-                <li>• We may change or discontinue features</li>
-                <li>• We&apos;re not liable for service outages</li>
+                <li>• The service may experience downtime or bugs</li>
+                <li>• We may add, change, or remove features at any time</li>
+                <li>• We are not liable for outages, data loss, or service interruptions</li>
+                <li>• We don&apos;t guarantee that the service will meet all of your requirements</li>
               </ul>
             </section>
 
+            {/* 8. Account Termination */}
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">8. Account Termination</h2>
-
-              <p className="font-medium text-slate-900 mb-2">You can:</p>
-              <ul className="space-y-1 ml-4 mb-3">
-                <li>• Close your account anytime</li>
-                <li>• Request data deletion</li>
-              </ul>
-
-              <p className="font-medium text-slate-900 mb-2">We can:</p>
-              <ul className="space-y-1 ml-4">
-                <li>• Suspend or terminate accounts that violate these Terms</li>
-                <li>• Terminate accounts for non-payment</li>
-                <li>• Discontinue the service with 30 days notice</li>
+              <ul className="space-y-2 ml-4">
+                <li>• You can close your account at any time and request deletion of your data</li>
+                <li>• We may suspend or terminate your account if you violate these Terms or fail to pay</li>
+                <li>• We may discontinue the service entirely with at least 30 days notice</li>
+                <li>• Upon termination, your right to use the service ends immediately (except for access through a paid billing period you&apos;ve already paid for)</li>
               </ul>
             </section>
 
+            {/* 9. Limitation of Liability */}
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">9. Limitation of Liability</h2>
-
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
-                <p className="mb-2">To the maximum extent permitted by law:</p>
-                <ul className="space-y-1 ml-4 text-sm">
-                  <li>• We&apos;re not liable for business losses, lost deals, or missed savings</li>
-                  <li>• We&apos;re not liable for AI errors or omissions</li>
-                  <li>• Our total liability is limited to what you paid us in the last 12 months</li>
-                  <li>• We&apos;re not liable for third-party actions (OpenAI, Stripe, etc.)</li>
+              <div className="rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-50/60 to-white p-6">
+                <p className="font-semibold text-slate-900 mb-3">To the maximum extent permitted by law:</p>
+                <ul className="space-y-2 text-sm">
+                  {[
+                    'TermLift is not liable for business losses, lost deals, or missed savings opportunities.',
+                    'TermLift is not liable for errors, omissions, or inaccuracies in AI-generated analysis.',
+                    'Our total liability is limited to the amount you have paid us in the last 12 months.',
+                    'TermLift is not liable for the actions or failures of third-party services (Anthropic, Stripe, etc.).',
+                  ].map((item, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="text-slate-400">•</span>
+                      {item}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </section>
 
+            {/* 10. Indemnification */}
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">10. Indemnification</h2>
-              <p>
-                You agree to indemnify TermLift from claims arising from your use of the service, your content, or your violation of these Terms.
-              </p>
+              <p>You agree to indemnify and hold TermLift harmless from any claims, damages, or expenses (including reasonable legal fees) arising from your use of the service, the content you upload, or your violation of these Terms.</p>
             </section>
 
+            {/* 11. Dispute Resolution */}
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">11. Dispute Resolution</h2>
-
-              <p className="mb-2">If there&apos;s a dispute:</p>
-              <ul className="space-y-1 ml-4 mb-3">
-                <li>• Contact us first to resolve it informally</li>
-                <li>• If needed, disputes go to binding arbitration (not court)</li>
-                <li>• No class actions</li>
-                <li>• Governed by the laws of Ireland</li>
+              <ul className="space-y-2 ml-4">
+                <li>• <span className="font-medium">Talk to us first:</span> If you have a dispute, contact us at <a href="mailto:hello@termlift.com" className="text-emerald-600 hover:underline">hello@termlift.com</a> and we&apos;ll try to resolve it informally within 30 days.</li>
+                <li>• <span className="font-medium">Binding arbitration:</span> If informal resolution fails, disputes will be resolved through binding arbitration rather than in court.</li>
+                <li>• <span className="font-medium">No class actions:</span> Disputes must be brought individually, not as part of a class action or representative proceeding.</li>
+                <li>• <span className="font-medium">Governing law:</span> These Terms are governed by the laws of Ireland.</li>
               </ul>
-
-              <p className="text-xs text-slate-600">Note: Some jurisdictions don&apos;t allow arbitration waivers. If yours doesn&apos;t, this clause doesn&apos;t apply to you.</p>
+              <p className="mt-3 text-sm text-slate-500">Note: Some jurisdictions don&apos;t allow arbitration waivers or class action waivers. In those jurisdictions, the applicable restrictions above will not apply to you, and disputes will be resolved in the courts of Ireland.</p>
             </section>
 
+            {/* 12. Changes to These Terms */}
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">12. Changes to Terms</h2>
-              <p>
-                We may update these Terms. Material changes will be communicated via email at least 14 days before taking effect. Continued use means you accept the new Terms.
-              </p>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">12. Changes to These Terms</h2>
+              <p>We may update these Terms from time to time. For material changes, we&apos;ll notify you via email at least 14 days before they take effect. Continued use of the service after changes take effect means you accept the updated Terms.</p>
             </section>
 
+            {/* 13. General */}
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">13. General</h2>
-              <ul className="space-y-1 ml-4">
-                <li>• These Terms are the entire agreement</li>
-                <li>• If a provision is unenforceable, the rest remains valid</li>
-                <li>• We can assign these Terms; you can&apos;t</li>
-                <li>• No waiver unless in writing</li>
+              <ul className="space-y-2 ml-4">
+                <li>• <span className="font-medium">Entire agreement:</span> These Terms, together with our Privacy Policy, constitute the entire agreement between you and TermLift.</li>
+                <li>• <span className="font-medium">Severability:</span> If any provision of these Terms is found to be unenforceable, the remaining provisions continue in full force.</li>
+                <li>• <span className="font-medium">Assignment:</span> We may assign our rights under these Terms. You may not assign yours without our written consent.</li>
+                <li>• <span className="font-medium">No waiver:</span> Our failure to enforce any provision is not a waiver of that provision. Any waiver must be in writing.</li>
               </ul>
             </section>
 
+            {/* 14. Contact */}
             <section>
               <h2 className="text-lg font-semibold text-slate-900 mb-3">14. Contact</h2>
               <div className="bg-slate-50 rounded-lg border border-slate-200 p-5">
-                <p className="text-sm"><span className="font-medium">Questions about Terms:</span> <a href="mailto:hello@termlift.com" className="text-emerald-600 hover:underline">hello@termlift.com</a></p>
-                <p className="text-sm mt-1"><span className="font-medium">Legal notices:</span> <a href="mailto:hello@termlift.com" className="text-emerald-600 hover:underline">hello@termlift.com</a></p>
+                <p className="text-sm">Questions about these Terms? Reach out to us at <a href="mailto:hello@termlift.com" className="text-emerald-600 hover:underline">hello@termlift.com</a></p>
               </div>
             </section>
 

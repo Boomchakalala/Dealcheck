@@ -1,16 +1,25 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Upload, Search, Send, Lock, ShieldCheck, Globe } from 'lucide-react'
+import { ArrowRight, Upload, Search, Send, Lock, ShieldCheck, Globe, Check, Users, Building2, ShoppingCart, Zap, FileText, Mail, CreditCard } from 'lucide-react'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
-import { examples } from '@/lib/examples'
+import { useScrollReveal, useCountUp } from '@/hooks/useScrollReveal'
+import { useT } from '@/i18n/context'
 
 export default function LandingPage() {
-  const [activeTab, setActiveTab] = useState<'price' | 'terms' | 'emails'>('price')
-  const [selectedExample, setSelectedExample] = useState<'marketing' | 'saas' | 'supplies'>('marketing')
+  const t = useT()
 
-  const currentExample = examples[selectedExample]
+  // Scroll reveal for each section
+  const statsReveal = useScrollReveal()
+  const whoReveal = useScrollReveal()
+  const howReveal = useScrollReveal()
+  const privacyReveal = useScrollReveal()
+  const pricingReveal = useScrollReveal()
+  const ctaReveal = useScrollReveal()
+
+  // Counter animations for stats bar
+  const counter60 = useCountUp(60)
+  const counter3 = useCountUp(3)
 
   return (
     <div className="min-h-screen bg-white relative">
@@ -25,33 +34,39 @@ export default function LandingPage() {
       <UnifiedHeader variant="landing" />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-20 md:pt-32 md:pb-28">
+      <section className="relative overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-16 md:pt-32 md:pb-24">
         {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/30 via-white to-white pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/40 via-white to-white pointer-events-none" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.08)_0%,transparent_70%)] pointer-events-none" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-5 md:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
             {/* Left: Content */}
             <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 mb-5 sm:mb-6">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-semibold text-emerald-700">{t('hero.badge')}</span>
+              </div>
+
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-4 sm:mb-6 leading-[1.15]">
-                Better terms in minutes, not weeks.
+                {t('hero.title1')}<br className="hidden sm:block" />
+                <span className="text-emerald-600">{t('hero.title2')}</span>
               </h1>
-              <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed">
-                Drop in a vendor quote. Get back exactly where you're overpaying, what to push for, and a ready-to-send email — before your next call.
+              <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-lg">
+                {t('hero.subtitle')}
               </p>
 
               {/* Benefits */}
               <div className="space-y-2.5 sm:space-y-3 mb-8 sm:mb-10">
                 {[
-                  'See exactly where you can save — hidden fees, inflated rates, unfavorable clauses',
-                  'Get a negotiation playbook with the asks that actually move the needle',
-                  'Send a polished supplier email in your tone, ready to copy and go',
+                  t('hero.check1'),
+                  t('hero.check2'),
+                  t('hero.check3'),
                 ].map((text) => (
                   <div key={text} className="flex items-start gap-2.5 sm:gap-3">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-emerald-600" strokeWidth={3} />
+                    </div>
                     <span className="text-sm sm:text-base text-slate-700">{text}</span>
                   </div>
                 ))}
@@ -63,100 +78,80 @@ export default function LandingPage() {
                   href="/try"
                   className="group inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  Analyze a quote free
+                  {t('hero.cta')}
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/example"
                   className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border-2 border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md"
                 >
-                  See a real example
+                  {t('hero.ctaSecondary')}
                 </Link>
               </div>
 
-              <p className="text-xs text-slate-500 mt-3 sm:mt-4">No signup needed. Results in under 60 seconds.</p>
+              <p className="text-xs text-slate-500 mt-3 sm:mt-4">{t('hero.noSignup')}</p>
             </div>
 
-            {/* Right: Product Preview */}
-            <div className="relative lg:pl-8 mt-8 lg:mt-0">
+            {/* Right: Product Preview — real content */}
+            <div className="relative lg:pl-8 mt-8 lg:mt-0 animate-hero-card">
               {/* Decorative blur orbs */}
               <div className="absolute -top-10 -right-10 w-40 h-40 sm:w-64 sm:h-64 bg-emerald-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
               <div className="absolute -bottom-10 -left-10 w-40 h-40 sm:w-64 sm:h-64 bg-teal-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
 
               <div className="relative bg-white rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200/60 overflow-hidden hover:shadow-[0_20px_70px_-10px_rgba(0,0,0,0.15)] transition-shadow duration-500">
                 {/* Mock browser chrome */}
-                <div className="bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 border-b border-slate-200">
-                  <div className="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+                <div className="bg-gradient-to-br from-slate-50 to-slate-100 px-4 sm:px-6 pt-4 sm:pt-5 pb-3 sm:pb-4 border-b border-slate-200">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-3">
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400" />
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400" />
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400" />
                   </div>
-                  <div className="space-y-2 sm:space-y-3">
-                    <div className="h-2 sm:h-3 bg-slate-300 rounded w-3/4" />
-                    <div className="h-2 sm:h-3 bg-slate-300 rounded w-1/2" />
-                  </div>
+                  <p className="text-[10px] sm:text-xs font-semibold text-slate-500">{t('example.quoteVendor')} — €110,000</p>
                 </div>
 
-                {/* Preview sections — labels match real OutputDisplay */}
-                <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-                  {/* Verdict with category */}
-                  <div className="bg-amber-50 border-2 border-amber-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-                      <span className="text-[9px] sm:text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 sm:py-1 rounded-full border border-amber-200">Negotiate before signing</span>
-                      <span className="text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">SaaS - Infrastructure</span>
+                <div className="p-4 sm:p-5 space-y-3">
+                  {/* Verdict */}
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-[9px] sm:text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">{t('hero.verdict')}</span>
                     </div>
-                    <div className="space-y-1.5 sm:space-y-2">
-                      <div className="h-1.5 sm:h-2 bg-amber-200 rounded w-full" />
-                      <div className="h-1.5 sm:h-2 bg-amber-200 rounded w-4/5" />
+                    <p className="text-[11px] sm:text-xs text-slate-700 leading-relaxed">
+                      {t('hero.verdictDesc')}
+                    </p>
+                  </div>
+
+                  {/* Red flag */}
+                  <div className="border border-red-200 rounded-lg p-3">
+                    <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider mb-1">{t('hero.redFlagLabel')}</p>
+                    <p className="text-[11px] sm:text-xs font-semibold text-slate-900 mb-1">{t('hero.redFlagTitle')}</p>
+                    <p className="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed">{t('hero.redFlagDesc')}</p>
+                  </div>
+
+                  {/* Savings */}
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-0.5">{t('example.savingsLabel')}</p>
+                        <p className="text-[10px] sm:text-[11px] text-slate-600">{t('hero.savingsDesc')}</p>
+                      </div>
+                      <span className="text-sm sm:text-base font-bold text-emerald-700">{t('example.savingsAmount')}</span>
                     </div>
                   </div>
 
-                  {/* Red flags to address */}
-                  <div className="bg-white border-2 border-red-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                    <p className="text-[10px] sm:text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
-                      <span className="text-red-600">&#9888;</span> Red flags to address
-                      <span className="text-[9px] sm:text-[10px] font-bold text-red-700 bg-red-100 px-1.5 sm:px-2 py-0.5 rounded-full border-2 border-red-200">3 issues</span>
-                    </p>
-                    <div className="space-y-1.5 sm:space-y-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                        <div className="h-1.5 sm:h-2 bg-slate-200 rounded flex-1" />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
-                        <div className="h-1.5 sm:h-2 bg-slate-200 rounded flex-1" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Potential savings */}
-                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                    <p className="text-[10px] sm:text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
-                      <span className="text-emerald-600">&#128176;</span> Potential savings
-                    </p>
+                  {/* Email preview */}
+                  <div className="border border-slate-200 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="h-1.5 sm:h-2 bg-emerald-200 rounded w-2/3" />
-                      <div className="h-1.5 sm:h-2 bg-emerald-300 rounded w-12 sm:w-16 font-bold" />
+                      <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">{t('example.emailLabel')}</p>
+                      <div className="flex gap-1">
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 border border-emerald-200">{t('hero.emailToneFriendly')}</span>
+                        <span className="text-[9px] font-medium px-2 py-0.5 rounded text-slate-400">{t('hero.emailToneDirect')}</span>
+                        <span className="text-[9px] font-medium px-2 py-0.5 rounded text-slate-400">{t('hero.emailToneFirm')}</span>
+                      </div>
                     </div>
-                    <div className="bg-gradient-to-br from-emerald-600 to-green-600 rounded-lg p-2 flex items-center justify-between">
-                      <div className="h-1 sm:h-1.5 bg-white/40 rounded w-1/2" />
-                      <div className="h-1.5 sm:h-2 bg-white rounded w-10 sm:w-12" />
-                    </div>
-                  </div>
-
-                  {/* Email builder */}
-                  <div className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm">
-                    <p className="text-[10px] sm:text-xs font-bold text-slate-900 mb-2 flex items-center gap-1.5">
-                      <span className="text-emerald-600">&#9993;</span> Email drafts
-                    </p>
-                    <div className="flex gap-1 sm:gap-1.5 mb-2 sm:mb-3 bg-slate-100 rounded-lg sm:rounded-xl p-0.5 sm:p-1">
-                      <span className="text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg bg-white shadow-md border border-slate-200 text-slate-900">Friendly</span>
-                      <span className="text-[9px] sm:text-[10px] font-semibold px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-slate-500">Direct</span>
-                      <span className="text-[9px] sm:text-[10px] font-semibold px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-slate-500">Firm</span>
-                    </div>
-                    <div className="space-y-1.5 sm:space-y-2">
-                      <div className="h-1.5 sm:h-2 bg-slate-200 rounded w-full" />
-                      <div className="h-1.5 sm:h-2 bg-slate-200 rounded w-3/4" />
+                    <div className="bg-slate-50 rounded p-2">
+                      <p className="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed line-clamp-2">
+                        {t('hero.emailSnippet')}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -166,38 +161,135 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Social Proof Bar */}
+      <section
+        ref={statsReveal.ref}
+        className={`py-12 sm:py-16 bg-gradient-to-b from-slate-50 to-white border-y border-slate-200/60 transition-all duration-700 ${
+          statsReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+        }`}
+      >
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
+            <div ref={counter60.ref} className="flex flex-col items-center text-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-3">
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">{counter60.count}s</p>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{t('stats.analysisTime')}</p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-3">
+                <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+              </div>
+              <p className="text-lg sm:text-xl font-extrabold text-emerald-600">{t('stats.anyFormat')}</p>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{t('stats.pdfEmailImage')}</p>
+            </div>
+            <div ref={counter3.ref} className="flex flex-col items-center text-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-3">
+                <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">{counter3.count}</p>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{t('stats.emailTones')}</p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-3">
+                <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">{t('stats.free')}</p>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{t('stats.noCard')}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Who it's for */}
+      <section
+        ref={whoReveal.ref}
+        className={`py-20 sm:py-28 bg-white relative transition-all duration-700 ${
+          whoReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
+      >
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <div className="text-center mb-14 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              {t('builtFor.title')}
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+              {t('builtFor.subtitle')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            {[
+              {
+                icon: Building2,
+                title: t('builtFor.founders'),
+                desc: t('builtFor.foundersDesc'),
+              },
+              {
+                icon: Users,
+                title: t('builtFor.ops'),
+                desc: t('builtFor.opsDesc'),
+              },
+              {
+                icon: ShoppingCart,
+                title: t('builtFor.buyers'),
+                desc: t('builtFor.buyersDesc'),
+              },
+            ].map((persona) => (
+              <div key={persona.title} className="bg-white border-2 border-slate-100 rounded-xl p-6 sm:p-8 hover:border-emerald-200 hover:shadow-lg transition-all duration-300 group">
+                <div className="w-12 h-12 mb-5 bg-emerald-50 rounded-xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+                  <persona.icon className="w-6 h-6 text-emerald-600" />
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2">{persona.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{persona.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How TermLift Works */}
-      <section id="how-it-works" className="py-24 sm:py-32 bg-gradient-to-b from-white via-slate-50/30 to-white relative overflow-hidden">
+      <section
+        ref={howReveal.ref}
+        id="how-it-works"
+        className={`py-20 sm:py-28 bg-gradient-to-b from-slate-50/80 via-slate-50/30 to-white relative overflow-hidden transition-all duration-700 ${
+          howReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
+      >
         {/* Decorative background elements */}
         <div className="absolute top-20 right-0 w-96 h-96 bg-emerald-100 rounded-full blur-3xl opacity-20 pointer-events-none" />
         <div className="absolute bottom-20 left-0 w-96 h-96 bg-teal-100 rounded-full blur-3xl opacity-20 pointer-events-none" />
 
         <div className="max-w-6xl mx-auto px-5 sm:px-8 relative">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              From quote to savings in 3 steps
+          <div className="text-center mb-14 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              {t('howItWorks.title')}
             </h2>
             <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
-              No spreadsheets, no back-and-forth with legal. Just clarity on what to ask for and the words to say it.
+              {t('howItWorks.subtitle')}
             </p>
           </div>
 
-          {/* 3 Steps — Lucide icons */}
+          {/* 3 Steps */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
             {[
-              { title: 'Drop in your quote', desc: 'Upload a PDF, paste an email, or snap a screenshot. Any format works.', icon: Upload },
-              { title: 'See where you can save', desc: 'Get a breakdown of hidden fees, inflated rates, and terms worth pushing on.', icon: Search },
-              { title: 'Send a stronger reply', desc: 'Copy a ready-made email with your asks baked in — pick your tone and go.', icon: Send },
-            ].map((step, index) => (
+              { step: '1', title: t('howItWorks.step1'), desc: t('howItWorks.step1Desc'), icon: Upload },
+              { step: '2', title: t('howItWorks.step2'), desc: t('howItWorks.step2Desc'), icon: Search },
+              { step: '3', title: t('howItWorks.step3'), desc: t('howItWorks.step3Desc'), icon: Send },
+            ].map((item, index) => (
               <div key={index} className="relative flex flex-col items-center text-center">
-                <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                  <step.icon className="w-7 h-7 text-emerald-700" />
+                <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center relative">
+                  <item.icon className="w-7 h-7 text-emerald-700" />
+                  <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center">
+                    {item.step}
+                  </div>
                 </div>
                 <p className="text-base font-semibold text-slate-900 mb-1.5">
-                  {step.title}
+                  {item.title}
                 </p>
                 <p className="text-sm text-slate-600 max-w-[250px]">
-                  {step.desc}
+                  {item.desc}
                 </p>
                 {index < 2 && (
                   <div className="hidden md:block absolute top-8 -right-6 text-slate-300 text-2xl">
@@ -208,342 +300,295 @@ export default function LandingPage() {
             ))}
           </div>
 
-          {/* Premium Demo Card with Tabs */}
-          <div className="max-w-4xl mx-auto">
-            {/* Example Selector with clear labels */}
-            <div className="text-center mb-6">
-              <p className="text-sm font-semibold text-slate-700 mb-3">See how it works with real examples:</p>
-              <div className="flex flex-col sm:flex-row justify-center gap-2 px-4 sm:px-0">
-                {[
-                  { key: 'marketing', label: 'Marketing Agency', desc: '$96K annual' },
-                  { key: 'saas', label: 'Email SaaS', desc: '$3.6K renewal' },
-                  { key: 'supplies', label: 'Office Supplies', desc: '$30K annual' },
-                ].map((ex) => (
-                  <button
-                    key={ex.key}
-                    onClick={() => setSelectedExample(ex.key as any)}
-                    className={`flex-1 sm:flex-initial px-4 py-3 text-sm font-semibold rounded-lg transition-all ${
-                      selectedExample === ex.key
-                        ? 'bg-emerald-600 text-white shadow-md'
-                        : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <div>{ex.label}</div>
-                    <div className="text-xs opacity-75">{ex.desc}</div>
-                  </button>
-                ))}
-              </div>
+          {/* Before / After Visual */}
+          <div className="max-w-5xl mx-auto px-4 sm:px-0">
+            <div className="text-center mb-10">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-900">{t('example.headline')}</h3>
             </div>
 
-            {/* Current example info */}
-            <div className="bg-slate-50 rounded-lg border-2 border-slate-200 p-3 sm:p-4 mb-4 mx-4 sm:mx-0">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm sm:text-base">{currentExample.title}</h3>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-1">{currentExample.vendor} • {currentExample.snapshot.total_commitment}</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              {/* LEFT: Before — Vendor Quote */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
+                    <span className="text-xs font-bold text-slate-500">1</span>
+                  </div>
+                  <p className="text-sm font-semibold text-slate-700">{t('example.youPaste')}</p>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 whitespace-nowrap">
-                  Example {selectedExample === 'marketing' ? '1' : selectedExample === 'saas' ? '2' : '3'}
-                </span>
+                <div className="bg-white rounded-xl border-2 border-slate-200 shadow-sm overflow-hidden">
+                  <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-slate-300" />
+                    <span className="text-[10px] sm:text-xs font-medium text-slate-400">vendor-quote.pdf</span>
+                  </div>
+                  <div className="p-4 sm:p-5 text-xs sm:text-sm text-slate-600 leading-relaxed space-y-3.5">
+                    <p className="text-base sm:text-lg font-semibold text-slate-800">{t('example.quoteVendor')}</p>
+                    <p className="text-slate-500 text-xs uppercase tracking-wide font-medium">{t('example.quoteTitle')}</p>
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex justify-between"><span>{t('example.quoteRetainer')}</span><span className="font-semibold text-slate-800">€7,500/mo</span></div>
+                      <div className="flex justify-between"><span>{t('example.quoteAdFee')}</span><span className="font-semibold text-slate-800">20%</span></div>
+                      <div className="flex justify-between"><span>{t('example.quoteAdBudget')}</span><span className="font-semibold text-slate-800">€9,000/mo</span></div>
+                      <div className="flex justify-between"><span>{t('example.quoteTerm')}</span><span className="font-semibold text-slate-800">12 months</span></div>
+                      <div className="flex justify-between border-t border-slate-100 pt-1.5 mt-1.5"><span className="font-medium text-slate-700">{t('example.quoteTotal')}</span><span className="font-bold text-slate-900">€110,000</span></div>
+                    </div>
+                    <p className="pt-1">{t('example.quoteDeliverables')}</p>
+                    <p className="text-slate-400">{t('example.quoteCancellation')}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT: After — TermLift Output */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center">
+                    <span className="text-xs font-bold text-white">2</span>
+                  </div>
+                  <p className="text-sm font-semibold text-slate-700">{t('example.termliftReturns')}</p>
+                </div>
+                <div className="space-y-3">
+                  {/* Red Flag 1 */}
+                  <div className="bg-white rounded-xl border border-red-200 p-3.5 sm:p-4 shadow-sm">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                      <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">{t('example.commercial')}</span>
+                    </div>
+                    <p className="text-xs sm:text-sm font-semibold text-slate-900 mb-1">{t('example.redFlag1Title')}</p>
+                    <p className="text-xs text-slate-500">{t('example.redFlag1Desc')}</p>
+                  </div>
+
+                  {/* Red Flag 2 */}
+                  <div className="bg-white rounded-xl border border-red-200 p-3.5 sm:p-4 shadow-sm">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                      <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">{t('example.commercial')}</span>
+                    </div>
+                    <p className="text-xs sm:text-sm font-semibold text-slate-900 mb-1">{t('example.redFlag2Title')}</p>
+                    <p className="text-xs text-slate-500">{t('example.redFlag2Desc')}</p>
+                  </div>
+
+                  {/* Savings */}
+                  <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-3.5 sm:p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-0.5">{t('example.savingsLabel')}</p>
+                        <p className="text-xs text-slate-600">{t('example.savingsDesc')}</p>
+                      </div>
+                      <span className="text-lg sm:text-xl font-bold text-emerald-700">{t('example.savingsAmount')}</span>
+                    </div>
+                  </div>
+
+                  {/* Email Preview */}
+                  <div className="bg-white rounded-xl border border-slate-200 p-3.5 sm:p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">{t('example.emailLabel')}</p>
+                      <div className="flex gap-1">
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 border border-emerald-200">{t('hero.emailToneFriendly')}</span>
+                        <span className="text-[9px] font-medium px-2 py-0.5 rounded text-slate-400">{t('hero.emailToneDirect')}</span>
+                        <span className="text-[9px] font-medium px-2 py-0.5 rounded text-slate-400">{t('hero.emailToneFirm')}</span>
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 rounded-lg p-2.5">
+                      <p className="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed">
+                        {t('hero.emailSnippet')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl overflow-hidden mx-4 sm:mx-0">
-              {/* Tab Headers */}
-              <div className="flex border-b border-slate-200 bg-slate-50">
-                <button
-                  onClick={() => setActiveTab('price')}
-                  className={`flex-1 px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold transition-all ${
-                    activeTab === 'price'
-                      ? 'text-emerald-700 bg-white border-b-2 border-emerald-600'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                >
-                  <span className="hidden sm:inline">Red flags to address</span>
-                  <span className="sm:hidden">Red flags</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('terms')}
-                  className={`flex-1 px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold transition-all ${
-                    activeTab === 'terms'
-                      ? 'text-emerald-700 bg-white border-b-2 border-emerald-600'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                >
-                  <span className="hidden sm:inline">Negotiation plan</span>
-                  <span className="sm:hidden">Strategy</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('emails')}
-                  className={`flex-1 px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold transition-all ${
-                    activeTab === 'emails'
-                      ? 'text-emerald-700 bg-white border-b-2 border-emerald-600'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                >
-                  <span className="hidden sm:inline">Email drafts</span>
-                  <span className="sm:hidden">Email</span>
-                </button>
-              </div>
-
-              {/* Tab Content */}
-              <div className="p-3 sm:p-8">
-                {activeTab === 'price' && (
-                  <div>
-                    {/* Styled to match real red flag cards in OutputDisplay */}
-                    {currentExample.red_flags.slice(0, 2).map((flag, idx) => (
-                      <div key={idx} className={`bg-white rounded-xl border border-red-200 p-4 sm:p-5 ${idx === 0 ? 'mb-3 sm:mb-4' : ''}`}>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">{flag.type}</span>
-                        </div>
-                        <h3 className="font-bold text-slate-900 text-xs sm:text-sm mb-1">{flag.issue}</h3>
-                        <p className="text-xs text-slate-600 leading-relaxed">{flag.why_it_matters}</p>
-                        <div className="mt-3 bg-emerald-50 rounded-lg border border-emerald-200 p-3">
-                          <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">What to ask for</p>
-                          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">{flag.what_to_ask_for}</p>
-                        </div>
-                      </div>
-                    ))}
-                    <p className="text-xs sm:text-sm text-slate-500 mt-4 sm:mt-6 italic">
-                      Every flag comes with exactly what to say — and a fallback if they push back.
-                    </p>
-                  </div>
-                )}
-
-                {activeTab === 'terms' && (
-                  <div>
-                    {/* 3-column grid matching OutputDisplay exactly */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
-                      {/* Push For - LEFT */}
-                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 sm:p-5">
-                        <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
-                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </div>
-                          <h4 className="text-sm sm:text-base font-bold text-slate-900">Push For</h4>
-                        </div>
-                        <div className="space-y-2 sm:space-y-2.5">
-                          {currentExample.what_to_ask_for.must_have.map((item, idx) => (
-                            <div key={idx} className="bg-white border border-slate-200 rounded-lg p-2.5 sm:p-3">
-                              {idx === 0 && (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white mb-2">
-                                  MUST-HAVE
-                                </span>
-                              )}
-                              <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">{item}</p>
-                            </div>
-                          ))}
-                          {currentExample.what_to_ask_for.nice_to_have?.slice(0, 1).map((item, idx) => (
-                            <div key={idx} className="bg-white border border-slate-200 rounded-lg p-2.5 sm:p-3">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-400 text-white mb-2">
-                                NICE-TO-HAVE
-                              </span>
-                              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">{item}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Your Leverage - MIDDLE */}
-                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 sm:p-5">
-                        <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
-                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                          </div>
-                          <h4 className="text-sm sm:text-base font-bold text-slate-900">Your Leverage</h4>
-                        </div>
-                        <ul className="space-y-2 sm:space-y-2.5">
-                          {currentExample.negotiation_plan.leverage_you_have.map((item, idx) => (
-                            <li key={idx} className="bg-white border border-slate-200 rounded-lg p-2.5 sm:p-3 flex items-start gap-2.5">
-                              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                              <span className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Can Offer - RIGHT */}
-                      <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 sm:p-5">
-                        <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
-                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                            </svg>
-                          </div>
-                          <h4 className="text-sm sm:text-base font-bold text-slate-900">Can Offer</h4>
-                        </div>
-                        <ul className="space-y-2 sm:space-y-2.5">
-                          {currentExample.negotiation_plan.trades_you_can_offer.map((item, idx) => (
-                            <li key={idx} className="bg-white border border-slate-200 rounded-lg p-2.5 sm:p-3 flex items-start gap-2.5">
-                              <span className="text-slate-400 mt-0.5 flex-shrink-0 text-sm sm:text-base">↔</span>
-                              <span className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'emails' && (
-                  <div className="space-y-4 sm:space-y-5">
-                    {/* Email Tone Selector - matching OutputDisplay */}
-                    <div>
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-1">
-                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email Tone</label>
-                        <span className="text-xs text-slate-600">Choose your approach</span>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                        {[
-                          { label: 'Friendly', desc: 'Warm & collaborative' },
-                          { label: 'Direct', desc: 'Clear & focused' },
-                          { label: 'Firm', desc: 'Urgent & deadline-driven' }
-                        ].map((tab, idx) => (
-                          <button
-                            key={idx}
-                            className={`relative px-2 sm:px-4 py-2.5 sm:py-3.5 rounded-lg border-2 transition-all ${
-                              idx === 0
-                                ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-200'
-                                : 'bg-white border-slate-200 hover:border-slate-300'
-                            }`}
-                          >
-                            <div className="text-center">
-                              <div className="text-xs sm:text-sm font-bold text-slate-900 mb-0.5">{tab.label}</div>
-                              <div className="text-[10px] sm:text-xs text-slate-600 hidden sm:block">{tab.desc}</div>
-                            </div>
-                            {idx === 0 && (
-                              <div className="absolute top-1 right-1 sm:top-2 sm:right-2">
-                                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                              </div>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Subject Line */}
-                    <div>
-                      <label className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 block">Subject Line</label>
-                      <input
-                        type="text"
-                        value={currentExample.email_drafts.neutral.subject}
-                        readOnly
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm border-2 border-slate-200 rounded-lg shadow-sm bg-white font-medium"
-                      />
-                    </div>
-
-                    {/* Email Body */}
-                    <div>
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 gap-2">
-                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email Body</label>
-                        <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                          <span className="hidden sm:inline">Copy to clipboard</span>
-                          <span className="sm:hidden">Copy</span>
-                        </button>
-                      </div>
-                      <textarea
-                        value={currentExample.email_drafts.neutral.body}
-                        readOnly
-                        rows={10}
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm border-2 border-slate-200 rounded-lg resize-none leading-relaxed shadow-sm bg-white"
-                      />
-                    </div>
-
-                    <p className="text-xs sm:text-sm text-slate-500 italic">
-                      All 3 tones ready to copy. Edit directly or regenerate with AI.
-                    </p>
-                  </div>
-                )}
-              </div>
+            {/* CTA below the before/after */}
+            <div className="text-center mt-10">
+              <Link
+                href="/try"
+                className="group inline-flex items-center justify-center px-7 sm:px-9 py-3.5 sm:py-4 text-sm sm:text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+              >
+                {t('example.cta')}
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <p className="text-xs text-slate-500 mt-3">
+                <Link href="/example" className="text-emerald-600 hover:text-emerald-700 font-medium">See a full example</Link>
+                {' '}{t('example.withAllDetails')}
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Data Privacy */}
-      <section id="data-privacy" className="py-24 sm:py-32 bg-white relative">
+      <section
+        ref={privacyReveal.ref}
+        id="data-privacy"
+        className={`py-20 sm:py-28 bg-white relative transition-all duration-700 ${
+          privacyReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
+      >
         <div className="max-w-6xl mx-auto px-5 sm:px-8 relative">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-              Your quotes stay yours
+          <div className="text-center mb-14 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              {t('privacy.title')}
             </h2>
             <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
-              Confidential pricing deserves confidential handling. Your data is encrypted, never trained on, and deleted when you say so.
+              {t('privacy.subtitle')}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
             <div className="relative flex flex-col items-center text-center group">
-              <div className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
-                <Lock className="w-8 h-8 text-emerald-700" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mb-5 sm:mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
+                <Lock className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-700" />
               </div>
-              <p className="text-lg font-semibold text-slate-900 mb-2">Enterprise-grade security</p>
-              <p className="text-sm text-slate-600 leading-relaxed">Data encrypted in transit and at rest. Securely processed and deleted after analysis unless you save it.</p>
+              <p className="text-base sm:text-lg font-semibold text-slate-900 mb-2">{t('privacy.encryption')}</p>
+              <p className="text-sm text-slate-600 leading-relaxed">{t('privacy.encryptionDesc')}</p>
             </div>
             <div className="relative flex flex-col items-center text-center group">
-              <div className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
-                <ShieldCheck className="w-8 h-8 text-emerald-700" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mb-5 sm:mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
+                <ShieldCheck className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-700" />
               </div>
-              <p className="text-lg font-semibold text-slate-900 mb-2">Never used for AI training</p>
-              <p className="text-sm text-slate-600 leading-relaxed">Your pricing, terms, and vendor details are never fed back into any model.</p>
+              <p className="text-base sm:text-lg font-semibold text-slate-900 mb-2">{t('privacy.noTraining')}</p>
+              <p className="text-sm text-slate-600 leading-relaxed">{t('privacy.noTrainingDesc')}</p>
             </div>
             <div className="relative flex flex-col items-center text-center group">
-              <div className="w-20 h-20 mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
-                <Globe className="w-8 h-8 text-emerald-700" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mb-5 sm:mb-6 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow duration-300">
+                <Globe className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-700" />
               </div>
-              <p className="text-lg font-semibold text-slate-900 mb-2">GDPR compliant</p>
-              <p className="text-sm text-slate-600 leading-relaxed">EU-hosted infrastructure with full compliance built in from day one.</p>
+              <p className="text-base sm:text-lg font-semibold text-slate-900 mb-2">{t('privacy.gdpr')}</p>
+              <p className="text-sm text-slate-600 leading-relaxed">{t('privacy.gdprDesc')}</p>
             </div>
           </div>
-          <div className="text-center mt-12">
+          <div className="text-center mt-10 sm:mt-12">
             <Link href="/security" className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors group">
-              Learn more about our security practices
+              {t('privacy.learnMore')}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Start free */}
-      <section id="pricing" className="py-24 sm:py-32 bg-gradient-to-b from-slate-50 via-slate-50/50 to-white relative">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 text-center relative">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-            Your first savings are free
-          </h2>
-          <p className="text-base sm:text-lg text-slate-600 mb-12 max-w-2xl mx-auto">
-            Get 2 full analyses — red flags, negotiation plan, and email drafts included. See what you've been leaving on the table.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Link
-              href="/try"
-              className="group inline-flex items-center justify-center px-8 py-4 text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-            >
-              Analyze a quote free
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors group"
-            >
-              View pricing details
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
+      {/* Pricing Preview */}
+      <section
+        ref={pricingReveal.ref}
+        id="pricing"
+        className={`py-20 sm:py-28 bg-gradient-to-b from-slate-50 via-slate-50/50 to-white relative transition-all duration-700 ${
+          pricingReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
+      >
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 relative">
+          <div className="text-center mb-12 sm:mb-14">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              {t('pricing.title')}
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+              {t('pricing.subtitle')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {/* Starter */}
+            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-7">
+              <div className="mb-5">
+                <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.starter')}</h3>
+                <p className="text-sm text-slate-500">{t('pricing.starterDesc')}</p>
+              </div>
+              <div className="mb-5">
+                <span className="text-3xl sm:text-4xl font-bold text-slate-900">€0</span>
+              </div>
+              <ul className="space-y-2.5 mb-7">
+                {[
+                  t('pricing.starterFeature1'),
+                  t('pricing.starterFeature2'),
+                  t('pricing.starterFeature3'),
+                  t('pricing.starterFeature4'),
+                ].map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5 text-sm text-slate-700">
+                    <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={3} />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/try"
+                className="block w-full text-center px-6 py-3 text-sm font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
+              >
+                {t('pricing.starterCta')}
+              </Link>
+            </div>
+
+            {/* Pro — Highlighted */}
+            <div className="bg-white border-2 border-emerald-500 rounded-2xl p-6 sm:p-7 relative shadow-lg">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white">{t('pricing.mostPopular')}</span>
+              </div>
+              <div className="mb-5">
+                <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.pro')}</h3>
+                <p className="text-sm text-slate-500">{t('pricing.proDesc')}</p>
+              </div>
+              <div className="mb-5">
+                <span className="text-3xl sm:text-4xl font-bold text-slate-900">€39</span>
+                <span className="text-sm text-slate-500">/month</span>
+              </div>
+              <ul className="space-y-2.5 mb-7">
+                {[
+                  t('pricing.proFeature1'),
+                  t('pricing.proFeature2'),
+                  t('pricing.proFeature3'),
+                  t('pricing.proFeature4'),
+                  t('pricing.proFeature5'),
+                ].map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5 text-sm text-slate-700">
+                    <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={3} />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <button
+                disabled
+                className="block w-full text-center px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white opacity-80 cursor-not-allowed transition-all shadow-md"
+              >
+                {t('pricing.comingSoon')}
+              </button>
+            </div>
+
+            {/* Business */}
+            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-7">
+              <div className="mb-5">
+                <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.business')}</h3>
+                <p className="text-sm text-slate-500">{t('pricing.businessDesc')}</p>
+              </div>
+              <div className="mb-5">
+                <span className="text-3xl sm:text-4xl font-bold text-slate-900">€149</span>
+                <span className="text-sm text-slate-500">/month</span>
+              </div>
+              <ul className="space-y-2.5 mb-7">
+                {[
+                  t('pricing.businessFeature1'),
+                  t('pricing.businessFeature2'),
+                  t('pricing.businessFeature3'),
+                  t('pricing.businessFeature4'),
+                  t('pricing.businessFeature5'),
+                ].map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5 text-sm text-slate-700">
+                    <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={3} />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <button
+                disabled
+                className="block w-full text-center px-6 py-3 text-sm font-semibold rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed transition-all"
+              >
+                {t('pricing.comingSoon')}
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="relative bg-gradient-to-br from-emerald-600 via-emerald-600 to-teal-700 py-24 sm:py-32 overflow-hidden">
+      <section
+        ref={ctaReveal.ref}
+        className={`relative bg-gradient-to-br from-emerald-600 via-emerald-600 to-teal-700 py-20 sm:py-28 overflow-hidden transition-all duration-700 ${
+          ctaReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
+      >
         {/* Decorative elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-1/4 w-96 h-96 bg-white rounded-full blur-3xl" />
@@ -551,17 +596,18 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center relative">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 leading-tight">
-            That quote in your inbox? You're probably overpaying.
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+            {t('cta.title')}
           </h2>
-          <p className="text-emerald-100 text-lg sm:text-xl mb-10 leading-relaxed">
-            Find out in 60 seconds. No signup, no commitment — just clarity.
+          <p className="text-emerald-100 text-base sm:text-lg md:text-xl mb-10 leading-relaxed max-w-2xl mx-auto">
+            {t('cta.subtitle')}
           </p>
           <Link
             href="/try"
             className="inline-flex items-center justify-center px-10 py-4 text-base font-semibold rounded-xl bg-white text-emerald-700 hover:bg-slate-50 transition-all shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:scale-[1.02] active:scale-[0.98]"
           >
-            Analyze your first quote
+            {t('cta.button')}
+            <ArrowRight className="w-4 h-4 ml-2" />
           </Link>
         </div>
       </section>
@@ -570,22 +616,22 @@ export default function LandingPage() {
       <footer className="border-t border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-slate-500">&copy; 2026 TermLift. All rights reserved.</p>
+            <p className="text-sm text-slate-500">{t('footer.rights')}</p>
             <div className="flex items-center flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
               <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                Pricing
+                {t('footer.pricing')}
               </Link>
               <Link href="/help" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                Help
+                {t('footer.help')}
               </Link>
               <Link href="/security" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                Security
+                {t('footer.security')}
               </Link>
               <Link href="/terms" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                Terms
+                {t('footer.terms')}
               </Link>
               <Link href="/privacy" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-                Privacy
+                {t('footer.privacy')}
               </Link>
             </div>
           </div>

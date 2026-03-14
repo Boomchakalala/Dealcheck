@@ -3,13 +3,15 @@
 import { type DealOutput } from '@/types'
 import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, TrendingDown, TrendingUp, Zap, Loader2, Sparkles, Clock, DollarSign, Calendar, Target, Layers, Info, AlertCircle } from 'lucide-react'
 import { useState, useMemo } from 'react'
+import { useT } from '@/i18n/context'
 
 interface OutputDisplayProps {
   output: DealOutput
   roundId?: string // Optional - only available in authenticated flow
+  hideHeader?: boolean // Hide title + metric cards when rendered inside deal page
 }
 
-export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
+export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDisplayProps) {
   const [expandedFlags, setExpandedFlags] = useState<number[]>(
     // Expand all flags by default
     Array.from({ length: output.red_flags?.length || 0 }, (_, i) => i)
@@ -22,17 +24,35 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
   const [showEmails, setShowEmails] = useState(true)
   const [activeEmailTab, setActiveEmailTab] = useState(0)
   const [selectedFlagTab, setSelectedFlagTab] = useState<Record<number, 'ask' | 'fallback'>>({})
+  const [addressedFlags, setAddressedFlags] = useState<number[]>([])
+  const [copiedAsk, setCopiedAsk] = useState<number | null>(null)
+  const [copiedCol, setCopiedCol] = useState<string | null>(null)
+  const t = useT()
+
+  // Helper: replace [DATE] placeholders with a real business date
+  function getNextBusinessDate(daysOut: number = 5): string {
+    const date = new Date()
+    let added = 0
+    while (added < daysOut) {
+      date.setDate(date.getDate() + 1)
+      const day = date.getDay()
+      if (day !== 0 && day !== 6) added++
+    }
+    const dayNum = date.getDate()
+    const suffix = dayNum === 1 || dayNum === 21 || dayNum === 31 ? 'st' : dayNum === 2 || dayNum === 22 ? 'nd' : dayNum === 3 || dayNum === 23 ? 'rd' : 'th'
+    return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long' }) + ' ' + dayNum + suffix
+  }
 
   // Email editing state
   const [emailSubjects, setEmailSubjects] = useState([
-    output.email_drafts.neutral.subject,
-    output.email_drafts.firm.subject,
-    output.email_drafts.final_push.subject
+    output.email_drafts.neutral.subject.replace(/\[DATE\]/gi, getNextBusinessDate()),
+    output.email_drafts.firm.subject.replace(/\[DATE\]/gi, getNextBusinessDate()),
+    output.email_drafts.final_push.subject.replace(/\[DATE\]/gi, getNextBusinessDate())
   ])
   const [emailBodies, setEmailBodies] = useState([
-    output.email_drafts.neutral.body,
-    output.email_drafts.firm.body,
-    output.email_drafts.final_push.body
+    output.email_drafts.neutral.body.replace(/\[DATE\]/gi, getNextBusinessDate()),
+    output.email_drafts.firm.body.replace(/\[DATE\]/gi, getNextBusinessDate()),
+    output.email_drafts.final_push.body.replace(/\[DATE\]/gi, getNextBusinessDate())
   ])
 
   // Regeneration state
@@ -43,9 +63,9 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
   const [showCustomPrompt, setShowCustomPrompt] = useState(false)
 
   const emailTabs = [
-    { label: 'Friendly', desc: 'Warm & collaborative' },
-    { label: 'Direct', desc: 'Clear & focused' },
-    { label: 'Firm', desc: 'Urgent & deadline-driven' }
+    { label: t('output.friendly'), desc: t('output.warmAndCollaborative') },
+    { label: t('output.direct'), desc: t('output.clearAndFocused') },
+    { label: t('output.firm'), desc: t('output.urgentAndDeadlineDriven') }
   ]
 
   // Parse a single annual_impact string to a number (handles $1,000, $2.5K, $1.2M, "3,000 saved", etc.)
@@ -77,12 +97,12 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
   const handleRegenerateEmails = async () => {
     if (!roundId) {
-      setRegenError('Email regeneration is only available for saved deals. Please sign in.')
+      setRegenError(t('output.regenErrorNotSaved'))
       return
     }
 
     if (remainingRegens <= 0) {
-      setRegenError('You have used all 3 email regenerations for this round.')
+      setRegenError(t('output.regenErrorUsedAll'))
       return
     }
 
@@ -135,7 +155,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       text: 'text-amber-900',
       badge: 'bg-amber-100 text-amber-800 border-amber-200',
       icon: <Zap className="w-5 h-5 text-amber-600" />,
-      label: 'Negotiate before signing',
+      label: t('output.negotiateBeforeSigning'),
     },
     competitive: {
       bg: 'bg-emerald-50',
@@ -143,7 +163,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       text: 'text-emerald-900',
       badge: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       icon: <CheckCircle2 className="w-5 h-5 text-emerald-600" />,
-      label: 'Competitive deal',
+      label: t('output.competitiveDeal'),
     },
     overpay_risk: {
       bg: 'bg-red-50',
@@ -151,7 +171,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       text: 'text-red-900',
       badge: 'bg-red-100 text-red-800 border-red-200',
       icon: <TrendingDown className="w-5 h-5 text-red-600" />,
-      label: 'Overpay risk',
+      label: t('output.overpayRisk'),
     },
   }
 
@@ -159,10 +179,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
   return (
     <div className="max-w-7xl mx-auto pb-6">
-      {/* ══════════════════════════════════════════════════════════════ */}
-      {/* TOP SECTION: Title + Metadata */}
-      {/* ══════════════════════════════════════════════════════════════ */}
-      <div className="mb-6">
+      {/* TOP SECTION: Title + Metadata — hidden when inside deal page */}
+      {!hideHeader && <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-slate-900 mb-2">
@@ -186,27 +204,25 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           </div>
         </div>
         <p className="text-sm text-slate-600 leading-relaxed">
-          <span className="font-semibold">1 round of analysis</span>
+          <span className="font-semibold">{t('output.roundOfAnalysis')}</span>
         </p>
-      </div>
+      </div>}
 
-      {/* ══════════════════════════════════════════════════════════════ */}
-      {/* METRIC CARDS ROW */}
-      {/* ══════════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      {/* METRIC CARDS ROW — hidden when inside deal page */}
+      {!hideHeader && <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Total Commitment Card */}
         <div className="bg-white rounded-xl border-2 border-slate-200 p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
               <DollarSign className="w-4 h-4 text-slate-600" />
             </div>
-            <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Total Commitment</p>
+            <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">{t('output.totalCommitment')}</p>
           </div>
           <p className="text-3xl font-bold text-slate-900 mb-1">
-            {output.snapshot?.total_commitment || 'N/A'}
+            {output.snapshot?.total_commitment || t('output.na')}
           </p>
           <p className="text-sm text-slate-600">
-            {output.snapshot?.term || '12-month contract'}
+            {output.snapshot?.term || t('output.12MonthContract')}
           </p>
         </div>
 
@@ -216,7 +232,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
               <AlertTriangle className="w-4 h-4 text-red-600" />
             </div>
-            <p className="text-xs font-semibold text-red-700 uppercase tracking-wide">Red Flags</p>
+            <p className="text-xs font-semibold text-red-700 uppercase tracking-wide">{t('output.redFlags')}</p>
           </div>
           <p className="text-3xl font-bold text-red-700 mb-1">
             {output.red_flags?.length || 0}
@@ -225,7 +241,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             onClick={() => setShowRedFlags(!showRedFlags)}
             className="text-sm text-red-700 hover:text-red-800 font-medium hover:underline"
           >
-            {output.red_flags?.length === 1 ? 'Issue to address' : 'Issues to address'}
+            {output.red_flags?.length === 1 ? t('output.issueToAddress') : t('output.issuesToAddress')}
           </button>
         </div>
 
@@ -235,10 +251,10 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
               <TrendingUp className="w-4 h-4 text-emerald-600" />
             </div>
-            <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Potential Savings</p>
+            <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">{t('output.potentialSavings')}</p>
           </div>
           <p className="text-3xl font-bold text-emerald-700 mb-1">
-            {totalSavings > 0 ? formatSavings(totalSavings) : 'N/A'}
+            {totalSavings > 0 ? formatSavings(totalSavings) : t('output.na')}
           </p>
           <p className="text-sm text-emerald-700">
             {totalSavings > 0 && output.snapshot?.total_commitment ? (
@@ -247,14 +263,14 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 const commitmentNum = parseFloat(totalCommitment)
                 if (!isNaN(commitmentNum) && commitmentNum > 0) {
                   const percentage = ((totalSavings / commitmentNum) * 100).toFixed(0)
-                  return `${percentage}% potential savings`
+                  return t('output.percentPotentialSavings', { pct: percentage })
                 }
-                return 'Identified savings opportunities'
+                return t('output.identifiedSavingsOpportunities')
               })()
-            ) : 'No savings calculated'}
+            ) : t('output.noSavingsCalculated')}
           </p>
         </div>
-      </div>
+      </div>}
 
       {/* ══════════════════════════════════════════════════════════════ */}
       {/* DEAL SNAPSHOT */}
@@ -265,15 +281,15 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           className="flex items-center gap-2 mb-4 text-left w-full"
         >
           <Target className="w-5 h-5 text-slate-600" />
-          <h2 className="text-lg font-bold text-slate-900">Deal snapshot</h2>
+          <h2 className="text-lg font-bold text-slate-900">{t('output.dealSnapshot')}</h2>
         </button>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Vendor</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">{t('output.vendor')}</p>
             <p className="text-sm font-semibold text-slate-900">
               {(() => {
-                const vendorProduct = output.snapshot?.vendor_product || output.vendor || 'N/A'
+                const vendorProduct = output.snapshot?.vendor_product || output.vendor || t('output.na')
                 // Extract just the vendor name (before "/" if present)
                 const vendorName = vendorProduct.split('/')[0].trim()
                 return vendorName
@@ -285,33 +301,33 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Term</p>
-            <p className="text-sm font-semibold text-slate-900">{output.snapshot?.term || 'N/A'}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">{t('output.term')}</p>
+            <p className="text-sm font-semibold text-slate-900">{output.snapshot?.term || t('output.na')}</p>
             {output.snapshot?.billing_payment && (
               <p className="text-xs text-slate-600 mt-0.5">{output.snapshot.billing_payment}</p>
             )}
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Total</p>
-            <p className="text-sm font-semibold text-slate-900">{output.snapshot?.total_commitment || 'N/A'}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">{t('output.total')}</p>
+            <p className="text-sm font-semibold text-slate-900">{output.snapshot?.total_commitment || t('output.na')}</p>
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Deal Type</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">{t('output.dealType')}</p>
             <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-              {output.snapshot?.deal_type || 'N/A'}
+              {output.snapshot?.deal_type || t('output.na')}
             </span>
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Pricing Model</p>
-            <p className="text-sm font-semibold text-slate-900">{output.snapshot?.pricing_model || 'N/A'}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">{t('output.pricingModel')}</p>
+            <p className="text-sm font-semibold text-slate-900">{output.snapshot?.pricing_model || t('output.na')}</p>
           </div>
 
           {output.snapshot?.renewal_date && (
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Renewal Date</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">{t('output.renewalDate')}</p>
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-slate-600" />
                 <p className="text-sm font-semibold text-slate-900">{output.snapshot.renewal_date}</p>
@@ -321,7 +337,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
           {output.snapshot?.signing_deadline && (
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Signing Deadline</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">{t('output.signingDeadline')}</p>
               <div className="flex items-center gap-1.5">
                 <AlertCircle className="w-3.5 h-3.5 text-orange-600" />
                 <p className="text-sm font-semibold text-orange-700">{output.snapshot.signing_deadline}</p>
@@ -345,8 +361,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">What's already solid</h2>
-                <p className="text-xs text-slate-600">Good aspects in this deal — build on these.</p>
+                <h2 className="text-lg font-bold text-slate-900">{t('output.whatsAlreadySolid')}</h2>
+                <p className="text-xs text-slate-600">{t('output.goodAspectsInThisDeal')}</p>
               </div>
             </div>
             {showSolid ? (
@@ -382,9 +398,9 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 <AlertTriangle className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">Red flags to address</h2>
+                <h2 className="text-lg font-bold text-slate-900">{t('output.redFlagsToAddress')}</h2>
                 <p className="text-sm text-slate-600">
-                  <span className="font-semibold text-red-700">{output.red_flags.length} critical issue{output.red_flags.length !== 1 ? 's' : ''}</span> — Each includes negotiation guidance
+                  <span className="font-semibold text-red-700">{output.red_flags.length !== 1 ? t('output.criticalIssues', { count: output.red_flags.length }) : t('output.criticalIssue', { count: output.red_flags.length })}</span> {t('output.eachIncludesNegotiationGuidance')}
                 </p>
               </div>
             </div>
@@ -405,20 +421,48 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               {output.red_flags.map((flag, idx) => {
                 const isExpanded = expandedFlags.includes(idx)
                 const activeTab = selectedFlagTab[idx] || 'ask'
+                const isAddressed = addressedFlags.includes(idx)
+
+                // Extract financial impact from why_it_matters
+                const impactMatch = flag.why_it_matters?.match(/[\$€£][\d,]+(?:\.\d+)?(?:\/(?:year|yr|month|mo))?(?:\s*(?:per|a)\s*year)?/i)
+                const financialImpact = impactMatch ? impactMatch[0] : null
+
+                // Determine severity based on dollar amounts in the text
+                const amountMatch = flag.why_it_matters?.match(/[\$€£]([\d,]+)/g)
+                const maxAmount = amountMatch
+                  ? Math.max(...amountMatch.map(s => parseInt(s.replace(/[^\d]/g, ''), 10) || 0))
+                  : 0
+                const severity = maxAmount >= 5000 ? 'HIGH' : maxAmount >= 1000 ? 'MEDIUM' : 'LOW'
+                const severityColor = severity === 'HIGH' ? 'bg-red-100 text-red-700 border-red-200' : severity === 'MEDIUM' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'
 
                 return (
-                  <div key={idx} className="bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                  <div key={idx} className={`rounded-xl border-2 overflow-hidden transition-all ${
+                    isAddressed
+                      ? 'bg-emerald-50/50 border-emerald-200'
+                      : 'bg-slate-50 border-slate-200'
+                  }`}>
                     <button
                       onClick={() => toggleFlag(idx)}
-                      className="w-full px-5 py-4 flex items-start justify-between hover:bg-slate-100 transition-colors text-left"
+                      className="w-full px-5 py-4 flex items-start justify-between hover:bg-slate-100/50 transition-colors text-left"
                     >
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center shadow-sm">
+                        <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
+                          <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center shadow-sm flex-shrink-0">
                             <span className="text-white font-bold text-xs">{idx + 1}</span>
                           </div>
-                          <h3 className="font-bold text-base text-slate-900">{flag.issue}</h3>
+                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${severityColor} uppercase tracking-wider`}>
+                            {severity === 'HIGH' ? t('output.severity.high') : severity === 'MEDIUM' ? t('output.severity.medium') : t('output.severity.low')}
+                          </span>
+                          {flag.type && (
+                            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{flag.type}</span>
+                          )}
                         </div>
+                        <h3 className={`font-bold text-base text-slate-900 mb-1 ${isAddressed ? 'line-through opacity-60' : ''}`}>
+                          {flag.issue}
+                        </h3>
+                        {financialImpact && (
+                          <p className="text-xs text-slate-400 mb-1.5">{t('output.estimatedRiskUpTo', { amount: financialImpact })}</p>
+                        )}
                         <p className="text-sm text-slate-700 leading-relaxed pr-4">
                           {flag.why_it_matters}
                         </p>
@@ -433,42 +477,101 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                     </button>
 
                     {isExpanded && (
-                      <div className="px-5 pb-5 border-t-2 border-slate-200 pt-5 bg-white">
-                        {/* Tabs */}
+                      <div className="px-5 pb-5 border-t-2 border-slate-200 pt-4 bg-white">
+                        {/* Pill toggle */}
                         <div className="space-y-3">
-                          <div className="flex gap-3">
+                          <div className="inline-flex rounded-full border-2 border-slate-200 bg-slate-100 p-0.5">
                             <button
                               onClick={() => setSelectedFlagTab({...selectedFlagTab, [idx]: 'ask'})}
-                              className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                 activeTab === 'ask'
                                   ? 'bg-emerald-600 text-white shadow-sm'
-                                  : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-300'
+                                  : 'text-slate-500 hover:text-slate-700'
                               }`}
                             >
-                              What to ask for
+                              {t('output.whatToAskFor')}
                             </button>
                             <button
                               onClick={() => setSelectedFlagTab({...selectedFlagTab, [idx]: 'fallback'})}
-                              className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                 activeTab === 'fallback'
-                                  ? 'bg-blue-600 text-white shadow-sm'
-                                  : 'bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-300'
+                                  ? 'bg-slate-700 text-white shadow-sm'
+                                  : 'text-slate-500 hover:text-slate-700'
                               }`}
                             >
-                              Fallback position
+                              {t('output.fallbackPosition')}
                             </button>
                           </div>
 
                           {activeTab === 'ask' ? (
-                            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4">
-                              <p className="text-sm text-slate-800 leading-relaxed">{flag.what_to_ask_for}</p>
+                            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4 relative">
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(flag.what_to_ask_for)
+                                  setCopiedAsk(idx)
+                                  setTimeout(() => setCopiedAsk(null), 2000)
+                                }}
+                                className="absolute top-2.5 right-2.5 p-1.5 rounded-md text-emerald-500 hover:text-emerald-700 hover:bg-emerald-100 transition-colors"
+                                title={t('output.copyToClipboard')}
+                              >
+                                {copiedAsk === idx ? (
+                                  <span className="text-[10px] font-bold text-emerald-700">{t('output.copied')}</span>
+                                ) : (
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                  </svg>
+                                )}
+                              </button>
+                              <p className="text-sm text-slate-800 leading-relaxed pr-8">{flag.what_to_ask_for}</p>
                             </div>
                           ) : (
-                            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-                              <p className="text-sm text-slate-800 leading-relaxed">{flag.if_they_push_back}</p>
+                            <div className="bg-slate-100 border-2 border-slate-200 rounded-lg p-4 relative">
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(flag.if_they_push_back)
+                                  setCopiedAsk(idx + 100)
+                                  setTimeout(() => setCopiedAsk(null), 2000)
+                                }}
+                                className="absolute top-2.5 right-2.5 p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+                                title={t('output.copyToClipboard')}
+                              >
+                                {copiedAsk === idx + 100 ? (
+                                  <span className="text-[10px] font-bold text-slate-700">{t('output.copied')}</span>
+                                ) : (
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                  </svg>
+                                )}
+                              </button>
+                              <p className="text-sm text-slate-800 leading-relaxed pr-8">{flag.if_they_push_back}</p>
                             </div>
                           )}
                         </div>
+
+                        {/* Mark as addressed */}
+                        <button
+                          onClick={() => {
+                            setAddressedFlags(prev =>
+                              prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+                            )
+                          }}
+                          className={`mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                            isAddressed
+                              ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                              : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100 border border-transparent'
+                          }`}
+                        >
+                          <div className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center transition-all ${
+                            isAddressed ? 'bg-emerald-600 border-emerald-600' : 'border-slate-300'
+                          }`}>
+                            {isAddressed && (
+                              <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </div>
+                          {isAddressed ? t('output.addressed') : t('output.markAsAddressed')}
+                        </button>
                       </div>
                     )}
                   </div>
@@ -487,7 +590,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
             <span className="text-white font-bold text-sm">1</span>
           </div>
-          <h2 className="text-xl font-bold text-slate-900 uppercase tracking-wide text-sm">Strategy</h2>
+          <h2 className="text-xl font-bold text-slate-900 uppercase tracking-wide text-sm">{t('output.strategy')}</h2>
           <ChevronDown className="w-5 h-5 text-slate-400" />
         </div>
 
@@ -497,36 +600,52 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               <Zap className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">Your negotiation strategy</h3>
-              <p className="text-xs text-slate-600">Leverage what you have, push for what matters, offer strategic trades.</p>
+              <h3 className="text-lg font-bold text-slate-900">{t('output.yourNegotiationStrategy')}</h3>
+              <p className="text-xs text-slate-600">{t('output.leverageWhatYouHave')}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
             {/* Push For - LEFT */}
-            <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                  <Target className="w-4 h-4 text-white" />
+            <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5 flex flex-col">
+              <div className="flex items-start justify-between mb-1">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                    <Target className="w-4 h-4 text-white" />
+                  </div>
+                  <h4 className="text-base font-bold text-slate-900">{t('output.pushFor')}</h4>
                 </div>
-                <h4 className="text-base font-bold text-slate-900">Push For</h4>
+                <button
+                  onClick={() => {
+                    const items = [...(output.what_to_ask_for?.must_have || []), ...(output.what_to_ask_for?.nice_to_have || [])]
+                    navigator.clipboard.writeText(items.map(i => `• ${i}`).join('\n'))
+                    setCopiedCol('push')
+                    setTimeout(() => setCopiedCol(null), 2000)
+                  }}
+                  className="text-[10px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-slate-100"
+                >
+                  {copiedCol === 'push' ? t('output.copied') : t('output.copyAll')}
+                </button>
               </div>
-              <div className="space-y-2.5">
+              <p className="text-[10px] text-slate-500 mb-3 ml-[42px]">{t('output.whatYouShouldAskVendorToChange')}</p>
+              <div className="space-y-2.5 flex-1">
                 {output.what_to_ask_for?.must_have?.map((item, idx) => (
                   <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3">
                     {idx === 0 && (
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white mb-2">
-                        MUST-HAVE
+                        {t('output.mustHave')}
                       </span>
                     )}
                     <p className="text-sm text-slate-800 leading-relaxed font-medium">{item}</p>
                   </div>
                 ))}
-                {output.what_to_ask_for?.nice_to_have?.slice(0, 1).map((item, idx) => (
+                {output.what_to_ask_for?.nice_to_have?.map((item, idx) => (
                   <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-400 text-white mb-2">
-                      NICE-TO-HAVE
-                    </span>
+                    {idx === 0 && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-400 text-white mb-2">
+                        {t('output.niceToHave')}
+                      </span>
+                    )}
                     <p className="text-sm text-slate-700 leading-relaxed">{item}</p>
                   </div>
                 ))}
@@ -534,16 +653,30 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             </div>
 
             {/* Your Leverage - MIDDLE */}
-            <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-white" />
+            <div className="bg-emerald-50/40 border-2 border-emerald-200 rounded-xl p-5 flex flex-col">
+              <div className="flex items-start justify-between mb-1">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-white" />
+                  </div>
+                  <h4 className="text-base font-bold text-slate-900">{t('output.yourLeverage')}</h4>
                 </div>
-                <h4 className="text-base font-bold text-slate-900">Your Leverage</h4>
+                <button
+                  onClick={() => {
+                    const items = output.negotiation_plan?.leverage_you_have || []
+                    navigator.clipboard.writeText(items.map(i => `• ${i}`).join('\n'))
+                    setCopiedCol('leverage')
+                    setTimeout(() => setCopiedCol(null), 2000)
+                  }}
+                  className="text-[10px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-emerald-100"
+                >
+                  {copiedCol === 'leverage' ? t('output.copied') : t('output.copyAll')}
+                </button>
               </div>
-              <ul className="space-y-2.5">
+              <p className="text-[10px] text-slate-500 mb-3 ml-[42px]">{t('output.whyTheyShouldSayYes')}</p>
+              <ul className="space-y-2.5 flex-1">
                 {output.negotiation_plan?.leverage_you_have?.map((item, idx) => (
-                  <li key={idx} className="bg-white border border-slate-200 rounded-lg p-3 flex items-start gap-2.5">
+                  <li key={idx} className="bg-white border-l-[3px] border-l-emerald-400 border border-emerald-200 rounded-lg p-3 flex items-start gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                     <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
                   </li>
@@ -552,17 +685,33 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             </div>
 
             {/* Can Offer - RIGHT */}
-            <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                  <Layers className="w-4 h-4 text-white" />
+            <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5 flex flex-col">
+              <div className="flex items-start justify-between mb-1">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                    <Layers className="w-4 h-4 text-white" />
+                  </div>
+                  <h4 className="text-base font-bold text-slate-900">{t('output.canOffer')}</h4>
                 </div>
-                <h4 className="text-base font-bold text-slate-900">Can Offer</h4>
+                <button
+                  onClick={() => {
+                    const items = output.negotiation_plan?.trades_you_can_offer || []
+                    navigator.clipboard.writeText(items.map(i => `• ${i}`).join('\n'))
+                    setCopiedCol('offer')
+                    setTimeout(() => setCopiedCol(null), 2000)
+                  }}
+                  className="text-[10px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-slate-100"
+                >
+                  {copiedCol === 'offer' ? t('output.copied') : t('output.copyAll')}
+                </button>
               </div>
-              <ul className="space-y-2.5">
+              <p className="text-[10px] text-slate-500 mb-3 ml-[42px]">{t('output.whatYouCanGiveToGetWhatYouWant')}</p>
+              <ul className="space-y-2.5 flex-1">
                 {output.negotiation_plan?.trades_you_can_offer?.map((item, idx) => (
                   <li key={idx} className="bg-white border border-slate-200 rounded-lg p-3 flex items-start gap-2.5">
-                    <span className="text-slate-400 mt-0.5 flex-shrink-0 text-base">↔</span>
+                    <svg className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                    </svg>
                     <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
                   </li>
                 ))}
@@ -575,44 +724,89 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
       {/* ══════════════════════════════════════════════════════════════ */}
       {/* SECTION 2: SAVINGS IMPACT - Simplified */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      {output.potential_savings && output.potential_savings.length > 0 && (
+      {output.potential_savings && output.potential_savings.length > 0 && (() => {
+        // Detect currency from deal value
+        const dealTotal = output.snapshot?.total_commitment || ''
+        const currencySymbol = dealTotal.includes('€') ? '€' : dealTotal.includes('£') ? '£' : dealTotal.includes('C$') ? 'C$' : dealTotal.includes('A$') ? 'A$' : '$'
+
+        // Detect if recurring contract
+        const termStr = (output.snapshot?.term || '').toLowerCase()
+        const isRecurring = termStr.includes('month') || termStr.includes('annual') || termStr.includes('year') || termStr.includes('/mo') || termStr.includes('/yr')
+        const savingsLabel = isRecurring ? t('output.perYear') : ''
+
+        // Format with correct currency
+        const fmtCurrency = (amount: number) => {
+          if (amount >= 1000000) return `${currencySymbol}${(amount / 1000000).toFixed(1)}M`
+          if (amount >= 1000) return `${currencySymbol}${Math.round(amount).toLocaleString('en-US')}`
+          return `${currencySymbol}${Math.round(amount)}`
+        }
+
+        // Parse deal total for comparison bar
+        const dealTotalNum = parseSavingsAmount(dealTotal)
+        const savingsPct = dealTotalNum > 0 ? Math.min((totalSavings / dealTotalNum) * 100, 100) : 0
+
+        return (
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
               <span className="text-white font-bold text-sm">2</span>
             </div>
-            <h2 className="text-xl font-bold text-slate-900 uppercase tracking-wide text-sm">Savings Impact</h2>
-            <ChevronDown className="w-5 h-5 text-slate-400" />
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">{t('output.savingsImpact')}</h2>
           </div>
 
           <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm">
             {/* Header with total */}
-            <div className="flex items-start justify-between mb-6 pb-6 border-b-2 border-slate-200">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-6 pb-6 border-b-2 border-slate-200">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Potential savings</h3>
-                  <p className="text-xs text-slate-600">Estimated impact if you negotiate recommended items</p>
+                  <h3 className="text-lg font-bold text-slate-900">{t('output.potentialSavingsTitle')}</h3>
+                  <p className="text-xs text-slate-600">{t('output.estimatedImpactIfNegotiate')}</p>
                 </div>
               </div>
-              <div className="text-right bg-emerald-50 rounded-lg px-5 py-3 border-2 border-emerald-200">
-                <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-1">Total Opportunity</p>
-                <p className="text-3xl font-bold text-emerald-700">{formatSavings(totalSavings)}</p>
+              <div className="text-right bg-emerald-50 rounded-xl px-5 py-3 border-2 border-emerald-200">
+                <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide mb-0.5">{t('output.totalOpportunity')}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-emerald-700">{fmtCurrency(totalSavings)}</p>
+                <p className="text-[10px] text-emerald-600 mt-0.5">{t('output.ifAllRecommendedAsksAccepted')}</p>
               </div>
             </div>
 
+            {/* Visual comparison bar */}
+            {dealTotalNum > 0 && savingsPct > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1.5">
+                  <span>{t('output.originalQuote')} <span className="font-semibold text-slate-700">{dealTotal}</span></span>
+                  <span>{t('output.potentialSavingsLabel')} <span className="font-semibold text-emerald-700">{fmtCurrency(totalSavings)}</span></span>
+                </div>
+                <div className="h-4 bg-slate-100 rounded-full overflow-hidden flex">
+                  <div
+                    className="h-full bg-slate-300 rounded-l-full transition-all duration-500"
+                    style={{ width: `${100 - savingsPct}%` }}
+                  />
+                  <div
+                    className="h-full bg-emerald-500 rounded-r-full transition-all duration-500"
+                    style={{ width: `${savingsPct}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between text-[10px] mt-1">
+                  <span className="text-slate-400">{t('output.afterSavings', { amount: fmtCurrency(dealTotalNum - totalSavings) })}</span>
+                  <span className="font-semibold text-emerald-600">{t('output.percentSavings', { pct: savingsPct.toFixed(0) })}</span>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-6">
-              {/* Savings breakdown - FULL WIDTH TOP */}
+              {/* Savings breakdown */}
               <div>
-                <h4 className="text-sm font-bold text-slate-900 mb-4">Savings breakdown</h4>
+                <h4 className="text-sm font-bold text-slate-900 mb-4">{t('output.savingsBreakdown')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {output.potential_savings.map((saving, idx) => (
                     <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4">
                       <div className="flex items-start justify-between gap-4 mb-2">
                         <span className="text-lg font-bold text-emerald-700 whitespace-nowrap flex-shrink-0">{saving.annual_impact}</span>
-                        <span className="text-xs text-slate-500 text-right">per year</span>
+                        {savingsLabel && <span className="text-[10px] text-slate-400 text-right mt-1">{savingsLabel}</span>}
                       </div>
                       <p className="text-sm text-slate-800 font-medium leading-relaxed">{saving.ask}</p>
                     </div>
@@ -620,9 +814,9 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 </div>
               </div>
 
-              {/* Your top priorities - FULL WIDTH BOTTOM */}
+              {/* Top priorities */}
               <div>
-                <h4 className="text-sm font-bold text-slate-900 mb-4">Your top priorities</h4>
+                <h4 className="text-sm font-bold text-slate-900 mb-4">{t('output.yourTopPriorities')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                   {output.what_to_ask_for?.must_have?.slice(0, 2).map((item, idx) => (
                     <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4 flex items-start gap-3">
@@ -634,27 +828,63 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                   ))}
                 </div>
                 {output.what_to_ask_for?.must_have && output.what_to_ask_for.must_have.length > 2 && (
-                  <div className="text-center py-3 mt-2">
-                    <span className="text-xs text-slate-600">
-                      +{output.what_to_ask_for.must_have.length - 2} more in strategy section
-                    </span>
-                  </div>
+                  <button
+                    onClick={() => setShowStrategy(true)}
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors group"
+                  >
+                    {t('output.moreInStrategySection', { count: output.what_to_ask_for.must_have.length - 2 })}
+                    <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
                 )}
               </div>
             </div>
           </div>
         </div>
-      )}
+        )
+      })()}
 
       {/* ══════════════════════════════════════════════════════════════ */}
       {/* SECTION 3: TAKE ACTION - EMAIL BUILDER */}
       {/* ══════════════════════════════════════════════════════════════ */}
       <div className="mb-8">
+        {/* Cash Flow & Risk Improvements */}
+        {output.cash_flow_improvements && output.cash_flow_improvements.length > 0 && (
+          <div className="bg-white rounded-xl border-2 border-blue-200 p-5 shadow-sm mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                <Info className="w-4 h-4 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">{t('output.cashFlowAndRiskImprovements')}</h3>
+                <p className="text-[10px] text-slate-500">{t('output.nonCashImprovements')}</p>
+              </div>
+            </div>
+            <div className="space-y-2.5">
+              {output.cash_flow_improvements.map((item, idx) => (
+                <div key={idx} className="bg-blue-50 border border-blue-200 rounded-lg p-3.5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                      item.category === 'cash_flow' ? 'bg-blue-100 text-blue-700 border border-blue-200' :
+                      item.category === 'risk_protection' ? 'bg-amber-100 text-amber-700 border border-amber-200' :
+                      'bg-purple-100 text-purple-700 border border-purple-200'
+                    }`}>
+                      {item.type}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-800 leading-relaxed">{item.recommendation}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-3 mb-6">
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
             <span className="text-white font-bold text-sm">3</span>
           </div>
-          <h2 className="text-xl font-bold text-slate-900 uppercase tracking-wide text-sm">Take Action</h2>
+          <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">{t('output.takeAction')}</h2>
           <ChevronDown className="w-5 h-5 text-slate-400" />
         </div>
 
@@ -666,18 +896,10 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 <Mail className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Ready-to-send negotiation email</h3>
-                <p className="text-sm text-emerald-50">Copy, edit, or send directly to your vendor contact</p>
+                <h3 className="text-lg font-bold text-white">{t('output.readyToSendNegotiationEmail')}</h3>
+                <p className="text-sm text-emerald-50">{t('output.copyEditOrSendDirectly')}</p>
               </div>
             </div>
-            {roundId && remainingRegens > 0 && (
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1.5 rounded-full">
-                <Sparkles className="w-3.5 h-3.5 text-white" />
-                <span className="text-sm font-semibold text-white">
-                  {remainingRegens} AI regen{remainingRegens !== 1 ? 's' : ''} left
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Email content */}
@@ -685,8 +907,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             {/* Email Tone Selector */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email Tone</label>
-                <span className="text-xs text-slate-600">Choose your approach</span>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">{t('output.emailTone')}</label>
+                <span className="text-xs text-slate-600">{t('output.chooseYourApproach')}</span>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 {emailTabs.map((tab, idx) => (
@@ -715,7 +937,18 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
             {/* Subject Line */}
             <div>
-              <label className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 block">Subject Line</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">{t('output.subjectLine')}</label>
+                <button
+                  onClick={() => navigator.clipboard.writeText(emailSubjects[activeEmailTab])}
+                  className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-slate-500 hover:text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  {t('output.copy')}
+                </button>
+              </div>
               <input
                 type="text"
                 value={emailSubjects[activeEmailTab]}
@@ -725,19 +958,19 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                   setEmailSubjects(newSubjects)
                 }}
                 className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm bg-white font-medium"
-                placeholder="Email subject..."
+                placeholder={t('output.emailSubjectPlaceholder')}
               />
             </div>
 
             {/* Email Body */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Email Body</label>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">{t('output.emailBody')}</label>
                 <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
-                  Copy to clipboard
+                  {t('output.copyToClipboard')}
                 </button>
               </div>
               <textarea
@@ -749,7 +982,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 }}
                 rows={12}
                 className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none leading-relaxed shadow-sm bg-white"
-                placeholder="Email body..."
+                placeholder={t('output.emailBodyPlaceholder')}
               />
             </div>
 
@@ -759,13 +992,13 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               <div className="flex items-center gap-3">
                 <button className="flex-1 px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold text-sm bg-gradient-to-br from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 transition-all shadow-md hover:shadow-lg">
                   <Mail className="w-4 h-4" />
-                  <span>Open in email client</span>
+                  <span>{t('output.openInEmailClient')}</span>
                 </button>
                 <button className="px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold text-sm bg-white text-slate-700 border-2 border-slate-200 hover:bg-slate-50 transition-all">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
-                  <span>Copy email</span>
+                  <span>{t('output.copyEmail')}</span>
                 </button>
               </div>
 
@@ -779,10 +1012,10 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                     <div className="flex items-center gap-3">
                       <Sparkles className="w-5 h-5 text-emerald-600" />
                       <div>
-                        <span className="text-sm font-bold text-slate-900">Regenerate with custom instructions</span>
+                        <span className="text-sm font-bold text-slate-900">{t('output.regenerateWithCustomInstructions')}</span>
                         {remainingRegens > 0 && (
                           <p className="text-xs text-slate-600 mt-0.5">
-                            {remainingRegens} AI regeneration{remainingRegens !== 1 ? 's' : ''} remaining
+                            {t('output.aiRegenerationsRemaining', { count: remainingRegens })}
                           </p>
                         )}
                       </div>
@@ -798,16 +1031,16 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                     <div className="p-4 bg-white border-t-2 border-slate-200 space-y-3">
                       <div>
                         <label className="text-xs font-bold text-slate-700 mb-2 block uppercase tracking-wide">
-                          Custom instructions (optional)
+                          {t('output.customInstructionsOptional')}
                         </label>
                         <textarea
                           value={customPrompt}
                           onChange={(e) => setCustomPrompt(e.target.value)}
                           rows={3}
                           className="w-full px-4 py-3 text-sm border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none shadow-sm bg-white"
-                          placeholder='e.g., "Make it more assertive" or "Add a 10% discount request"'
+                          placeholder={t('output.customInstructionsPlaceholder')}
                         />
-                        <p className="text-xs text-slate-500 mt-2">Tell AI how to adjust all 3 email tones.</p>
+                        <p className="text-xs text-slate-500 mt-2">{t('output.tellAiHowToAdjust')}</p>
                       </div>
 
                       <button
@@ -822,21 +1055,25 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                         {regenerating ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Regenerating all 3 tones...</span>
+                            <span>{t('output.regeneratingAll3Tones')}</span>
                           </>
                         ) : (
                           <>
                             <Sparkles className="w-4 h-4" />
                             <span>
-                              {remainingRegens <= 0 ? 'No regenerations left' : 'Regenerate all 3 email tones'}
+                              {remainingRegens <= 0 ? t('output.noRegenerationsLeft') : t('output.regenerateAll3EmailTones')}
                             </span>
                           </>
                         )}
                       </button>
 
+                      {remainingRegens > 0 && (
+                        <p className="text-xs text-slate-400 text-center">{t('output.regenerationsRemaining', { count: remainingRegens })}</p>
+                      )}
+
                       {remainingRegens <= 0 && (
                         <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
-                          You've used all 3 AI regenerations for this round. You can still edit emails manually above.
+                          {t('output.usedAllRegenerations')}
                         </p>
                       )}
                     </div>
@@ -855,7 +1092,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                   <div className="flex items-start gap-2">
                     <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                     <p className="text-xs text-blue-900">
-                      Sign up to save this deal and unlock AI email regeneration (3 per round).
+                      {t('output.signUpToSaveDeal')}
                     </p>
                   </div>
                 </div>
@@ -877,7 +1114,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
             <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
               <Info className="w-5 h-5 text-blue-600" />
             </div>
-            <h2 className="text-lg font-bold text-slate-900">Assumptions & disclaimer</h2>
+            <h2 className="text-lg font-bold text-slate-900">{t('output.assumptionsAndDisclaimer')}</h2>
           </div>
           {showAssumptions ? (
             <ChevronUp className="w-5 h-5 text-slate-400" />
@@ -890,7 +1127,7 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
           <div className="px-6 pb-6 border-t border-blue-100 pt-5 space-y-4">
             {output.assumptions && output.assumptions.length > 0 && (
               <div>
-                <p className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">Assumptions made</p>
+                <p className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide">{t('output.assumptionsMade')}</p>
                 <ul className="space-y-2">
                   {output.assumptions.map((assumption, idx) => (
                     <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 leading-relaxed">
@@ -919,12 +1156,12 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 <Clock className="w-5 h-5 text-slate-600" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-slate-900">Analysis History</h2>
-                <p className="text-xs text-slate-600">Track your negotiation rounds over time</p>
+                <h2 className="text-base font-bold text-slate-900">{t('output.analysisHistory')}</h2>
+                <p className="text-xs text-slate-600">{t('output.trackNegotiationRounds')}</p>
               </div>
             </div>
             <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700 border border-slate-300">
-              1 round completed
+              {t('output.roundCompleted')}
             </span>
           </div>
         </div>
@@ -941,9 +1178,9 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-base font-bold text-slate-900">Round 1 — Initial Analysis</span>
+                      <span className="text-base font-bold text-slate-900">{t('output.round1InitialAnalysis')}</span>
                       <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
-                        ACTION REQUIRED
+                        {t('output.actionRequired')}
                       </span>
                     </div>
                     <p className="text-sm text-slate-700">
@@ -956,8 +1193,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
                   </div>
                 </div>
                 <div className="text-right bg-white/60 backdrop-blur rounded-lg px-4 py-2 border border-emerald-300">
-                  <p className="text-xs font-semibold text-slate-600 mb-0.5">Total Value</p>
-                  <p className="text-lg font-bold text-slate-900">{output.snapshot?.total_commitment || 'N/A'}</p>
+                  <p className="text-xs font-semibold text-slate-600 mb-0.5">{t('output.totalValue')}</p>
+                  <p className="text-lg font-bold text-slate-900">{output.snapshot?.total_commitment || t('output.na')}</p>
                 </div>
               </div>
 
@@ -965,10 +1202,10 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               <div className="bg-white/60 backdrop-blur rounded-lg border border-emerald-200 p-4">
                 <div className="flex items-start gap-2 mb-2">
                   <Info className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs font-bold text-emerald-900 uppercase tracking-wide">Analysis Summary</p>
+                  <p className="text-xs font-bold text-emerald-900 uppercase tracking-wide">{t('output.analysisSummary')}</p>
                 </div>
                 <p className="text-sm text-slate-700 leading-relaxed">
-                  {output.verdict || output.quick_read?.conclusion || 'Quote analyzed with considerations for pricing, terms, and negotiation leverage points.'}
+                  {output.verdict || output.quick_read?.conclusion || t('output.defaultAnalysisSummary')}
                 </p>
               </div>
             </div>
@@ -976,8 +1213,8 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
 
           {/* Future rounds placeholder */}
           <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-xl">
-            <p className="text-sm text-slate-500 font-medium mb-2">No additional rounds yet</p>
-            <p className="text-xs text-slate-400">Upload vendor responses to track negotiation progress</p>
+            <p className="text-sm text-slate-500 font-medium mb-2">{t('output.noAdditionalRoundsYet')}</p>
+            <p className="text-xs text-slate-400">{t('output.uploadVendorResponses')}</p>
           </div>
         </div>
       </div>
@@ -993,14 +1230,14 @@ export function OutputDisplay({ output, roundId }: OutputDisplayProps) {
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-900">Analysis complete</p>
-              <p className="text-xs text-slate-600">Review the findings above or close this deal</p>
+              <p className="text-sm font-bold text-slate-900">{t('output.analysisComplete')}</p>
+              <p className="text-xs text-slate-600">{t('output.reviewFindingsAbove')}</p>
             </div>
           </div>
 
           <button className="px-6 py-3 rounded-lg flex items-center gap-2 font-semibold text-sm bg-gradient-to-br from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 transition-all shadow-md">
             <CheckCircle2 className="w-4 h-4" />
-            <span>Mark deal as closed</span>
+            <span>{t('output.markDealAsClosed')}</span>
           </button>
         </div>
       </div>

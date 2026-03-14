@@ -27,7 +27,7 @@ export type AnalyticsEvent =
 
   // Deal management
   | { name: 'deal_created'; properties: { dealType: string; source: 'upload' | 'paste' | 'trial_import'; hasGoal: boolean } }
-  | { name: 'deal_closed'; properties: { outcome: 'won' | 'lost' | 'paused'; hasSavings: boolean; savingsAmount?: number } }
+  | { name: 'deal_closed'; properties: { outcome: string; hasSavings: boolean; savingsAmount?: number } }
   | { name: 'deal_reopened'; properties: { dealId: string } }
   | { name: 'deal_deleted'; properties: { isClosed: boolean; hasSavings: boolean } }
 

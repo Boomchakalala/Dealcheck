@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
+import { I18nProvider } from "@/i18n/context";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,8 +16,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TermLift — Turn supplier quotes into better deals",
-  description: "Paste a vendor email or upload a quote. Get back where you're overpaying, what to ask for, and a reply you can send today.",
+  title: {
+    default: "TermLift — AI Vendor Quote Analyzer | Negotiate Better Supplier Deals",
+    template: "%s | TermLift",
+  },
+  description: "Drop in a vendor quote and get back exactly where you're overpaying, what to push for, and a ready-to-send email in 60 seconds.",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/icon-256.png",
+  },
+  openGraph: {
+    title: "TermLift — AI Vendor Quote Analyzer | Negotiate Better Supplier Deals",
+    description: "Drop in a vendor quote and get back exactly where you're overpaying, what to push for, and a ready-to-send email in 60 seconds.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
 };
 
 export default function RootLayout({
@@ -29,10 +42,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AnalyticsProvider>
-          <Toaster position="top-right" richColors />
-          {children}
-        </AnalyticsProvider>
+        <I18nProvider>
+          <AnalyticsProvider>
+            <Toaster position="top-right" richColors />
+            {children}
+          </AnalyticsProvider>
+        </I18nProvider>
       </body>
     </html>
   );

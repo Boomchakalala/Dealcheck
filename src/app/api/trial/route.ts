@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { analyzeDeal } from '@/lib/openai'
 
 // Guest trial - no auth required, uses V1 schema (full text analysis)
-// Simple IP-based rate limiting: 5 requests per IP per day
+// 1 free analysis per IP without signup — then prompt to create account
 const trialCache = new Map<string, { count: number; resetAt: number }>()
 
 function getClientIP(request: Request): string {
@@ -18,16 +18,16 @@ function checkTrialRateLimit(ip: string): { allowed: boolean; remaining: number 
   // Reset daily (24 hours)
   if (!cached || now > cached.resetAt) {
     trialCache.set(ip, { count: 1, resetAt: now + 24 * 60 * 60 * 1000 })
-    return { allowed: true, remaining: 4 }
+    return { allowed: true, remaining: 0 }
   }
 
-  // Check limit (5 per day for trial)
-  if (cached.count >= 5) {
+  // Check limit (1 per IP for anonymous trial — sign up for more)
+  if (cached.count >= 1) {
     return { allowed: false, remaining: 0 }
   }
 
   cached.count++
-  return { allowed: true, remaining: 5 - cached.count }
+  return { allowed: true, remaining: 1 - cached.count }
 }
 
 export async function POST(request: Request) {
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { extractedText, dealType, goal, notes, imageData, structuredQuote } = body
+    const { extractedText, dealType, goal, notes, imageData, allPages, structuredQuote, locale } = body
 
     // IP-based rate limiting for trial route
     const clientIP = getClientIP(request)
@@ -49,12 +49,14 @@ export async function POST(request: Request) {
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        { error: 'Trial limit reached. Sign up for free to continue analyzing deals!' },
+        { error: 'You\'ve used your free trial analysis. Sign up to unlock 3 more free analyses!' },
         { status: 429 }
       )
     }
 
-    if (!extractedText || extractedText.length < 10) {
+    // Allow empty text when images are provided (PDF vision or image upload)
+    const hasVisualInput = imageData?.base64 || (allPages && allPages.length > 0)
+    if (!hasVisualInput && (!extractedText || extractedText.length < 10)) {
       return NextResponse.json(
         { error: 'Please provide text to analyze' },
         { status: 400 }
@@ -68,14 +70,21 @@ export async function POST(request: Request) {
         ? { base64: imageData.base64, mimeType: imageData.mimeType }
         : undefined
 
+    // Validate all page images
+    const validAllPages = allPages?.filter((p: any) =>
+      p.base64 && p.mimeType && supportedImageTypes.includes(p.mimeType)
+    ) || undefined
+
     // Analyze with V1 (full text analysis - catches everything)
     const output = await analyzeDeal(
-      extractedText,
+      extractedText || '',
       dealType || 'New',
       goal,
       notes,
       undefined,
-      validImageData
+      validImageData,
+      validAllPages && validAllPages.length > 0 ? validAllPages : undefined,
+      locale || undefined
     )
 
     return NextResponse.json({

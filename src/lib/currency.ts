@@ -14,14 +14,24 @@ let ratesCache: ExchangeRates | null = null
 let cacheTimestamp = 0
 const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours
 
-export const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD'] as const
+export const SUPPORTED_CURRENCIES = ['EUR', 'USD', 'GBP', 'CAD', 'AUD', 'CHF', 'JPY'] as const
 export type Currency = typeof SUPPORTED_CURRENCIES[number]
+
+export const CURRENCY_LABELS: Record<Currency, string> = {
+  EUR: '€ EUR — Euro',
+  USD: '$ USD — US Dollar',
+  GBP: '£ GBP — British Pound',
+  CAD: 'C$ CAD — Canadian Dollar',
+  AUD: 'A$ AUD — Australian Dollar',
+  CHF: 'CHF — Swiss Franc',
+  JPY: '¥ JPY — Japanese Yen',
+}
 
 /**
  * Detect currency from a string like "$15,000" or "€14,200" or "£10,000"
  */
 export function detectCurrency(text: string): Currency {
-  if (!text) return 'USD'
+  if (!text) return 'EUR'
 
   const upper = text.toUpperCase()
 
@@ -30,10 +40,12 @@ export function detectCurrency(text: string): Currency {
   if (upper.includes('GBP') || text.includes('£')) return 'GBP'
   if (upper.includes('CAD') || upper.includes('C$')) return 'CAD'
   if (upper.includes('AUD') || upper.includes('A$')) return 'AUD'
+  if (upper.includes('CHF')) return 'CHF'
+  if (upper.includes('JPY') || text.includes('¥')) return 'JPY'
   if (upper.includes('USD') || text.includes('$')) return 'USD'
 
-  // Default to USD
-  return 'USD'
+  // Default to EUR
+  return 'EUR'
 }
 
 /**
@@ -72,7 +84,9 @@ async function fetchRates(): Promise<ExchangeRates> {
         EUR: 0.92,
         GBP: 0.79,
         CAD: 1.36,
-        AUD: 1.52
+        AUD: 1.52,
+        CHF: 0.88,
+        JPY: 149.5,
       },
       base: 'USD',
       time_last_update_unix: now
@@ -110,24 +124,35 @@ export async function convertCurrency(
  */
 export function formatCurrency(amount: number, currency: Currency): string {
   const symbols: Record<Currency, string> = {
-    USD: '$',
     EUR: '€',
+    USD: '$',
     GBP: '£',
     CAD: 'C$',
-    AUD: 'A$'
+    AUD: 'A$',
+    CHF: 'CHF ',
+    JPY: '¥',
   }
 
   const symbol = symbols[currency]
+  const noDecimals = currency === 'JPY'
 
-  // For millions, use M notation (e.g., $2.5M)
+  // For millions, use M notation
   if (amount >= 1000000) {
     return `${symbol}${(amount / 1000000).toFixed(1)}M`
   }
 
-  // For amounts under 1M, show actual number with thousand separators
-  // Round to nearest dollar for cleaner display
-  const rounded = Math.round(amount)
-  return `${symbol}${rounded.toLocaleString('en-US')}`
+  // For amounts over 1,000 — round to whole numbers
+  if (amount >= 1000) {
+    const rounded = Math.round(amount)
+    return `${symbol}${rounded.toLocaleString('en-US')}`
+  }
+
+  // For small amounts — show 2 decimals (except JPY)
+  if (noDecimals) {
+    return `${symbol}${Math.round(amount).toLocaleString('en-US')}`
+  }
+
+  return `${symbol}${amount.toFixed(2)}`
 }
 
 /**
@@ -135,7 +160,7 @@ export function formatCurrency(amount: number, currency: Currency): string {
  */
 export function parseMoney(str: string): { amount: number; currency: Currency } {
   if (!str || typeof str !== 'string') {
-    return { amount: 0, currency: 'USD' }
+    return { amount: 0, currency: 'EUR' }
   }
 
   // Detect currency first
@@ -144,8 +169,8 @@ export function parseMoney(str: string): { amount: number; currency: Currency } 
   // Remove currency symbols and extra text
   let cleaned = str
     .toUpperCase()
-    .replace(/USD|EUR|GBP|CAD|AUD/g, '')
-    .replace(/\$|€|£/g, '')
+    .replace(/USD|EUR|GBP|CAD|AUD|CHF|JPY/g, '')
+    .replace(/\$|€|£|¥/g, '')
     .replace(/\/MONTH|\/YEAR|MONTHLY|ANNUAL|CONTRACT/g, '')
     .trim()
 

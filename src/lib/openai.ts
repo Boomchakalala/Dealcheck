@@ -113,9 +113,37 @@ ALWAYS FOCUS ON:
 ✅ Price vs value (discounts already included, missed opportunities)
 ✅ Commit risks (what happens if usage changes)
 ✅ Renewal traps (auto-renew, notice periods, lock-in)
-✅ Payment structure (upfront deposits, payment terms)
 ✅ Hidden costs (setup fees, overage charges, exit costs)
 ✅ Scope gaps that will cause cost overruns
+
+PAYMENT TERMS — CONTEXT AWARE:
+- Only recommend payment term improvements when it makes commercial sense
+- SKIP payment terms negotiation when:
+  * Contract is a one-time event or short-term engagement (under 30 days)
+  * Total value is under €5,000 / $5,000
+  * Vendor is a freelancer or very small supplier
+  * Payment terms are already favourable
+- When payment terms ARE relevant, include as a recommendation but NEVER count improved payment terms as cash savings
+- Payment term improvements go in "cash_flow_improvements", NOT in "potential_savings"
+
+SAVINGS CALCULATION — STRICT RULES:
+- potential_savings must ONLY include actual cash reductions in contract value
+- NEVER count the following as savings:
+  * Risk protection clauses (force majeure, cancellation protection, liability caps)
+  * Payment term improvements (NET 30 → NET 60 is cash flow, not savings)
+  * Non-financial term improvements (SLAs, warranties, support levels)
+  * Worst-case scenario avoidance (these go in risk_improvements)
+- Be conservative — only include savings the user will definitely realise if the ask is accepted
+- Show a range where appropriate: "$500-$1,200 depending on usage"
+- Never inflate with risk protection or hypothetical worst-case values
+
+PERCENTAGE DISCOUNT RECOMMENDATION:
+- When there are no clear line-item savings AND it makes commercial sense, recommend pushing for 10-20% overall discount
+- Frame as: "Request X% overall discount in exchange for [signing quickly / longer commitment / case study / referral]"
+- SKIP this recommendation if:
+  * Contract is event-specific with fixed costs
+  * Vendor is a small operator with thin margins
+  * Pricing is already clearly at or below market rate
 
 IF INFO IS MISSING: Frame as "This vagueness will cost you X%" NOT "please provide contact info"
 
@@ -362,7 +390,7 @@ OUTPUT SCHEMA
 
 Return valid JSON only. Match this structure exactly:
 {
-  "title": "Vendor -- New/Renewal -- Month Year",
+  "title": "Vendor · New Purchase/Renewal · Month Year",
   "vendor": "vendor name",
   "category": "SaaS - Infrastructure",
   "description": "Observability and monitoring platform for cloud infrastructure",
@@ -446,7 +474,15 @@ Return valid JSON only. Match this structure exactly:
       "annual_impact": "$2,400 saved"
     }
   ],
-  "NOTE_SAVINGS": "CRITICAL: Total savings MUST be less than total_commitment. Show realistic % discounts (5-20%) or cost removals. Use this to highlight the top 2-3 negotiation levers with clear $ impact. Format: '$X saved' or '$X reduction'. Omit if no clear savings opportunities.",
+  "NOTE_SAVINGS": "CRITICAL: potential_savings must ONLY include ACTUAL CASH REDUCTIONS. Never include risk protection, payment term improvements, or non-financial improvements here. Be conservative — show ranges where appropriate. Total savings must be less than total_commitment. Format: '$X saved' or '$X-Y saved'. Omit if no clear cash savings.",
+  "cash_flow_improvements": [
+    {
+      "type": "Payment Terms | Risk Protection | Liability",
+      "recommendation": "Negotiate NET 30 to NET 60 payment terms — improves cash flow by $15K/quarter",
+      "category": "cash_flow"
+    }
+  ],
+  "NOTE_CASHFLOW": "Include payment term improvements, risk protection clauses, liability caps, and other non-cash improvements here. Each must have type, recommendation, and category (cash_flow | risk_protection | liability). Omit if none relevant. NEVER include these in potential_savings.",
   "email_drafts": {
     "neutral": {"subject": "...", "body": "..."},
     "firm": {"subject": "...", "body": "..."},
@@ -705,34 +741,60 @@ export async function analyzeDeal(
   goal?: string,
   notes?: string,
   previousRoundOutput?: DealOutput,
-  imageData?: { base64: string; mimeType: string }
+  imageData?: { base64: string; mimeType: string },
+  allPages?: Array<{ base64: string; mimeType: string }>,
+  userLocale?: string
 ): Promise<DealOutputType> {
   const contextParts = [
     `Deal Type: ${dealType}`,
     goal && `User Goal: ${goal}`,
     notes && `User Notes: ${notes}`,
     previousRoundOutput && `Previous Round Context: ${JSON.stringify(previousRoundOutput, null, 2)}`,
+    userLocale === 'fr' && `OUTPUT LANGUAGE INSTRUCTION: Write ALL analysis sections (verdict, quick_read, red_flags, what_to_ask_for, negotiation_plan, potential_savings, assumptions, disclaimer) in FRENCH. However, write the email_drafts (subject and body) in the SAME LANGUAGE AS THE INPUT DOCUMENT. If the quote is in English, emails must be in English. If the quote is in French, emails must be in French. The user reads French but needs to send emails the vendor can understand.`,
   ].filter(Boolean)
 
-  const userPrompt = imageData
-    ? contextParts.join('\n\n') + '\n\nPlease analyze the quote/contract shown in the image.'
+  // Determine if we're using vision
+  const hasImages = allPages && allPages.length > 0
+  const hasSingleImage = imageData && SUPPORTED_IMAGE_MIME_TYPES.includes(imageData.mimeType as ClaudeImageMediaType)
+
+  const userPrompt = (hasImages || hasSingleImage)
+    ? contextParts.join('\n\n') + '\n\nPlease analyze the quote/contract shown in the attached document. Read the entire document carefully — pay close attention to tables, pricing, terms, dates, and any fine print.'
     : contextParts.join('\n\n') + `\n\nSupplier Document/Quote:\n${extractedText}`
 
   try {
-    const useVision = imageData && SUPPORTED_IMAGE_MIME_TYPES.includes(imageData.mimeType as ClaudeImageMediaType)
-    const userContent: Anthropic.MessageParam['content'] = useVision
-      ? [
-          { type: 'text', text: userPrompt },
-          {
-            type: 'image' as const,
-            source: {
-              type: 'base64' as const,
-              media_type: imageData!.mimeType as ClaudeImageMediaType,
-              data: imageData!.base64,
-            },
+    let userContent: Anthropic.MessageParam['content']
+
+    if (hasImages) {
+      // Multi-page PDF: send all pages as images
+      const imageBlocks: Anthropic.MessageParam['content'] = allPages!.map((page) => ({
+        type: 'image' as const,
+        source: {
+          type: 'base64' as const,
+          media_type: page.mimeType as ClaudeImageMediaType,
+          data: page.base64,
+        },
+      }))
+      userContent = [
+        { type: 'text', text: userPrompt },
+        ...imageBlocks,
+      ]
+    } else if (hasSingleImage) {
+      // Single image (screenshot, photo, single-page)
+      userContent = [
+        { type: 'text', text: userPrompt },
+        {
+          type: 'image' as const,
+          source: {
+            type: 'base64' as const,
+            media_type: imageData!.mimeType as ClaudeImageMediaType,
+            data: imageData!.base64,
           },
-        ]
-      : userPrompt
+        },
+      ]
+    } else {
+      // Text only
+      userContent = userPrompt
+    }
 
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,

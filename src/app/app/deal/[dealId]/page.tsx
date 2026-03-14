@@ -1,16 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
-import { RoundCard } from '@/components/RoundCard'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { OutputDisplay } from '@/components/OutputDisplay'
 import { OutputDisplayV2 } from '@/components/OutputDisplayV2'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { Breadcrumb } from '@/components/Breadcrumb'
-import { CheckSquare, Mail, Plus, FileText, AlertTriangle, TrendingDown, BadgeDollarSign, Package, ChevronRight, CheckCircle2, Minus } from 'lucide-react'
+import { DealStickyBar } from '@/components/DealStickyBar'
+import { ScrollToTopButton } from '@/components/DealHistoryActions'
+import { FeatureGate } from '@/components/FeatureGate'
+import { FileText, AlertTriangle, TrendingUp, DollarSign, ChevronRight, CheckCircle2, TrendingDown, Minus } from 'lucide-react'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 import { AddRoundForm } from './AddRoundForm'
+import type { Plan } from '@/lib/tiers'
 import type { DealOutput, DealOutputV2 } from '@/types'
 
 export default async function DealPage({
@@ -21,18 +24,32 @@ export default async function DealPage({
   const { dealId } = await params
   const supabase = await createClient()
 
+  const cookieStore = await cookies()
+  const locale = (cookieStore.get('termlift_lang')?.value || 'en') as 'en' | 'fr'
+  const messages: Record<string, Record<string, string>> = { en: require('@/i18n/en.json'), fr: require('@/i18n/fr.json') }
+  const t = (key: string, vars?: Record<string, string | number>) => {
+    let text = messages[locale]?.[key] || messages.en[key] || key
+    if (vars) Object.entries(vars).forEach(([k, v]) => { text = text.replace(`{${k}}`, String(v)) })
+    return text
+  }
+
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     redirect('/login')
   }
 
-  // Get deal with rounds
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('plan, is_admin')
+    .eq('id', user.id)
+    .single()
+
+  const userPlan = (profile?.plan || 'free') as Plan
+  const isAdmin = profile?.is_admin || false
+
   const { data: deal } = await supabase
     .from('deals')
-    .select(`
-      *,
-      rounds (*)
-    `)
+    .select(`*, rounds (*)`)
     .eq('id', dealId)
     .eq('user_id', user.id)
     .single()
@@ -41,37 +58,30 @@ export default async function DealPage({
     notFound()
   }
 
-  // Sort rounds by number (descending for list, get latest)
   const sortedRounds = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number) || []
   const latestRound = sortedRounds[0]
   const latestOutput = latestRound?.output_json
   const schemaVersion = latestRound?.schema_version || 'v1'
   const isV2 = schemaVersion === 'v2'
 
-  // Get vendor name based on schema version
+  // Extract data from analysis
   const dealName = deal.vendor ||
     (isV2 ? (latestOutput as DealOutputV2)?.commercial_facts?.supplier : (latestOutput as DealOutput)?.vendor) ||
-    deal.title ||
-    'Deal'
+    deal.title || 'Deal'
 
-  // Extract key metrics from latest analysis
   const category = (latestOutput as DealOutput)?.category
+  const description = (latestOutput as DealOutput)?.description || (latestOutput as DealOutput)?.quick_read?.conclusion || null
+  const totalCommitment = latestOutput?.snapshot?.total_commitment
+  const term = latestOutput?.snapshot?.term
+
   const redFlagCount = isV2
     ? (latestOutput as DealOutputV2)?.priority_points?.length || 0
     : (latestOutput as DealOutput)?.red_flags?.length || 0
 
-  // Calculate total potential savings
   const potentialSavings = (latestOutput as DealOutput)?.potential_savings?.reduce((sum, saving) => {
-    const match = saving.annual_impact.match(/\$[\d,]+(?:K|k)?/)
+    const match = saving.annual_impact?.match(/[\d,]+/)
     if (match) {
-      let amountStr = match[0].replace(/[$,]/g, '')
-      let amount: number
-      if (amountStr.toLowerCase().includes('k')) {
-        amount = parseFloat(amountStr.replace(/k/i, '')) * 1000
-      } else {
-        amount = parseFloat(amountStr)
-      }
-      return sum + (isNaN(amount) ? 0 : amount)
+      return sum + parseInt(match[0].replace(/,/g, ''), 10)
     }
     return sum
   }, 0) || 0
@@ -82,16 +92,28 @@ export default async function DealPage({
     return `$${amount.toFixed(0)}`
   }
 
-  const totalCommitment = latestOutput?.snapshot?.total_commitment
+  // Clean title format: replace " - " or " -- " with " · "
+  const cleanTitle = deal.title
+    ?.replace(/\s*--\s*/g, ' · ')
+    ?.replace(/\s*-\s*/g, ' · ')
+    || dealName
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Breadcrumb + New Analysis */}
+      {/* Sticky summary bar */}
+      <DealStickyBar
+        dealName={dealName}
+        totalCommitment={totalCommitment}
+        redFlagCount={redFlagCount}
+        potentialSavings={potentialSavings > 0 ? formatSavings(potentialSavings) : undefined}
+      />
+
+      {/* Breadcrumb */}
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
           <Breadcrumb
             items={[
-              { label: 'Dashboard', href: '/app/dashboard' },
+              { label: t('deal.breadcrumbDeals'), href: '/app' },
               { label: dealName },
             ]}
           />
@@ -101,34 +123,34 @@ export default async function DealPage({
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all flex-shrink-0"
         >
           <FileText className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">New analysis</span>
-          <span className="sm:hidden">New</span>
+          <span className="hidden sm:inline">{t('deal.newAnalysis')}</span>
+          <span className="sm:hidden">{t('deal.newAnalysisShort')}</span>
         </Link>
       </div>
 
-      {/* Deal Header */}
-      <Card className="p-4 sm:p-6">
+      {/* Unified Deal Header Card */}
+      <Card className="p-5 sm:p-6 overflow-hidden">
+        {/* Top: Title + Actions */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <h1 className="text-xl sm:text-3xl font-bold text-slate-900">{deal.title}</h1>
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{cleanTitle}</h1>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap mb-2">
               {category && (
-                <span className="inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
                   {category}
                 </span>
               )}
-            </div>
-            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-              {deal.vendor && (
-                <span className="text-slate-600">{deal.vendor}</span>
-              )}
               <Badge variant={deal.deal_type === 'New' ? 'default' : 'secondary'}>
-                {deal.deal_type}
+                {deal.deal_type === 'New' ? t('deal.newPurchase') : t('deal.renewal')}
               </Badge>
-              {deal.goal && (
-                <span className="text-sm text-slate-500">Goal: {deal.goal}</span>
-              )}
+              <span className="text-xs text-slate-400">{t('deal.roundsCompleted', { count: sortedRounds.length, s: sortedRounds.length !== 1 ? 's' : '' })}</span>
             </div>
+            {/* AI-generated deal summary */}
+            {description && (
+              <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">{description}</p>
+            )}
           </div>
           <DealHeaderClient
             dealId={dealId}
@@ -137,60 +159,81 @@ export default async function DealPage({
             savingsAmount={deal.savings_amount}
             savingsPercent={deal.savings_percent}
             closedAt={deal.closed_at}
-            currentTotal={latestOutput?.snapshot?.total_commitment}
+            currentTotal={totalCommitment}
             roundCount={sortedRounds.length}
             whatChanged={deal.what_changed}
           />
         </div>
 
-        <div className="text-sm text-slate-500">
-          <p>Created: {new Date(deal.created_at).toLocaleDateString()}</p>
-          <p>Last updated: {new Date(deal.updated_at).toLocaleDateString()}</p>
-          <p className="font-semibold mt-2">{sortedRounds.length} round{sortedRounds.length !== 1 ? 's' : ''}</p>
+        {/* Stats row inside the header card */}
+        <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100">
+          <div className="text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
+              <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('deal.totalValue')}</span>
+            </div>
+            <p className="text-lg sm:text-xl font-bold text-slate-900">{totalCommitment || 'N/A'}</p>
+            {term && <p className="text-[10px] text-slate-400">{term}</p>}
+          </div>
+          <div className="text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
+              <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('deal.redFlags')}</span>
+            </div>
+            <p className="text-lg sm:text-xl font-bold text-red-600">{redFlagCount}</p>
+            <p className="text-[10px] text-slate-400">{t('deal.issuesFound')}</p>
+          </div>
+          <div className="text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('deal.savings')}</span>
+            </div>
+            <p className="text-lg sm:text-xl font-bold text-emerald-700">
+              {potentialSavings > 0 ? formatSavings(potentialSavings) : '—'}
+            </p>
+            {potentialSavings > 0 && <p className="text-[10px] text-emerald-600">{t('deal.potentialYear')}</p>}
+          </div>
         </div>
       </Card>
 
-      {/* Outcome Card - Shows when deal is closed */}
+      {/* Outcome Card — closed deals */}
       {deal.status?.startsWith('closed_') && (
-        <Card className="p-6 bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 border-2 border-emerald-300 shadow-lg">
+        <Card className="p-5 sm:p-6 bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 border-2 border-emerald-300 shadow-lg">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center flex-shrink-0 shadow-md">
-              {deal.status === 'closed_won' && <CheckCircle2 className="w-6 h-6 text-white" />}
-              {deal.status === 'closed_lost' && <TrendingDown className="w-6 h-6 text-white" />}
-              {deal.status === 'closed_paused' && <Minus className="w-6 h-6 text-white" />}
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center flex-shrink-0 shadow-md">
+              {deal.status === 'closed_won' && <CheckCircle2 className="w-5 h-5 text-white" />}
+              {deal.status === 'closed_lost' && <TrendingDown className="w-5 h-5 text-white" />}
+              {deal.status === 'closed_paused' && <Minus className="w-5 h-5 text-white" />}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-bold text-slate-900">Deal Closed</h3>
+                <h3 className="text-base font-bold text-slate-900">{t('deal.dealClosed')}</h3>
                 {deal.closed_at && (
-                  <span className="text-xs text-slate-600 font-medium px-3 py-1 bg-white rounded-full border border-slate-200">
-                    {new Date(deal.closed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  <span className="text-[10px] text-slate-600 font-medium px-2.5 py-0.5 bg-white rounded-full border border-slate-200">
+                    {new Date(deal.closed_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 )}
               </div>
 
-              {/* Savings Badge - Make it prominent */}
-              {deal.savings_amount !== null && deal.savings_amount !== undefined && deal.savings_amount > 0 && (() => {
+              {deal.savings_amount != null && deal.savings_amount > 0 && (() => {
                 const currency = totalCommitment?.includes('€') ? '€' : totalCommitment?.includes('£') ? '£' : '$'
-                const savingsFormatted = `${currency}${Math.round(deal.savings_amount).toLocaleString('en-US')}`
                 return (
-                  <div className="mb-4 p-4 bg-white rounded-xl border-2 border-emerald-300 shadow-sm">
-                    <p className="text-xs text-emerald-700 font-bold uppercase tracking-wide mb-1">Total Savings</p>
+                  <div className="mb-3 p-3 bg-white rounded-xl border-2 border-emerald-300">
+                    <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-wide mb-0.5">{t('deal.totalSavings')}</p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-3xl font-bold text-emerald-900">{savingsFormatted}</p>
-                      <p className="text-xl font-bold text-emerald-700">({deal.savings_percent?.toFixed(1)}%)</p>
+                      <p className="text-2xl font-bold text-emerald-900">{currency}{Math.round(deal.savings_amount).toLocaleString('en-US')}</p>
+                      {deal.savings_percent != null && <p className="text-base font-bold text-emerald-700">({deal.savings_percent.toFixed(1)}%)</p>}
                     </div>
                   </div>
                 )
               })()}
 
-              {/* What Changed Chips */}
               {deal.what_changed && deal.what_changed.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">What Changed</p>
-                  <div className="flex flex-wrap gap-2">
+                <div className="mb-3">
+                  <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1.5">{t('deal.whatChanged')}</p>
+                  <div className="flex flex-wrap gap-1.5">
                     {deal.what_changed.map((item: string) => (
-                      <span key={item} className="px-3 py-1.5 text-xs font-bold bg-white text-emerald-700 rounded-lg border-2 border-emerald-200 shadow-sm">
+                      <span key={item} className="px-2.5 py-1 text-[10px] font-bold bg-white text-emerald-700 rounded-lg border border-emerald-200">
                         {item}
                       </span>
                     ))}
@@ -198,26 +241,10 @@ export default async function DealPage({
                 </div>
               )}
 
-              {/* AI Summary */}
               {deal.close_summary && (
-                <div className="p-4 bg-white rounded-xl border border-slate-200">
-                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Summary</p>
-                  <div className="text-sm text-slate-700 leading-relaxed">
-                    {deal.close_summary.split('\n').map((line: string, i: number) => {
-                      // Convert markdown bold (**text**) to actual bold
-                      const parts = line.split(/(\*\*[^*]+\*\*)/g)
-                      return (
-                        <p key={i} className="mb-2">
-                          {parts.map((part: string, j: number) => {
-                            if (part.startsWith('**') && part.endsWith('**')) {
-                              return <strong key={j} className="font-bold text-slate-900">{part.slice(2, -2)}</strong>
-                            }
-                            return part
-                          })}
-                        </p>
-                      )
-                    })}
-                  </div>
+                <div className="p-3 bg-white rounded-xl border border-slate-200">
+                  <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1">{t('deal.summary')}</p>
+                  <p className="text-sm text-slate-700 leading-relaxed">{deal.close_summary}</p>
                 </div>
               )}
             </div>
@@ -225,89 +252,97 @@ export default async function DealPage({
         </Card>
       )}
 
-      {/* Latest Round Output (expanded) */}
+      {/* Analysis Output — no duplicate title section */}
       {latestOutput && (
         <div id="email-drafts">
           <div className="flex items-center gap-3 mb-4">
-            <div className="px-4 py-1.5 bg-emerald-600 text-white rounded-full text-sm font-bold">
-              Round {latestRound.round_number}
+            <div className="px-3.5 py-1 bg-emerald-600 text-white rounded-full text-xs font-bold">
+              {t('deal.round')} {latestRound.round_number}
             </div>
-            <span className="text-sm text-slate-500">Latest analysis</span>
+            <span className="text-xs text-slate-500">{t('deal.latestAnalysis')}</span>
             <div className="flex-1 h-px bg-slate-200" />
           </div>
           {isV2 ? (
             <OutputDisplayV2 output={latestOutput as DealOutputV2} roundId={latestRound.id} />
           ) : (
-            <OutputDisplay output={latestOutput as DealOutput} roundId={latestRound.id} />
+            <OutputDisplay output={latestOutput as DealOutput} roundId={latestRound.id} hideHeader />
           )}
         </div>
       )}
 
-      {/* Add Round Form */}
-      <div id="add-round">
-        <AddRoundForm dealId={dealId} roundNumber={sortedRounds.length + 1} />
-      </div>
+      {/* Analysis History */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <h2 className="text-base font-bold text-slate-900">{t('deal.analysisHistory')}</h2>
+            <span className="text-xs text-slate-400">{t('deal.roundsCompleted', { count: sortedRounds.length, s: sortedRounds.length !== 1 ? 's' : '' })}</span>
+          </div>
+        </div>
 
-      {/* Rounds List */}
-      {sortedRounds.length > 1 && (
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-slate-400"></div>
-            Round History
-          </h2>
-          <div className="space-y-3">
-            {sortedRounds.slice(1).map((round: any, idx: number) => {
+        {/* Round cards */}
+        {sortedRounds.length > 0 && (
+          <div className="space-y-2">
+            {sortedRounds.map((round: any) => {
               const roundOutput = round.output_json as any
               const roundTotal = roundOutput?.snapshot?.total_commitment
               const roundRedFlags = roundOutput?.red_flags?.length || 0
+              const isLatest = round.id === latestRound?.id
 
               return (
-                <Link key={round.id} href={`/app/round/${round.id}`}>
-                  <Card className="p-4 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-full text-xs font-bold flex-shrink-0">
-                          Round {round.round_number}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-slate-600 mb-1">
-                            {new Date(round.created_at).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                            })}
-                          </p>
-                          {round.note && (
-                            <p className="text-sm text-slate-700 truncate">{round.note}</p>
-                          )}
-                        </div>
-                        {roundRedFlags > 0 && (
-                          <span className="inline-flex items-center gap-1 text-xs text-red-600 font-medium flex-shrink-0">
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            {roundRedFlags}
-                          </span>
-                        )}
-                        {roundTotal && (
-                          <span className="text-sm font-bold text-slate-900 flex-shrink-0">
-                            {roundTotal}
-                          </span>
-                        )}
+                <Card key={round.id} className={`px-4 py-3 transition-all ${isLatest ? 'border-emerald-200 bg-emerald-50/30' : 'hover:border-slate-300'}`}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                      <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex-shrink-0 ${
+                        isLatest ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        R{round.round_number}
                       </div>
-                      <ChevronRight className="w-5 h-5 text-slate-400" />
+                      {isLatest && <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />}
+                      <span className="text-xs text-slate-500">
+                        {new Date(round.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}
+                      </span>
+                      {round.note && (
+                        <span className="text-xs text-slate-600 truncate">{round.note}</span>
+                      )}
                     </div>
-                  </Card>
-                </Link>
+                    <div className="flex items-center gap-2.5 flex-shrink-0">
+                      {roundRedFlags > 0 && (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-red-500 font-medium">
+                          <AlertTriangle className="w-3 h-3" />
+                          {roundRedFlags}
+                        </span>
+                      )}
+                      {roundTotal && (
+                        <span className="text-xs font-bold text-slate-900">{roundTotal}</span>
+                      )}
+                      {!isLatest && (
+                        <Link href={`/app/round/${round.id}`} className="text-[10px] font-medium text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5">
+                          {t('deal.view')} <ChevronRight className="w-3 h-3" />
+                        </Link>
+                      )}
+                      {isLatest && <ScrollToTopButton />}
+                    </div>
+                  </div>
+                </Card>
               )
             })}
           </div>
-        </div>
+        )}
+      </div>
+
+      {/* Add Round — gated for Starter users */}
+      {!deal.status?.startsWith('closed_') && (
+        <FeatureGate feature="multi_round" plan={userPlan} isAdmin={isAdmin}>
+          <div id="add-round">
+            <AddRoundForm dealId={dealId} roundNumber={sortedRounds.length + 1} />
+          </div>
+        </FeatureGate>
       )}
 
-      {sortedRounds.length === 0 && (
-        <Card className="p-12 text-center">
-          <p className="text-slate-600">No rounds yet. Add a round above to start.</p>
-        </Card>
-      )}
+      {/* Subtle metadata footer */}
+      <div className="text-center text-[10px] text-slate-300 pt-2 pb-4">
+        {t('deal.created')} {new Date(deal.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · {t('deal.lastUpdated')} {new Date(deal.updated_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+      </div>
     </div>
   )
 }

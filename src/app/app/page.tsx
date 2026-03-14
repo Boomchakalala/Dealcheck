@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import Link from 'next/link'
-import { X } from 'lucide-react'
+import { Plus, ArrowRight, FileText, TrendingUp, Zap, BarChart3, Lock, AlertTriangle } from 'lucide-react'
+import { OnboardingBanner } from '@/components/OnboardingBanner'
+import { LockedDealCard } from '@/components/FeatureGate'
 import { useRouter } from 'next/navigation'
 import { DealListClient } from '@/components/DealListClient'
 import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
 import { trackEvent } from '@/lib/analytics'
+import { useI18n } from '@/i18n/context'
 
 type RoundData = {
   id: string
@@ -32,18 +35,20 @@ type DealWithRounds = {
   rounds: RoundData[]
 }
 
-export default function DashboardPage() {
+export default function AppHomePage() {
+  const { locale, t } = useI18n()
   const router = useRouter()
   const [deals, setDeals] = useState<DealWithRounds[]>([])
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [showUploader, setShowUploader] = useState(false)
   const [input, setInput] = useState('')
   const [uploading, setUploading] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [imageData, setImageData] = useState<{ base64: string; mimeType: string } | null>(null)
-  const [showHelpModal, setShowHelpModal] = useState(false)
+  const [allPages, setAllPages] = useState<Array<{ base64: string; mimeType: string }> | null>(null)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -68,7 +73,6 @@ export default function DashboardPage() {
       setDeals((dealsRes.data as DealWithRounds[]) || [])
       setLoading(false)
 
-      // Track dashboard view
       const closedDeals = (dealsRes.data as DealWithRounds[])?.filter(d => d.status && ['won', 'lost', 'paused'].includes(d.status)) || []
       trackEvent({
         name: 'dashboard_viewed',
@@ -78,7 +82,7 @@ export default function DashboardPage() {
         }
       })
 
-      // Check for pending trial import (localStorage with 24h TTL)
+      // Check for pending trial import
       const pendingTrial = localStorage.getItem('termlift_trial')
       if (pendingTrial) {
         localStorage.removeItem('termlift_trial')
@@ -116,14 +120,16 @@ export default function DashboardPage() {
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to process file')
 
-      // Handle vision API response (images)
       if (data.useVision && data.imageData) {
         setImageData(data.imageData)
-        setInput('[Image uploaded - will be analyzed directly by AI]')
+        setAllPages(data.allPages || null)
+        setInput(data.pageCount > 1
+          ? `[${data.pageCount}-page document received — will be analyzed visually]`
+          : '[Document received — will be analyzed visually]')
       } else {
-        // Handle text extraction (PDFs, or fallback)
         setInput(data.extractedText)
         setImageData(null)
+        setAllPages(null)
       }
       setUploadedFileName(file.name)
     } catch (err) {
@@ -149,12 +155,14 @@ export default function DashboardPage() {
         saveExtractedText: false,
       }
 
-      // Send either imageData or extractedText
       if (imageData) {
         payload.imageData = imageData
-        payload.extractedText = '' // Empty for images
+        payload.allPages = allPages || undefined
+        payload.extractedText = ''
+        payload.locale = locale
       } else {
         payload.extractedText = input
+        payload.locale = locale
       }
 
       const response = await fetch('/api/deal/create', {
@@ -165,7 +173,6 @@ export default function DashboardPage() {
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to create deal')
 
-      // Track deal creation
       trackEvent({
         name: 'deal_created',
         properties: {
@@ -175,7 +182,6 @@ export default function DashboardPage() {
         }
       })
 
-      // Redirect to the new deal
       router.push(`/app/deal/${data.dealId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -192,112 +198,52 @@ export default function DashboardPage() {
     )
   }
 
-  return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Help Modal */}
-      {showHelpModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowHelpModal(false)}>
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-slate-900">What can I upload?</h3>
-              <button onClick={() => setShowHelpModal(false)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
-                <X className="w-5 h-5 text-slate-500" />
-              </button>
-            </div>
-            <div className="space-y-4 text-sm text-slate-700">
-              <div>
-                <p className="font-semibold text-slate-900 mb-1.5">Supported formats:</p>
-                <ul className="space-y-1.5 ml-1">
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-600 mt-0.5">•</span>
-                    <span>PDF documents (quotes, contracts, proposals)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-600 mt-0.5">•</span>
-                    <span>Images (PNG, JPG, WEBP) with text</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-600 mt-0.5">•</span>
-                    <span>Plain text (paste supplier emails or quotes)</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="pt-3 border-t border-slate-200">
-                <p className="font-semibold text-slate-900 mb-1.5">Privacy:</p>
-                <p className="text-slate-600 text-xs leading-relaxed">
-                  Files are processed securely over encrypted connections. Extracted text is deleted immediately after analysis unless you explicitly save the deal. We never use your data for AI training.
-                </p>
-              </div>
+  const isPro = profile?.plan === 'pro'
+  const isAdmin = profile?.is_admin || false
+  const usageCount = profile?.usage_count || 0
+  const remaining = 4 - usageCount
+  const isAtLimit = !isPro && !isAdmin && usageCount >= 4
+  const hasDeals = deals.length > 0
+
+  // Calculate quick stats
+  const dealsWithFlags = deals.filter(d => {
+    const latest = d.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
+    return (latest?.output_json?.red_flags?.length || 0) > 0
+  })
+  const totalRedFlags = deals.reduce((sum, d) => {
+    const latest = d.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
+    return sum + (latest?.output_json?.red_flags?.length || 0)
+  }, 0)
+  // Total potential savings identified by AI across all deals
+  const totalPotentialSavings = deals.reduce((sum, d) => {
+    const latest = d.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
+    const savings = latest?.output_json?.potential_savings || []
+    return sum + savings.reduce((s: number, item: any) => {
+      const match = item.annual_impact?.match(/[\d,]+/)
+      return s + (match ? parseInt(match[0].replace(/,/g, ''), 10) : 0)
+    }, 0)
+  }, 0)
+
+  // New user — no deals yet
+  if (!hasDeals) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-6">
+        {/* Onboarding */}
+        <OnboardingBanner userEmail={profile?.email} hasDeals={false} />
+
+        {/* Usage pill */}
+        {!isPro && !isAdmin && (
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200">
+              <Zap className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="text-xs font-semibold text-emerald-700">{t('app.remaining', { remaining })}</span>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Welcome + Upload Section */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">
-          Welcome back!
-        </h1>
-        <p className="text-sm text-slate-600 mb-6">
-          Upload a quote or paste text to start analysis.{' '}
-          <button
-            onClick={() => setShowHelpModal(true)}
-            className="text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
-          >
-            What can I upload?
-          </button>
-        </p>
-
-        {/* Usage Banner */}
-        {profile && (
-          <>
-            {profile.plan !== 'pro' && profile.usage_count >= 2 ? (
-              <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-sm font-bold text-amber-900 mb-1">Free analyses used</h3>
-                    <p className="text-sm text-amber-800 mb-3">
-                      You've used both free analyses. Upgrade to Pro for unlimited AI analyses and priority processing.
-                    </p>
-                    <Link
-                      href="/pricing"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-lg transition-colors"
-                    >
-                      View pricing
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ) : profile.plan !== 'pro' ? (
-              <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-emerald-50/50 to-teal-50/30 border border-emerald-200/60">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-emerald-900">
-                      {2 - (profile.usage_count || 0)} of 2 free analyses remaining
-                    </p>
-                    <p className="text-xs text-emerald-700 mt-0.5">
-                      Upgrade to Pro for unlimited analyses
-                    </p>
-                  </div>
-                  <Link
-                    href="/pricing"
-                    className="text-xs font-medium text-emerald-700 hover:text-emerald-800 transition-colors px-3 py-1.5 rounded-lg hover:bg-emerald-100"
-                  >
-                    View plans
-                  </Link>
-                </div>
-              </div>
-            ) : null}
-          </>
         )}
 
+        {/* Uploader */}
         <QuoteUploaderCard
-          variant="app"
+          variant="public"
           input={input}
           setInput={setInput}
           uploading={uploading}
@@ -311,55 +257,207 @@ export default function DashboardPage() {
             setInput('')
             setImageData(null)
           }}
-          showTrustBadges={false}
-          showWhatYouGet={true}
+          showTrustBadges={true}
+          showWhatYouGet={false}
         />
-      </div>
 
-      {/* Your Quote Analysis */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-slate-900">Recent Analysis</h2>
-          {deals.length > 0 && (
-            <Link href="/app/dashboard" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
-              Dashboard →
-            </Link>
-          )}
+        {/* What you'll get */}
+        <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 sm:p-8">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4 text-center">{t('app.whatYoullGetBack')}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { icon: AlertTriangle, label: t('app.redFlagsLabel'), desc: t('app.hiddenFees') },
+              { icon: TrendingUp, label: t('app.savingsLabel'), desc: t('app.whereYouCanSave') },
+              { icon: FileText, label: t('app.strategyLabel'), desc: t('app.whatToPushFor') },
+              { icon: ArrowRight, label: t('app.emailDrafts'), desc: t('app.threeTones') },
+            ].map((item) => (
+              <div key={item.label} className="text-center">
+                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center mx-auto mb-2">
+                  <item.icon className="w-5 h-5 text-emerald-600" />
+                </div>
+                <p className="text-xs font-semibold text-slate-800">{item.label}</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {!deals || deals.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-slate-200">
-            <div className="max-w-md mx-auto px-6">
-              <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Upload your first quote</h3>
-              <p className="text-sm text-slate-600 mb-6 leading-relaxed">
-                Get leverage, key terms, and ready-to-send emails in one pass.
+        {/* See example link */}
+        <div className="text-center">
+          <Link href="/example" className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors">
+            {t('app.seeExample')} &rarr;
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  // Returning user — has deals
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">{t('app.yourDeals')}</h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {deals.length === 1
+              ? t('app.dealSingular', { count: deals.length })
+              : t('app.dealsAnalyzed', { count: deals.length })}
+          </p>
+        </div>
+        <button
+          onClick={() => setShowUploader(!showUploader)}
+          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg"
+        >
+          <Plus className="w-4 h-4" />
+          {t('app.newAnalysis')}
+        </button>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+        <div className="bg-white rounded-xl border border-slate-200 p-3.5 sm:p-4">
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+              <FileText className="w-3.5 h-3.5 text-blue-600" />
+            </div>
+            <span className="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('app.deals')}</span>
+          </div>
+          <p className="text-xl sm:text-2xl font-bold text-slate-900">{deals.length}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-3.5 sm:p-4">
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
+              <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+            </div>
+            <span className="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('app.redFlags')}</span>
+          </div>
+          <p className="text-xl sm:text-2xl font-bold text-slate-900">{totalRedFlags}</p>
+          {dealsWithFlags.length > 0 && (
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">{t('app.acrossDeals', { count: dealsWithFlags.length })}</p>
+          )}
+        </div>
+        <div className="bg-white rounded-xl border border-emerald-200 p-3.5 sm:p-4 bg-gradient-to-br from-emerald-50/50 to-white">
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+            </div>
+            <span className="text-[10px] sm:text-xs font-semibold text-emerald-700 uppercase tracking-wide">{t('app.savingsFound')}</span>
+          </div>
+          <p className="text-xl sm:text-2xl font-bold text-emerald-900">
+            {totalPotentialSavings > 0 ? `$${totalPotentialSavings.toLocaleString()}` : '—'}
+          </p>
+          {totalPotentialSavings > 0 && (
+            <p className="text-[10px] sm:text-xs text-emerald-600 mt-0.5">{t('app.potentialIdentified')}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Usage banner */}
+      {!isPro && !isAdmin && (
+        <div className={`rounded-xl p-4 flex items-center justify-between ${
+          isAtLimit
+            ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200'
+            : 'bg-gradient-to-r from-emerald-50/50 to-teal-50/30 border border-emerald-200/60'
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+              isAtLimit ? 'bg-amber-100' : 'bg-emerald-100'
+            }`}>
+              {isAtLimit ? (
+                <Lock className="w-4.5 h-4.5 text-amber-600" />
+              ) : (
+                <Zap className="w-4.5 h-4.5 text-emerald-600" />
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-900">
+                {isAtLimit ? t('app.starterLimitReached') : t('app.remaining', { remaining })}
               </p>
-              <p className="text-sm font-medium text-slate-600 mb-3">
-                Scroll up to upload a file or paste text to get started.
-              </p>
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <span className="text-slate-400 text-xs">or</span>
-              </div>
-              <Link
-                href="/example"
-                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                See an example →
-              </Link>
-              <p className="text-xs text-slate-500 mt-6 leading-relaxed">
-                Processed securely. Deleted after analysis unless you save.
+              <p className="text-xs text-slate-500">
+                {isAtLimit ? t('app.upgradeToProUnlimited') : t('app.starterPlan')}
               </p>
             </div>
           </div>
-        ) : (
-          <DealListClient deals={deals.slice(0, 10)} />
-        )}
+          <Link
+            href="/pricing"
+            className={`flex-shrink-0 px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+              isAtLimit
+                ? 'bg-amber-600 text-white hover:bg-amber-700'
+                : 'text-emerald-700 hover:bg-emerald-100'
+            }`}
+          >
+            {isAtLimit ? t('app.upgradeToPro') : t('app.viewPlans')}
+          </Link>
+        </div>
+      )}
+
+      {/* Collapsible uploader */}
+      {showUploader && (
+        <div className="animate-in slide-in-from-top-2 duration-200">
+          <QuoteUploaderCard
+            variant="app"
+            input={input}
+            setInput={setInput}
+            uploading={uploading}
+            analyzing={analyzing}
+            error={error}
+            uploadedFileName={uploadedFileName}
+            onFileUpload={handleFileUpload}
+            onAnalyze={handleAnalyze}
+            onClearFile={() => {
+              setUploadedFileName(null)
+              setInput('')
+              setImageData(null)
+            }}
+            showTrustBadges={false}
+            showWhatYouGet={true}
+          />
+        </div>
+      )}
+
+      {/* Deals list */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-slate-900">{t('app.recentDeals')}</h2>
+          <Link href="/app/dashboard" className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors">
+            {t('app.fullDashboard')} &rarr;
+          </Link>
+        </div>
+        <DealListClient deals={deals.slice(0, 10)} />
+        {isAtLimit && deals.length >= 4 && <LockedDealCard />}
       </div>
+
+      {/* Pro teaser for free users */}
+      {!isPro && !isAdmin && (
+        <div className="relative rounded-2xl border border-slate-200 overflow-hidden">
+          <div className="filter blur-[5px] pointer-events-none select-none p-5 bg-white">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-slate-50 rounded-lg p-3">
+                <div className="h-2 bg-slate-200 rounded w-20 mb-2" />
+                <div className="h-6 bg-slate-200 rounded w-16" />
+              </div>
+              <div className="bg-slate-50 rounded-lg p-3">
+                <div className="h-2 bg-slate-200 rounded w-24 mb-2" />
+                <div className="h-6 bg-emerald-200 rounded w-20" />
+              </div>
+              <div className="bg-slate-50 rounded-lg p-3">
+                <div className="h-2 bg-slate-200 rounded w-16 mb-2" />
+                <div className="h-6 bg-slate-200 rounded w-12" />
+              </div>
+            </div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center bg-white/50">
+            <div className="text-center px-6">
+              <BarChart3 className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
+              <p className="text-sm font-semibold text-slate-900 mb-1">{t('app.spendTracking')}</p>
+              <Link href="/pricing" className="text-xs font-medium text-emerald-600 hover:text-emerald-700">
+                {t('app.unlockWithPro')} &rarr;
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

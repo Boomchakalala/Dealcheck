@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const { baseCurrency } = await request.json()
 
     // Validate currency
-    const validCurrencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD']
+    const validCurrencies = ['EUR', 'USD', 'GBP', 'CAD', 'AUD', 'CHF', 'JPY']
     if (!validCurrencies.includes(baseCurrency)) {
       return NextResponse.json({ error: 'Invalid currency' }, { status: 400 })
     }

@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { CloseDealModal } from '@/components/CloseDealModal'
-import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, X } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, MoreHorizontal } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
 
 interface DealListClientProps {
@@ -26,12 +26,12 @@ function getTimeAgo(date: string): string {
   const diffHours = Math.floor(diffMs / 3600000)
   const diffDays = Math.floor(diffMs / 86400000)
 
-  if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? 's' : ''} ago`
-  if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`
+  if (diffMins < 60) return `${diffMins}m ago`
+  if (diffHours < 24) return `${diffHours}h ago`
   if (diffDays === 1) return 'Yesterday'
-  if (diffDays < 7) return `${diffDays} days ago`
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
-  return past.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  if (diffDays < 7) return `${diffDays}d ago`
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`
+  return past.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
 function getStatusBadge(deal: any): { label: string; color: string } {
@@ -41,7 +41,7 @@ function getStatusBadge(deal: any): { label: string; color: string } {
     if (outcome === 'lost') return { label: 'Lost', color: 'bg-red-100 text-red-700 border-red-200' }
     return { label: 'No change', color: 'bg-slate-100 text-slate-700 border-slate-200' }
   }
-  return { label: 'In progress', color: 'bg-blue-100 text-blue-700 border-blue-200' }
+  return { label: 'Active', color: 'bg-blue-50 text-blue-700 border-blue-200' }
 }
 
 function getStatusIcon(deal: any) {
@@ -53,7 +53,6 @@ function getStatusIcon(deal: any) {
   return null
 }
 
-// Helper to detect currency symbol from total commitment string
 function detectCurrency(str?: string): string {
   if (!str) return '$'
   if (str.includes('€') || str.toUpperCase().includes('EUR')) return '€'
@@ -63,15 +62,64 @@ function detectCurrency(str?: string): string {
   return '$'
 }
 
-// Format savings with correct currency - cleaner display
 function formatSavings(amount: number, currency: string): string {
-  // For millions, use M notation
-  if (amount >= 1000000) {
-    return `${currency}${(amount / 1000000).toFixed(1)}M`
-  }
-  // For everything else, show actual number with commas
+  if (amount >= 1000000) return `${currency}${(amount / 1000000).toFixed(1)}M`
   const rounded = Math.round(amount)
   return `${currency}${rounded.toLocaleString('en-US')}`
+}
+
+function DealMenu({ dealId, isClosed, totalCommitment, roundCount, hasSavings, onClose, onDelete }: {
+  dealId: string
+  isClosed: boolean
+  totalCommitment?: string
+  roundCount: number
+  hasSavings: boolean
+  onClose: (dealId: string, total: string | undefined, roundCount: number) => void
+  onDelete: (dealId: string, isClosed: boolean, hasSavings: boolean) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    if (open) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open])
+
+  return (
+    <div ref={menuRef} className="relative">
+      <button
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open) }}
+        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+      >
+        <MoreHorizontal className="w-4 h-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-8 z-20 w-40 bg-white rounded-lg shadow-lg border border-slate-200 py-1">
+          {!isClosed && (
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); onClose(dealId, totalCommitment, roundCount) }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              Close deal
+            </button>
+          )}
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); onDelete(dealId, isClosed, hasSavings) }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            Delete
+          </button>
+        </div>
+      )}
+    </div>
+  )
 }
 
 export function DealListClient({ deals }: DealListClientProps) {
@@ -79,46 +127,27 @@ export function DealListClient({ deals }: DealListClientProps) {
   const [dealToClose, setDealToClose] = useState<{id: string, total?: string, roundCount: number} | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const handleQuickClose = (e: React.MouseEvent, dealId: string, currentTotal?: string, roundCount?: number) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDealToClose({ id: dealId, total: currentTotal, roundCount: roundCount || 0 })
+  const handleClose = (dealId: string, total?: string, roundCount?: number) => {
+    setDealToClose({ id: dealId, total, roundCount: roundCount || 0 })
   }
 
-  const handleDelete = async (e: React.MouseEvent, dealId: string, isClosed?: boolean, hasSavings?: boolean) => {
-    e.preventDefault()
-    e.stopPropagation()
-
+  const handleDelete = async (dealId: string, isClosed: boolean, hasSavings: boolean) => {
     const message = isClosed && hasSavings
-      ? 'This is a closed deal with savings data. Are you sure you want to delete it? This action cannot be undone.'
-      : 'Are you sure you want to delete this deal? This action cannot be undone.'
+      ? 'This is a closed deal with savings data. Are you sure you want to delete it?'
+      : 'Are you sure you want to delete this deal?'
 
-    if (!confirm(message)) {
-      return
-    }
+    if (!confirm(message)) return
 
     setDeletingId(dealId)
-
     try {
-      const response = await fetch(`/api/deal/${dealId}`, {
-        method: 'DELETE',
-      })
-
+      const response = await fetch(`/api/deal/${dealId}`, { method: 'DELETE' })
       if (response.ok) {
-        // Track deal deletion
-        trackEvent({
-          name: 'deal_deleted',
-          properties: {
-            isClosed: !!isClosed,
-            hasSavings: !!hasSavings
-          }
-        })
-
+        trackEvent({ name: 'deal_deleted', properties: { isClosed, hasSavings } })
         router.refresh()
       } else {
         alert('Failed to delete deal')
       }
-    } catch (error) {
+    } catch {
       alert('Error deleting deal')
     } finally {
       setDeletingId(null)
@@ -135,7 +164,7 @@ export function DealListClient({ deals }: DealListClientProps) {
 
   return (
     <>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {deals.map((deal) => {
           const latestRound = getLatestRound(deal)
           const latestOutput = latestRound?.output_json
@@ -144,106 +173,62 @@ export function DealListClient({ deals }: DealListClientProps) {
           const isClosed = deal.status?.startsWith('closed_')
           const totalCommitment = latestOutput?.snapshot?.total_commitment
           const currency = detectCurrency(totalCommitment)
-          const conclusion = latestOutput?.quick_read?.conclusion || null
           const redFlagCount = latestOutput?.red_flags?.length || 0
           const roundCount = deal.rounds?.length || 0
           const status = getStatusBadge(deal)
 
           return (
             <Link key={deal.id} href={`/app/deal/${deal.id}`}>
-              <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group">
-                <div className="flex items-start justify-between gap-4">
+              <div className={`bg-white rounded-lg border border-slate-200 px-4 py-3 hover:border-emerald-300 hover:shadow-sm transition-all cursor-pointer group ${deletingId === deal.id ? 'opacity-50' : ''}`}>
+                <div className="flex items-center justify-between gap-3">
+                  {/* Left: main info */}
                   <div className="flex-1 min-w-0">
-                    {/* Status + badges row */}
-                    <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md border ${status.color}`}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-sm font-semibold text-slate-900 truncate group-hover:text-emerald-700 transition-colors">
+                        {vendorName}
+                      </h3>
+                      <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded border ${status.color}`}>
                         {getStatusIcon(deal)}
                         {status.label}
                       </span>
                       {category && (
-                        <span className="inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                        <span className="hidden sm:inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200">
                           {category}
                         </span>
                       )}
-                      <Badge variant={deal.deal_type === 'New' ? 'default' : 'secondary'}>
-                        {deal.deal_type}
-                      </Badge>
                     </div>
-
-                    {/* Action buttons */}
-                    <div className="flex items-center gap-2 mb-2">
-                      {!isClosed && (
-                        <button
-                          onClick={(e) => handleQuickClose(e, deal.id, totalCommitment || undefined, roundCount)}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-sm"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          Close deal
-                        </button>
-                      )}
-                      <button
-                        onClick={(e) => handleDelete(e, deal.id, isClosed, (deal.savings_amount || 0) > 0)}
-                        disabled={deletingId === deal.id}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-md border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        {deletingId === deal.id ? 'Deleting...' : 'Delete'}
-                      </button>
-                    </div>
-
-                    {/* Vendor name */}
-                    <h3 className="text-base font-bold text-slate-900 mb-1 truncate group-hover:text-emerald-700 transition-colors">
-                      {vendorName}
-                    </h3>
-
-                    {/* Conclusion */}
-                    {conclusion && (
-                      <p className="text-sm text-slate-600 mb-2 line-clamp-1">{conclusion}</p>
-                    )}
-
-                    {/* Red flags + savings row */}
-                    {(redFlagCount > 0 || (deal.savings_amount && deal.savings_amount > 0)) && (
-                      <div className="flex items-center gap-4 flex-wrap mb-2">
-                        {redFlagCount > 0 && (
-                          <span className="inline-flex items-center gap-1 text-xs text-red-600 font-medium">
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            {redFlagCount} red flag{redFlagCount !== 1 ? 's' : ''}
-                          </span>
-                        )}
-                        {deal.savings_amount && deal.savings_amount > 0 && (
-                          <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Saved {formatSavings(deal.savings_amount, currency)}
-                            {deal.savings_percent ? ` (${deal.savings_percent.toFixed(0)}%)` : ''}
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* What changed chips */}
-                    {isClosed && deal.what_changed?.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mb-2">
-                        {deal.what_changed.map((item: string) => (
-                          <span key={item} className="px-2 py-0.5 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-md border border-emerald-200">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Meta row */}
                     <div className="flex items-center gap-3 text-xs text-slate-400">
+                      {redFlagCount > 0 && (
+                        <span className="inline-flex items-center gap-1 text-red-500 font-medium">
+                          <AlertTriangle className="w-3 h-3" />
+                          {redFlagCount}
+                        </span>
+                      )}
+                      {deal.savings_amount > 0 && (
+                        <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">
+                          <CheckCircle2 className="w-3 h-3" />
+                          {formatSavings(deal.savings_amount, currency)}
+                        </span>
+                      )}
                       <span>{roundCount} round{roundCount !== 1 ? 's' : ''}</span>
-                      <span className="text-slate-300">&middot;</span>
-                      <span>Updated {getTimeAgo(deal.updated_at)}</span>
+                      <span>{getTimeAgo(deal.updated_at)}</span>
                     </div>
                   </div>
 
-                  {/* Amount right-aligned */}
-                  <div className="text-right flex-shrink-0">
+                  {/* Right: amount + menu */}
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     {totalCommitment && (
-                      <p className="text-base font-bold text-slate-900">{totalCommitment}</p>
+                      <p className="text-sm font-bold text-slate-900">{totalCommitment}</p>
                     )}
+                    <DealMenu
+                      dealId={deal.id}
+                      isClosed={!!isClosed}
+                      totalCommitment={totalCommitment}
+                      roundCount={roundCount}
+                      hasSavings={(deal.savings_amount || 0) > 0}
+                      onClose={handleClose}
+                      onDelete={handleDelete}
+                    />
                   </div>
                 </div>
               </div>
@@ -252,7 +237,6 @@ export function DealListClient({ deals }: DealListClientProps) {
         })}
       </div>
 
-      {/* Close Deal Modal */}
       {dealToClose && (
         <CloseDealModal
           dealId={dealToClose.id}

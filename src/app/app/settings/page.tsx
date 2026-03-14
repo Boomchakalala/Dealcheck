@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { User, CreditCard, Shield } from 'lucide-react'
+import { SettingsClient } from '@/components/SettingsClient'
+import { formatCurrency, type Currency } from '@/lib/currency'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -16,103 +17,62 @@ export default async function SettingsPage() {
     .eq('id', user.id)
     .single()
 
-  const usageCount = profile?.usage_count || 0
-  const isFreePlan = profile?.plan !== 'pro'
-  const analysesRemaining = isFreePlan ? Math.max(0, 2 - usageCount) : null
+  // Get deal stats
+  const { data: deals } = await supabase
+    .from('deals')
+    .select('id, status, savings_amount, rounds (id, output_json)')
+    .eq('user_id', user.id)
+
+  const { count: roundCount } = await supabase
+    .from('rounds')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+
+  const allDeals = deals || []
+  const activeDeals = allDeals.filter(d => !d.status?.startsWith('closed_'))
+  const closedDeals = allDeals.filter(d => d.status?.startsWith('closed_'))
+
+  // Total savings identified from AI analysis (all deals)
+  const totalSavingsIdentified = allDeals.reduce((sum, d) => {
+    const rounds = (d as any).rounds || []
+    const latest = rounds.sort((a: any, b: any) => (b.round_number || 0) - (a.round_number || 0))[0]
+    const savings = latest?.output_json?.potential_savings || []
+    return sum + savings.reduce((s: number, item: any) => {
+      const match = item.annual_impact?.match(/[\d,]+/)
+      return s + (match ? parseInt(match[0].replace(/,/g, ''), 10) : 0)
+    }, 0)
+  }, 0)
+
+  const baseCurrency = (profile?.base_currency || 'EUR') as Currency
+  const plan = profile?.plan || 'free'
+  const planLabel = plan === 'pro' ? 'Pro' : plan === 'business' ? 'Business' : 'Starter'
+
+  // Calculate "joined X months ago"
+  const createdAt = new Date(user.created_at)
+  const now = new Date()
+  const monthsAgo = (now.getFullYear() - createdAt.getFullYear()) * 12 + (now.getMonth() - createdAt.getMonth())
+  const joinedAgo = monthsAgo === 0 ? 'This month' : monthsAgo === 1 ? '1 month ago' : `${monthsAgo} months ago`
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-10">
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">Settings</h1>
-        <p className="text-sm text-slate-500">Manage your account and preferences.</p>
-      </div>
-
-      <div className="space-y-6">
-        {/* Profile */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-7 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-sm">
-              <User className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-slate-900">Profile</h2>
-              <p className="text-xs text-slate-500">Your account details</p>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between py-3 border-b border-slate-100">
-              <span className="text-sm text-slate-500">Email</span>
-              <span className="text-sm font-medium text-slate-900">{user.email}</span>
-            </div>
-            <div className="flex items-center justify-between py-3 border-b border-slate-100">
-              <span className="text-sm text-slate-500">Member since</span>
-              <span className="text-sm font-medium text-slate-900">
-                {new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-              </span>
-            </div>
-            <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-slate-500">Analyses run</span>
-              <span className="text-sm font-medium text-slate-900">{profile?.usage_count || 0}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Plan */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-7 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-sm">
-              <CreditCard className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-slate-900">Plan</h2>
-              <p className="text-xs text-slate-500">Your current subscription</p>
-            </div>
-          </div>
-          <div className="flex items-center justify-between py-3 border-b border-slate-100">
-            <span className="text-sm text-slate-500">Current plan</span>
-            <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold">
-              {(profile?.plan || 'free').toUpperCase()}
-            </span>
-          </div>
-          <div className="flex items-center justify-between py-3">
-            <span className="text-sm text-slate-500">Analysis rounds</span>
-            <span className="text-sm font-medium text-emerald-700">
-              {isFreePlan ? `${analysesRemaining} of 2 remaining` : 'Unlimited'}
-            </span>
-          </div>
-          {profile?.plan === 'free' && (
-            <div className="mt-6 rounded-xl bg-gradient-to-br from-emerald-50/50 to-teal-50/30 border border-emerald-200/60 p-5">
-              <p className="text-sm text-slate-700 mb-3">
-                Pro features coming soon: PDF export, team seats, and priority analysis speed.
-              </p>
-              <a href="/pricing" className="inline-flex items-center text-sm font-semibold text-emerald-700 hover:text-emerald-800 transition-colors">
-                View pricing &rarr;
-              </a>
-            </div>
-          )}
-        </div>
-
-        {/* Security */}
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-7 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-slate-900">Security</h2>
-              <p className="text-xs text-slate-500">Account security settings</p>
-            </div>
-          </div>
-          <div className="flex items-center justify-between py-3 border-b border-slate-100">
-            <span className="text-sm text-slate-500">Authentication</span>
-            <span className="text-sm font-medium text-slate-900">Email + Password</span>
-          </div>
-          <div className="flex items-center justify-between py-3">
-            <span className="text-sm text-slate-500">Data protection</span>
-            <span className="text-sm font-medium text-slate-900">TLS + RLS</span>
-          </div>
-        </div>
-      </div>
+    <div className="max-w-2xl mx-auto pb-12">
+      <SettingsClient
+        email={user.email || ''}
+        firstName={profile?.first_name || ''}
+        lastName={profile?.last_name || ''}
+        plan={plan}
+        planLabel={planLabel}
+        usageCount={profile?.usage_count || 0}
+        dealCount={allDeals.length}
+        activeDeals={activeDeals.length}
+        closedDeals={closedDeals.length}
+        roundCount={roundCount || 0}
+        isAdmin={profile?.is_admin || false}
+        baseCurrency={baseCurrency}
+        totalSavings={formatCurrency(totalSavingsIdentified, baseCurrency)}
+        memberSince={createdAt.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+        joinedAgo={joinedAgo}
+        locale={profile?.locale || 'en'}
+      />
     </div>
   )
 }

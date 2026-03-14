@@ -1,10 +1,13 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { HelpCircle, ChevronDown, User, LogOut, Menu, X, Settings, Zap, Crown } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { useT } from '@/i18n/context'
 
 interface UnifiedHeaderProps {
   variant: 'landing' | 'public' | 'app'
@@ -16,6 +19,7 @@ interface UnifiedHeaderProps {
 
 export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCount = 0, isAdmin = false }: UnifiedHeaderProps) {
   const pathname = usePathname()
+  const t = useT()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
 
@@ -36,13 +40,13 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
   const marketingNavLinks = (
     <>
       <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-        Pricing
+        {t('nav.pricing')}
       </Link>
       <Link href="/#how-it-works" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-        How it works
+        {t('nav.howItWorks')}
       </Link>
       <Link href="/example" className="text-sm text-slate-600 hover:text-slate-900 transition-colors">
-        Examples
+        {t('nav.examples')}
       </Link>
     </>
   )
@@ -50,14 +54,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
   // Logo component
   const logo = (
     <Link href="/" className="flex items-center gap-2.5">
-      <svg width="42" height="36" viewBox="0 0 100 85" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Navy T base */}
-        <path d="M0 12C0 5.37258 5.37258 0 12 0H52C58.6274 0 64 5.37258 64 12V20H48V85H28V20H0V12Z" fill="#1e3a5f"/>
-        {/* White swoosh cut creating the lift effect */}
-        <path d="M30 28L75 0L75 70C75 78.2843 68.2843 85 60 85H38L30 70V28Z" fill="white"/>
-        {/* Green L with upward lift */}
-        <path d="M32 32L80 2L80 68C80 77.3888 72.3888 85 63 85H42C35.3726 85 30 79.6274 30 73V32H32Z" fill="#10b981"/>
-      </svg>
+      <Image src="/logo-icon.png" alt="TermLift" width={36} height={36} className="flex-shrink-0" priority />
       <div className="flex items-baseline">
         <span className="text-xl font-bold text-slate-900">Term</span>
         <span className="text-xl font-bold text-emerald-600">Lift</span>
@@ -73,21 +70,21 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
         className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
         onClick={() => setShowMobileMenu(false)}
       >
-        Pricing
+        {t('nav.pricing')}
       </Link>
       <Link
         href="/#how-it-works"
         className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
         onClick={() => setShowMobileMenu(false)}
       >
-        How it works
+        {t('nav.howItWorks')}
       </Link>
       <Link
         href="/example"
         className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
         onClick={() => setShowMobileMenu(false)}
       >
-        Examples
+        {t('nav.examples')}
       </Link>
       <div className="border-t border-slate-200 my-2" />
       <Link
@@ -95,14 +92,14 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
         className="block px-4 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
         onClick={() => setShowMobileMenu(false)}
       >
-        Sign in
+        {t('nav.signIn')}
       </Link>
       <Link
         href="/try"
         className="block mx-4 mt-2 px-4 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center"
         onClick={() => setShowMobileMenu(false)}
       >
-        Try free
+        {t('nav.tryFree')}
       </Link>
     </div>
   )
@@ -121,18 +118,19 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
             </nav>
 
             {/* Right side (desktop) */}
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-3">
+              <LanguageSwitcher variant="compact" />
               <Link
                 href="/login"
                 className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
               >
-                Sign in
+                {t('nav.signIn')}
               </Link>
               <Link
                 href="/try"
                 className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
               >
-                Try free
+                {t('nav.tryFree')}
               </Link>
             </div>
 
@@ -142,7 +140,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
                 href="/try"
                 className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
               >
-                Try free
+                {t('nav.tryFree')}
               </Link>
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
@@ -174,18 +172,19 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
             </nav>
 
             {/* Right side (desktop) */}
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-3">
+              <LanguageSwitcher variant="compact" />
               <Link
                 href="/login"
                 className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
               >
-                Sign in
+                {t('nav.signIn')}
               </Link>
               <Link
                 href="/try"
                 className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
               >
-                Try free
+                {t('nav.tryFree')}
               </Link>
             </div>
 
@@ -233,15 +232,16 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
             ))}
           </nav>
 
-          {/* Right: Help + Usage + Upgrade (if not upgraded) + User dropdown (desktop) */}
+          {/* Right: Lang + Help + Usage + Upgrade + User dropdown (desktop) */}
           <div className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher variant="compact" />
             {/* Help link */}
             <Link
               href="/help"
               className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
             >
               <HelpCircle className="w-4 h-4" />
-              <span className="hidden lg:inline">Help</span>
+              <span className="hidden lg:inline">{t('nav.help')}</span>
             </Link>
 
             {/* Usage indicator (skip for admins) */}
@@ -259,7 +259,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
                     title="Free plan usage"
                   >
                     <Zap className="w-3.5 h-3.5 text-slate-600" />
-                    <span className="text-xs font-bold text-slate-900">{usageCount}/5</span>
+                    <span className="text-xs font-bold text-slate-900">{usageCount}/4</span>
                   </Link>
                 )}
               </>
@@ -277,7 +277,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
                 }}
                 className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
               >
-                Upgrade
+                {t('nav.upgrade')}
               </Link>
             )}
 
@@ -299,12 +299,12 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
                   />
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-20">
                     <Link
-                      href="/app/profile"
+                      href="/app/settings"
                       className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <User className="w-4 h-4" />
-                      Profile
+                      {t('nav.profile')}
                     </Link>
                     <Link
                       href="/app/settings"
@@ -312,7 +312,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
                       onClick={() => setShowUserMenu(false)}
                     >
                       <Settings className="w-4 h-4" />
-                      Settings
+                      {t('nav.settings')}
                     </Link>
                     <div className="border-t border-slate-200 my-1" />
                     <form action="/auth/signout" method="post">
@@ -321,7 +321,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
                         className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors w-full text-left"
                       >
                         <LogOut className="w-4 h-4" />
-                        Sign out
+                        {t('nav.signOut')}
                       </button>
                     </form>
                   </div>
@@ -373,7 +373,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
                 ) : (
                   <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100">
                     <Zap className="w-3.5 h-3.5 text-slate-600" />
-                    <span className="text-xs font-bold text-slate-900">{usageCount} of 5 analyses used</span>
+                    <span className="text-xs font-bold text-slate-900">{usageCount} of 4 analyses used</span>
                   </div>
                 )}
               </div>
@@ -385,7 +385,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
               onClick={() => setShowMobileMenu(false)}
             >
               <HelpCircle className="w-4 h-4" />
-              Help
+              {t('nav.help')}
             </Link>
             {!isUpgraded && !isAdmin && (
               <Link
@@ -393,12 +393,12 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
                 className="mx-4 px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center block"
                 onClick={() => setShowMobileMenu(false)}
               >
-                Upgrade
+                {t('nav.upgrade')}
               </Link>
             )}
             <div className="border-t border-slate-200 my-2" />
             <Link
-              href="/app/profile"
+              href="/app/settings"
               className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50"
               onClick={() => setShowMobileMenu(false)}
             >
@@ -412,7 +412,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
                 className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors w-full text-left"
               >
                 <LogOut className="w-4 h-4" />
-                Sign out
+                {t('nav.signOut')}
               </button>
             </form>
           </div>

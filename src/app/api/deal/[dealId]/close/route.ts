@@ -18,9 +18,13 @@ export async function POST(
     const body = await request.json()
     const { outcome, finalTotal, savingsAmount, savingsPercent, whatChanged, notes } = body
 
-    if (!['won', 'lost', 'paused'].includes(outcome)) {
+    // Accept both 'won'/'lost' and 'closed_won'/'closed_lost' formats
+    const validOutcomes = ['won', 'lost', 'paused', 'closed_won', 'closed_lost', 'closed_paused']
+    if (!validOutcomes.includes(outcome)) {
       return NextResponse.json({ error: 'Invalid outcome' }, { status: 400 })
     }
+    // Normalize to closed_ prefix for storage
+    const normalizedOutcome = outcome.startsWith('closed_') ? outcome : `closed_${outcome}`
 
     // Get deal with rounds
     const { data: deal, error: dealError } = await supabase
@@ -41,7 +45,7 @@ export async function POST(
 
     // Generate close summary using Claude
     let closeSummary = null
-    if (latestRound?.output_json && outcome === 'won') {
+    if (latestRound?.output_json && (normalizedOutcome === 'closed_won')) {
       try {
         const summaryPrompt = `Generate a brief summary for this procurement deal that was just closed:
 
@@ -73,7 +77,7 @@ Generate 3-5 concise bullet points covering: starting position, final terms, sav
     const { error: updateError } = await supabase
       .from('deals')
       .update({
-        status: `closed_${outcome}`,
+        status: normalizedOutcome,
         closed_at: new Date().toISOString(),
         savings_amount: savingsAmount,
         savings_percent: savingsPercent,
