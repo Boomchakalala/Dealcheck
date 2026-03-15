@@ -814,7 +814,7 @@ Return valid JSON only. Match this structure exactly:
   "snapshot": {
     "vendor_product": "Datadog / Observability Platform",
     "term": "12 months",
-    "total_commitment": "$15,000",
+    "total_commitment": "$15,000 (as stated in quote — do NOT multiply by term length)",
     "currency": "USD",
     "billing_payment": "Monthly",
     "pricing_model": "Commit-based: 10M logs/day + per-host",
@@ -822,7 +822,7 @@ Return valid JSON only. Match this structure exactly:
     "renewal_date": "March 15, 2026",
     "signing_deadline": "February 28, 2026"
   },
-  "NOTE_TOTAL": "total_commitment = CAREFULLY FIND THE ACTUAL TOTAL CONTRACT VALUE. Look for phrases like 'Total Contract Value', 'Annual Total', 'Total Amount', 'Grand Total'. DO NOT just multiply a monthly line item by 12 - find the actual stated total. If monthly amount shown, verify it matches: (total ÷ 12) = monthly.",
+  "NOTE_TOTAL": "total_commitment = Use the EXACT total from the quote. Look for 'Total Contract Value', 'Annual Total', 'Total Amount', 'Grand Total', 'Net amount due'. If you find a stated total, use it AS-IS — do NOT multiply it by anything. Only calculate (monthly × 12) if the amount is EXPLICITLY labeled '/month' or 'per month' and no total is stated.",
   "NOTE_CURRENCY": "currency = Detect from the quote: 'USD' ($ or USD), 'EUR' (€ or EUR), 'GBP' (£ or GBP), 'CAD' (C$ or CAD), 'AUD' (A$ or AUD). Default to 'USD' if unclear.",
   "NOTE_BILLING": "billing_payment = 'Monthly', 'Quarterly', 'Annual upfront', etc. Keep it simple.",
   "NOTE_DEAL_TYPE": "deal_type = 'Renewal' if renewing existing, 'New purchase' if new vendor",
@@ -1425,7 +1425,7 @@ export async function analyzeDeal(
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: 4500,
-      system: enhancedSystemPrompt + getLanguageInstruction(userLocale || 'en'),
+      system: enhancedSystemPrompt + getLanguageInstruction(userLocale || 'en') + '\n\nFINAL REMINDER — TOTAL CONTRACT VALUE: If the quote states a total (e.g. "Total: $15,000", "Net amount due: €5,000", "Annual commitment: $50,000"), use that number EXACTLY as total_commitment. Do NOT multiply it by the term length. Only multiply if the amount is explicitly a monthly recurring charge with no stated total.',
       messages: [{ role: 'user', content: userContent }],
       temperature: 0.4,
     })
