@@ -416,12 +416,12 @@ DOCUMENT ANALYSIS - VISUAL COMPREHENSION:
 
 PRICING STRUCTURE - READ CAREFULLY:
 
-⚠️ CRITICAL — DO NOT AUTO-MULTIPLY MONTHLY AMOUNTS:
-- Do NOT automatically multiply monthly amounts by 12 to calculate total value.
-- Use the total contract value EXPLICITLY STATED in the quote if present.
-- If only a monthly amount is shown with a 12-month term, note the annual cost as "monthly × 12 = estimated annual spend" but clearly label it as ESTIMATED, not total contract value.
-- Never fabricate a total that isn't in the source document.
-- If the quote says "Net amount due: $5,000" and "Term: 12 months", the total is $5,000 UNLESS the quote explicitly says this is a monthly amount. "Net amount due" typically means the full amount owed, not a monthly installment.
+⚠️ CRITICAL — HOW TO DETERMINE TOTAL CONTRACT VALUE:
+- ALWAYS look for a stated total FIRST: "Net amount due", "Total amount", "Grand total", "Contract value", "Total commitment". If you find one, that IS the total. Full stop. Do NOT multiply it by anything.
+- VERIFY before multiplying: Many quotes show per-unit monthly prices but the TOTAL AMOUNT column already accounts for quantity × term. Check if the line item totals already include the full contract period by doing the math: if (unit price × quantity × months) = line total, then the final total already includes the full term.
+- Example: A quote says "USD 16.50 per Host per month", Quantity: 5, Total Amount: $990.00. Math check: $16.50 × 5 = $82.50/month, but $82.50 × 12 = $990. So the Total Amount column ALREADY includes 12 months. The "Net Amount Due" summing these totals is the FULL CONTRACT VALUE — do NOT multiply it by 12 again.
+- Only multiply if you are certain the final total represents a single month's charges and no full-term total is stated anywhere.
+- When in doubt, use the stated total as-is and note "as stated in quote" rather than risk doubling it.
 
 RULE 1 — NEVER INVENT OR EXTRAPOLATE CONTRACT VALUES:
 - ONLY use numbers that are EXPLICITLY STATED in the quote document
@@ -924,7 +924,7 @@ FINAL SELF-CHECK (do this mentally before returning JSON)
 
 Before returning your JSON response, verify ALL of these:
 1. Does total_commitment match what the quote ACTUALLY STATES? Did you accidentally double or halve it? Can you point to the exact line in the quote where this number appears or show the exact calculation?
-2. Did you multiply a lump-sum amount by 12? If the quote shows "Net amount due: $X" or "Total: $X" — that IS the total. You should NOT have multiplied it by the term length. Only multiply if the amount is explicitly labeled as monthly/recurring (e.g., "$X/month", "$X per month").
+2. Did you multiply the total by the term length? STOP. Check: does the "Total Amount" column already include the full term? Do the math: (unit price × quantity × months). If it equals the line total, the total already covers the full contract. "Net Amount Due" summing those line totals is the FULL contract value — do NOT multiply again.
 3. Did you INVENT any numbers? Every amount in your output must trace back to a specific number in the quote. If you cannot, remove it.
 4. Are potential_savings amounts realistic? Are they properly formatted (€4,000 not €4, €2,500 not €2)?
 5. Is the first must_have ask a direct price reduction with a specific € or $ amount?
@@ -1425,7 +1425,7 @@ export async function analyzeDeal(
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: 4500,
-      system: enhancedSystemPrompt + getLanguageInstruction(userLocale || 'en') + '\n\nFINAL REMINDER — TOTAL CONTRACT VALUE: If the quote states a total (e.g. "Total: $15,000", "Net amount due: €5,000", "Annual commitment: $50,000"), use that number EXACTLY as total_commitment. Do NOT multiply it by the term length. Only multiply if the amount is explicitly a monthly recurring charge with no stated total.',
+      system: enhancedSystemPrompt + getLanguageInstruction(userLocale || 'en') + '\n\nFINAL REMINDER — TOTAL CONTRACT VALUE:\n1. If a "Net Amount Due", "Total", or "Grand Total" is stated, use it AS-IS for total_commitment. Do NOT multiply by term length.\n2. VERIFY: Many quotes show per-unit monthly prices but the TOTAL AMOUNT column already multiplies by quantity AND by the contract term (e.g. 12 months). Check the math before multiplying again — you will likely be double-counting.\n3. Only multiply a stated total by 12 if you are 100% certain it represents a single month and no annual/full-term total exists in the document.',
       messages: [{ role: 'user', content: userContent }],
       temperature: 0.4,
     })
