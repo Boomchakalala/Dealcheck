@@ -19,18 +19,34 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "TermLift — AI Vendor Quote Analyzer | Negotiate Better Supplier Deals",
+    default: "TermLift — Better Vendor Terms in Minutes",
     template: "%s | TermLift",
   },
-  description: "Drop in a vendor quote and get back exactly where you're overpaying, what to push for, and a ready-to-send email in 60 seconds.",
+  description: "Drop in a vendor quote and get back exactly where you're overpaying, a full negotiation playbook, and a ready-to-send email — in under 60 seconds. Free to try.",
+  metadataBase: new URL("https://www.termlift.com"),
   icons: {
     icon: "/favicon.png",
     apple: "/icon-512.png",
   },
   openGraph: {
-    title: "TermLift — AI Vendor Quote Analyzer | Negotiate Better Supplier Deals",
-    description: "Drop in a vendor quote and get back exactly where you're overpaying, what to push for, and a ready-to-send email in 60 seconds.",
+    type: "website",
+    siteName: "TermLift",
+    title: "TermLift — Better Vendor Terms in Minutes",
+    description: "AI-powered quote analysis. Spot hidden fees, get a negotiation plan, and send a better reply in 60 seconds.",
+    url: "https://www.termlift.com",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TermLift — Better Vendor Terms in Minutes",
+    description: "AI-powered quote analysis. Spot hidden fees, get a negotiation plan, and send a better reply in 60 seconds.",
+  },
+  alternates: {
+    canonical: "https://www.termlift.com",
+    languages: {
+      en: "https://www.termlift.com",
+      fr: "https://www.termlift.com/fr",
+    },
   },
 };
 
@@ -44,6 +60,23 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "TermLift",
+              applicationCategory: "BusinessApplication",
+              description: "AI-powered vendor quote analyzer. Spot hidden fees, get a negotiation playbook, and send a better reply in 60 seconds.",
+              url: "https://www.termlift.com",
+              offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+              operatingSystem: "Web",
+            }),
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

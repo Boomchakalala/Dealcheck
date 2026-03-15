@@ -31,17 +31,27 @@ async function convertDealAmount(totalStr: string, dealCurrency: Currency | unde
 
 function parseSavingsAmount(str?: string): number {
   if (!str) return 0
-  // Remove currency symbols and text suffixes
-  let cleaned = str.replace(/[€$£¥]/g, '').replace(/saved|économisés?|potentiel|per year|\/year|\/yr|\/an/gi, '').trim()
-  // Handle K/M suffixes
-  const kmMatch = cleaned.match(/([\d.,\s]+)\s*([KkMm])/)
+
+  // Handle K/M suffixes first
+  const kmMatch = str.match(/([\d.,\s]+)\s*([KkMm])/)
   if (kmMatch) {
     const num = parseFloat(kmMatch[1].replace(/[\s,]/g, ''))
     const suffix = kmMatch[2].toUpperCase()
     if (suffix === 'K') return num * 1000
     if (suffix === 'M') return num * 1000000
   }
-  // Remove spaces (French thousands), handle dots as thousands sep
+
+  // Check for range: "3,000-6,000" — take midpoint
+  const rangeMatch = str.match(/([\d.,\s]+)[-–—]\s*([\d.,\s]+)/)
+  if (rangeMatch) {
+    const parse = (s: string) => parseFloat(s.replace(/[€$£¥\s]/g, '').replace(/,/g, ''))
+    const a = parse(rangeMatch[1]), b = parse(rangeMatch[2])
+    if (!isNaN(a) && !isNaN(b) && a > 0 && b > 0) return (a + b) / 2
+    if (!isNaN(a) && a > 0) return a
+  }
+
+  // Single number
+  let cleaned = str.replace(/[€$£¥]/g, '').replace(/saved|économisés?|potentiel|per year|\/year|\/yr|\/an|over contract life/gi, '').trim()
   cleaned = cleaned.replace(/\s/g, '')
   if (/^\d{1,3}(\.\d{3})+$/.test(cleaned)) cleaned = cleaned.replace(/\./g, '')
   cleaned = cleaned.replace(/,/g, '')

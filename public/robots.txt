@@ -3,5 +3,8 @@ Allow: /
 Disallow: /app/
 Disallow: /api/
 Disallow: /auth/
+Disallow: /login
+Disallow: /try
+Disallow: /reset-password
 
 Sitemap: https://www.termlift.com/sitemap.xml

@@ -200,7 +200,7 @@ export default async function DealPage({
             const score = (latestOutput as any)?.score as number | undefined
             const scoreLabel = (latestOutput as any)?.score_label as string | undefined
             if (score == null) return null
-            const color = score >= 80 ? 'text-emerald-600' : score >= 60 ? 'text-amber-600' : score >= 40 ? 'text-orange-600' : 'text-red-600'
+            const color = score >= 85 ? 'text-emerald-600' : score >= 65 ? 'text-amber-600' : score >= 40 ? 'text-orange-600' : 'text-red-600'
             return (
               <div className="text-center sm:text-left">
                 <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">

@@ -64,6 +64,9 @@ export const DealOutputSchema = z.object({
     pricing_fairness: z.number().min(0).max(50),
     terms_protections: z.number().min(0).max(30),
     leverage_position: z.number().min(0).max(20),
+    pricing_deductions: z.array(z.object({ points: z.number(), reason: z.string() })).optional(),
+    terms_deductions: z.array(z.object({ points: z.number(), reason: z.string() })).optional(),
+    leverage_deductions: z.array(z.object({ points: z.number(), reason: z.string() })).optional(),
   }).optional(),
   score_rationale: z.string().optional(),
   email_drafts: z.object({
@@ -138,7 +141,7 @@ export const DealOutputSchemaV2 = z.object({
   }),
 
   // Red Flags with mitigation
-  red_flags: z.array(RedFlagSchema).max(3),
+  red_flags: z.array(RedFlagSchema),
 
   // What to Ask For
   what_to_ask_for: z.object({

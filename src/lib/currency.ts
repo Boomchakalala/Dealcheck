@@ -217,12 +217,22 @@ export function parseMoney(str: string): { amount: number; currency: Currency } 
   // Detect currency first
   const currency = detectCurrency(str)
 
+  // Check for range first: "$3,000-6,000" — take midpoint
+  const rangeMatch = str.match(/([\d.,\s]+)[-–—]\s*([\d.,\s]+)/)
+  if (rangeMatch) {
+    const parseNum = (s: string) => parseFloat(s.replace(/[\s,]/g, ''))
+    const a = parseNum(rangeMatch[1]), b = parseNum(rangeMatch[2])
+    if (!isNaN(a) && !isNaN(b) && a > 0 && b > 0) {
+      return { amount: (a + b) / 2, currency }
+    }
+  }
+
   // Remove currency symbols and extra text
   let cleaned = str
     .toUpperCase()
     .replace(/USD|EUR|GBP|CAD|AUD|CHF|JPY/g, '')
     .replace(/\$|€|£|¥/g, '')
-    .replace(/\/MONTH|\/YEAR|MONTHLY|ANNUAL|CONTRACT/g, '')
+    .replace(/\/MONTH|\/YEAR|MONTHLY|ANNUAL|CONTRACT|SAVED|OVER CONTRACT LIFE|PER YEAR/g, '')
     .trim()
 
   // Extract number with K/M suffix

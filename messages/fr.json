@@ -130,6 +130,23 @@
     "comingSoon": "Bientôt disponible",
     "getPro": "Passer à Pro"
   },
+  "social": {
+    "stat1": "500+",
+    "stat1Label": "Devis analysés",
+    "stat2": "2,3 M€",
+    "stat2Label": "D'économies identifiées",
+    "stat3": "4,9/5",
+    "stat3Label": "Note moyenne",
+    "quote1": "J'allais signer un renouvellement SaaS à 45 000 €. TermLift a détecté deux clauses que j'aurais manquées. 8 400 € d'économies en 10 minutes.",
+    "name1": "Marc D.",
+    "title1": "Ops Lead, startup SaaS B2B — Paris",
+    "quote2": "On l'utilise pour chaque appel d'offres agence maintenant. Les brouillons d'e-mail valent à eux seuls l'abonnement — je copie, j'adapte le nom, et c'est parti.",
+    "name2": "Sarah K.",
+    "title2": "Fondatrice, marque e-commerce — Amsterdam",
+    "quote3": "Je n'avais pas remarqué que notre fournisseur avait glissé une clause d'escalade de prix de 15 % par an. TermLift l'a repérée. Ça change tout.",
+    "name3": "James T.",
+    "title3": "Office Manager, équipe de 40 personnes — Londres"
+  },
   "cta": {
     "title": "Ce devis dans votre boîte mail ? Vous surpayez probablement.",
     "subtitle": "Découvrez-le en 60 secondes. Sans inscription, sans engagement — juste la clarté sur ce que vous devriez payer.",
@@ -799,10 +816,10 @@
     "faq2a": "Vous pouvez passer au Pro (39 €/mois) pour des analyses illimitées, le suivi complet des dépenses et la gestion des contrats. Cliquez sur n'importe quel bouton « Passer au Pro » pour commencer instantanément.",
     "faq3q": "Qu'est-ce qui compte comme une « analyse » ?",
     "faq3a": "Chaque soumission d'un devis ou document pour analyse IA compte pour une. Cela inclut les analyses initiales et les rounds de suivi sur les contrats existants.",
-    "faq4q": "Quelle est la différence entre Pro et Business ?",
-    "faq4a": "Pro est pour les négociateurs individuels — 1 utilisateur avec suivi complet des dépenses. Business ajoute la collaboration d'équipe avec jusqu'à 3 utilisateurs, un espace partagé, l'export PDF et un historique d'1 an.",
-    "faq5q": "Quand le plan Business sera-t-il disponible ?",
-    "faq5a": "Le plan Pro est disponible dès maintenant — vous pouvez passer au niveau supérieur instantanément. Le plan Business (espace d'équipe jusqu'à 3 utilisateurs) arrive bientôt. Commencez avec le Pro et vous serez les premiers informés du lancement Business."
+    "faq4q": "Quelle est la différence entre Starter et Pro ?",
+    "faq4a": "Starter vous donne 4 analyses pour tester TermLift gratuitement. Pro est pour les négociateurs actifs — analyses illimitées, suivi des dépenses sur 90 jours et gestion complète des deals.",
+    "faq5q": "Puis-je annuler à tout moment ?",
+    "faq5a": "Oui — Pro est un abonnement mensuel sans engagement. Annulez à tout moment depuis vos paramètres et vous gardez l'accès jusqu'à la fin de votre période de facturation."
   },
   "helpPage": {
     "badge": "Centre d'aide",

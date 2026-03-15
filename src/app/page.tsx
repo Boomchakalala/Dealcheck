@@ -14,6 +14,7 @@ export default function LandingPage() {
   const statsReveal = useScrollReveal()
   const whoReveal = useScrollReveal()
   const howReveal = useScrollReveal()
+  const socialReveal = useScrollReveal()
   const privacyReveal = useScrollReveal()
   const pricingReveal = useScrollReveal()
   const ctaReveal = useScrollReveal()
@@ -107,7 +108,7 @@ export default function LandingPage() {
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400" />
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400" />
                   </div>
-                  <p className="text-[10px] sm:text-xs font-semibold text-slate-500">{t('example.quoteVendor')} — €110,000</p>
+                  <p className="text-[10px] sm:text-xs font-semibold text-slate-500">{t('example.quoteVendor')} — €111,600</p>
                 </div>
 
                 <div className="p-4 sm:p-5 space-y-3">
@@ -126,6 +127,25 @@ export default function LandingPage() {
                     <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider mb-1">{t('hero.redFlagLabel')}</p>
                     <p className="text-[11px] sm:text-xs font-semibold text-slate-900 mb-1">{t('hero.redFlagTitle')}</p>
                     <p className="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed">{t('hero.redFlagDesc')}</p>
+                  </div>
+
+                  {/* Quote Score */}
+                  <div className="border border-orange-200 bg-orange-50/50 rounded-lg px-3 py-2 flex items-center gap-2.5">
+                    <svg width="32" height="32" viewBox="0 0 32 32" className="-rotate-90 flex-shrink-0">
+                      <circle cx="16" cy="16" r="13" fill="none" stroke="#fed7aa" strokeWidth="3" />
+                      <circle cx="16" cy="16" r="13" fill="none" stroke="#f97316" strokeWidth="3"
+                        strokeDasharray={`${(52/100) * 2 * Math.PI * 13} ${(1 - 52/100) * 2 * Math.PI * 13}`}
+                        strokeLinecap="round"
+                      />
+                      <text x="16" y="16" textAnchor="middle" dominantBaseline="central"
+                        className="fill-orange-700 text-[8px] font-extrabold rotate-90"
+                        style={{ transformOrigin: 'center' }}
+                      >52</text>
+                    </svg>
+                    <div>
+                      <p className="text-[9px] font-bold text-orange-700 uppercase tracking-wider">Quote Score</p>
+                      <p className="text-[11px] font-extrabold text-orange-600">Overpriced</p>
+                    </div>
                   </div>
 
                   {/* Savings */}
@@ -254,49 +274,58 @@ export default function LandingPage() {
       <section
         ref={howReveal.ref}
         id="how-it-works"
-        className={`py-20 sm:py-28 bg-gradient-to-b from-slate-50/80 via-slate-50/30 to-white relative overflow-hidden transition-all duration-700 ${
+        className={`py-24 sm:py-36 bg-[#0f172a] relative overflow-hidden transition-all duration-700 ${
           howReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
         {/* Decorative background elements */}
-        <div className="absolute top-20 right-0 w-96 h-96 bg-emerald-100 rounded-full blur-3xl opacity-20 pointer-events-none" />
-        <div className="absolute bottom-20 left-0 w-96 h-96 bg-teal-100 rounded-full blur-3xl opacity-20 pointer-events-none" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-teal-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-6xl mx-auto px-5 sm:px-8 relative">
-          <div className="text-center mb-14 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+          <div className="text-center mb-16 sm:mb-20">
+            <h2 className="text-2xl sm:text-3xl md:text-[2.75rem] font-bold text-white mb-4 tracking-tight">
               {t('howItWorks.title')}
             </h2>
-            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
               {t('howItWorks.subtitle')}
             </p>
           </div>
 
           {/* 3 Steps */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-0 mb-20 sm:mb-24 relative">
+            {/* Connector line — desktop only */}
+            <div className="hidden md:block absolute top-10 left-[20%] right-[20%] h-px border-t-2 border-dashed border-emerald-500/30" />
+
             {[
               { step: '1', title: t('howItWorks.step1'), desc: t('howItWorks.step1Desc'), icon: Upload },
               { step: '2', title: t('howItWorks.step2'), desc: t('howItWorks.step2Desc'), icon: Search },
               { step: '3', title: t('howItWorks.step3'), desc: t('howItWorks.step3Desc'), icon: Send },
             ].map((item, index) => (
-              <div key={index} className="relative flex flex-col items-center text-center">
-                <div className="w-16 h-16 mb-4 bg-emerald-100 rounded-2xl flex items-center justify-center relative">
-                  <item.icon className="w-7 h-7 text-emerald-700" />
-                  <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center">
-                    {item.step}
-                  </div>
-                </div>
-                <p className="text-base font-semibold text-slate-900 mb-1.5">
-                  {item.title}
-                </p>
-                <p className="text-sm text-slate-600 max-w-[250px]">
-                  {item.desc}
-                </p>
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-8 -right-6 text-slate-300 text-2xl">
-                    ›
+              <div key={index} className="relative flex flex-col items-center text-center group">
+                {/* Mobile vertical arrow */}
+                {index > 0 && (
+                  <div className="md:hidden mb-4">
+                    <svg className="w-5 h-5 text-emerald-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
                   </div>
                 )}
+
+                <div className="bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8 hover:-translate-y-1 hover:bg-white/[0.09] hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 w-full max-w-[300px]">
+                  <div className="w-20 h-20 mb-5 bg-emerald-600 rounded-2xl flex items-center justify-center relative mx-auto shadow-lg shadow-emerald-500/20">
+                    <item.icon className="w-9 h-9 text-white" />
+                    <div className="absolute -top-2.5 -right-2.5 w-8 h-8 rounded-full bg-white text-[#0f172a] text-sm font-extrabold flex items-center justify-center shadow-md">
+                      {item.step}
+                    </div>
+                  </div>
+                  <p className="text-lg sm:text-xl font-bold text-white mb-2">
+                    {item.title}
+                  </p>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
@@ -304,49 +333,111 @@ export default function LandingPage() {
           {/* Before / After Visual */}
           <div className="max-w-5xl mx-auto px-4 sm:px-0">
             <div className="text-center mb-10">
-              <h3 className="text-xl sm:text-2xl font-bold text-slate-900">{t('example.headline')}</h3>
+              <h3 className="text-2xl sm:text-3xl md:text-[2rem] font-bold text-white">
+                {t('example.headline').split(/(wouldn't notice|n'auriez pas remarqué)/i).map((part, i) =>
+                  /wouldn't notice|n'auriez pas remarqué/i.test(part)
+                    ? <span key={i} className="text-red-400 italic">{part}</span>
+                    : <span key={i}>{part}</span>
+                )}
+              </h3>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <div className="flex flex-col lg:flex-row gap-6 items-stretch">
               {/* LEFT: Before — Vendor Quote */}
-              <div>
+              <div className="lg:w-1/2 flex flex-col">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
                     <span className="text-xs font-bold text-slate-500">1</span>
                   </div>
-                  <p className="text-sm font-semibold text-slate-700">{t('example.youPaste')}</p>
+                  <p className="text-sm font-semibold text-slate-300">{t('example.youPaste')}</p>
                 </div>
-                <div className="bg-white rounded-xl border-2 border-slate-200 shadow-sm overflow-hidden">
+                <div className="bg-white rounded-xl border-2 border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col relative">
                   <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-slate-300" />
                     <span className="text-[10px] sm:text-xs font-medium text-slate-400">vendor-quote.pdf</span>
                   </div>
-                  <div className="p-4 sm:p-5 text-xs sm:text-sm text-slate-600 leading-relaxed space-y-3.5">
-                    <p className="text-base sm:text-lg font-semibold text-slate-800">{t('example.quoteVendor')}</p>
+                  <div className="p-4 sm:p-5 text-xs sm:text-sm text-slate-600 leading-relaxed space-y-3.5 flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-base sm:text-lg font-semibold text-slate-800">{t('example.quoteVendor')}</p>
+                      <p className="text-[10px] text-slate-400">March 12, 2026</p>
+                    </div>
+                    <p className="text-slate-400 text-[10px] mb-2">Prepared for: [Your Company]</p>
                     <p className="text-slate-500 text-xs uppercase tracking-wide font-medium">{t('example.quoteTitle')}</p>
                     <div className="space-y-1.5 pt-1">
                       <div className="flex justify-between"><span>{t('example.quoteRetainer')}</span><span className="font-semibold text-slate-800">€7,500/mo</span></div>
                       <div className="flex justify-between"><span>{t('example.quoteAdFee')}</span><span className="font-semibold text-slate-800">20%</span></div>
                       <div className="flex justify-between"><span>{t('example.quoteAdBudget')}</span><span className="font-semibold text-slate-800">€9,000/mo</span></div>
                       <div className="flex justify-between"><span>{t('example.quoteTerm')}</span><span className="font-semibold text-slate-800">12 months</span></div>
-                      <div className="flex justify-between border-t border-slate-100 pt-1.5 mt-1.5"><span className="font-medium text-slate-700">{t('example.quoteTotal')}</span><span className="font-bold text-slate-900">€110,000</span></div>
+                      <div className="flex justify-between"><span>Start date</span><span className="font-semibold text-slate-800">April 1, 2026</span></div>
+                      <div className="flex justify-between"><span>Payment</span><span className="font-semibold text-slate-800">Annual in advance</span></div>
+                      <div className="flex justify-between border-t border-slate-100 pt-1.5 mt-1.5"><span className="font-medium text-slate-700">{t('example.quoteTotal')}</span><span className="font-bold text-slate-900">€111,600</span></div>
                     </div>
                     <p className="pt-1">{t('example.quoteDeliverables')}</p>
-                    <p className="text-slate-400">{t('example.quoteCancellation')}</p>
+
+                    <div className="border-t border-slate-100 pt-3 mt-1">
+                      <p className="text-xs font-semibold text-slate-700 mb-1.5">Contract terms</p>
+                      <div className="space-y-1 text-[11px] text-slate-500">
+                        <p>• Auto-renewal for 12 months unless 60-day written notice</p>
+                        <p>• Pricing subject to annual review (up to 10% increase)</p>
+                        <p>• All creative assets remain property of Brightwave</p>
+                        <p>• Performance reports delivered monthly</p>
+                      </div>
+                    </div>
+
+                    <p className="text-slate-400 pt-1">{t('example.quoteCancellation')}</p>
+
+                    <div className="border-t border-slate-100 pt-3 mt-1">
+                      <p className="text-[10px] text-slate-300 italic">This proposal is valid for 14 days from the date above. All prices exclude VAT.</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* RIGHT: After — TermLift Output */}
-              <div>
+              <div className="lg:w-1/2 flex flex-col">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center">
                     <span className="text-xs font-bold text-white">2</span>
                   </div>
-                  <p className="text-sm font-semibold text-slate-700">{t('example.termliftReturns')}</p>
+                  <p className="text-sm font-semibold text-slate-300">{t('example.termliftReturns')}</p>
                 </div>
-                <div className="space-y-3">
-                  {/* Red Flag 1 */}
+                <div className="flex flex-col gap-3">
+                  {/* 1. Quote Score — shown first for impact */}
+                  <div className="bg-white rounded-xl border border-orange-200 p-3.5 sm:p-4 shadow-sm">
+                    <p className="text-[10px] font-bold text-orange-700 uppercase tracking-wider mb-2.5">Quote Score</p>
+                    <div className="flex items-center gap-3 mb-3">
+                      <svg width="44" height="44" viewBox="0 0 44 44" className="-rotate-90 flex-shrink-0">
+                        <circle cx="22" cy="22" r="18" fill="none" stroke="#fed7aa" strokeWidth="3.5" />
+                        <circle cx="22" cy="22" r="18" fill="none" stroke="#f97316" strokeWidth="3.5"
+                          strokeDasharray={`${(52/100) * 2 * Math.PI * 18} ${(1 - 52/100) * 2 * Math.PI * 18}`}
+                          strokeLinecap="round"
+                        />
+                        <text x="22" y="22" textAnchor="middle" dominantBaseline="central"
+                          className="fill-orange-700 text-xs font-extrabold rotate-90"
+                          style={{ transformOrigin: 'center' }}
+                        >52</text>
+                      </svg>
+                      <span className="text-base font-extrabold text-orange-600">Overpriced</span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {[
+                        { label: 'Pricing', value: 19, max: 50 },
+                        { label: 'Terms', value: 20, max: 30 },
+                        { label: 'Leverage', value: 13, max: 20 },
+                      ].map((bar) => (
+                        <div key={bar.label} className="flex items-center gap-2">
+                          <span className="text-[9px] text-slate-400 w-12 text-right">{bar.label}</span>
+                          <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full ${bar.value / bar.max >= 0.7 ? 'bg-emerald-500' : bar.value / bar.max >= 0.4 ? 'bg-amber-500' : 'bg-red-500'}`}
+                              style={{ width: `${(bar.value / bar.max) * 100}%` }} />
+                          </div>
+                          <span className="text-[9px] font-semibold text-slate-400 w-8">{bar.value}/{bar.max}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 2. Red Flag 1 */}
                   <div className="bg-white rounded-xl border border-red-200 p-3.5 sm:p-4 shadow-sm">
                     <div className="flex items-center gap-2 mb-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
@@ -356,7 +447,7 @@ export default function LandingPage() {
                     <p className="text-xs text-slate-500">{t('example.redFlag1Desc')}</p>
                   </div>
 
-                  {/* Red Flag 2 */}
+                  {/* 3. Red Flag 2 */}
                   <div className="bg-white rounded-xl border border-red-200 p-3.5 sm:p-4 shadow-sm">
                     <div className="flex items-center gap-2 mb-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
@@ -406,11 +497,62 @@ export default function LandingPage() {
                 {t('example.cta')}
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <p className="text-xs text-slate-500 mt-3">
-                <Link href="/example" className="text-emerald-600 hover:text-emerald-700 font-medium">See a full example</Link>
+              <p className="text-xs text-slate-400 mt-3">
+                <Link href="/example" className="text-emerald-400 hover:text-emerald-300 font-medium">See a full example</Link>
                 {' '}{t('example.withAllDetails')}
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof */}
+      <section
+        ref={socialReveal.ref}
+        className={`py-20 sm:py-28 bg-gradient-to-b from-slate-50/80 to-white relative transition-all duration-700 ${
+          socialReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
+      >
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
+          {/* Stat bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-0 sm:divide-x sm:divide-slate-200 mb-16 sm:mb-20">
+            {[
+              { value: t('social.stat1'), label: t('social.stat1Label') },
+              { value: t('social.stat2'), label: t('social.stat2Label') },
+              { value: t('social.stat3'), label: t('social.stat3Label') },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center px-8 sm:px-12">
+                <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">{stat.value}</p>
+                <p className="text-sm text-slate-500 mt-1 font-medium">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Testimonials */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { quote: t('social.quote1'), name: t('social.name1'), title: t('social.title1'), initials: 'MD' },
+              { quote: t('social.quote2'), name: t('social.name2'), title: t('social.title2'), initials: 'SK' },
+              { quote: t('social.quote3'), name: t('social.name3'), title: t('social.title3'), initials: 'JT' },
+            ].map((testimonial) => (
+              <div key={testimonial.name} className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="mb-4">
+                  <svg className="w-6 h-6 text-emerald-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                  </svg>
+                </div>
+                <p className="text-sm text-slate-700 leading-relaxed mb-5">{testimonial.quote}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-emerald-700">{testimonial.initials}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{testimonial.name}</p>
+                    <p className="text-xs text-slate-400">{testimonial.title}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -482,7 +624,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
             {/* Starter */}
             <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-7">
               <div className="mb-5">
@@ -548,7 +690,7 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* Business */}
+            {/* Business — HIDDEN: uncomment to restore
             <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-7">
               <div className="mb-5">
                 <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.business')}</h3>
@@ -579,6 +721,7 @@ export default function LandingPage() {
                 {t('pricing.comingSoon')}
               </button>
             </div>
+            */}
           </div>
         </div>
       </section>

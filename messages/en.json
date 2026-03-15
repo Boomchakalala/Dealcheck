@@ -130,6 +130,23 @@
     "comingSoon": "Coming soon",
     "getPro": "Get Pro"
   },
+  "social": {
+    "stat1": "500+",
+    "stat1Label": "Quotes analyzed",
+    "stat2": "€2.3M",
+    "stat2Label": "In savings identified",
+    "stat3": "4.9/5",
+    "stat3Label": "Average rating",
+    "quote1": "I was about to sign a €45K SaaS renewal. TermLift flagged two clauses I would have missed. Saved €8,400 in 10 minutes.",
+    "name1": "Marc D.",
+    "title1": "Ops Lead, B2B SaaS startup — Paris",
+    "quote2": "We use this for every agency pitch now. The email drafts alone are worth it — I just copy, edit the name, and send.",
+    "name2": "Sarah K.",
+    "title2": "Founder, e-commerce brand — Amsterdam",
+    "quote3": "Didn't realize our supplier had baked in a 15% annual price escalation clause until TermLift caught it. Game changer.",
+    "name3": "James T.",
+    "title3": "Office Manager, 40-person team — London"
+  },
   "cta": {
     "title": "That quote in your inbox? You're probably overpaying.",
     "subtitle": "Find out in 60 seconds. No signup, no commitment — just clarity on what you should be paying.",
@@ -799,10 +816,10 @@
     "faq2a": "You can upgrade to Pro (€39/mo) for unlimited analyses, full spend tracking, and deal management. Click any 'Upgrade' button to get started instantly.",
     "faq3q": "What counts as an \"analysis\"?",
     "faq3a": "Each time you submit a quote or document for AI analysis counts as one. This includes initial analyses and follow-up rounds on existing deals.",
-    "faq4q": "What's the difference between Pro and Business?",
-    "faq4a": "Pro is for individual negotiators — 1 seat with full spend tracking. Business adds team collaboration with up to 3 seats, a shared workspace, PDF export, and 1-year deal history.",
-    "faq5q": "When will Business launch?",
-    "faq5a": "Pro is live now — you can upgrade instantly. Business (team workspace with up to 3 seats) is coming soon. Start with Pro and you'll be first to know when Business goes live."
+    "faq4q": "What's the difference between Starter and Pro?",
+    "faq4a": "Starter gives you 4 analyses to try TermLift for free. Pro is for active negotiators — unlimited analyses, 90-day spend tracking, and full deal management.",
+    "faq5q": "Can I cancel anytime?",
+    "faq5a": "Yes — Pro is a monthly subscription with no commitment. Cancel anytime from your account settings and you'll keep access until the end of your billing period."
   },
   "helpPage": {
     "badge": "Help center",

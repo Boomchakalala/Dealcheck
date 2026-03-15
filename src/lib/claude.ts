@@ -362,18 +362,18 @@ SAVINGS TARGET (from classification)
 TARGET: Push for ${target_percent_min}-${target_percent_max}% savings by ${approachLabels[approach] || approach}.
 RATIONALE: ${rationale}
 
-CRITICAL SAVINGS RULES:
-- You MUST include concrete savings in potential_savings. NEVER return empty potential_savings.
-- If clear line-item wins exist, quantify each one with specific € or $ amounts.
-- If NO obvious line-item wins, push for a ${target_percent_min}-${target_percent_max}% package discount on the total.
-- Frame the package discount ask as: "Request ${target_percent_min}-${target_percent_max}% discount on the total in exchange for [fast signing / commitment / referral / case study]"
-- Always calculate savings as actual numbers, not just percentages. If total is €40K, a 10% ask = €4,000 saved.
-- Format savings consistently: "€X,XXX saved" or "$X,XXX saved" — never "€2" when you mean "€2,000".`
+SAVINGS GUIDANCE:
+- Only include savings that are REALISTIC and DEFENSIBLE based on what's in the quote.
+- If clear line-item overpricing exists, quantify each one with specific € or $ amounts.
+- If no obvious line-item wins, suggest a modest ${target_percent_min}-${target_percent_max}% package discount — but keep the total savings REASONABLE relative to the deal size.
+- Format savings consistently: "€X,XXX saved" or "$X,XXX saved".
+- CRITICAL: Total potential savings MUST be less than 30% of total_commitment. If your savings calculation exceeds 30%, you are inflating — reduce it.
+- NEVER calculate savings by applying a percentage to multi-year totals. Calculate per-year savings only, then state the annual figure.`
 
   if (recurring && (deal_size_bracket === 'medium' || deal_size_bracket === 'large' || deal_size_bracket === 'enterprise')) {
     directive += `
 
-MULTI-YEAR LEVER: This is a recurring commitment of significant size. ALWAYS evaluate whether a 2-3 year commitment could unlock additional savings (typically 15-25% off annual pricing). Frame as: "We'd consider a multi-year commitment if pricing reflects the reduced churn risk for you." Include this as a must-have or nice-to-have ask.`
+MULTI-YEAR LEVER: This is a recurring commitment. Consider suggesting a 2-year commitment in exchange for 5-10% annual discount — but only as a nice-to-have ask, not as the primary savings figure.`
   }
 
   return directive
@@ -415,13 +415,37 @@ DOCUMENT ANALYSIS - VISUAL COMPREHENSION:
   * Parse table structure carefully: columns often are Item | Price | Qty | Total
 
 PRICING STRUCTURE - READ CAREFULLY:
-- If the quote STATES a total (e.g., "Total: €55,000"), USE THAT NUMBER. Do NOT multiply it by term length.
+
+RULE 1 — NEVER INVENT OR EXTRAPOLATE CONTRACT VALUES:
+- ONLY use numbers that are EXPLICITLY STATED in the quote document
+- If a total contract value is stated (e.g., "Total: €55,000"), USE THAT NUMBER exactly. Do NOT multiply it by term length.
+- If NO total is stated but monthly/annual amounts ARE stated with a term, you may calculate: e.g., "$1,250/mo × 12 months = $15,000"
+- If term length is NOT stated, do NOT assume or extrapolate — set total_commitment to the stated amount with a note (e.g., "$1,250/month (term not specified)")
+- NEVER invent a total by assuming a term length that isn't in the quote
+
+RULE 2 — SHOW YOUR CALCULATION:
+- If total_commitment was calculated (not explicitly stated), show how in the total_commitment field:
+  e.g., "$1,250/mo × 12 months = $15,000" or "€7,500/mo × 12 = €90,000 + €21,600 ad fees = €111,600"
+- If it was explicitly stated in the document, just show the number as-is
+
+RULE 3 — FLAG MISSING INFORMATION:
+- If the quote is missing key commercial information (total value, term length, payment schedule, scope), add a red_flag:
+  type: "Commercial"
+  issue: "Contract value could not be fully verified"
+  why_it_matters: "The quote does not explicitly state [missing field]. Without this, you cannot accurately assess the total cost."
+  what_to_ask_for: "Request a clear total contract value and term length in writing before signing."
+  if_they_push_back: "Do not sign any contract where the total commitment is ambiguous."
+
+RULE 4 — CURRENCY CONSISTENCY:
+- Use the currency from the quote document — do NOT convert or mix currencies
+- If the quote is in USD, all amounts must be in USD. If EUR, all in EUR.
+- If currency is ambiguous, flag it as missing information
+
+SPECIFIC MATH RULES:
 - total_commitment = the FULL amount the buyer will pay over the ENTIRE contract duration
 - If quote says "$X/month for 12 months" → Total is $X * 12 (ANNUAL), not monthly
 - If quote says "annual commitment of $Y, billed monthly" → Total is $Y/year
 - If quote says "€27,500/year for 2 years" → Total is €55,000 (not €27,500 and not €110,000)
-- If quote says "commit to X logs/day at $Y" → That's the BASE cost, not total
-- ALWAYS distinguish: Total Contract Value vs Annual Cost vs Monthly Payment
 - Example: "$50K total contract, paid $4,166/month" → Total: $50K, NOT $4,166
 - NEVER double-count: if a total is stated, trust it. Do not re-derive it by multiplying sub-components.
 
@@ -434,7 +458,7 @@ Each section serves a DIFFERENT purpose. DO NOT repeat the same points:
 2. **quick_read.whats_concerning** = High-level concerns (2-3 items)
    - Example: "Pricing above typical market", "Overage risk at scale", "Auto-renewal"
 
-3. **red_flags** = DETAILED issues with mitigation (0-3 items)
+3. **red_flags** = DETAILED issues with mitigation (flag ALL significant issues found)
    - Must include: type, issue, why_it_matters, what_to_ask_for, if_they_push_back
    - Example: Full analysis of "No overage cap means spike from 10M to 15M logs = $50K extra"
 
@@ -466,6 +490,29 @@ ALWAYS FOCUS ON:
 ✅ Hidden costs (setup fees, overage charges, exit costs)
 ✅ Scope gaps that will cause cost overruns
 
+SOURCE DETECTION — RESELLER / MIDDLEMAN CHECK:
+When analyzing a quote, check for signals that the vendor may be a reseller, distributor, or intermediary rather than the original manufacturer or service provider:
+
+DETECTION SIGNALS:
+- Vendor name includes: "solutions", "group", "partners", "distribution", "supply", "trading", "wholesale", "consulting" (when quoting products they don't make)
+- Products/services reference well-known third-party brands (e.g., Microsoft, Cisco, HP, Adobe, SAP, AWS, Google, Oracle, Dell, Lenovo)
+- Vendor describes themselves as "reseller", "authorized partner", "VAR", "distributor", "channel partner"
+- Pricing includes visible intermediary markup or "handling" fees
+- Quote is for standardized products/licenses available directly from the manufacturer
+
+WHEN DETECTED — add ONE red_flag with these exact fields:
+- type: "Source Insight"
+- issue: "You may be buying through a middleman"
+- why_it_matters: "This vendor appears to be a reseller or distributor, not the original provider of [detected brand/product]. You may be paying a 15–40% markup on top of the source price."
+- what_to_ask_for: "Request a quote directly from [manufacturer/brand] or their official channel to compare pricing. Ask this vendor to disclose their margin or match the direct price."
+- if_they_push_back: "If they offer value-added services (support, integration, local service), ask them to itemize the markup separately so you can evaluate whether it's worth the premium."
+
+RULES:
+- Only flag this when there are CLEAR signals — do not flag every vendor just because their name includes "solutions"
+- Set severity to MEDIUM by default. If the markup appears significant (>25% above known list pricing), it's HIGH.
+- Also add this as a leverage point in negotiation_plan.leverage_you_have: "Consider going direct to [brand/manufacturer] — reseller markups are typically 15–40%"
+- Do NOT flag when the vendor IS the original manufacturer/provider (e.g., Microsoft quoting their own products, or a law firm quoting their own legal services)
+
 PAYMENT TERMS — CONTEXT AWARE:
 - Only recommend payment term improvements when it makes commercial sense
 - SKIP payment terms negotiation when:
@@ -488,17 +535,18 @@ SAVINGS CALCULATION — STRICT RULES:
 - Never inflate with risk protection or hypothetical worst-case values
 
 SAVINGS SANITY CHECK — VERIFY BEFORE RETURNING:
-- potential_savings MUST NOT be empty. Every quote has room for negotiation.
-- Total savings should be between 3% and 40% of total_commitment. Under 3% means you're not pushing hard enough. Over 40% means you're inflating.
-- Every savings amount must be in the SAME CURRENCY and ORDER OF MAGNITUDE as the deal. A €40,000 deal cannot have a €265 savings item as the main ask — that's less than 1%.
-- Format amounts consistently: "€4,000 saved" or "$2,500-$3,500 saved" — NEVER "€2" when you mean "€2,000", NEVER "€265" on a €40K deal as a primary savings.
-- At least ONE must_have ask MUST be a direct price reduction with a specific € or $ amount. No exceptions.
+- potential_savings should include realistic, defensible savings based on the quote.
+- If the quote looks fair and competitive, it's OK to have modest savings (5-10% range) or even minimal savings. Do NOT inflate.
+- Total savings MUST be less than 30% of total_commitment. If you exceed this, you are almost certainly inflating — cut back.
+- Every savings amount must be in the SAME CURRENCY as the deal.
+- Format amounts consistently: "€4,000 saved" or "$2,500-$3,500 saved".
+- Savings should be ANNUAL figures, not multi-year totals.
+- At least ONE must_have ask should be a price-related request with a specific € or $ target.
 
-PERCENTAGE DISCOUNT — ALWAYS APPLICABLE:
-- If no clear line-item overpricing exists, ALWAYS push for a package discount (use the savings target from classification)
-- Frame as: "Request X% overall discount in exchange for [signing quickly / longer commitment / case study / referral / early payment]"
-- Calculate the actual € or $ amount: "10% on €40K = €4,000 saved"
-- This applies to ALL quote types — there is ALWAYS room to ask
+PERCENTAGE DISCOUNT:
+- If no clear line-item overpricing exists, consider suggesting a 5-10% package discount.
+- Frame as: "Request X% overall discount in exchange for [fast signing / commitment / referral]"
+- Calculate the actual amount: "10% on €40K = €4,000/year saved"
 
 IF INFO IS MISSING: Frame as "This vagueness will cost you X%" NOT "please provide contact info"
 
@@ -517,9 +565,9 @@ Instead:
 - if only one issue matters, return ONE issue (not three)
 - never force extra asks just to fill a template
 
-Maximum red flags: 3 (only if truly justified)
+Red flags: flag ALL significant issues found — there is no maximum. Flag every pricing issue, legal risk, missing clause, and unfavorable term.
 Maximum must-have asks: 3 (should typically include price improvement)
-Minimum: 0 if nothing meaningful needs pushing
+Minimum red flags: 0 if nothing meaningful needs pushing
 
 ==================================================
 STEP 1: DETERMINE AUDIENCE
@@ -559,7 +607,7 @@ This dominant issue should inform your entire analysis.
 STEP 3: BE SELECTIVE WITH RED FLAGS
 ==================================================
 
-Return 0-3 red flags. Do NOT pad.
+Return ALL significant red flags found. Do NOT pad with low-value issues, but do NOT cap at an arbitrary number either. If a quote has 5 real issues, return 5.
 
 Rules:
 - Only include issues that genuinely matter commercially
@@ -593,13 +641,13 @@ CRITICAL: BE SPECIFIC TO THIS QUOTE
 STEP 4: SELECTIVE MUST-HAVE ASKS
 ==================================================
 
-Return 1-3 must-have asks. The FIRST must-have ask MUST ALWAYS be a price reduction.
+Return 1-3 must-have asks. Lead with the most impactful commercial ask.
 
 Rules:
-- MANDATORY: The first must_have item must be a direct price/cost reduction ask with a specific € or $ target amount
-- If line-item reductions are obvious, lead with the biggest one
-- If no obvious line-item wins, lead with a package discount ask at the target savings percentage
-- Each ask must be SPECIFIC to this quote with ACTUAL NUMBERS
+- The first must_have item should be a price/cost reduction ask with a specific € or $ target — but ONLY if the quote has clear overpricing
+- If the quote is mostly fair, the first ask can be about terms, flexibility, or protections instead
+- Each ask must be SPECIFIC to this quote with ACTUAL NUMBERS from the document
+- Savings targets must be REALISTIC — do not ask for more than 15-20% off any single line item unless there is clear evidence of extreme overpricing
 - Be ASSERTIVE and direct - start with action verbs
 - NEVER use: "Could we...", "Would you consider...", "Would it be possible to...", "Can we..."
 - Frame as confident recommendations: "Negotiate...", "Push for...", "Request...", "Lock in...", "Get...", "Secure..."
@@ -841,15 +889,6 @@ Return valid JSON only. Match this structure exactly:
     }
   ],
   "NOTE_CASHFLOW": "Include payment term improvements, risk protection clauses, liability caps, and other non-cash improvements here. Each must have type, recommendation, and category (cash_flow | risk_protection | liability). Omit if none relevant. NEVER include these in potential_savings.",
-  "score": 67,
-  "score_label": "Room to Negotiate",
-  "score_breakdown": {
-    "pricing_fairness": 28,
-    "terms_protections": 22,
-    "leverage_position": 17
-  },
-  "score_rationale": "20% ad management fee and no overage cap are the main drivers of risk here.",
-  "NOTE_SCORE": "See QUOTE SCORE CALCULATION section below for scoring rules.",
   "email_drafts": {
     "neutral": {"subject": "...", "body": "..."},
     "firm": {"subject": "...", "body": "..."},
@@ -865,7 +904,7 @@ CRITICAL REMINDERS:
 - Lead with the dominant issue
 - Adapt to business vs personal context
 - Only include price_insight if quote contains pricing signals
-- red_flags: 0-3 items (not always 3)
+- red_flags: flag ALL significant issues — no arbitrary cap
 - must_have asks: 1-3 items, FIRST ONE MUST be a price reduction with specific € or $ amount
 - potential_savings: MUST NOT be empty — always include at least one concrete savings item
 - If quote is mostly acceptable, say so clearly — but still push for a modest discount
@@ -876,52 +915,13 @@ FINAL SELF-CHECK (do this mentally before returning JSON)
 ==================================================
 
 Before returning your JSON response, verify ALL of these:
-1. Does total_commitment match what the quote ACTUALLY STATES? Did you accidentally double or halve it?
-2. Are potential_savings amounts realistic? Are they properly formatted (€4,000 not €4, €2,500 not €2)?
-3. Is the first must_have ask a direct price reduction with a specific € or $ amount?
-4. Are savings proportional to the deal? (3-40% of total, not 0.5% or 80%)
-5. Would a smart procurement person find this analysis sharp and useful, or generic and bland?
-6. Did you reference actual numbers from the quote (not made-up benchmarks)?
-
-==================================================
-QUOTE SCORE CALCULATION
-==================================================
-
-Calculate a score from 0-100 composed of three weighted components:
-
-1. PRICING FAIRNESS (0-50 points):
-   - Are rates at, below, or above market for this category?
-   - Are there hidden fees or unusual pricing structures?
-   - Is the total reasonable for the scope?
-   - 50 = at or below market, transparent pricing
-   - 0 = significantly above market, opaque or punitive fees
-
-2. TERMS AND PROTECTIONS (0-30 points):
-   - Reasonable cancellation clause? (30 days = good, 60+ days = bad)
-   - Auto-renewal addressed with adequate notice?
-   - Overage/excess fees capped or defined?
-   - Deliverables and SLAs clearly specified?
-   - Liability reasonably limited?
-   - 30 = all protections present and fair
-   - 0 = one-sided terms heavily favoring vendor
-
-3. LEVERAGE POSITION (0-20 points):
-   - Renewal (more leverage) or new purchase?
-   - Hard deadline creating pressure?
-   - Commitment length reasonable for the category?
-   - Competing alternatives in market?
-   - 20 = strong leverage, flexibility
-   - 0 = weak position, locked in, no alternatives
-
-score = pricing_fairness + terms_protections + leverage_position
-
-SCORE LABELS:
-- 80-100: "Mostly Fair"
-- 60-79: "Room to Negotiate"
-- 40-59: "Overpriced"
-- 0-39: "High Risk"
-
-score_rationale: One punchy sentence explaining the biggest factor dragging the score down (or up if mostly fair).
+1. Does total_commitment match what the quote ACTUALLY STATES? Did you accidentally double or halve it? Can you point to the exact line in the quote where this number appears or show the exact calculation?
+2. Did you INVENT any numbers? Every amount in your output must trace back to a specific number in the quote. If you cannot, remove it.
+3. Are potential_savings amounts realistic? Are they properly formatted (€4,000 not €4, €2,500 not €2)?
+4. Is the first must_have ask a direct price reduction with a specific € or $ amount?
+5. Are savings proportional to the deal? (under 30% of total — if over 30% you are inflating, cut back)
+6. Is the currency consistent throughout? (all USD or all EUR, never mixed)
+7. If term length was not stated in the quote, did you flag it as missing information instead of assuming?
 
 ==================================================
 EMAIL GENERATION RULES
@@ -1093,7 +1093,7 @@ OUTPUT SCHEMA:
       "if_they_push_back": "Fallback position"
     }
   ],
-  "NOTE_RED_FLAGS": "0-3 items only. Focus on $ impact, not admin stuff",
+  "NOTE_RED_FLAGS": "Flag ALL significant issues. Focus on $ impact, not admin stuff",
 
   "what_to_ask_for": {
     "must_have": ["Could we... bullets - 1-4 items, ALWAYS include price/savings angle"],
@@ -1146,7 +1146,7 @@ OUTPUT SCHEMA:
 CRITICAL RULES:
 - quote_snapshot: Clear summary of what the deal is
 - quick_read: What's good/bad + sharp conclusion
-- red_flags: 0-3 items, focus on $ impact
+- red_flags: flag ALL significant issues, focus on $ impact
 - what_to_ask_for: ALWAYS include price/savings in must_have
 - Price analysis comes FIRST if quote includes pricing
 - Focus on commercial leverage, not admin clarity
@@ -1154,6 +1154,155 @@ CRITICAL RULES:
 - Skip generic advice unless it has direct $ impact
 
 Return ONLY valid JSON. Be commercially sharp.`
+
+// ==================================================
+// DETERMINISTIC QUOTE SCORE CALCULATION
+// ==================================================
+
+type DeductionItem = { points: number; reason: string }
+
+function getSeverity(flag: { issue: string; why_it_matters: string; type: string }): 'HIGH' | 'MEDIUM' | 'LOW' {
+  const text = `${flag.issue} ${flag.why_it_matters}`.toLowerCase()
+  const amounts = flag.why_it_matters.match(/[\d,]+/g)?.map(s => parseInt(s.replace(/,/g, ''), 10)).filter(n => !isNaN(n) && n > 0) || []
+  const maxAmount = Math.max(...amounts, 0)
+  if (maxAmount > 10000 || text.includes('double') || text.includes('significant') || text.includes('major')) return 'HIGH'
+  if (maxAmount > 2000 || text.includes('above market') || text.includes('au-dessus')) return 'MEDIUM'
+  return 'LOW'
+}
+
+const SEVERITY_POINTS: Record<string, number> = { HIGH: 15, MEDIUM: 8, LOW: 3 }
+
+function classifyFlag(flag: { issue: string; why_it_matters: string; type: string }): 'pricing' | 'terms' | 'leverage' {
+  const text = `${flag.issue} ${flag.why_it_matters} ${flag.type}`.toLowerCase()
+
+  const pricingKeywords = ['price', 'cost', 'fee', 'rate', 'discount', 'overpay', 'markup', 'tarif', 'prix', 'surcoût', 'frais', 'volume', 'seat', 'licence', 'license', 'retainer', 'mandat']
+  const termsKeywords = ['cancel', 'renewal', 'auto-renew', 'lock', 'notice', 'escalat', 'liability', 'penalty', 'terminat', 'résiliation', 'renouvellement', 'préavis', 'clause', 'contract', 'contrat']
+
+  if (pricingKeywords.some(k => text.includes(k))) return 'pricing'
+  if (termsKeywords.some(k => text.includes(k))) return 'terms'
+  return 'pricing' // default to pricing if unclear
+}
+
+function calculateQuoteScore(output: DealOutputType): {
+  score: number
+  score_label: string
+  score_breakdown: {
+    pricing_fairness: number; terms_protections: number; leverage_position: number
+    pricing_deductions: DeductionItem[]; terms_deductions: DeductionItem[]; leverage_deductions: DeductionItem[]
+  }
+  score_rationale: string
+} {
+  const pricingItems: DeductionItem[] = []
+  const termsItems: DeductionItem[] = []
+  const leverageItems: DeductionItem[] = []
+
+  const allText = JSON.stringify(output).toLowerCase()
+
+  // --- STEP 1: Score EVERY red flag by severity and classify into category ---
+  for (const flag of output.red_flags || []) {
+    if (flag.type?.toLowerCase() === 'source insight') continue
+
+    const severity = getSeverity(flag)
+    const points = SEVERITY_POINTS[severity]
+    const category = classifyFlag(flag)
+
+    if (category === 'pricing') {
+      pricingItems.push({ points, reason: flag.issue })
+    } else if (category === 'terms') {
+      termsItems.push({ points, reason: flag.issue })
+    }
+  }
+
+  // --- STEP 2: Additional pricing signals from savings % ---
+  const totalCommitment = output.snapshot?.total_commitment || ''
+  const commitNum = parseFloat(totalCommitment.replace(/[^\d.]/g, '')) || 0
+  const totalSavings = (output.potential_savings || []).reduce((sum, s) => {
+    return sum + (parseFloat((s.annual_impact || '').replace(/[^\d.]/g, '')) || 0)
+  }, 0)
+
+  if (commitNum > 0 && totalSavings > 0) {
+    const savingsPct = (totalSavings / commitNum) * 100
+    if (savingsPct > 20) pricingItems.push({ points: 8, reason: `Savings exceed 20% of contract value (${Math.round(savingsPct)}%)` })
+    else if (savingsPct > 10) pricingItems.push({ points: 4, reason: `Savings exceed 10% of contract value (${Math.round(savingsPct)}%)` })
+  }
+
+  // --- STEP 3: Terms signals from whats_concerning ---
+  for (const concern of output.quick_read?.whats_concerning || []) {
+    const text = concern.toLowerCase()
+    if (text.includes('auto-renew') || text.includes('renouvellement auto')) termsItems.push({ points: 5, reason: concern })
+    else if (text.includes('cancel') || text.includes('résiliation')) termsItems.push({ points: 5, reason: concern })
+    else if (text.includes('escalat') || text.includes('augmentation')) termsItems.push({ points: 5, reason: concern })
+    else if (text.includes('notice') || text.includes('préavis')) termsItems.push({ points: 3, reason: concern })
+  }
+
+  let pricingDeduction = Math.min(pricingItems.reduce((s, i) => s + i.points, 0), 50)
+  let termsDeduction = Math.min(termsItems.reduce((s, i) => s + i.points, 0), 30)
+
+  // --- LEVERAGE POSITION (max deduction: 20) ---
+  if (allText.includes('lock-in') || allText.includes('locked in') || allText.includes('verrouillé'))
+    leverageItems.push({ points: 7, reason: 'Lock-in clause limits flexibility' })
+  if (allText.includes('sole provider') || allText.includes('no alternative') || allText.includes('seul fournisseur'))
+    leverageItems.push({ points: 8, reason: 'No competing alternatives mentioned' })
+
+  const termText = (output.snapshot?.term || '').toLowerCase()
+  if (termText.includes('24') || termText.includes('36') || termText.includes('2 year') || termText.includes('3 year') ||
+    termText.includes('2 ans') || termText.includes('3 ans'))
+    leverageItems.push({ points: 5, reason: 'Long commitment term (>12 months)' })
+
+  if (allText.includes('upfront') || allText.includes('annual in advance') || allText.includes('avance'))
+    leverageItems.push({ points: 5, reason: 'Upfront or advance payment required' })
+
+  if (output.snapshot?.signing_deadline)
+    leverageItems.push({ points: 3, reason: 'Signing deadline creates time pressure' })
+
+  let leverageDeduction = Math.min(leverageItems.reduce((s, i) => s + i.points, 0), 20)
+
+  // --- CALCULATE FINAL SCORE (floor 5, cap 98) ---
+  const pricingScore = Math.max(0, 50 - pricingDeduction)
+  const termsScore = Math.max(0, 30 - termsDeduction)
+  const leverageScore = Math.max(0, 20 - leverageDeduction)
+  const rawScore = pricingScore + termsScore + leverageScore
+  const totalScore = Math.max(5, Math.min(98, rawScore))
+
+  let label: string
+  if (totalScore >= 85) label = 'Strong deal'
+  else if (totalScore >= 65) label = 'Negotiate a few points'
+  else if (totalScore >= 40) label = 'Overpriced'
+  else label = 'Walk away'
+
+  // Build rationale from the biggest area + flag count
+  const biggestArea = pricingDeduction >= termsDeduction && pricingDeduction >= leverageDeduction
+    ? 'pricing' : termsDeduction >= leverageDeduction ? 'terms' : 'leverage'
+
+  let rationale: string
+  if (totalScore >= 85) {
+    rationale = 'Deal terms are broadly fair with minor optimization possible.'
+  } else if (biggestArea === 'pricing') {
+    const count = pricingItems.length
+    const topReason = pricingItems.length > 0 ? pricingItems[0].reason : 'Pricing is above market'
+    rationale = count > 1 ? `${count} pricing issues found — ${topReason}` : topReason
+  } else if (biggestArea === 'terms') {
+    const count = termsItems.length
+    const topReason = termsItems.length > 0 ? termsItems[0].reason : 'Contract terms favor the vendor'
+    rationale = count > 1 ? `${count} terms issues found — ${topReason}` : topReason
+  } else {
+    rationale = leverageItems.length > 0 ? leverageItems[0].reason : 'Weak negotiation position.'
+  }
+
+  return {
+    score: totalScore,
+    score_label: label,
+    score_breakdown: {
+      pricing_fairness: pricingScore,
+      terms_protections: termsScore,
+      leverage_position: leverageScore,
+      pricing_deductions: pricingItems,
+      terms_deductions: termsItems,
+      leverage_deductions: leverageItems,
+    },
+    score_rationale: rationale,
+  }
+}
 
 export async function analyzeDeal(
   extractedText: string,
@@ -1281,7 +1430,14 @@ export async function analyzeDeal(
     const parsed = parseJsonFromContent(content)
     const validated = DealOutputSchema.parse(parsed)
 
-    return validated
+    // Calculate deterministic quote score from analysis output
+    const scoreData = calculateQuoteScore(validated)
+    const withScore = {
+      ...validated,
+      ...scoreData,
+    }
+
+    return withScore
   } catch (error) {
     // CRITICAL: Never expose raw error messages - they may contain API keys in headers
     console.error('AI analysis error:', error)

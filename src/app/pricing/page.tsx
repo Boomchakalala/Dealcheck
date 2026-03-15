@@ -1,9 +1,16 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { CheckCircle2, Sparkles, ArrowRight, X } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { UpgradeButton } from '@/components/UpgradeButton'
+
+export const metadata: Metadata = {
+  title: 'Pricing — TermLift | Start Free, Upgrade When Ready',
+  description: 'TermLift is free to try — no credit card needed. Upgrade to Pro for unlimited vendor quote analyses, spend tracking, and deal history from €39/month.',
+  alternates: { canonical: 'https://www.termlift.com/pricing' },
+}
 
 export default async function PricingPage() {
   const t = await getTranslations()
@@ -44,8 +51,8 @@ export default async function PricingPage() {
               </p>
             </div>
 
-            {/* 3-Tier Grid */}
-            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {/* 2-Tier Grid (Business hidden — restore later) */}
+            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
 
               {/* Starter (Free) */}
               <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-7 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300">
@@ -102,7 +109,7 @@ export default async function PricingPage() {
                 />
               </div>
 
-              {/* Business (€149/mo) */}
+              {/* Business (€149/mo) — HIDDEN: uncomment to restore
               <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-7 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300">
                 <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">{t('pricing.business')}</p>
                 <div className="mb-5">
@@ -127,6 +134,7 @@ export default async function PricingPage() {
                   {t('pricing.comingSoon')}
                 </button>
               </div>
+              */}
             </div>
           </div>
 
@@ -148,24 +156,20 @@ export default async function PricingPage() {
                 <tr className="border-b-2 border-slate-200">
                   <th className="text-left py-4 pr-4 font-semibold text-slate-900">{t('pricingPage.feature')}</th>
                   <th className="text-center py-4 px-4 font-semibold text-slate-900">{t('pricing.starter')}</th>
-                  <th className="text-center py-4 px-4 font-semibold text-emerald-700 bg-emerald-50/50 rounded-t-lg">{t('pricing.pro')}</th>
-                  <th className="text-center py-4 pl-4 font-semibold text-slate-900">{t('pricing.business')}</th>
+                  <th className="text-center py-4 pl-4 font-semibold text-emerald-700 bg-emerald-50/50 rounded-t-lg">{t('pricing.pro')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {[
-                  { feature: t('pricingPage.aiAnalyses'), starter: t('pricingPage.fourTotal'), pro: t('pricingPage.unlimited'), business: t('pricingPage.unlimited') },
-                  { feature: t('pricingPage.redFlagsNegotiation'), starter: true, pro: true, business: true },
-                  { feature: t('pricingPage.emailDrafts3Tones'), starter: true, pro: true, business: true },
-                  { feature: t('pricingPage.pdfImageTextInput'), starter: true, pro: true, business: true },
-                  { feature: t('pricingPage.multiRoundTracking'), starter: false, pro: true, business: true },
-                  { feature: t('pricingPage.personalDashboard'), starter: false, pro: true, business: true },
-                  { feature: t('pricingPage.savingsTracking'), starter: false, pro: true, business: true },
-                  { feature: t('pricingPage.dealHistory'), starter: t('pricingPage.none'), pro: t('pricingPage.ninetyDays'), business: t('pricingPage.oneYear') },
-                  { feature: t('pricingPage.userSeats'), starter: t('pricingPage.one'), pro: t('pricingPage.one'), business: t('pricingPage.upTo3') },
-                  { feature: t('pricingPage.sharedWorkspace'), starter: false, pro: false, business: true },
-                  { feature: t('pricingPage.exportPdf'), starter: false, pro: false, business: true },
-                  { feature: t('pricingPage.priorityAi'), starter: false, pro: false, business: true },
+                  { feature: t('pricingPage.aiAnalyses'), starter: t('pricingPage.fourTotal'), pro: t('pricingPage.unlimited') },
+                  { feature: t('pricingPage.redFlagsNegotiation'), starter: true, pro: true },
+                  { feature: t('pricingPage.emailDrafts3Tones'), starter: true, pro: true },
+                  { feature: t('pricingPage.pdfImageTextInput'), starter: true, pro: true },
+                  { feature: t('pricingPage.multiRoundTracking'), starter: false, pro: true },
+                  { feature: t('pricingPage.personalDashboard'), starter: false, pro: true },
+                  { feature: t('pricingPage.savingsTracking'), starter: false, pro: true },
+                  { feature: t('pricingPage.dealHistory'), starter: t('pricingPage.none'), pro: t('pricingPage.ninetyDays') },
+                  { feature: t('pricingPage.userSeats'), starter: t('pricingPage.one'), pro: t('pricingPage.one') },
                 ].map((row) => (
                   <tr key={row.feature}>
                     <td className="py-3.5 pr-4 text-slate-700 font-medium">{row.feature}</td>
@@ -174,15 +178,10 @@ export default async function PricingPage() {
                         row.starter ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto" /> : <X className="w-4 h-4 text-slate-300 mx-auto" />
                       ) : <span className="text-slate-600">{row.starter}</span>}
                     </td>
-                    <td className="py-3.5 px-4 text-center bg-emerald-50/30">
+                    <td className="py-3.5 pl-4 text-center bg-emerald-50/30">
                       {typeof row.pro === 'boolean' ? (
                         row.pro ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto" /> : <X className="w-4 h-4 text-slate-300 mx-auto" />
                       ) : <span className="text-slate-600 font-medium">{row.pro}</span>}
-                    </td>
-                    <td className="py-3.5 pl-4 text-center">
-                      {typeof row.business === 'boolean' ? (
-                        row.business ? <CheckCircle2 className="w-4 h-4 text-emerald-500 mx-auto" /> : <X className="w-4 h-4 text-slate-300 mx-auto" />
-                      ) : <span className="text-slate-600">{row.business}</span>}
                     </td>
                   </tr>
                 ))}

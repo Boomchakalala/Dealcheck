@@ -391,17 +391,17 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
             <h3 className="text-sm font-bold text-slate-900 mb-3">{locale === 'fr' ? 'Score moyen' : 'Avg Score'}</h3>
             {averageQuoteScore != null && averageQuoteScore > 0 ? (() => {
               const s = Math.round(averageQuoteScore)
-              const color = s >= 80 ? 'text-emerald-600 stroke-emerald-500 stroke-emerald-100'
-                : s >= 60 ? 'text-amber-600 stroke-amber-500 stroke-amber-100'
+              const color = s >= 85 ? 'text-emerald-600 stroke-emerald-500 stroke-emerald-100'
+                : s >= 65 ? 'text-amber-600 stroke-amber-500 stroke-amber-100'
                 : s >= 40 ? 'text-orange-600 stroke-orange-500 stroke-orange-100'
                 : 'text-red-600 stroke-red-500 stroke-red-100'
               const colors = color.split(' ')
               const circ = 2 * Math.PI * 36
               const dash = (s / 100) * circ
-              const label = s >= 80 ? (locale === 'fr' ? 'Équitable' : 'Mostly Fair')
-                : s >= 60 ? (locale === 'fr' ? 'Négociable' : 'Room to Negotiate')
+              const label = s >= 85 ? (locale === 'fr' ? 'Bon deal' : 'Strong deal')
+                : s >= 65 ? (locale === 'fr' ? 'Négociable' : 'Negotiate a few points')
                 : s >= 40 ? (locale === 'fr' ? 'Surcoté' : 'Overpriced')
-                : (locale === 'fr' ? 'Risque élevé' : 'High Risk')
+                : (locale === 'fr' ? 'À fuir' : 'Walk away')
               return (
                 <>
                   <svg width="88" height="88" viewBox="0 0 88 88" className="-rotate-90 mb-2">

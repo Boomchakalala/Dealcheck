@@ -7,6 +7,7 @@ export const metadata: Metadata = {
     title: 'Security — TermLift',
     description: 'How TermLift handles your data. Files deleted after analysis, encrypted in transit and at rest, never used for AI training.',
   },
+  alternates: { canonical: 'https://www.termlift.com/security' },
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {

@@ -202,6 +202,9 @@ export type DealOutput = {
     pricing_fairness: number
     terms_protections: number
     leverage_position: number
+    pricing_deductions?: Array<{ points: number; reason: string }>
+    terms_deductions?: Array<{ points: number; reason: string }>
+    leverage_deductions?: Array<{ points: number; reason: string }>
   }
   score_rationale?: string
   email_drafts: {

@@ -66,24 +66,33 @@ function formatSavings(amount: number, locale: string, currencyHint?: string): s
 
 function parseSavingsNumber(str: string): number {
   if (!str) return 0
-  // Remove currency symbols and text
-  let cleaned = str.replace(/[€$£¥]/g, '').replace(/saved|économisés?|potentiel|per year|\/year|\/yr|\/an/gi, '').trim()
-  // Handle K/M suffixes: "2.5K" → 2500, "1.2M" → 1200000
-  const kmMatch = cleaned.match(/([\d.,\s]+)\s*([KkMm])/)
+
+  // Handle K/M suffixes first
+  const kmMatch = str.match(/([\d.,\s]+)\s*([KkMm])/)
   if (kmMatch) {
-    const num = parseFloat(kmMatch[1].replace(/[\s,]/g, '').replace(/\.(?=.*\.)/, ''))
+    const num = parseFloat(kmMatch[1].replace(/[\s,]/g, ''))
     const suffix = kmMatch[2].toUpperCase()
     if (suffix === 'K') return num * 1000
     if (suffix === 'M') return num * 1000000
   }
-  // Handle French format: "2 000" or "16 800" (spaces as thousands separators)
-  // Handle European format: "2.000" (dots as thousands separators with no decimals)
-  // Handle standard: "2,000" or "16,800"
-  cleaned = cleaned.replace(/\s/g, '') // remove all spaces first
-  // If pattern is like 2.000 (dot as thousands sep, no decimal), convert
-  if (/^\d{1,3}(\.\d{3})+$/.test(cleaned)) {
-    cleaned = cleaned.replace(/\./g, '')
+
+  // Check for range: "3,000-6,000" or "3 000–6 000" — take midpoint
+  const rangeMatch = str.match(/([\d.,\s]+)[-–—]\s*([\d.,\s]+)/)
+  if (rangeMatch) {
+    const parse = (s: string) => {
+      let n = s.replace(/[€$£¥\s]/g, '').replace(/,/g, '')
+      if (/^\d{1,3}(\.\d{3})+$/.test(n)) n = n.replace(/\./g, '')
+      return parseFloat(n)
+    }
+    const a = parse(rangeMatch[1]), b = parse(rangeMatch[2])
+    if (!isNaN(a) && !isNaN(b) && a > 0 && b > 0) return (a + b) / 2
+    if (!isNaN(a) && a > 0) return a
   }
+
+  // Single number
+  let cleaned = str.replace(/[€$£¥]/g, '').replace(/saved|économisés?|potentiel|per year|\/year|\/yr|\/an|over contract life/gi, '').trim()
+  cleaned = cleaned.replace(/\s/g, '')
+  if (/^\d{1,3}(\.\d{3})+$/.test(cleaned)) cleaned = cleaned.replace(/\./g, '')
   cleaned = cleaned.replace(/,/g, '')
   const num = parseFloat(cleaned)
   return isNaN(num) ? 0 : num
@@ -183,78 +192,122 @@ export function DealListClient({ deals }: DealListClientProps) {
           const achievedSavings = deal.savings_amount || 0
           const savingsToShow = isClosed && achievedSavings > 0 ? achievedSavings : potentialSavings
 
+          // Determine negotiation step: 1=Analyzed, 2=Negotiating, 3=Closed
+          const step = isClosed ? 3 : roundCount > 1 ? 2 : 1
+
+          // Left border color based on score
+          const borderColor = quoteScore == null ? 'border-l-slate-300'
+            : quoteScore >= 85 ? 'border-l-emerald-500'
+            : quoteScore >= 65 ? 'border-l-amber-500'
+            : quoteScore >= 40 ? 'border-l-orange-500'
+            : 'border-l-red-500'
+
           return (
             <Link key={deal.id} href={`/app/deal/${deal.id}`}>
-              <div className={`bg-white rounded-xl border border-slate-200 border-l-[3px] ${status.border} px-5 py-4 hover:shadow-md hover:border-slate-300 transition-all cursor-pointer group ${deletingId === deal.id ? 'opacity-50' : ''}`}>
-                <div className="flex items-center gap-4">
+              <div className={`bg-white rounded-xl border border-slate-200 border-l-4 ${borderColor} px-5 py-4 hover:shadow-lg transition-all cursor-pointer group ${deletingId === deal.id ? 'opacity-50' : ''}`}>
+                <div className="flex items-start gap-4">
 
-                  {/* Left: vendor + category */}
+                  {/* Left: vendor + category + meta */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2.5 mb-1 flex-wrap">
-                      <h3 className="text-[15px] font-bold text-slate-900 group-hover:text-emerald-700 transition-colors break-words">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h3 className="text-base font-semibold text-slate-900 group-hover:text-emerald-700 transition-colors break-words">
                         {vendorName}
                       </h3>
-                      {quoteScore != null && (
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0 ${
-                          quoteScore >= 80 ? 'bg-emerald-100 text-emerald-700' :
-                          quoteScore >= 60 ? 'bg-amber-100 text-amber-700' :
-                          quoteScore >= 40 ? 'bg-orange-100 text-orange-700' :
-                          'bg-red-100 text-red-700'
-                        }`} title={`${quoteScore}/100 — ${scoreLabel || ''}`}>
-                          {quoteScore}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                          isClosed ? 'bg-slate-100 text-slate-500' :
+                          roundCount === 0 ? 'bg-blue-50 text-blue-600' :
+                          'bg-emerald-50 text-emerald-600'
+                        }`}>
+                          {status.label}
                         </span>
-                      )}
-                      <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border flex-shrink-0 ${status.badge}`}>
-                        {status.icon}{status.label}
-                      </span>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <DealMenu
+                            dealId={deal.id} isClosed={!!isClosed} totalCommitment={totalCommitment}
+                            roundCount={roundCount} hasSavings={achievedSavings > 0}
+                            onClose={handleClose} onDelete={handleDelete} t={t}
+                          />
+                        </div>
+                      </div>
                     </div>
                     {category && (
-                      <p className="text-[11px] text-slate-400 font-medium mb-1.5">{category}</p>
+                      <span className="inline-flex text-[10px] text-slate-400 font-medium bg-slate-50 px-2 py-0.5 rounded-full mb-2">{category}</span>
                     )}
-                    <div className="flex items-center gap-3 text-[11px] text-slate-400">
-                      {redFlagCount > 0 && (
-                        <span className="inline-flex items-center gap-1 text-red-500 font-medium">
-                          <AlertTriangle className="w-3 h-3" />{redFlagCount}
-                        </span>
-                      )}
+                    <div className="flex items-center gap-2 text-[11px] text-slate-400">
                       <span>{t(roundCount !== 1 ? 'time.rounds' : 'time.round', { count: roundCount })}</span>
+                      <span className="text-slate-300">·</span>
                       <span>{getTimeAgo(deal.updated_at, t, locale)}</span>
+                    </div>
+
+                    {/* Negotiation progress steps */}
+                    <div className="flex items-center gap-1 mt-2.5">
+                      {[1, 2, 3].map((s) => (
+                        <div key={s} className="flex items-center gap-1">
+                          <div className={`w-2 h-2 rounded-full ${s <= step ? 'bg-emerald-500' : 'bg-slate-200'}`} />
+                          {s < 3 && <div className={`w-4 h-px ${s < step ? 'bg-emerald-400' : 'bg-slate-200'}`} />}
+                        </div>
+                      ))}
+                      <span className="text-[9px] text-slate-400 ml-1">
+                        {step === 1 ? (locale === 'fr' ? 'Analysé' : 'Analyzed')
+                          : step === 2 ? (locale === 'fr' ? 'En négociation' : 'Negotiating')
+                          : (locale === 'fr' ? 'Clôturé' : 'Closed')}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Right: value + savings + menu */}
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <div className="text-right">
-                      {totalCommitment && (
-                        <p className="text-base font-bold text-slate-900">{formatAmount(totalCommitment)}</p>
-                      )}
-                      {savingsToShow > 0 && (() => {
-                        const totalAmount = parseSavingsNumber(totalCommitment || '0')
-                        const savingsPct = totalAmount > 0 ? (savingsToShow / totalAmount) * 100 : 0
-                        const isMeaningful = savingsToShow >= 100 && savingsPct >= 1
+                  {/* Right: value + savings + score */}
+                  <div className="text-right flex-shrink-0 space-y-1.5">
+                    {totalCommitment && (
+                      <p className="text-base font-bold text-slate-900">{formatAmount(totalCommitment)}</p>
+                    )}
+                    {savingsToShow > 0 && (() => {
+                      const totalAmount = parseSavingsNumber(totalCommitment || '0')
+                      const savingsPct = totalAmount > 0 ? (savingsToShow / totalAmount) * 100 : 0
+                      const isMeaningful = savingsToShow >= 100 && savingsPct >= 1
 
-                        if (isClosed && achievedSavings > 0) {
-                          return (
-                            <p className="text-xs font-semibold text-emerald-600 mt-0.5">
-                              {formatSavings(savingsToShow, locale, totalCommitment)} {locale === 'fr' ? 'économisés' : 'saved'}
-                            </p>
-                          )
-                        }
-                        if (isMeaningful) {
-                          return (
-                            <p className="text-xs font-semibold text-emerald-600 mt-0.5">
-                              {formatSavings(savingsToShow, locale, totalCommitment)} {locale === 'fr' ? 'potentiel' : 'potential'}
-                            </p>
-                          )
-                        }
-                        return null
-                      })()}
-                    </div>
-                    <DealMenu
-                      dealId={deal.id} isClosed={!!isClosed} totalCommitment={totalCommitment}
-                      roundCount={roundCount} hasSavings={achievedSavings > 0}
-                      onClose={handleClose} onDelete={handleDelete} t={t}
-                    />
+                      if (isClosed && achievedSavings > 0) {
+                        return (
+                          <span className="inline-flex text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                            {formatSavings(savingsToShow, locale, totalCommitment)} {locale === 'fr' ? 'économisés' : 'saved'}
+                          </span>
+                        )
+                      }
+                      if (isMeaningful) {
+                        return (
+                          <span className="inline-flex text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                            {formatSavings(savingsToShow, locale, totalCommitment)} {locale === 'fr' ? 'potentiel' : 'potential'}
+                          </span>
+                        )
+                      }
+                      return null
+                    })()}
+                    {quoteScore != null && (() => {
+                      const sc = quoteScore
+                      const ringColor = sc >= 85 ? 'stroke-emerald-500' : sc >= 65 ? 'stroke-amber-500' : sc >= 40 ? 'stroke-orange-500' : 'stroke-red-500'
+                      const trackColor = sc >= 85 ? 'stroke-emerald-100' : sc >= 65 ? 'stroke-amber-100' : sc >= 40 ? 'stroke-orange-100' : 'stroke-red-100'
+                      const textColor = sc >= 85 ? 'text-emerald-600' : sc >= 65 ? 'text-amber-600' : sc >= 40 ? 'text-orange-600' : 'text-red-600'
+                      const circ = 2 * Math.PI * 15
+                      const dash = (sc / 100) * circ
+                      const lbl = sc >= 85 ? (locale === 'fr' ? 'Bon deal' : 'Strong')
+                        : sc >= 65 ? (locale === 'fr' ? 'Négociable' : 'Negotiate')
+                        : sc >= 40 ? (locale === 'fr' ? 'Surcoté' : 'Overpriced')
+                        : (locale === 'fr' ? 'À fuir' : 'Walk away')
+                      return (
+                        <div className="flex items-center justify-end gap-1.5 mt-0.5">
+                          <svg width="36" height="36" viewBox="0 0 36 36" className="-rotate-90 flex-shrink-0">
+                            <circle cx="18" cy="18" r="15" fill="none" className={trackColor} strokeWidth="3" />
+                            <circle cx="18" cy="18" r="15" fill="none" className={ringColor} strokeWidth="3"
+                              strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
+                            />
+                            <text x="18" y="18" textAnchor="middle" dominantBaseline="central"
+                              className={`${textColor} text-[9px] font-extrabold rotate-90 fill-current`}
+                              style={{ transformOrigin: 'center' }}
+                            >{sc}</text>
+                          </svg>
+                          <span className={`text-[10px] font-bold ${textColor}`}>{lbl}</span>
+                        </div>
+                      )
+                    })()}
                   </div>
                 </div>
               </div>

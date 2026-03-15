@@ -38,7 +38,7 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
  * Animates a number counting up from 0 when scrolled into view.
  */
 export function useCountUp(target: number, duration = 1200) {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(target)
   const [hasStarted, setHasStarted] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 

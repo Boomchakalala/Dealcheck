@@ -27,6 +27,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
   const [activeEmailTab, setActiveEmailTab] = useState(0)
   const [selectedFlagTab, setSelectedFlagTab] = useState<Record<number, 'ask' | 'fallback'>>({})
   const [addressedFlags, setAddressedFlags] = useState<number[]>([])
+  const [showAllFlags, setShowAllFlags] = useState(false)
   const [copiedAsk, setCopiedAsk] = useState<number | null>(null)
   const [copiedCol, setCopiedCol] = useState<string | null>(null)
   const t = useT()
@@ -72,11 +73,13 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
 
   // Parse a single annual_impact string to a number
   // Handles: "$1,000", "€2 000", "2.5K", "1.2M", "3,000 saved", "16 800 €/an"
+  // For ranges like "$3,000-6,000", takes the midpoint
   const parseSavingsAmount = (text: string): number => {
     if (!text || typeof text !== 'string') return 0
-    // Remove currency symbols and text suffixes
-    let cleaned = text.replace(/[€$£¥]/g, '').replace(/saved|économisés?|potentiel|per year|\/year|\/yr|\/an/gi, '').trim()
-    // Handle K/M suffixes
+    // Remove currency symbols
+    let cleaned = text.replace(/[€$£¥]/g, '').trim()
+
+    // Handle K/M suffixes first (e.g., "2.5K", "1.2M")
     const kmMatch = cleaned.match(/([\d.,\s]+)\s*([KkMm])/)
     if (kmMatch) {
       const num = parseFloat(kmMatch[1].replace(/[\s,]/g, ''))
@@ -84,10 +87,27 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
       if (suffix === 'K') return num * 1000
       if (suffix === 'M') return num * 1000000
     }
-    // Remove spaces (French thousands separator), then handle dots/commas
+
+    // Check for range pattern FIRST: "3,000-6,000" or "3 000-6 000" — take midpoint
+    const rangeMatch = text.match(/[\d.,\s]+[-–—to]+\s*[\d.,\s]+/)
+    if (rangeMatch) {
+      const parts = rangeMatch[0].split(/[-–—]|to/i).map(p => {
+        let n = p.replace(/[€$£¥]/g, '').replace(/\s/g, '').replace(/,/g, '')
+        if (/^\d{1,3}(\.\d{3})+$/.test(n)) n = n.replace(/\./g, '')
+        return parseFloat(n)
+      }).filter(n => !isNaN(n) && n > 0)
+      if (parts.length >= 2) return (parts[0] + parts[1]) / 2
+      if (parts.length === 1) return parts[0]
+    }
+
+    // Single number: strip everything non-numeric
+    // Remove text suffixes
+    cleaned = cleaned.replace(/saved|économisés?|potentiel|per year|\/year|\/yr|\/an|over contract life/gi, '').trim()
+    // Remove spaces (French thousands), handle dots as thousands sep
     cleaned = cleaned.replace(/\s/g, '')
-    if (/^\d{1,3}(\.\d{3})+$/.test(cleaned)) cleaned = cleaned.replace(/\./g, '') // dot as thousands sep
+    if (/^\d{1,3}(\.\d{3})+$/.test(cleaned)) cleaned = cleaned.replace(/\./g, '')
     cleaned = cleaned.replace(/,/g, '')
+    // Only parse if it looks like a clean number now
     const num = parseFloat(cleaned)
     return isNaN(num) ? 0 : num
   }
@@ -220,7 +240,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
       {/* METRIC CARDS ROW — hidden when inside deal page */}
       {!hideHeader && <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {/* Total Commitment Card */}
-        <div className="bg-white rounded-xl border-2 border-slate-200 p-5 shadow-sm">
+        <div className="bg-white rounded-xl border-2 border-slate-200 p-5 shadow-sm flex flex-col">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
               <DollarSign className="w-4 h-4 text-slate-600" />
@@ -236,7 +256,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
         </div>
 
         {/* Red Flags Card */}
-        <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl border-2 border-red-200 p-5 shadow-sm">
+        <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl border-2 border-red-200 p-5 shadow-sm flex flex-col">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
               <AlertTriangle className="w-4 h-4 text-red-600" />
@@ -255,7 +275,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
         </div>
 
         {/* Potential Savings Card */}
-        <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200 p-5 shadow-sm">
+        <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200 p-5 shadow-sm flex flex-col">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
               <TrendingUp className="w-4 h-4 text-emerald-600" />
@@ -283,40 +303,40 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
         {/* Quote Score Card */}
         {output.score != null && (() => {
           const score = output.score
-          const scoreColor = score >= 80 ? { bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200', text: 'text-emerald-700', ring: 'stroke-emerald-500', track: 'stroke-emerald-100', label: 'bg-emerald-100 text-emerald-700' }
-            : score >= 60 ? { bg: 'from-amber-50 to-yellow-50', border: 'border-amber-200', text: 'text-amber-700', ring: 'stroke-amber-500', track: 'stroke-amber-100', label: 'bg-amber-100 text-amber-700' }
+          const scoreColor = score >= 85 ? { bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200', text: 'text-emerald-700', ring: 'stroke-emerald-500', track: 'stroke-emerald-100', label: 'bg-emerald-100 text-emerald-700' }
+            : score >= 65 ? { bg: 'from-amber-50 to-yellow-50', border: 'border-amber-200', text: 'text-amber-700', ring: 'stroke-amber-500', track: 'stroke-amber-100', label: 'bg-amber-100 text-amber-700' }
             : score >= 40 ? { bg: 'from-orange-50 to-amber-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100', label: 'bg-orange-100 text-orange-700' }
             : { bg: 'from-red-50 to-pink-50', border: 'border-red-200', text: 'text-red-700', ring: 'stroke-red-500', track: 'stroke-red-100', label: 'bg-red-100 text-red-700' }
 
-          const circumference = 2 * Math.PI * 28
+          const circumference = 2 * Math.PI * 34
           const dashLength = (score / 100) * circumference
 
           return (
-            <div className={`bg-gradient-to-br ${scoreColor.bg} rounded-xl border-2 ${scoreColor.border} p-5 shadow-sm`}>
+            <div className={`bg-gradient-to-br ${scoreColor.bg} rounded-xl border-2 ${scoreColor.border} p-5 shadow-sm flex flex-col`}>
               <div className="flex items-center gap-2 mb-3">
                 <div className={`w-8 h-8 rounded-lg ${scoreColor.label} flex items-center justify-center`}>
                   <Target className="w-4 h-4" />
                 </div>
                 <p className={`text-xs font-semibold ${scoreColor.text} uppercase tracking-wide`}>Quote Score</p>
               </div>
-              <div className="flex items-center gap-3">
-                <svg width="64" height="64" viewBox="0 0 64 64" className="-rotate-90 flex-shrink-0">
-                  <circle cx="32" cy="32" r="28" fill="none" className={scoreColor.track} strokeWidth="5" />
-                  <circle cx="32" cy="32" r="28" fill="none" className={scoreColor.ring} strokeWidth="5"
+              <div className="flex items-center gap-4 flex-1">
+                <svg width="80" height="80" viewBox="0 0 80 80" className="-rotate-90 flex-shrink-0">
+                  <circle cx="40" cy="40" r="34" fill="none" className={scoreColor.track} strokeWidth="6" />
+                  <circle cx="40" cy="40" r="34" fill="none" className={scoreColor.ring} strokeWidth="6"
                     strokeDasharray={`${dashLength} ${circumference - dashLength}`}
                     strokeLinecap="round"
                   />
-                  <text x="32" y="32" textAnchor="middle" dominantBaseline="central"
-                    className={`${scoreColor.text} text-lg font-bold rotate-90 fill-current`}
+                  <text x="40" y="40" textAnchor="middle" dominantBaseline="central"
+                    className={`${scoreColor.text} text-2xl font-extrabold rotate-90 fill-current`}
                     style={{ transformOrigin: 'center' }}
                   >
                     {score}
                   </text>
                 </svg>
-                <div>
-                  <p className={`text-sm font-bold ${scoreColor.text}`}>{output.score_label}</p>
+                <div className="min-w-0">
+                  <p className={`text-base font-extrabold ${scoreColor.text} mb-0.5`}>{output.score_label}</p>
                   {output.score_rationale && (
-                    <p className="text-xs text-slate-500 leading-relaxed mt-0.5 line-clamp-2">{output.score_rationale}</p>
+                    <p className="text-xs text-slate-500 leading-relaxed">{output.score_rationale}</p>
                   )}
                 </div>
               </div>
@@ -325,43 +345,59 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
         })()}
       </div>}
 
-      {/* Score Breakdown — collapsible */}
+      {/* Score Breakdown — always visible */}
       {output.score != null && output.score_breakdown && (() => {
         const bd = output.score_breakdown
-        const bars = [
-          { label: locale === 'fr' ? 'Équité prix' : 'Pricing fairness', value: bd.pricing_fairness, max: 50 },
-          { label: locale === 'fr' ? 'Termes & protections' : 'Terms & protections', value: bd.terms_protections, max: 30 },
-          { label: locale === 'fr' ? 'Position de levier' : 'Leverage position', value: bd.leverage_position, max: 20 },
+        type Deduction = { points: number; reason: string }
+        const categories = [
+          { label: locale === 'fr' ? 'Équité prix' : 'Pricing fairness', value: bd.pricing_fairness, max: 50, deductions: (bd.pricing_deductions || []) as Deduction[], noIssueLabel: locale === 'fr' ? 'Aucun problème détecté' : 'No issues found' },
+          { label: locale === 'fr' ? 'Termes & protections' : 'Terms & protections', value: bd.terms_protections, max: 30, deductions: (bd.terms_deductions || []) as Deduction[], noIssueLabel: locale === 'fr' ? 'Aucun problème détecté' : 'No issues found' },
+          { label: locale === 'fr' ? 'Position de levier' : 'Leverage position', value: bd.leverage_position, max: 20, deductions: (bd.leverage_deductions || []) as Deduction[], noIssueLabel: locale === 'fr' ? 'Aucun problème détecté' : 'No issues found' },
         ]
         const barColor = (v: number, max: number) => {
           const pct = v / max
-          if (pct >= 0.7) return 'bg-emerald-500'
-          if (pct >= 0.5) return 'bg-amber-500'
-          if (pct >= 0.3) return 'bg-orange-500'
+          if (pct >= 0.75) return 'bg-emerald-500'
+          if (pct >= 0.4) return 'bg-amber-500'
           return 'bg-red-500'
         }
+        const scoreTextColor = (v: number, max: number) => {
+          const pct = v / max
+          if (pct >= 0.75) return 'text-emerald-700'
+          if (pct >= 0.4) return 'text-amber-700'
+          return 'text-red-700'
+        }
         return (
-          <details className="mb-6 group">
-            <summary className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors mb-3 list-none">
-              <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform" />
-              {locale === 'fr' ? 'Détail du score' : 'Score breakdown'}
-            </summary>
-            <div className="bg-white rounded-xl border-2 border-slate-200 p-5 shadow-sm space-y-3">
-              {bars.map((bar) => (
-                <div key={bar.label}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium text-slate-700">{bar.label}</span>
-                    <span className="text-xs font-bold text-slate-900">{bar.value}/{bar.max}</span>
+          <div className="bg-white rounded-xl border-2 border-slate-200 p-5 shadow-sm mb-6">
+            <h3 className="text-sm font-bold text-slate-900 mb-4">{locale === 'fr' ? 'Détail du score' : 'Score breakdown'}</h3>
+            <div className="space-y-4">
+              {categories.map((cat) => {
+                // Find the worst deduction (highest points) for the one-line reason
+                const worst = cat.deductions.length > 0
+                  ? cat.deductions.reduce((a, b) => a.points >= b.points ? a : b)
+                  : null
+                return (
+                  <div key={cat.label}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-slate-800">{cat.label}</span>
+                      <span className={`text-sm font-extrabold ${scoreTextColor(cat.value, cat.max)}`}>{cat.value}/{cat.max}</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5 mb-1">
+                      <div className={`h-full rounded-full ${barColor(cat.value, cat.max)}`}
+                        style={{ width: `${(cat.value / cat.max) * 100}%` }}
+                      />
+                    </div>
+                    {worst ? (
+                      <p className="text-xs text-slate-500 leading-snug">{worst.reason}</p>
+                    ) : (
+                      <p className="text-xs text-emerald-600 leading-snug flex items-center gap-1">
+                        <span>&#10003;</span> {cat.noIssueLabel}
+                      </p>
+                    )}
                   </div>
-                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all ${barColor(bar.value, bar.max)}`}
-                      style={{ width: `${(bar.value / bar.max) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
-          </details>
+          </div>
         )
       })()}
 
@@ -534,30 +570,41 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
             </button>
           </div>
 
-          {showRedFlags && (
+          {showRedFlags && (() => {
+            // Sort flags by severity: HIGH first, then MEDIUM, then LOW
+            const flagsWithSeverity = output.red_flags.map((flag, originalIdx) => {
+              const amountMatch = flag.why_it_matters?.match(/[\$€£]([\d,]+)/g)
+              const maxAmount = amountMatch
+                ? Math.max(...amountMatch.map(s => parseInt(s.replace(/[^\d]/g, ''), 10) || 0))
+                : 0
+              const severity = maxAmount >= 5000 ? 'HIGH' : maxAmount >= 1000 ? 'MEDIUM' : 'LOW'
+              const severityOrder = severity === 'HIGH' ? 0 : severity === 'MEDIUM' ? 1 : 2
+              return { flag, originalIdx, severity, maxAmount, severityOrder }
+            }).sort((a, b) => a.severityOrder - b.severityOrder)
+
+            const visibleFlags = showAllFlags ? flagsWithSeverity : flagsWithSeverity.slice(0, 5)
+            const hiddenCount = flagsWithSeverity.length - 5
+
+            return (
             <div className="space-y-4">
-              {output.red_flags.map((flag, idx) => {
+              {visibleFlags.map(({ flag, originalIdx: idx, severity, maxAmount }) => {
                 const isExpanded = expandedFlags.includes(idx)
                 const activeTab = selectedFlagTab[idx] || 'ask'
                 const isAddressed = addressedFlags.includes(idx)
 
-                // Extract financial impact from why_it_matters
                 const impactMatch = flag.why_it_matters?.match(/[\$€£][\d,]+(?:\.\d+)?(?:\/(?:year|yr|month|mo))?(?:\s*(?:per|a)\s*year)?/i)
                 const financialImpact = impactMatch ? impactMatch[0] : null
 
-                // Determine severity based on dollar amounts in the text
-                const amountMatch = flag.why_it_matters?.match(/[\$€£]([\d,]+)/g)
-                const maxAmount = amountMatch
-                  ? Math.max(...amountMatch.map(s => parseInt(s.replace(/[^\d]/g, ''), 10) || 0))
-                  : 0
-                const severity = maxAmount >= 5000 ? 'HIGH' : maxAmount >= 1000 ? 'MEDIUM' : 'LOW'
-                const severityColor = severity === 'HIGH' ? 'bg-red-100 text-red-700 border-red-200' : severity === 'MEDIUM' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                const isSourceInsight = flag.type?.toLowerCase() === 'source insight'
+                const severityColor = isSourceInsight
+                  ? 'bg-indigo-100 text-indigo-700 border-indigo-200'
+                  : severity === 'HIGH' ? 'bg-red-100 text-red-700 border-red-200' : severity === 'MEDIUM' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'
 
                 return (
                   <div key={idx} className={`rounded-xl border-2 overflow-hidden transition-all ${
                     isAddressed
                       ? 'bg-emerald-50/50 border-emerald-200'
-                      : 'bg-slate-50 border-slate-200'
+                      : isSourceInsight ? 'bg-indigo-50/50 border-indigo-200' : 'bg-slate-50 border-slate-200'
                   }`}>
                     <button
                       onClick={() => toggleFlag(idx)}
@@ -565,13 +612,19 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
-                          <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center shadow-sm flex-shrink-0">
-                            <span className="text-white font-bold text-xs">{idx + 1}</span>
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center shadow-sm flex-shrink-0 ${isSourceInsight ? 'bg-indigo-500' : 'bg-red-500'}`}>
+                            {isSourceInsight ? (
+                              <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.312a4.5 4.5 0 00-6.364 0l-4.5 4.5a4.5 4.5 0 006.364 6.364l1.757-1.757" />
+                              </svg>
+                            ) : (
+                              <span className="text-white font-bold text-xs">{idx + 1}</span>
+                            )}
                           </div>
                           <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${severityColor} uppercase tracking-wider`}>
-                            {severity === 'HIGH' ? t('output.severity.high') : severity === 'MEDIUM' ? t('output.severity.medium') : t('output.severity.low')}
+                            {isSourceInsight ? 'Source Insight' : severity === 'HIGH' ? t('output.severity.high') : severity === 'MEDIUM' ? t('output.severity.medium') : t('output.severity.low')}
                           </span>
-                          {flag.type && (
+                          {flag.type && !isSourceInsight && (
                             <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{flag.type}</span>
                           )}
                         </div>
@@ -666,37 +719,21 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                           )}
                         </div>
 
-                        {/* Mark as addressed */}
-                        <button
-                          onClick={() => {
-                            setAddressedFlags(prev =>
-                              prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
-                            )
-                          }}
-                          className={`mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                            isAddressed
-                              ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                              : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100 border border-transparent'
-                          }`}
-                        >
-                          <div className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center transition-all ${
-                            isAddressed ? 'bg-emerald-600 border-emerald-600' : 'border-slate-300'
-                          }`}>
-                            {isAddressed && (
-                              <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            )}
-                          </div>
-                          {isAddressed ? t('output.addressed') : t('output.markAsAddressed')}
-                        </button>
                       </div>
                     )}
                   </div>
                 )
               })}
+              {!showAllFlags && hiddenCount > 0 && (
+                <button
+                  onClick={() => setShowAllFlags(true)}
+                  className="w-full py-3 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 transition-all"
+                >
+                  {locale === 'fr' ? `Voir ${hiddenCount} problème${hiddenCount > 1 ? 's' : ''} de plus` : `Show ${hiddenCount} more issue${hiddenCount !== 1 ? 's' : ''}`}
+                </button>
+              )}
             </div>
-          )}
+          )})()}
         </div>
       )}
 
