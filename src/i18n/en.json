@@ -308,6 +308,7 @@
   "settings.planFeatureFree4": "PDF, image, and text input",
 
   "output.roundOfAnalysis": "1 round of analysis",
+  "output.quoteScore": "Quote Score",
   "output.totalCommitment": "Total Commitment",
   "output.redFlags": "Red Flags",
   "output.potentialSavings": "Potential Savings",

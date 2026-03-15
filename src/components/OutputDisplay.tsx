@@ -256,7 +256,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                 <div className={`w-8 h-8 rounded-lg ${scoreColor.label} flex items-center justify-center`}>
                   <Target className="w-4 h-4" />
                 </div>
-                <p className={`text-xs font-semibold ${scoreColor.text} uppercase tracking-wide`}>Quote Score</p>
+                <p className={`text-xs font-semibold ${scoreColor.text} uppercase tracking-wide`}>{t('output.quoteScore')}</p>
               </div>
               <div className="flex items-center gap-4 flex-1">
                 <svg width="80" height="80" viewBox="0 0 80 80" className="-rotate-90 flex-shrink-0">

@@ -308,6 +308,7 @@
   "settings.planFeatureFree4": "PDF, image et texte",
 
   "output.roundOfAnalysis": "1 cycle d'analyse",
+  "output.quoteScore": "Score du devis",
   "output.totalCommitment": "Engagement total",
   "output.redFlags": "Alertes",
   "output.potentialSavings": "Économies potentielles",

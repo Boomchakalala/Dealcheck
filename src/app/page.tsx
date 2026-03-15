@@ -126,8 +126,8 @@ export default function LandingPage() {
                       >52</text>
                     </svg>
                     <div>
-                      <p className="text-[9px] font-bold text-orange-700 uppercase tracking-wider">Quote Score</p>
-                      <p className="text-[11px] font-extrabold text-orange-600">Overpriced</p>
+                      <p className="text-[9px] font-bold text-orange-700 uppercase tracking-wider">{t('example.quoteScore')}</p>
+                      <p className="text-[11px] font-extrabold text-orange-600">{t('example.quoteScoreLabel')}</p>
                     </div>
                   </div>
 
@@ -361,33 +361,33 @@ export default function LandingPage() {
                       <p className="text-base sm:text-lg font-semibold text-slate-800">{t('example.quoteVendor')}</p>
                       <p className="text-[10px] text-slate-400">March 12, 2026</p>
                     </div>
-                    <p className="text-slate-400 text-[10px] mb-2">Prepared for: [Your Company]</p>
+                    <p className="text-slate-400 text-[10px] mb-2">{t('example.quotePreparedFor')}</p>
                     <p className="text-slate-500 text-xs uppercase tracking-wide font-medium">{t('example.quoteTitle')}</p>
                     <div className="space-y-1.5 pt-1">
                       <div className="flex justify-between"><span>{t('example.quoteRetainer')}</span><span className="font-semibold text-slate-800">€7,500/mo</span></div>
                       <div className="flex justify-between"><span>{t('example.quoteAdFee')}</span><span className="font-semibold text-slate-800">20%</span></div>
                       <div className="flex justify-between"><span>{t('example.quoteAdBudget')}</span><span className="font-semibold text-slate-800">€9,000/mo</span></div>
                       <div className="flex justify-between"><span>{t('example.quoteTerm')}</span><span className="font-semibold text-slate-800">12 months</span></div>
-                      <div className="flex justify-between"><span>Start date</span><span className="font-semibold text-slate-800">April 1, 2026</span></div>
-                      <div className="flex justify-between"><span>Payment</span><span className="font-semibold text-slate-800">Annual in advance</span></div>
+                      <div className="flex justify-between"><span>{t('example.quoteStartDate')}</span><span className="font-semibold text-slate-800">{t('example.quoteStartDateValue')}</span></div>
+                      <div className="flex justify-between"><span>{t('example.quotePayment')}</span><span className="font-semibold text-slate-800">{t('example.quotePaymentValue')}</span></div>
                       <div className="flex justify-between border-t border-slate-100 pt-1.5 mt-1.5"><span className="font-medium text-slate-700">{t('example.quoteTotal')}</span><span className="font-bold text-slate-900">€111,600</span></div>
                     </div>
                     <p className="pt-1">{t('example.quoteDeliverables')}</p>
 
                     <div className="border-t border-slate-100 pt-3 mt-1">
-                      <p className="text-xs font-semibold text-slate-700 mb-1.5">Contract terms</p>
+                      <p className="text-xs font-semibold text-slate-700 mb-1.5">{t('example.quoteContractTerms')}</p>
                       <div className="space-y-1 text-[11px] text-slate-500">
-                        <p>• Auto-renewal for 12 months unless 60-day written notice</p>
-                        <p>• Pricing subject to annual review (up to 10% increase)</p>
-                        <p>• All creative assets remain property of Brightwave</p>
-                        <p>• Performance reports delivered monthly</p>
+                        <p>• {t('example.quoteAutoRenewal')}</p>
+                        <p>• {t('example.quotePriceReview')}</p>
+                        <p>• {t('example.quoteCreativeAssets')}</p>
+                        <p>• {t('example.quoteReportsMonthly')}</p>
                       </div>
                     </div>
 
                     <p className="text-slate-400 pt-1">{t('example.quoteCancellation')}</p>
 
                     <div className="border-t border-slate-100 pt-3 mt-1">
-                      <p className="text-[10px] text-slate-300 italic">This proposal is valid for 14 days from the date above. All prices exclude VAT.</p>
+                      <p className="text-[10px] text-slate-300 italic">{t('example.quoteValidFor')}</p>
                     </div>
                   </div>
                 </div>
@@ -404,7 +404,7 @@ export default function LandingPage() {
                 <div className="flex flex-col gap-3">
                   {/* 1. Quote Score — shown first for impact */}
                   <div className="bg-white rounded-xl border border-orange-200 p-3.5 sm:p-4 shadow-sm">
-                    <p className="text-[10px] font-bold text-orange-700 uppercase tracking-wider mb-2.5">Quote Score</p>
+                    <p className="text-[10px] font-bold text-orange-700 uppercase tracking-wider mb-2.5">{t('example.quoteScore')}</p>
                     <div className="flex items-center gap-3 mb-3">
                       <svg width="44" height="44" viewBox="0 0 44 44" className="-rotate-90 flex-shrink-0">
                         <circle cx="22" cy="22" r="18" fill="none" stroke="#fed7aa" strokeWidth="3.5" />
@@ -417,13 +417,13 @@ export default function LandingPage() {
                           style={{ transformOrigin: 'center' }}
                         >52</text>
                       </svg>
-                      <span className="text-base font-extrabold text-orange-600">Overpriced</span>
+                      <span className="text-base font-extrabold text-orange-600">{t('example.quoteScoreLabel')}</span>
                     </div>
                     <div className="space-y-1.5">
                       {[
-                        { label: 'Pricing', value: 19, max: 50 },
-                        { label: 'Terms', value: 20, max: 30 },
-                        { label: 'Leverage', value: 13, max: 20 },
+                        { label: t('example.scorePricing'), value: 19, max: 50 },
+                        { label: t('example.scoreTerms'), value: 20, max: 30 },
+                        { label: t('example.scoreLeverage'), value: 13, max: 20 },
                       ].map((bar) => (
                         <div key={bar.label} className="flex items-center gap-2">
                           <span className="text-[9px] text-slate-400 w-12 text-right">{bar.label}</span>
@@ -498,7 +498,7 @@ export default function LandingPage() {
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
               <p className="text-xs text-slate-400 mt-3">
-                <Link href="/example" className="text-emerald-400 hover:text-emerald-300 font-medium">See a full example</Link>
+                <Link href="/example" className="text-emerald-400 hover:text-emerald-300 font-medium">{t('example.seeFullExampleLink')}</Link>
                 {' '}{t('example.withAllDetails')}
               </p>
             </div>
