@@ -416,10 +416,18 @@ DOCUMENT ANALYSIS - VISUAL COMPREHENSION:
 
 PRICING STRUCTURE - READ CAREFULLY:
 
+⚠️ CRITICAL — DO NOT AUTO-MULTIPLY MONTHLY AMOUNTS:
+- Do NOT automatically multiply monthly amounts by 12 to calculate total value.
+- Use the total contract value EXPLICITLY STATED in the quote if present.
+- If only a monthly amount is shown with a 12-month term, note the annual cost as "monthly × 12 = estimated annual spend" but clearly label it as ESTIMATED, not total contract value.
+- Never fabricate a total that isn't in the source document.
+- If the quote says "Net amount due: $5,000" and "Term: 12 months", the total is $5,000 UNLESS the quote explicitly says this is a monthly amount. "Net amount due" typically means the full amount owed, not a monthly installment.
+
 RULE 1 — NEVER INVENT OR EXTRAPOLATE CONTRACT VALUES:
 - ONLY use numbers that are EXPLICITLY STATED in the quote document
 - If a total contract value is stated (e.g., "Total: €55,000"), USE THAT NUMBER exactly. Do NOT multiply it by term length.
-- If NO total is stated but monthly/annual amounts ARE stated with a term, you may calculate: e.g., "$1,250/mo × 12 months = $15,000"
+- If NO total is stated but monthly/annual amounts ARE stated with a term, you may calculate ONLY IF the amount is explicitly labeled as monthly/recurring: e.g., "$1,250/mo × 12 months = $15,000"
+- If the amount is labeled "Total", "Net amount due", "Amount due", "Grand total", "Contract value" — that IS the total. Do NOT multiply it further.
 - If term length is NOT stated, do NOT assume or extrapolate — set total_commitment to the stated amount with a note (e.g., "$1,250/month (term not specified)")
 - NEVER invent a total by assuming a term length that isn't in the quote
 
@@ -916,12 +924,13 @@ FINAL SELF-CHECK (do this mentally before returning JSON)
 
 Before returning your JSON response, verify ALL of these:
 1. Does total_commitment match what the quote ACTUALLY STATES? Did you accidentally double or halve it? Can you point to the exact line in the quote where this number appears or show the exact calculation?
-2. Did you INVENT any numbers? Every amount in your output must trace back to a specific number in the quote. If you cannot, remove it.
-3. Are potential_savings amounts realistic? Are they properly formatted (€4,000 not €4, €2,500 not €2)?
-4. Is the first must_have ask a direct price reduction with a specific € or $ amount?
-5. Are savings proportional to the deal? (under 30% of total — if over 30% you are inflating, cut back)
-6. Is the currency consistent throughout? (all USD or all EUR, never mixed)
-7. If term length was not stated in the quote, did you flag it as missing information instead of assuming?
+2. Did you multiply a lump-sum amount by 12? If the quote shows "Net amount due: $X" or "Total: $X" — that IS the total. You should NOT have multiplied it by the term length. Only multiply if the amount is explicitly labeled as monthly/recurring (e.g., "$X/month", "$X per month").
+3. Did you INVENT any numbers? Every amount in your output must trace back to a specific number in the quote. If you cannot, remove it.
+4. Are potential_savings amounts realistic? Are they properly formatted (€4,000 not €4, €2,500 not €2)?
+5. Is the first must_have ask a direct price reduction with a specific € or $ amount?
+6. Are savings proportional to the deal? (under 30% of total — if over 30% you are inflating, cut back)
+7. Is the currency consistent throughout? (all USD or all EUR, never mixed)
+8. If term length was not stated in the quote, did you flag it as missing information instead of assuming?
 
 ==================================================
 EMAIL GENERATION RULES
