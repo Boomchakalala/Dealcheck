@@ -147,11 +147,15 @@ function DealMenu({ dealId, isClosed, totalCommitment, roundCount, hasSavings, o
   )
 }
 
-export function DealListClient({ deals }: DealListClientProps) {
+export function DealListClient({ deals: initialDeals }: DealListClientProps) {
   const router = useRouter()
   const { t, locale } = useI18n()
+  const [deals, setDeals] = useState(initialDeals)
   const [dealToClose, setDealToClose] = useState<{ id: string; total?: string; roundCount: number } | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  // Sync with server data when props change (e.g. after router.refresh())
+  useEffect(() => { setDeals(initialDeals) }, [initialDeals])
 
   const handleClose = (dealId: string, total?: string, roundCount?: number) => {
     setDealToClose({ id: dealId, total, roundCount: roundCount || 0 })
@@ -162,8 +166,11 @@ export function DealListClient({ deals }: DealListClientProps) {
     setDeletingId(dealId)
     try {
       const response = await fetch(`/api/deal/${dealId}`, { method: 'DELETE' })
-      if (response.ok) { trackEvent({ name: 'deal_deleted', properties: { isClosed, hasSavings } }); router.refresh() }
-      else alert(t('dealList.deleteFailed'))
+      if (response.ok) {
+        setDeals(prev => prev.filter(d => d.id !== dealId))
+        trackEvent({ name: 'deal_deleted', properties: { isClosed, hasSavings } })
+        router.refresh()
+      } else alert(t('dealList.deleteFailed'))
     } catch { alert(t('dealList.deleteError')) }
     finally { setDeletingId(null) }
   }
