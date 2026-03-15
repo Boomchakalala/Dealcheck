@@ -63,13 +63,12 @@ export async function POST(request: Request) {
     // Determine locale from cookie or request body
     const locale = (await cookies()).get('termlift_lang')?.value || (body as any).locale || 'en'
 
-    // Analyze with V1 (full text analysis - catches everything)
     // Validate PDF data if provided
-    const pdfData = (body as any).pdfData
-    const validPdfData = pdfData?.base64 && pdfData?.mimeType === 'application/pdf'
-      ? { base64: pdfData.base64, mimeType: pdfData.mimeType }
+    const validPdfData = validated.pdfData?.base64 && validated.pdfData?.mimeType === 'application/pdf'
+      ? { base64: validated.pdfData.base64, mimeType: validated.pdfData.mimeType }
       : undefined
 
+    // Analyze with V1 (full text analysis - catches everything)
     const output = await analyzeDeal(
       validated.extractedText || '',
       validated.dealType,

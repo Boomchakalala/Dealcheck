@@ -544,7 +544,7 @@ export default function LandingPage() {
                 href="/pricing"
                 className="block w-full text-center px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md"
               >
-                Get Pro
+                {t('pricing.getPro')}
               </Link>
             </div>
 

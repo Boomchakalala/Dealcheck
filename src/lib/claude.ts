@@ -141,20 +141,15 @@ export async function classifyQuote(
   allPages?: Array<{ base64: string; mimeType: string }>,
   pdfData?: { base64: string; mimeType: string }
 ): Promise<QuoteClassificationType> {
-  const hasPdf = pdfData?.base64 && pdfData?.mimeType === 'application/pdf'
-  const hasImages = allPages && allPages.length > 0
-  const hasSingleImage = imageData && SUPPORTED_IMAGE_MIME_TYPES.includes(imageData.mimeType as ClaudeImageMediaType)
+  // Note: Haiku doesn't support PDF document input — for PDFs, classify from text only
+  const hasImages = !pdfData && allPages && allPages.length > 0
+  const hasSingleImage = !pdfData && imageData && SUPPORTED_IMAGE_MIME_TYPES.includes(imageData.mimeType as ClaudeImageMediaType)
 
   const userPrompt = `Deal Type: ${dealType}\n\nClassify this quote:\n${extractedText || '(see attached document)'}`
 
   let userContent: Anthropic.MessageParam['content']
 
-  if (hasPdf) {
-    userContent = [
-      { type: 'text', text: userPrompt },
-      { type: 'document' as any, source: { type: 'base64' as const, media_type: 'application/pdf', data: pdfData!.base64 } },
-    ]
-  } else if (hasImages) {
+  if (hasImages) {
     const imageBlocks: Anthropic.MessageParam['content'] = allPages!.map((page) => ({
       type: 'image' as const,
       source: { type: 'base64' as const, media_type: page.mimeType as ClaudeImageMediaType, data: page.base64 },

@@ -24,8 +24,8 @@ export const metadata: Metadata = {
   },
   description: "Drop in a vendor quote and get back exactly where you're overpaying, what to push for, and a ready-to-send email in 60 seconds.",
   icons: {
-    icon: "/favicon.ico",
-    apple: "/icon-256.png",
+    icon: "/favicon.png",
+    apple: "/icon-512.png",
   },
   openGraph: {
     title: "TermLift — AI Vendor Quote Analyzer | Negotiate Better Supplier Deals",

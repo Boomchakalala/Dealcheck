@@ -86,11 +86,15 @@ export const CreateDealSchema = z.object({
     base64: z.string(),
     mimeType: z.string(),
   }).optional(),
+  pdfData: z.object({
+    base64: z.string(),
+    mimeType: z.string(),
+  }).optional(),
   saveExtractedText: z.boolean().default(false),
   isDemoText: z.boolean().default(false), // Flag for demo text (don't count against usage)
 }).refine(
-  (data) => (data.extractedText && data.extractedText.length >= 10) || data.imageData,
-  { message: 'Either extractedText (min 10 chars) or imageData must be provided' }
+  (data) => (data.extractedText && data.extractedText.length >= 10) || data.imageData || data.pdfData,
+  { message: 'Either extractedText (min 10 chars), imageData, or pdfData must be provided' }
 )
 
 export const AddRoundSchema = z.object({
