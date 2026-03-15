@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 
 export async function DELETE(
   request: Request,
@@ -15,7 +15,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get deal to check ownership and status
+    // Get deal to check ownership
     const { data: deal } = await supabase
       .from('deals')
       .select('user_id, status')
@@ -30,8 +30,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    // Delete the deal (rounds will cascade delete via foreign key)
-    const { error: deleteError } = await supabase
+    // Use admin client to bypass RLS for cascade delete (ownership already verified above)
+    const admin = createAdminClient()
+    const { error: deleteError } = await admin
       .from('deals')
       .delete()
       .eq('id', dealId)
