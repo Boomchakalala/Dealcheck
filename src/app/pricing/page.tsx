@@ -17,7 +17,6 @@ export default async function PricingPage() {
 
   const starterFeatures = t.raw('pricingPage.starterFeatures') as string[]
   const proFeatures = t.raw('pricingPage.proFeatures') as string[]
-  const businessFeatures = t.raw('pricingPage.businessFeatures') as string[]
 
   return (
     <div className="min-h-screen bg-white flex flex-col relative">
@@ -51,7 +50,7 @@ export default async function PricingPage() {
               </p>
             </div>
 
-            {/* 2-Tier Grid (Business hidden — restore later) */}
+            {/* 2-Tier Grid */}
             <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
 
               {/* Starter (Free) */}
@@ -109,32 +108,6 @@ export default async function PricingPage() {
                 />
               </div>
 
-              {/* Business (€149/mo) — HIDDEN: uncomment to restore
-              <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-7 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300">
-                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">{t('pricing.business')}</p>
-                <div className="mb-5">
-                  <span className="text-5xl font-bold text-slate-900 tracking-tight">€149</span>
-                  <span className="text-slate-500 ml-1.5 text-lg">{t('pricingPage.proPerMo')}</span>
-                </div>
-                <p className="text-sm text-slate-500 mb-7 leading-relaxed">
-                  {t('pricingPage.businessDesc')}
-                </p>
-                <ul className="space-y-3 mb-8">
-                  {businessFeatures.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  disabled
-                  className="block w-full text-center px-6 py-3.5 text-sm font-semibold rounded-xl border border-slate-200 text-slate-400 opacity-80 cursor-not-allowed transition-all"
-                >
-                  {t('pricing.comingSoon')}
-                </button>
-              </div>
-              */}
             </div>
           </div>
 

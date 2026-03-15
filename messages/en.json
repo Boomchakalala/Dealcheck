@@ -15,7 +15,7 @@
     "newAnalysis": "New analysis"
   },
   "hero": {
-    "badge": "AI-powered quote analysis",
+    "badge": "Your procurement copilot",
     "title1": "Stop overpaying.",
     "title2": "Start negotiating.",
     "subtitle": "Drop in a vendor quote. Get back exactly where you're overpaying, what to push for, and a ready-to-send email — in under 60 seconds.",
@@ -45,7 +45,7 @@
     "noCard": "No credit card needed"
   },
   "builtFor": {
-    "title": "Not everyone has a procurement team. Now it doesn't matter.",
+    "title": "No procurement team? No problem.",
     "subtitle": "Whether it's a SaaS renewal, agency retainer, office supplies, or any vendor contract — just drop in your quote and let TermLift do the heavy lifting.",
     "founders": "Startup founders",
     "foundersDesc": "Negotiating vendor contracts, agency fees, and SaaS agreements for the first time without a legal or procurement team.",
@@ -131,21 +131,21 @@
     "getPro": "Get Pro"
   },
   "social": {
-    "stat1": "500+",
-    "stat1Label": "Quotes analyzed",
-    "stat2": "€2.3M",
-    "stat2Label": "In savings identified",
-    "stat3": "4.9/5",
-    "stat3Label": "Average rating",
-    "quote1": "I was about to sign a €45K SaaS renewal. TermLift flagged two clauses I would have missed. Saved €8,400 in 10 minutes.",
-    "name1": "Marc D.",
-    "title1": "Ops Lead, B2B SaaS startup — Paris",
-    "quote2": "We use this for every agency pitch now. The email drafts alone are worth it — I just copy, edit the name, and send.",
-    "name2": "Sarah K.",
-    "title2": "Founder, e-commerce brand — Amsterdam",
-    "quote3": "Didn't realize our supplier had baked in a 15% annual price escalation clause until TermLift caught it. Game changer.",
-    "name3": "James T.",
-    "title3": "Office Manager, 40-person team — London"
+    "stat1": "8 years",
+    "stat1Label": "Of procurement expertise built in",
+    "stat2": "60 seconds",
+    "stat2Label": "From quote to negotiation plan",
+    "stat3": "3 tones",
+    "stat3Label": "Ready-to-send email drafts",
+    "quote1": "After years of watching founders and ops managers sign contracts they shouldn't have, I built the tool I wished they'd had. TermLift is real procurement thinking — not generic AI.",
+    "name1": "The founder",
+    "title1": "8 years in procurement",
+    "quote2": "Most people don't overpay because they're bad at negotiation. They overpay because they don't know what to look for. TermLift closes that gap in 60 seconds.",
+    "name2": "Why this exists",
+    "title2": "The problem we solve",
+    "quote3": "Every red flag, every negotiation ask, every email draft comes from patterns seen across hundreds of real vendor contracts — not a prompt template.",
+    "name3": "How it works",
+    "title3": "Real expertise, not generic AI"
   },
   "cta": {
     "title": "That quote in your inbox? You're probably overpaying.",
@@ -168,7 +168,7 @@
   },
   "about": {
     "heroTitle": "Built by someone who's been on your side of the table",
-    "heroSubtitle": "TermLift was built by a procurement professional with 8 years of experience — not a tech team that's never negotiated a contract.",
+    "heroSubtitle": "TermLift was built by a procurement professional — not a tech team that's never negotiated a contract.",
     "whyTitle": "Why TermLift exists",
     "whyContent": "After 8 years working in procurement, I kept seeing the same problem. Founders signing SaaS contracts they didn't understand. Operations managers renewing supplier agreements without pushing back. Small business owners accepting vendor terms because they didn't know what to ask for.\n\nThe knowledge to negotiate better deals exists — it lives in procurement departments at large companies. TermLift makes that knowledge available to everyone, in 60 seconds, for any quote or contract.",
     "differenceTitle": "What makes us different",
@@ -179,7 +179,7 @@
     "card3Title": "Privacy first",
     "card3Desc": "Your vendor pricing is confidential. We built TermLift with that in mind from day one — encrypted, never trained on, deleted after analysis.",
     "founderTitle": "Who built this",
-    "founderBio": "TermLift was built by a procurement professional currently working in the industry. 8 years of experience across vendor negotiations, SaaS contracts, agency agreements, and supplier management. Built TermLift to solve a problem seen every day — good people signing bad contracts because they didn't have the right tools.",
+    "founderBio": "TermLift was built by a procurement professional currently working in the industry — across vendor negotiations, SaaS contracts, agency agreements, and supplier management. Built to solve a problem seen every day: good people signing bad contracts because they didn't have the right tools.",
     "valuesTitle": "What we stand for",
     "value1Title": "Honesty",
     "value1Desc": "We tell you what we actually find, not what you want to hear.",

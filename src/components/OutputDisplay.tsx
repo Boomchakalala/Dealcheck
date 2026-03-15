@@ -239,6 +239,50 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
 
       {/* METRIC CARDS ROW — hidden when inside deal page */}
       {!hideHeader && <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {/* Quote Score Card — always first */}
+        {output.score != null && (() => {
+          const score = output.score
+          const scoreColor = score >= 85 ? { bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200', text: 'text-emerald-700', ring: 'stroke-emerald-500', track: 'stroke-emerald-100', label: 'bg-emerald-100 text-emerald-700' }
+            : score >= 65 ? { bg: 'from-amber-50 to-yellow-50', border: 'border-amber-200', text: 'text-amber-700', ring: 'stroke-amber-500', track: 'stroke-amber-100', label: 'bg-amber-100 text-amber-700' }
+            : score >= 40 ? { bg: 'from-orange-50 to-amber-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100', label: 'bg-orange-100 text-orange-700' }
+            : { bg: 'from-red-50 to-pink-50', border: 'border-red-200', text: 'text-red-700', ring: 'stroke-red-500', track: 'stroke-red-100', label: 'bg-red-100 text-red-700' }
+
+          const circumference = 2 * Math.PI * 34
+          const dashLength = (score / 100) * circumference
+
+          return (
+            <div className={`bg-gradient-to-br ${scoreColor.bg} rounded-xl border-2 ${scoreColor.border} p-5 shadow-sm flex flex-col`}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className={`w-8 h-8 rounded-lg ${scoreColor.label} flex items-center justify-center`}>
+                  <Target className="w-4 h-4" />
+                </div>
+                <p className={`text-xs font-semibold ${scoreColor.text} uppercase tracking-wide`}>Quote Score</p>
+              </div>
+              <div className="flex items-center gap-4 flex-1">
+                <svg width="80" height="80" viewBox="0 0 80 80" className="-rotate-90 flex-shrink-0">
+                  <circle cx="40" cy="40" r="34" fill="none" className={scoreColor.track} strokeWidth="6" />
+                  <circle cx="40" cy="40" r="34" fill="none" className={scoreColor.ring} strokeWidth="6"
+                    strokeDasharray={`${dashLength} ${circumference - dashLength}`}
+                    strokeLinecap="round"
+                  />
+                  <text x="40" y="40" textAnchor="middle" dominantBaseline="central"
+                    className={`${scoreColor.text} text-2xl font-extrabold rotate-90 fill-current`}
+                    style={{ transformOrigin: 'center' }}
+                  >
+                    {score}
+                  </text>
+                </svg>
+                <div className="min-w-0">
+                  <p className={`text-base font-extrabold ${scoreColor.text} mb-0.5`}>{output.score_label}</p>
+                  {output.score_rationale && (
+                    <p className="text-xs text-slate-500 leading-relaxed">{output.score_rationale}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Total Commitment Card */}
         <div className="bg-white rounded-xl border-2 border-slate-200 p-5 shadow-sm flex flex-col">
           <div className="flex items-center gap-2 mb-3">
@@ -300,49 +344,6 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           </p>
         </div>
 
-        {/* Quote Score Card */}
-        {output.score != null && (() => {
-          const score = output.score
-          const scoreColor = score >= 85 ? { bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200', text: 'text-emerald-700', ring: 'stroke-emerald-500', track: 'stroke-emerald-100', label: 'bg-emerald-100 text-emerald-700' }
-            : score >= 65 ? { bg: 'from-amber-50 to-yellow-50', border: 'border-amber-200', text: 'text-amber-700', ring: 'stroke-amber-500', track: 'stroke-amber-100', label: 'bg-amber-100 text-amber-700' }
-            : score >= 40 ? { bg: 'from-orange-50 to-amber-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100', label: 'bg-orange-100 text-orange-700' }
-            : { bg: 'from-red-50 to-pink-50', border: 'border-red-200', text: 'text-red-700', ring: 'stroke-red-500', track: 'stroke-red-100', label: 'bg-red-100 text-red-700' }
-
-          const circumference = 2 * Math.PI * 34
-          const dashLength = (score / 100) * circumference
-
-          return (
-            <div className={`bg-gradient-to-br ${scoreColor.bg} rounded-xl border-2 ${scoreColor.border} p-5 shadow-sm flex flex-col`}>
-              <div className="flex items-center gap-2 mb-3">
-                <div className={`w-8 h-8 rounded-lg ${scoreColor.label} flex items-center justify-center`}>
-                  <Target className="w-4 h-4" />
-                </div>
-                <p className={`text-xs font-semibold ${scoreColor.text} uppercase tracking-wide`}>Quote Score</p>
-              </div>
-              <div className="flex items-center gap-4 flex-1">
-                <svg width="80" height="80" viewBox="0 0 80 80" className="-rotate-90 flex-shrink-0">
-                  <circle cx="40" cy="40" r="34" fill="none" className={scoreColor.track} strokeWidth="6" />
-                  <circle cx="40" cy="40" r="34" fill="none" className={scoreColor.ring} strokeWidth="6"
-                    strokeDasharray={`${dashLength} ${circumference - dashLength}`}
-                    strokeLinecap="round"
-                  />
-                  <text x="40" y="40" textAnchor="middle" dominantBaseline="central"
-                    className={`${scoreColor.text} text-2xl font-extrabold rotate-90 fill-current`}
-                    style={{ transformOrigin: 'center' }}
-                  >
-                    {score}
-                  </text>
-                </svg>
-                <div className="min-w-0">
-                  <p className={`text-base font-extrabold ${scoreColor.text} mb-0.5`}>{output.score_label}</p>
-                  {output.score_rationale && (
-                    <p className="text-xs text-slate-500 leading-relaxed">{output.score_rationale}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )
-        })()}
       </div>}
 
       {/* Score Breakdown — always visible */}

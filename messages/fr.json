@@ -15,7 +15,7 @@
     "newAnalysis": "Nouvelle analyse"
   },
   "hero": {
-    "badge": "Analyse de devis par IA",
+    "badge": "Votre copilote achats",
     "title1": "Arrêtez de surpayer.",
     "title2": "Négociez mieux.",
     "subtitle": "Déposez un devis fournisseur. Découvrez où vous surpayez, quoi demander, et recevez un email prêt à envoyer — en moins de 60 secondes.",
@@ -45,7 +45,7 @@
     "noCard": "Sans carte bancaire"
   },
   "builtFor": {
-    "title": "Tout le monde n'a pas un service achats. Ce n'est plus un problème.",
+    "title": "Pas de service achats ? Pas de problème.",
     "subtitle": "Qu'il s'agisse d'un renouvellement SaaS, d'un contrat d'agence, de fournitures de bureau ou de tout contrat fournisseur — déposez votre devis et laissez TermLift faire le travail.",
     "founders": "Fondateurs de startups",
     "foundersDesc": "Négocier des contrats fournisseurs, des honoraires d'agence et des accords SaaS pour la première fois, sans équipe juridique ni achats.",
@@ -131,21 +131,21 @@
     "getPro": "Passer à Pro"
   },
   "social": {
-    "stat1": "500+",
-    "stat1Label": "Devis analysés",
-    "stat2": "2,3 M€",
-    "stat2Label": "D'économies identifiées",
-    "stat3": "4,9/5",
-    "stat3Label": "Note moyenne",
-    "quote1": "J'allais signer un renouvellement SaaS à 45 000 €. TermLift a détecté deux clauses que j'aurais manquées. 8 400 € d'économies en 10 minutes.",
-    "name1": "Marc D.",
-    "title1": "Ops Lead, startup SaaS B2B — Paris",
-    "quote2": "On l'utilise pour chaque appel d'offres agence maintenant. Les brouillons d'e-mail valent à eux seuls l'abonnement — je copie, j'adapte le nom, et c'est parti.",
-    "name2": "Sarah K.",
-    "title2": "Fondatrice, marque e-commerce — Amsterdam",
-    "quote3": "Je n'avais pas remarqué que notre fournisseur avait glissé une clause d'escalade de prix de 15 % par an. TermLift l'a repérée. Ça change tout.",
-    "name3": "James T.",
-    "title3": "Office Manager, équipe de 40 personnes — Londres"
+    "stat1": "8 ans",
+    "stat1Label": "D'expertise achats intégrée",
+    "stat2": "60 secondes",
+    "stat2Label": "Du devis au plan de négociation",
+    "stat3": "3 tons",
+    "stat3Label": "D'e-mails prêts à envoyer",
+    "quote1": "Après des années à voir des fondateurs et des responsables ops signer des contrats qu'ils n'auraient pas dû, j'ai construit l'outil que j'aurais voulu qu'ils aient. TermLift, c'est une vraie logique achats — pas de l'IA générique.",
+    "name1": "Le fondateur",
+    "title1": "8 ans dans les achats",
+    "quote2": "La plupart des gens ne surpayent pas parce qu'ils négocient mal. Ils surpayent parce qu'ils ne savent pas quoi chercher. TermLift comble ce vide en 60 secondes.",
+    "name2": "Pourquoi ça existe",
+    "title2": "Le problème qu'on résout",
+    "quote3": "Chaque alerte, chaque demande de négociation, chaque brouillon d'e-mail vient de schémas observés sur des centaines de vrais contrats fournisseurs — pas d'un template de prompt.",
+    "name3": "Comment ça marche",
+    "title3": "Une vraie expertise, pas de l'IA générique"
   },
   "cta": {
     "title": "Ce devis dans votre boîte mail ? Vous surpayez probablement.",
@@ -168,7 +168,7 @@
   },
   "about": {
     "heroTitle": "Conçu par quelqu'un qui a été de votre côté de la table",
-    "heroSubtitle": "TermLift a été créé par un professionnel des achats avec 8 ans d'expérience — pas par une équipe tech qui n'a jamais négocié un contrat.",
+    "heroSubtitle": "TermLift a été créé par un professionnel des achats — pas par une équipe tech qui n'a jamais négocié un contrat.",
     "whyTitle": "Pourquoi TermLift existe",
     "whyContent": "Après 8 ans dans les achats, je voyais toujours le même problème. Des fondateurs qui signaient des contrats SaaS sans les comprendre. Des responsables opérations qui renouvelaient des accords fournisseurs sans négocier. Des dirigeants de PME qui acceptaient les conditions des fournisseurs faute de savoir quoi demander.\n\nLe savoir-faire pour mieux négocier existe — il vit dans les services achats des grandes entreprises. TermLift rend cette expertise accessible à tous, en 60 secondes, pour n'importe quel devis ou contrat.",
     "differenceTitle": "Ce qui nous distingue",
@@ -179,7 +179,7 @@
     "card3Title": "Confidentialité avant tout",
     "card3Desc": "Vos tarifs fournisseurs sont confidentiels. Nous avons conçu TermLift avec cette exigence dès le premier jour — chiffré, jamais utilisé pour l'entraînement IA, supprimé après analyse.",
     "founderTitle": "Qui a créé TermLift",
-    "founderBio": "TermLift a été créé par un professionnel des achats en activité. 8 ans d'expérience dans la négociation fournisseurs, les contrats SaaS, les accords d'agence et la gestion des prestataires. TermLift est né d'un constat quotidien — des gens compétents qui signent de mauvais contrats faute d'avoir les bons outils.",
+    "founderBio": "TermLift a été créé par un professionnel des achats en activité — négociation fournisseurs, contrats SaaS, accords d'agence et gestion des prestataires. Né d'un constat quotidien : des gens compétents qui signent de mauvais contrats faute d'avoir les bons outils.",
     "valuesTitle": "Ce en quoi nous croyons",
     "value1Title": "Honnêteté",
     "value1Desc": "Nous vous disons ce que nous trouvons vraiment, pas ce que vous voulez entendre.",

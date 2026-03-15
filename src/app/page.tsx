@@ -112,24 +112,7 @@ export default function LandingPage() {
                 </div>
 
                 <div className="p-4 sm:p-5 space-y-3">
-                  {/* Verdict */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-[9px] sm:text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">{t('hero.verdict')}</span>
-                    </div>
-                    <p className="text-[11px] sm:text-xs text-slate-700 leading-relaxed">
-                      {t('hero.verdictDesc')}
-                    </p>
-                  </div>
-
-                  {/* Red flag */}
-                  <div className="border border-red-200 rounded-lg p-3">
-                    <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider mb-1">{t('hero.redFlagLabel')}</p>
-                    <p className="text-[11px] sm:text-xs font-semibold text-slate-900 mb-1">{t('hero.redFlagTitle')}</p>
-                    <p className="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed">{t('hero.redFlagDesc')}</p>
-                  </div>
-
-                  {/* Quote Score */}
+                  {/* Quote Score — first for impact */}
                   <div className="border border-orange-200 bg-orange-50/50 rounded-lg px-3 py-2 flex items-center gap-2.5">
                     <svg width="32" height="32" viewBox="0 0 32 32" className="-rotate-90 flex-shrink-0">
                       <circle cx="16" cy="16" r="13" fill="none" stroke="#fed7aa" strokeWidth="3" />
@@ -146,6 +129,23 @@ export default function LandingPage() {
                       <p className="text-[9px] font-bold text-orange-700 uppercase tracking-wider">Quote Score</p>
                       <p className="text-[11px] font-extrabold text-orange-600">Overpriced</p>
                     </div>
+                  </div>
+
+                  {/* Verdict */}
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-[9px] sm:text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">{t('hero.verdict')}</span>
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-slate-700 leading-relaxed">
+                      {t('hero.verdictDesc')}
+                    </p>
+                  </div>
+
+                  {/* Red flag */}
+                  <div className="border border-red-200 rounded-lg p-3">
+                    <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider mb-1">{t('hero.redFlagLabel')}</p>
+                    <p className="text-[11px] sm:text-xs font-semibold text-slate-900 mb-1">{t('hero.redFlagTitle')}</p>
+                    <p className="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed">{t('hero.redFlagDesc')}</p>
                   </div>
 
                   {/* Savings */}
@@ -293,7 +293,7 @@ export default function LandingPage() {
           </div>
 
           {/* 3 Steps */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-0 mb-20 sm:mb-24 relative">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-0 mb-20 sm:mb-24 relative md:items-stretch">
             {/* Connector line — desktop only */}
             <div className="hidden md:block absolute top-10 left-[20%] right-[20%] h-px border-t-2 border-dashed border-emerald-500/30" />
 
@@ -312,7 +312,7 @@ export default function LandingPage() {
                   </div>
                 )}
 
-                <div className="bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8 hover:-translate-y-1 hover:bg-white/[0.09] hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 w-full max-w-[300px]">
+                <div className="bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8 hover:-translate-y-1 hover:bg-white/[0.09] hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 w-full max-w-[300px] flex-1">
                   <div className="w-20 h-20 mb-5 bg-emerald-600 rounded-2xl flex items-center justify-center relative mx-auto shadow-lg shadow-emerald-500/20">
                     <item.icon className="w-9 h-9 text-white" />
                     <div className="absolute -top-2.5 -right-2.5 w-8 h-8 rounded-full bg-white text-[#0f172a] text-sm font-extrabold flex items-center justify-center shadow-md">
@@ -531,18 +531,18 @@ export default function LandingPage() {
           {/* Testimonials */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { quote: t('social.quote1'), name: t('social.name1'), title: t('social.title1'), initials: 'MD' },
-              { quote: t('social.quote2'), name: t('social.name2'), title: t('social.title2'), initials: 'SK' },
-              { quote: t('social.quote3'), name: t('social.name3'), title: t('social.title3'), initials: 'JT' },
+              { quote: t('social.quote1'), name: t('social.name1'), title: t('social.title1'), initials: 'TL' },
+              { quote: t('social.quote2'), name: t('social.name2'), title: t('social.title2'), initials: 'TL' },
+              { quote: t('social.quote3'), name: t('social.name3'), title: t('social.title3'), initials: 'AI' },
             ].map((testimonial) => (
-              <div key={testimonial.name} className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div key={testimonial.name} className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
                 <div className="mb-4">
                   <svg className="w-6 h-6 text-emerald-300" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
                   </svg>
                 </div>
                 <p className="text-sm text-slate-700 leading-relaxed mb-5">{testimonial.quote}</p>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mt-auto">
                   <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
                     <span className="text-xs font-bold text-emerald-700">{testimonial.initials}</span>
                   </div>
@@ -690,38 +690,6 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* Business — HIDDEN: uncomment to restore
-            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-7">
-              <div className="mb-5">
-                <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.business')}</h3>
-                <p className="text-sm text-slate-500">{t('pricing.businessDesc')}</p>
-              </div>
-              <div className="mb-5">
-                <span className="text-3xl sm:text-4xl font-bold text-slate-900">€149</span>
-                <span className="text-sm text-slate-500">/month</span>
-              </div>
-              <ul className="space-y-2.5 mb-7">
-                {[
-                  t('pricing.businessFeature1'),
-                  t('pricing.businessFeature2'),
-                  t('pricing.businessFeature3'),
-                  t('pricing.businessFeature4'),
-                  t('pricing.businessFeature5'),
-                ].map((feature) => (
-                  <li key={feature} className="flex items-start gap-2.5 text-sm text-slate-700">
-                    <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={3} />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <button
-                disabled
-                className="block w-full text-center px-6 py-3 text-sm font-semibold rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed transition-all"
-              >
-                {t('pricing.comingSoon')}
-              </button>
-            </div>
-            */}
           </div>
         </div>
       </section>
