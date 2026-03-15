@@ -447,7 +447,7 @@ export default function AppHomePage() {
             {locale === 'fr' ? 'Aucun contrat trouvé' : 'No deals match your filters'}
           </div>
         ) : (
-          <DealListClient deals={filteredDeals.slice(0, 20)} />
+          <DealListClient deals={filteredDeals.slice(0, 20)} onDealDeleted={(id) => setDeals(prev => prev.filter(d => d.id !== id))} />
         )}
         {isAtLimit && deals.length >= 4 && <LockedDealCard />}
       </div>

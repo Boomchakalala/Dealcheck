@@ -11,6 +11,7 @@ import { normalizeAmount, detectCurrency, formatCurrency, parseMoney } from '@/l
 
 interface DealListClientProps {
   deals: any[]
+  onDealDeleted?: (dealId: string) => void
 }
 
 function getLatestRound(deal: any) {
@@ -147,7 +148,7 @@ function DealMenu({ dealId, isClosed, totalCommitment, roundCount, hasSavings, o
   )
 }
 
-export function DealListClient({ deals: initialDeals }: DealListClientProps) {
+export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListClientProps) {
   const router = useRouter()
   const { t, locale } = useI18n()
   const [deals, setDeals] = useState(initialDeals)
@@ -168,8 +169,8 @@ export function DealListClient({ deals: initialDeals }: DealListClientProps) {
       const response = await fetch(`/api/deal/${dealId}`, { method: 'DELETE' })
       if (response.ok) {
         setDeals(prev => prev.filter(d => d.id !== dealId))
+        onDealDeleted?.(dealId)
         trackEvent({ name: 'deal_deleted', properties: { isClosed, hasSavings } })
-        router.refresh()
       } else alert(t('dealList.deleteFailed'))
     } catch { alert(t('dealList.deleteError')) }
     finally { setDeletingId(null) }
