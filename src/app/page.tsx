@@ -190,35 +190,21 @@ export default function LandingPage() {
         }`}
       >
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
-            <div ref={counter60.ref} className="flex flex-col items-center text-center">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-3">
-                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 items-start">
+            {[
+              { ref: counter60.ref, icon: Zap, value: `${counter60.count}s`, label: t('stats.analysisTime') },
+              { icon: FileText, value: t('stats.anyFormat'), label: t('stats.pdfEmailImage') },
+              { ref: counter3.ref, icon: Mail, value: `${counter3.count}`, label: t('stats.emailTones') },
+              { icon: CreditCard, value: t('stats.free'), label: t('stats.noCard') },
+            ].map((stat, i) => (
+              <div key={i} ref={stat.ref} className="flex flex-col items-center text-center">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-3">
+                  <stat.icon className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+                </div>
+                <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">{stat.value}</p>
+                <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{stat.label}</p>
               </div>
-              <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">{counter60.count}s</p>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{t('stats.analysisTime')}</p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-3">
-                <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
-              </div>
-              <p className="text-lg sm:text-xl font-extrabold text-emerald-600">{t('stats.anyFormat')}</p>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{t('stats.pdfEmailImage')}</p>
-            </div>
-            <div ref={counter3.ref} className="flex flex-col items-center text-center">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-3">
-                <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
-              </div>
-              <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">{counter3.count}</p>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{t('stats.emailTones')}</p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-3">
-                <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
-              </div>
-              <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">{t('stats.free')}</p>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">{t('stats.noCard')}</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
