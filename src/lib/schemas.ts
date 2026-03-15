@@ -34,48 +34,48 @@ export const DealOutputSchema = z.object({
     signing_deadline: z.string().optional(),
   }),
   quick_read: z.object({
-    whats_solid: z.array(z.string()),
-    whats_concerning: z.array(z.string()),
-    conclusion: z.string(),
-  }),
-  red_flags: z.array(RedFlagSchema),
+    whats_solid: z.array(z.string()).default([]),
+    whats_concerning: z.array(z.string()).default([]),
+    conclusion: z.string().optional().default(''),
+  }).optional().default({}),
+  red_flags: z.array(RedFlagSchema).default([]),
   negotiation_plan: z.object({
-    leverage_you_have: z.array(z.string()),
-    must_have_asks: z.array(z.string()),
-    nice_to_have_asks: z.array(z.string()),
-    trades_you_can_offer: z.array(z.string()),
-  }),
+    leverage_you_have: z.array(z.string()).default([]),
+    must_have_asks: z.array(z.string()).default([]),
+    nice_to_have_asks: z.array(z.string()).default([]),
+    trades_you_can_offer: z.array(z.string()).default([]),
+  }).optional().default({}),
   what_to_ask_for: z.object({
-    must_have: z.array(z.string()),
-    nice_to_have: z.array(z.string()),
-  }),
+    must_have: z.array(z.string()).default([]),
+    nice_to_have: z.array(z.string()).default([]),
+  }).optional().default({}),
   potential_savings: z.array(z.object({
     ask: z.string(),
     annual_impact: z.string(),
-  })).optional(),
+  })).optional().default([]),
   cash_flow_improvements: z.array(z.object({
     type: z.string(),
     recommendation: z.string(),
     category: z.enum(['cash_flow', 'risk_protection', 'liability']),
-  })).optional(),
+  })).optional().default([]),
   score: z.number().min(0).max(100).optional(),
   score_label: z.string().optional(),
   score_breakdown: z.object({
     pricing_fairness: z.number().min(0).max(50),
     terms_protections: z.number().min(0).max(30),
     leverage_position: z.number().min(0).max(20),
-    pricing_deductions: z.array(z.object({ points: z.number(), reason: z.string() })).optional(),
-    terms_deductions: z.array(z.object({ points: z.number(), reason: z.string() })).optional(),
-    leverage_deductions: z.array(z.object({ points: z.number(), reason: z.string() })).optional(),
+    pricing_deductions: z.array(z.object({ points: z.number(), reason: z.string() })).optional().default([]),
+    terms_deductions: z.array(z.object({ points: z.number(), reason: z.string() })).optional().default([]),
+    leverage_deductions: z.array(z.object({ points: z.number(), reason: z.string() })).optional().default([]),
   }).optional(),
   score_rationale: z.string().optional(),
   email_drafts: z.object({
     neutral: EmailDraftSchema,
     firm: EmailDraftSchema,
     final_push: EmailDraftSchema,
-  }),
-  assumptions: z.array(z.string()),
-  disclaimer: z.string(),
+  }).optional(),
+  assumptions: z.array(z.string()).default([]),
+  disclaimer: z.string().optional().default('This analysis is AI-generated and should be used as guidance only.'),
 })
 
 // API request schemas
@@ -135,19 +135,19 @@ export const DealOutputSchemaV2 = z.object({
 
   // Quick Read - What's good/bad
   quick_read: z.object({
-    whats_solid: z.array(z.string()).max(3),
-    whats_concerning: z.array(z.string()).max(3),
-    conclusion: z.string(),
-  }),
+    whats_solid: z.array(z.string()).max(3).default([]),
+    whats_concerning: z.array(z.string()).max(3).default([]),
+    conclusion: z.string().optional().default(''),
+  }).optional().default({}),
 
   // Red Flags with mitigation
-  red_flags: z.array(RedFlagSchema),
+  red_flags: z.array(RedFlagSchema).default([]),
 
   // What to Ask For
   what_to_ask_for: z.object({
-    must_have: z.array(z.string()).max(4),
-    nice_to_have: z.array(z.string()).max(3),
-  }),
+    must_have: z.array(z.string()).max(4).default([]),
+    nice_to_have: z.array(z.string()).max(3).default([]),
+  }).optional().default({}),
 
   // Deal metadata
   deal_snapshot: z.object({
@@ -165,15 +165,15 @@ export const DealOutputSchemaV2 = z.object({
     currency: z.string(),
     term_length: z.string(),
     billing_structure: z.string(),
-    key_elements: z.array(z.string()),
-    unclear_or_missing: z.array(z.string()),
+    key_elements: z.array(z.string()).default([]),
+    unclear_or_missing: z.array(z.string()).default([]),
   }),
   dominant_issue: z.object({
     title: z.string(),
     explanation: z.string(),
   }),
-  priority_points: z.array(PriorityPointSchema).max(3),
-  low_priority_or_acceptable: z.array(z.string()),
+  priority_points: z.array(PriorityPointSchema).max(3).default([]),
+  low_priority_or_acceptable: z.array(z.string()).default([]),
   recommended_strategy: z.object({
     posture: z.enum([
       'no_push_needed',

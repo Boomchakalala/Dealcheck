@@ -80,7 +80,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('File extraction error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to extract text from file' },
+      { error: 'Failed to extract text from file. Please try a different format.' },
       { status: 500 }
     );
   }
