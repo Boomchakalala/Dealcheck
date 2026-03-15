@@ -174,6 +174,31 @@ export const DealOutputSchemaV2 = z.object({
   email_controls: EmailControlsSchema,
 })
 
+// Quote Classification Schema (Step 1 of two-step pipeline)
+export const QuoteClassificationSchema = z.object({
+  quote_type: z.enum(['saas', 'professional_services', 'product_hardware', 'household', 'event_project', 'construction']),
+  deal_size_bracket: z.enum(['micro', 'small', 'medium', 'large', 'enterprise']),
+  recurring: z.boolean(),
+  leverage_level: z.enum(['high', 'medium', 'low', 'unclear']),
+  audience: z.enum(['business', 'personal']),
+  savings_strategy: z.object({
+    target_percent_min: z.number(),
+    target_percent_max: z.number(),
+    approach: z.enum([
+      'line_item_reduction',
+      'volume_discount',
+      'package_discount',
+      'multi_year_commitment',
+      'scope_optimization',
+      'payment_restructure',
+      'competitive_leverage',
+    ]),
+    rationale: z.string(),
+  }),
+})
+
+export type QuoteClassificationType = z.infer<typeof QuoteClassificationSchema>
+
 export type DealOutputType = z.infer<typeof DealOutputSchema>
 export type DealOutputTypeV2 = z.infer<typeof DealOutputSchemaV2>
 export type CreateDealInput = z.infer<typeof CreateDealSchema>

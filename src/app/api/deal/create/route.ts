@@ -2,8 +2,11 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { CreateDealSchema } from '@/lib/schemas'
-import { analyzeDeal } from '@/lib/openai'
+import { analyzeDeal } from '@/lib/claude'
 import { checkRateLimit } from '@/lib/rate-limit'
+
+// Allow up to 60s for classification + analysis (Vercel Pro plan)
+export const maxDuration = 60
 
 const FREE_ANALYSIS_LIMIT = 4
 
@@ -61,6 +64,12 @@ export async function POST(request: Request) {
     const locale = (await cookies()).get('termlift_lang')?.value || (body as any).locale || 'en'
 
     // Analyze with V1 (full text analysis - catches everything)
+    // Validate PDF data if provided
+    const pdfData = (body as any).pdfData
+    const validPdfData = pdfData?.base64 && pdfData?.mimeType === 'application/pdf'
+      ? { base64: pdfData.base64, mimeType: pdfData.mimeType }
+      : undefined
+
     const output = await analyzeDeal(
       validated.extractedText || '',
       validated.dealType,
@@ -69,7 +78,8 @@ export async function POST(request: Request) {
       undefined,
       validated.imageData,
       (body as any).allPages || undefined,
-      locale
+      locale,
+      validPdfData
     )
 
     // Auto-detect vendor
@@ -104,7 +114,7 @@ export async function POST(request: Request) {
         output_json: output,
         output_markdown: '', // V1 doesn't need markdown
         status: 'done',
-        model_version: 'gpt-4o',
+        model_version: 'claude-sonnet-4',
         schema_version: 'v1',
       })
       .select()

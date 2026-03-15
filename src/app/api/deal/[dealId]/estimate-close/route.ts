@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { getClaudeResponse, getLanguageInstruction } from '@/lib/openai'
+import { getClaudeResponse, getLanguageInstruction } from '@/lib/claude'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 

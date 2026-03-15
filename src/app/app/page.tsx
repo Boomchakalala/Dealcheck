@@ -50,6 +50,7 @@ export default function AppHomePage() {
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [imageData, setImageData] = useState<{ base64: string; mimeType: string } | null>(null)
   const [allPages, setAllPages] = useState<Array<{ base64: string; mimeType: string }> | null>(null)
+  const [pdfData, setPdfData] = useState<{ base64: string; mimeType: string } | null>(null)
 
   // Search & filter state
   const [searchQuery, setSearchQuery] = useState('')
@@ -124,7 +125,14 @@ export default function AppHomePage() {
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to process file')
 
-      if (data.useVision && data.imageData) {
+      if (data.useVision && data.pdfData) {
+        // Native PDF — send directly to Claude
+        setPdfData(data.pdfData)
+        setImageData(null)
+        setAllPages(null)
+        setInput('[Document received — will be analyzed visually]')
+      } else if (data.useVision && data.imageData) {
+        setPdfData(null)
         setImageData(data.imageData)
         setAllPages(data.allPages || null)
         setInput(data.pageCount > 1
@@ -134,6 +142,7 @@ export default function AppHomePage() {
         setInput(data.extractedText)
         setImageData(null)
         setAllPages(null)
+        setPdfData(null)
       }
       setUploadedFileName(file.name)
     } catch (err) {
@@ -144,7 +153,7 @@ export default function AppHomePage() {
   }
 
   const handleAnalyze = async () => {
-    if (!input.trim() && !imageData) {
+    if (!input.trim() && !imageData && !pdfData) {
       setError('Please upload a file or paste text first.')
       return
     }
@@ -155,7 +164,11 @@ export default function AppHomePage() {
         title: uploadedFileName || 'New Deal',
         vendor: null, dealType: 'New', goal: null, saveExtractedText: false,
       }
-      if (imageData) {
+      if (pdfData) {
+        payload.pdfData = pdfData
+        payload.extractedText = ''
+        payload.locale = locale
+      } else if (imageData) {
         payload.imageData = imageData
         payload.allPages = allPages || undefined
         payload.extractedText = ''

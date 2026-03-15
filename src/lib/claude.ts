@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { DealOutputSchema, DealOutputSchemaV2, type DealOutputType, type DealOutputTypeV2 } from './schemas'
+import { DealOutputSchema, DealOutputSchemaV2, QuoteClassificationSchema, type DealOutputType, type DealOutputTypeV2, type QuoteClassificationType } from './schemas'
 import type { DealOutput, DealOutputV2 } from '@/types'
 import type { ExtractedQuote } from './extract-normalize'
 
@@ -8,6 +8,7 @@ const anthropic = new Anthropic({
 })
 
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514'
+const CLAUDE_CLASSIFY_MODEL = 'claude-haiku-4-5-20251001'
 
 export const CLAUDE_MODEL_ID = CLAUDE_MODEL
 
@@ -62,6 +63,343 @@ export async function getClaudeResponse(params: {
   return text
 }
 
+// ==================================================
+// STEP 1: QUOTE CLASSIFICATION
+// ==================================================
+
+const CLASSIFICATION_PROMPT = `You are a quote classification engine. Read the quote and return a JSON classification.
+
+RULES:
+- quote_type: What kind of vendor/service is this?
+  - "saas" = Software subscriptions, licenses, cloud services, SaaS platforms
+  - "professional_services" = Consulting, agencies, marketing, legal, accounting, freelancers
+  - "product_hardware" = Physical products, equipment, supplies, shipping, inventory
+  - "household" = Home services: gardening, plumbing, cleaning, painting, moving, pest control
+  - "event_project" = One-time events: conferences, weddings, trade shows, campaigns, launches
+  - "construction" = Building, renovation, remodeling, architecture, structural work
+
+- deal_size_bracket: Based on total contract value
+  - "micro" = under €1K / $1K
+  - "small" = €1K-€10K / $1K-$10K
+  - "medium" = €10K-€50K / $10K-$50K
+  - "large" = €50K-€250K / $50K-$250K
+  - "enterprise" = over €250K / $250K
+
+- recurring: true if ongoing subscription/retainer/contract, false if one-time
+
+- leverage_level: How much negotiation power does the buyer have?
+  - "high" = Large deal, multiple alternatives exist, buyer has volume, or it's a renewal (vendor doesn't want to lose you)
+  - "medium" = Standard competitive market, some alternatives
+  - "low" = Niche vendor, small deal, urgent timeline, few alternatives
+  - "unclear" = Not enough info to determine
+
+- audience: "business" or "personal"
+
+- savings_strategy: How should we approach savings?
+  - target_percent_min / target_percent_max: The realistic savings range to push for
+  - approach: The primary negotiation lever
+  - rationale: One sentence explaining why this target makes sense
+
+  SAVINGS TARGET GUIDELINES:
+  - saas + recurring + medium+ deal: 10-20% (volume discount or multi-year)
+  - saas + recurring + renewal: 15-25% (vendor retention leverage)
+  - professional_services + large: 10-20% (scope optimization or package discount)
+  - professional_services + small: 5-15% (package discount or competitive leverage)
+  - product_hardware: 5-15% (volume discount or competitive leverage)
+  - household + small: 5-15% (package discount, competitive quotes exist)
+  - household + micro: 5-10% (modest ask, competitive quotes)
+  - event_project: 5-15% (margins vary, package discount)
+  - construction + medium+: 10-20% (line item reduction, material alternatives)
+  - construction + small: 5-10% (package discount)
+  - Higher leverage = push toward top of range
+  - Renewal with incumbent = add 5% to range (they want to keep you)
+  - Enterprise deal = push toward top of range (more room to negotiate)
+
+Return ONLY valid JSON matching this structure:
+{
+  "quote_type": "saas|professional_services|product_hardware|household|event_project|construction",
+  "deal_size_bracket": "micro|small|medium|large|enterprise",
+  "recurring": true|false,
+  "leverage_level": "high|medium|low|unclear",
+  "audience": "business|personal",
+  "savings_strategy": {
+    "target_percent_min": 5,
+    "target_percent_max": 15,
+    "approach": "package_discount|volume_discount|line_item_reduction|multi_year_commitment|scope_optimization|payment_restructure|competitive_leverage",
+    "rationale": "One sentence explaining the recommended approach"
+  }
+}`
+
+// ==================================================
+// STEP 1 FUNCTION: classifyQuote
+// ==================================================
+
+export async function classifyQuote(
+  extractedText: string,
+  dealType: 'New' | 'Renewal',
+  imageData?: { base64: string; mimeType: string },
+  allPages?: Array<{ base64: string; mimeType: string }>,
+  pdfData?: { base64: string; mimeType: string }
+): Promise<QuoteClassificationType> {
+  const hasPdf = pdfData?.base64 && pdfData?.mimeType === 'application/pdf'
+  const hasImages = allPages && allPages.length > 0
+  const hasSingleImage = imageData && SUPPORTED_IMAGE_MIME_TYPES.includes(imageData.mimeType as ClaudeImageMediaType)
+
+  const userPrompt = `Deal Type: ${dealType}\n\nClassify this quote:\n${extractedText || '(see attached document)'}`
+
+  let userContent: Anthropic.MessageParam['content']
+
+  if (hasPdf) {
+    userContent = [
+      { type: 'text', text: userPrompt },
+      { type: 'document' as any, source: { type: 'base64' as const, media_type: 'application/pdf', data: pdfData!.base64 } },
+    ]
+  } else if (hasImages) {
+    const imageBlocks: Anthropic.MessageParam['content'] = allPages!.map((page) => ({
+      type: 'image' as const,
+      source: { type: 'base64' as const, media_type: page.mimeType as ClaudeImageMediaType, data: page.base64 },
+    }))
+    userContent = [{ type: 'text', text: userPrompt }, ...imageBlocks]
+  } else if (hasSingleImage) {
+    userContent = [
+      { type: 'text', text: userPrompt },
+      { type: 'image' as const, source: { type: 'base64' as const, media_type: imageData!.mimeType as ClaudeImageMediaType, data: imageData!.base64 } },
+    ]
+  } else {
+    userContent = userPrompt
+  }
+
+  const response = await anthropic.messages.create({
+    model: CLAUDE_CLASSIFY_MODEL,
+    max_tokens: 500,
+    system: CLASSIFICATION_PROMPT,
+    messages: [{ role: 'user', content: userContent }],
+    temperature: 0.3,
+  })
+
+  const content = getResponseText(response)
+  const parsed = parseJsonFromContent(content)
+  return QuoteClassificationSchema.parse(parsed)
+}
+
+// ==================================================
+// QUOTE TYPE OVERLAYS (injected into analysis prompt)
+// ==================================================
+
+const QUOTE_TYPE_OVERLAYS: Record<string, string> = {
+  saas: `
+QUOTE TYPE: SaaS / Software Subscription
+FOCUS AREAS:
+- Per-seat/per-unit economics at scale — are they charging list price for volume?
+- Shelfware risk — are they buying more licenses than they'll use?
+- Overage exposure — what happens if usage exceeds commitment?
+- Renewal lock-in — auto-renewal clauses, notice periods, price escalation
+- Multi-year discount opportunity — can they lock in 2-3 years for 15-25% off?
+- Module/feature bundling — are they paying for features they don't need?
+
+GOOD SAVINGS BENCHMARKS:
+- 15-30% off list price is normal for annual SaaS commitments
+- Volume tiers should kick in at 50+ seats, 100+ seats, 500+ seats
+- Multi-year (2-3 year) deals typically unlock 15-25% additional discount
+- Renewal pricing should not exceed original deal + inflation (3-5%)
+
+TYPE-SPECIFIC RED FLAGS:
+- No volume discount despite significant seat count
+- Auto-renewal with short notice period (30-60 days)
+- Per-seat pricing at enterprise scale (should be flat or tiered)
+- No overage cap on usage-based components
+- Price escalation clause allowing unlimited increases at renewal
+- Bundled modules where only 2 of 5 are being used`,
+
+  professional_services: `
+QUOTE TYPE: Professional Services (Consulting, Agency, Legal, Marketing)
+FOCUS AREAS:
+- Scope clarity — vague deliverables lead to scope creep and cost overruns
+- Rate benchmarking — are hourly/daily rates in line with market for this expertise level?
+- Fixed fee vs T&M — fixed fee protects buyer, T&M protects vendor
+- Deliverable specificity — "strategy development" vs "3 deliverables with revision rounds"
+- Change order terms — what happens when scope changes (it always does)?
+- Retainer efficiency — are they paying for unused hours in a retainer?
+
+GOOD SAVINGS BENCHMARKS:
+- 10-20% through scope tightening or fixed-fee conversion
+- Retainer models: push for rollover of unused hours or reduced monthly rate
+- Agency fees: 10-15% of ad spend is standard (not 20%+)
+- Consulting day rates vary by seniority — junior resources at senior rates is a red flag
+- Volume/multi-project discounts of 10-15% are standard for ongoing relationships
+
+TYPE-SPECIFIC RED FLAGS:
+- Vague scope with T&M billing (blank check for the vendor)
+- No cap on hours or total cost
+- Deliverables defined as "as needed" or "ongoing support"
+- No revision rounds included in fixed-fee proposals
+- High percentage of senior resources for junior-level tasks
+- No performance metrics or KPIs tied to fees`,
+
+  product_hardware: `
+QUOTE TYPE: Product / Hardware / Physical Goods
+FOCUS AREAS:
+- Unit pricing at volume — bulk should be cheaper
+- Shipping and handling — often inflated, sometimes negotiable
+- Warranty and support terms — what's included vs upsold
+- Installation/setup fees — often bundled at high markup
+- Delivery timeline and penalties — delayed delivery = hidden cost
+- Maintenance/service contracts — is this bundled or separate?
+
+GOOD SAVINGS BENCHMARKS:
+- 5-15% volume discount for bulk orders is standard
+- Shipping can often be negotiated to free/reduced for large orders
+- Installation markup of 50%+ over actual cost is common and negotiable
+- Extended warranty is often 10x the actual risk cost — push for inclusion
+- MOQ (minimum order quantity) requirements can sometimes be lowered
+
+TYPE-SPECIFIC RED FLAGS:
+- No volume break at significant quantities
+- Shipping/handling charges exceeding 10% of product cost
+- Short warranty with expensive extended warranty upsell
+- Installation required but not included in quote
+- Lead times not guaranteed (risk of project delays)
+- Restocking fees above 15%`,
+
+  household: `
+QUOTE TYPE: Household / Personal Services (Gardening, Plumbing, Cleaning, etc.)
+FOCUS AREAS:
+- Labor vs materials split — if not itemized, you can't verify fairness
+- Hourly rate reasonableness — compare to local market
+- Material markup — contractors often mark up materials 20-40%
+- Scope boundaries — what's included vs what will be "extra"
+- Timeline commitment — no timeline = no accountability
+- Cleanup and disposal — often forgotten and charged extra
+
+GOOD SAVINGS BENCHMARKS:
+- 5-15% package discount for accepting the full quote
+- Material savings by sourcing materials directly (10-30% markup avoided)
+- Bundle multiple jobs for 10-20% discount (e.g., gardening + cleanup)
+- Seasonal timing — off-peak months can be 10-20% cheaper
+- Cash/prompt payment discount of 3-5% is common
+
+TYPE-SPECIFIC RED FLAGS:
+- No itemization (lump sum with no breakdown)
+- Labor rate significantly above local market
+- "As needed" language for materials or hours (open-ended cost)
+- No timeline or completion date commitment
+- Excessive deposit (over 30% for small jobs, over 20% for larger)
+- No warranty on workmanship
+- Cleanup/disposal not mentioned (will be extra)`,
+
+  event_project: `
+QUOTE TYPE: One-Time Event / Project (Conference, Campaign, Wedding, Trade Show, Launch)
+FOCUS AREAS:
+- Fixed budget vs variable costs — which items can escalate?
+- Cancellation terms — what do you lose if plans change?
+- Deposit structure — how much risk is front-loaded on buyer?
+- Inclusions vs exclusions — what's NOT in this quote?
+- Timeline penalties — what if vendor is late?
+- Vendor lock-in — can you switch vendors mid-project?
+
+GOOD SAVINGS BENCHMARKS:
+- 5-15% package discount for booking the full package
+- Venue/space negotiation: 10-20% off rack rates for off-peak or multi-day
+- Early booking discounts of 5-10% are common
+- Bundle services (AV, catering, setup) for 10-15% package deal
+- Remove line items you can source independently for 15-30% savings
+
+TYPE-SPECIFIC RED FLAGS:
+- Non-refundable deposits exceeding 25%
+- No cancellation policy or harsh cancellation penalties
+- Vague inclusions ("standard setup" — what does that mean?)
+- No backup plan for weather/no-show/tech failure
+- Timeline not contractually committed
+- Hidden costs: overtime, cleanup, electricity, parking`,
+
+  construction: `
+QUOTE TYPE: Construction / Renovation / Remodeling
+FOCUS AREAS:
+- Material costs vs labor — verify both are reasonable
+- Allowances — vague allowances always run over budget
+- Change order terms — this is where projects blow up (20-50% cost overruns)
+- Payment schedule — should be milestone-based, not front-loaded
+- Timeline with penalties — no penalty = no accountability
+- Permits and inspection costs — who pays?
+- Subcontractor markup — are subs being marked up 30%+?
+
+GOOD SAVINGS BENCHMARKS:
+- 10-20% through material alternatives (same quality, different brand)
+- Competitive sub-quotes can save 10-15% on major trades
+- Reducing allowances to actuals can save 15-25% on those line items
+- Phase-based negotiation: commit to phase 1, negotiate phase 2 pricing
+- Off-season construction (winter) can be 10-15% cheaper
+
+TYPE-SPECIFIC RED FLAGS:
+- Vague allowances ("allowance for fixtures" with no amount)
+- Change order terms allowing unlimited markup (should be cost + 15% max)
+- Payment schedule front-loaded (50%+ before work starts)
+- No timeline penalties for delays
+- Cleanup and disposal not included
+- Permit costs not specified (who pays?)
+- No warranty on workmanship (should be 1-2 years minimum)
+- Subcontractor costs not transparent`,
+}
+
+// ==================================================
+// HELPERS: Build dynamic prompt parts from classification
+// ==================================================
+
+function buildSavingsDirective(classification: QuoteClassificationType): string {
+  const { savings_strategy, deal_size_bracket, recurring } = classification
+  const { target_percent_min, target_percent_max, approach, rationale } = savings_strategy
+
+  const approachLabels: Record<string, string> = {
+    line_item_reduction: 'targeting specific overpriced line items',
+    volume_discount: 'leveraging volume for a bulk discount',
+    package_discount: 'negotiating a package/bundle discount on the total',
+    multi_year_commitment: 'offering a multi-year commitment in exchange for lower pricing',
+    scope_optimization: 'tightening scope to reduce unnecessary costs',
+    payment_restructure: 'restructuring payment terms to improve value',
+    competitive_leverage: 'using competitive alternatives as leverage',
+  }
+
+  let directive = `
+==================================================
+SAVINGS TARGET (from classification)
+==================================================
+
+TARGET: Push for ${target_percent_min}-${target_percent_max}% savings by ${approachLabels[approach] || approach}.
+RATIONALE: ${rationale}
+
+CRITICAL SAVINGS RULES:
+- You MUST include concrete savings in potential_savings. NEVER return empty potential_savings.
+- If clear line-item wins exist, quantify each one with specific € or $ amounts.
+- If NO obvious line-item wins, push for a ${target_percent_min}-${target_percent_max}% package discount on the total.
+- Frame the package discount ask as: "Request ${target_percent_min}-${target_percent_max}% discount on the total in exchange for [fast signing / commitment / referral / case study]"
+- Always calculate savings as actual numbers, not just percentages. If total is €40K, a 10% ask = €4,000 saved.
+- Format savings consistently: "€X,XXX saved" or "$X,XXX saved" — never "€2" when you mean "€2,000".`
+
+  if (recurring && (deal_size_bracket === 'medium' || deal_size_bracket === 'large' || deal_size_bracket === 'enterprise')) {
+    directive += `
+
+MULTI-YEAR LEVER: This is a recurring commitment of significant size. ALWAYS evaluate whether a 2-3 year commitment could unlock additional savings (typically 15-25% off annual pricing). Frame as: "We'd consider a multi-year commitment if pricing reflects the reduced churn risk for you." Include this as a must-have or nice-to-have ask.`
+  }
+
+  return directive
+}
+
+function buildClassificationContext(classification: QuoteClassificationType): string {
+  return `
+QUOTE CLASSIFICATION (pre-analyzed):
+Type: ${classification.quote_type}
+Deal Size: ${classification.deal_size_bracket}
+Recurring: ${classification.recurring}
+Leverage: ${classification.leverage_level}
+Audience: ${classification.audience}
+Savings Target: ${classification.savings_strategy.target_percent_min}-${classification.savings_strategy.target_percent_max}% via ${classification.savings_strategy.approach}
+Rationale: ${classification.savings_strategy.rationale}`
+}
+
+// ==================================================
+// MAIN ANALYSIS PROMPT (base — overlays get injected)
+// ==================================================
+
 const SYSTEM_PROMPT = `You are TermLift's core quote analysis engine - a sharp procurement copilot.
 
 ==================================================
@@ -82,11 +420,15 @@ DOCUMENT ANALYSIS - VISUAL COMPREHENSION:
   * Parse table structure carefully: columns often are Item | Price | Qty | Total
 
 PRICING STRUCTURE - READ CAREFULLY:
+- If the quote STATES a total (e.g., "Total: €55,000"), USE THAT NUMBER. Do NOT multiply it by term length.
+- total_commitment = the FULL amount the buyer will pay over the ENTIRE contract duration
 - If quote says "$X/month for 12 months" → Total is $X * 12 (ANNUAL), not monthly
 - If quote says "annual commitment of $Y, billed monthly" → Total is $Y/year
+- If quote says "€27,500/year for 2 years" → Total is €55,000 (not €27,500 and not €110,000)
 - If quote says "commit to X logs/day at $Y" → That's the BASE cost, not total
 - ALWAYS distinguish: Total Contract Value vs Annual Cost vs Monthly Payment
 - Example: "$50K total contract, paid $4,166/month" → Total: $50K, NOT $4,166
+- NEVER double-count: if a total is stated, trust it. Do not re-derive it by multiplying sub-components.
 
 SECTION INDEPENDENCE - NO REPETITION:
 Each section serves a DIFFERENT purpose. DO NOT repeat the same points:
@@ -138,20 +480,25 @@ SAVINGS CALCULATION — STRICT RULES:
 - potential_savings must ONLY include actual cash reductions in contract value
 - NEVER count the following as savings:
   * Risk protection clauses (force majeure, cancellation protection, liability caps)
-  * Payment term improvements (NET 30 → NET 60 is cash flow, not savings)
+  * Payment term improvements (NET 30 → NET 60 is cash flow, not savings — put these in cash_flow_improvements)
   * Non-financial term improvements (SLAs, warranties, support levels)
   * Worst-case scenario avoidance (these go in risk_improvements)
 - Be conservative — only include savings the user will definitely realise if the ask is accepted
 - Show a range where appropriate: "$500-$1,200 depending on usage"
 - Never inflate with risk protection or hypothetical worst-case values
 
-PERCENTAGE DISCOUNT RECOMMENDATION:
-- When there are no clear line-item savings AND it makes commercial sense, recommend pushing for 10-20% overall discount
-- Frame as: "Request X% overall discount in exchange for [signing quickly / longer commitment / case study / referral]"
-- SKIP this recommendation if:
-  * Contract is event-specific with fixed costs
-  * Vendor is a small operator with thin margins
-  * Pricing is already clearly at or below market rate
+SAVINGS SANITY CHECK — VERIFY BEFORE RETURNING:
+- potential_savings MUST NOT be empty. Every quote has room for negotiation.
+- Total savings should be between 3% and 40% of total_commitment. Under 3% means you're not pushing hard enough. Over 40% means you're inflating.
+- Every savings amount must be in the SAME CURRENCY and ORDER OF MAGNITUDE as the deal. A €40,000 deal cannot have a €265 savings item as the main ask — that's less than 1%.
+- Format amounts consistently: "€4,000 saved" or "$2,500-$3,500 saved" — NEVER "€2" when you mean "€2,000", NEVER "€265" on a €40K deal as a primary savings.
+- At least ONE must_have ask MUST be a direct price reduction with a specific € or $ amount. No exceptions.
+
+PERCENTAGE DISCOUNT — ALWAYS APPLICABLE:
+- If no clear line-item overpricing exists, ALWAYS push for a package discount (use the savings target from classification)
+- Frame as: "Request X% overall discount in exchange for [signing quickly / longer commitment / case study / referral / early payment]"
+- Calculate the actual € or $ amount: "10% on €40K = €4,000 saved"
+- This applies to ALL quote types — there is ALWAYS room to ask
 
 IF INFO IS MISSING: Frame as "This vagueness will cost you X%" NOT "please provide contact info"
 
@@ -246,9 +593,12 @@ CRITICAL: BE SPECIFIC TO THIS QUOTE
 STEP 4: SELECTIVE MUST-HAVE ASKS
 ==================================================
 
-Return 1-3 must-have asks (typically should include price improvement).
+Return 1-3 must-have asks. The FIRST must-have ask MUST ALWAYS be a price reduction.
 
 Rules:
+- MANDATORY: The first must_have item must be a direct price/cost reduction ask with a specific € or $ target amount
+- If line-item reductions are obvious, lead with the biggest one
+- If no obvious line-item wins, lead with a package discount ask at the target savings percentage
 - Each ask must be SPECIFIC to this quote with ACTUAL NUMBERS
 - Be ASSERTIVE and direct - start with action verbs
 - NEVER use: "Could we...", "Would you consider...", "Would it be possible to...", "Can we..."
@@ -507,9 +857,22 @@ CRITICAL REMINDERS:
 - Adapt to business vs personal context
 - Only include price_insight if quote contains pricing signals
 - red_flags: 0-3 items (not always 3)
-- must_have asks: typically 1-3 items including price improvement
-- If quote is mostly acceptable, say so clearly
+- must_have asks: 1-3 items, FIRST ONE MUST be a price reduction with specific € or $ amount
+- potential_savings: MUST NOT be empty — always include at least one concrete savings item
+- If quote is mostly acceptable, say so clearly — but still push for a modest discount
 - Never pad output just to fill the template
+
+==================================================
+FINAL SELF-CHECK (do this mentally before returning JSON)
+==================================================
+
+Before returning your JSON response, verify ALL of these:
+1. Does total_commitment match what the quote ACTUALLY STATES? Did you accidentally double or halve it?
+2. Are potential_savings amounts realistic? Are they properly formatted (€4,000 not €4, €2,500 not €2)?
+3. Is the first must_have ask a direct price reduction with a specific € or $ amount?
+4. Are savings proportional to the deal? (3-40% of total, not 0.5% or 80%)
+5. Would a smart procurement person find this analysis sharp and useful, or generic and bland?
+6. Did you reference actual numbers from the quote (not made-up benchmarks)?
 
 ==================================================
 EMAIL GENERATION RULES
@@ -751,29 +1114,77 @@ export async function analyzeDeal(
   previousRoundOutput?: DealOutput,
   imageData?: { base64: string; mimeType: string },
   allPages?: Array<{ base64: string; mimeType: string }>,
-  userLocale?: string
+  userLocale?: string,
+  pdfData?: { base64: string; mimeType: string }
 ): Promise<DealOutputType> {
+
+  // =============================================
+  // STEP 1: Classify the quote (fast, cheap call)
+  // =============================================
+  let classification: QuoteClassificationType | null = null
+  try {
+    classification = await classifyQuote(extractedText, dealType, imageData, allPages, pdfData)
+    console.log('[TermLift] Classification:', JSON.stringify(classification))
+  } catch (err) {
+    console.warn('[TermLift] Classification failed, proceeding without overlay:', err)
+  }
+
+  // =============================================
+  // STEP 2: Build enhanced system prompt
+  // =============================================
+  let enhancedSystemPrompt = SYSTEM_PROMPT
+
+  if (classification) {
+    // Inject type-specific overlay
+    const overlay = QUOTE_TYPE_OVERLAYS[classification.quote_type]
+    if (overlay) {
+      enhancedSystemPrompt += `\n\n==================================================\nQUOTE-TYPE SPECIFIC GUIDANCE\n==================================================${overlay}`
+    }
+
+    // Inject savings directive
+    enhancedSystemPrompt += buildSavingsDirective(classification)
+  }
+
+  // =============================================
+  // STEP 3: Run the analysis
+  // =============================================
   const contextParts = [
     `Deal Type: ${dealType}`,
+    classification && buildClassificationContext(classification),
     goal && `User Goal: ${goal}`,
     notes && `User Notes: ${notes}`,
     previousRoundOutput && `Previous Round Context: ${JSON.stringify(previousRoundOutput, null, 2)}`,
     userLocale === 'fr' && `OUTPUT LANGUAGE INSTRUCTION: Write ALL analysis sections (verdict, quick_read, red_flags, what_to_ask_for, negotiation_plan, potential_savings, assumptions, disclaimer) in FRENCH. However, write the email_drafts (subject and body) in the SAME LANGUAGE AS THE INPUT DOCUMENT. If the quote is in English, emails must be in English. If the quote is in French, emails must be in French. The user reads French but needs to send emails the vendor can understand.`,
   ].filter(Boolean)
 
-  // Determine if we're using vision
+  // Determine input type
+  const hasPdf = pdfData?.base64 && pdfData?.mimeType === 'application/pdf'
   const hasImages = allPages && allPages.length > 0
   const hasSingleImage = imageData && SUPPORTED_IMAGE_MIME_TYPES.includes(imageData.mimeType as ClaudeImageMediaType)
+  const hasVisualInput = hasPdf || hasImages || hasSingleImage
 
-  const userPrompt = (hasImages || hasSingleImage)
+  const userPrompt = hasVisualInput
     ? contextParts.join('\n\n') + '\n\nPlease analyze the quote/contract shown in the attached document. Read the entire document carefully — pay close attention to tables, pricing, terms, dates, and any fine print.'
     : contextParts.join('\n\n') + `\n\nSupplier Document/Quote:\n${extractedText}`
 
   try {
     let userContent: Anthropic.MessageParam['content']
 
-    if (hasImages) {
-      // Multi-page PDF: send all pages as images
+    if (hasPdf) {
+      // Native PDF document — send directly to Claude
+      userContent = [
+        { type: 'text', text: userPrompt },
+        {
+          type: 'document' as any,
+          source: {
+            type: 'base64' as const,
+            media_type: 'application/pdf',
+            data: pdfData!.base64,
+          },
+        },
+      ]
+    } else if (hasImages) {
+      // Multi-page images
       const imageBlocks: Anthropic.MessageParam['content'] = allPages!.map((page) => ({
         type: 'image' as const,
         source: {
@@ -806,10 +1217,10 @@ export async function analyzeDeal(
 
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
-      max_tokens: 3500,
-      system: SYSTEM_PROMPT + getLanguageInstruction(userLocale || 'en'),
+      max_tokens: 4500,
+      system: enhancedSystemPrompt + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: userContent }],
-      temperature: 0.7,
+      temperature: 0.4,
     })
 
     const content = getResponseText(response)

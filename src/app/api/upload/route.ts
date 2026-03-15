@@ -41,39 +41,17 @@ export async function POST(request: Request) {
       })
     }
 
-    // PDFs → convert to page images for Claude vision
+    // PDFs → send directly as base64 document to Claude (native PDF support)
     if (file.type === 'application/pdf') {
-      try {
-        const { pdfToImages } = await import('@/lib/pdf-to-images')
-        const pageImages = await pdfToImages(buffer, 10)
-
-        if (pageImages.length > 0) {
-          return NextResponse.json({
-            useVision: true,
-            imageData: pageImages[0], // Primary page for single-image analysis
-            allPages: pageImages,     // All pages for multi-page docs
-            pageCount: pageImages.length,
-            source: 'pdf-vision',
-          })
-        }
-      } catch (error) {
-        console.warn('PDF vision conversion failed, falling back to text extraction:', error)
-      }
-
-      // Fallback: extract text from PDF
-      try {
-        const extractedText = await extractText(file)
-        return NextResponse.json({
-          extractedText,
-          useVision: false,
-          source: 'text-fallback',
-        })
-      } catch (extractError) {
-        console.error('Text extraction also failed:', extractError)
-        return NextResponse.json({
-          error: 'Could not process this PDF. Try pasting the text directly or uploading as an image.'
-        }, { status: 422 })
-      }
+      const base64 = buffer.toString('base64')
+      return NextResponse.json({
+        useVision: true,
+        pdfData: {
+          base64,
+          mimeType: 'application/pdf',
+        },
+        source: 'pdf-native',
+      })
     }
 
     return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 })

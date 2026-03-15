@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
-import { generateEmailV2 } from '@/lib/openai'
+import { generateEmailV2 } from '@/lib/claude'
 import type { DealOutputV2, EmailControls } from '@/types'
 
 export async function POST(

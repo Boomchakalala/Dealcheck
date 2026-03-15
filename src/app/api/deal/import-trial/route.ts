@@ -87,7 +87,7 @@ export async function POST(request: Request) {
         output_json: output,
         output_markdown: renderMarkdown(output),
         status: 'done',
-        model_version: 'gpt-4o',
+        model_version: 'claude-sonnet-4',
       })
       .select()
       .single()

@@ -42,6 +42,7 @@ export default function TryPage() {
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
   const [imageData, setImageData] = useState<{ base64: string; mimeType: string } | null>(null)
   const [allPages, setAllPages] = useState<Array<{ base64: string; mimeType: string }> | null>(null)
+  const [pdfData, setPdfData] = useState<{ base64: string; mimeType: string } | null>(null)
   const [dealType, setDealType] = useState<'New' | 'Renewal'>('New')
   const [goal, setGoal] = useState('')
   const [isDemoText, setIsDemoText] = useState(false)
@@ -92,7 +93,14 @@ This quote expires in 14 days.`
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || t('try.failedProcess'))
 
-      if (data.useVision && data.imageData) {
+      if (data.useVision && data.pdfData) {
+        // Native PDF — send directly to Claude
+        setPdfData(data.pdfData)
+        setImageData(null)
+        setAllPages(null)
+        setInput(`[${t('try.docReceived')}]`)
+      } else if (data.useVision && data.imageData) {
+        setPdfData(null)
         setImageData(data.imageData)
         setAllPages(data.allPages || null)
         setInput(data.pageCount > 1
@@ -102,6 +110,7 @@ This quote expires in 14 days.`
         setInput(data.extractedText)
         setImageData(null)
         setAllPages(null)
+        setPdfData(null)
       }
       setUploadedFileName(file.name)
     } catch (err) {
@@ -112,7 +121,7 @@ This quote expires in 14 days.`
   }
 
   const handleSubmit = async () => {
-    if (!input.trim() && !imageData) {
+    if (!input.trim() && !imageData && !pdfData) {
       setError(t('try.uploadOrPaste'))
       return
     }
@@ -136,6 +145,7 @@ This quote expires in 14 days.`
           isDemoText,
           imageData: imageData || undefined,
           allPages: allPages || undefined,
+          pdfData: pdfData || undefined,
           locale,
         }),
       })

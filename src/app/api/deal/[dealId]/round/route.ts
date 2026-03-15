@@ -2,8 +2,11 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { AddRoundSchema } from '@/lib/schemas'
-import { analyzeDeal } from '@/lib/openai'
+import { analyzeDeal } from '@/lib/claude'
 import { checkRateLimit } from '@/lib/rate-limit'
+
+// Allow up to 60s for classification + analysis (Vercel Pro plan)
+export const maxDuration = 60
 
 const FREE_ANALYSIS_LIMIT = 5
 
@@ -112,7 +115,7 @@ export async function POST(
         output_json: output,
         output_markdown: renderMarkdown(output),
         status: 'done',
-        model_version: 'gpt-4o',
+        model_version: 'claude-sonnet-4',
       })
       .select()
       .single()

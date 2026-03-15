@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { analyzeDeal } from '@/lib/openai'
+import { analyzeDeal } from '@/lib/claude'
+
+// Allow up to 60s for classification + analysis (Vercel Pro plan)
+export const maxDuration = 60
 
 // Guest trial - no auth required, uses V1 schema (full text analysis)
 // 1 free analysis per IP without signup — then prompt to create account
@@ -42,7 +45,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { extractedText, dealType, goal, notes, imageData, allPages, structuredQuote, locale } = body
+    const { extractedText, dealType, goal, notes, imageData, allPages, pdfData, structuredQuote, locale } = body
 
     // IP-based rate limiting for trial route
     const clientIP = getClientIP(request)
@@ -55,8 +58,8 @@ export async function POST(request: Request) {
       )
     }
 
-    // Allow empty text when images are provided (PDF vision or image upload)
-    const hasVisualInput = imageData?.base64 || (allPages && allPages.length > 0)
+    // Allow empty text when images or PDFs are provided
+    const hasVisualInput = imageData?.base64 || (allPages && allPages.length > 0) || pdfData?.base64
     if (!hasVisualInput && (!extractedText || extractedText.length < 10)) {
       return NextResponse.json(
         { error: 'Please provide text to analyze' },
@@ -76,6 +79,11 @@ export async function POST(request: Request) {
       p.base64 && p.mimeType && supportedImageTypes.includes(p.mimeType)
     ) || undefined
 
+    // Validate PDF data
+    const validPdfData = pdfData?.base64 && pdfData?.mimeType === 'application/pdf'
+      ? { base64: pdfData.base64, mimeType: pdfData.mimeType }
+      : undefined
+
     // Determine locale from cookie or request body
     const resolvedLocale = (await cookies()).get('termlift_lang')?.value || locale || 'en'
 
@@ -88,7 +96,8 @@ export async function POST(request: Request) {
       undefined,
       validImageData,
       validAllPages && validAllPages.length > 0 ? validAllPages : undefined,
-      resolvedLocale
+      resolvedLocale,
+      validPdfData
     )
 
     return NextResponse.json({
