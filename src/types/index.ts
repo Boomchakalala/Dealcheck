@@ -196,6 +196,14 @@ export type DealOutput = {
     recommendation: string
     category: 'cash_flow' | 'risk_protection' | 'liability'
   }>
+  score?: number
+  score_label?: string
+  score_breakdown?: {
+    pricing_fairness: number
+    terms_protections: number
+    leverage_position: number
+  }
+  score_rationale?: string
   email_drafts: {
     neutral: EmailDraft
     firm: EmailDraft

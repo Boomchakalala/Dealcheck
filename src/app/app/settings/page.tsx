@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { SettingsClient } from '@/components/SettingsClient'
-import { formatCurrency, type Currency } from '@/lib/currency'
+import { formatCurrency, parseMoney, type Currency } from '@/lib/currency'
 import { getTranslations } from 'next-intl/server'
 import { cookies } from 'next/headers'
 
@@ -42,8 +42,7 @@ export default async function SettingsPage() {
     const latest = rounds.sort((a: any, b: any) => (b.round_number || 0) - (a.round_number || 0))[0]
     const savings = latest?.output_json?.potential_savings || []
     return sum + savings.reduce((s: number, item: any) => {
-      const match = item.annual_impact?.match(/[\d,]+/)
-      return s + (match ? parseInt(match[0].replace(/,/g, ''), 10) : 0)
+      return s + parseMoney(item.annual_impact || '').amount
     }, 0)
   }, 0)
 

@@ -58,6 +58,14 @@ export const DealOutputSchema = z.object({
     recommendation: z.string(),
     category: z.enum(['cash_flow', 'risk_protection', 'liability']),
   })).optional(),
+  score: z.number().min(0).max(100).optional(),
+  score_label: z.string().optional(),
+  score_breakdown: z.object({
+    pricing_fairness: z.number().min(0).max(50),
+    terms_protections: z.number().min(0).max(30),
+    leverage_position: z.number().min(0).max(20),
+  }).optional(),
+  score_rationale: z.string().optional(),
   email_drafts: z.object({
     neutral: EmailDraftSchema,
     firm: EmailDraftSchema,

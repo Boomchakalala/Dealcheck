@@ -7,6 +7,7 @@ import { CloseDealModal } from '@/components/CloseDealModal'
 import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, MoreHorizontal } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
 import { useI18n } from '@/i18n/context'
+import { normalizeAmount, detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
 
 interface DealListClientProps {
   deals: any[]
@@ -55,20 +56,44 @@ function normalizeCategory(raw: string): string {
 }
 
 function formatAmount(value: string): string {
-  return value.replace(/\.00$/, '').replace(/\.\d{1,2}$/, '')
+  return normalizeAmount(value)
 }
 
-function formatSavings(amount: number, locale: string): string {
-  if (amount >= 1000000) return `€${(amount / 1000000).toFixed(1)}M`
-  return `€${Math.round(amount).toLocaleString(locale === 'fr' ? 'fr-FR' : 'en-US')}`
+function formatSavings(amount: number, locale: string, currencyHint?: string): string {
+  const currency = currencyHint ? detectCurrency(currencyHint) : 'EUR'
+  return formatCurrency(amount, currency)
+}
+
+function parseSavingsNumber(str: string): number {
+  if (!str) return 0
+  // Remove currency symbols and text
+  let cleaned = str.replace(/[€$£¥]/g, '').replace(/saved|économisés?|potentiel|per year|\/year|\/yr|\/an/gi, '').trim()
+  // Handle K/M suffixes: "2.5K" → 2500, "1.2M" → 1200000
+  const kmMatch = cleaned.match(/([\d.,\s]+)\s*([KkMm])/)
+  if (kmMatch) {
+    const num = parseFloat(kmMatch[1].replace(/[\s,]/g, '').replace(/\.(?=.*\.)/, ''))
+    const suffix = kmMatch[2].toUpperCase()
+    if (suffix === 'K') return num * 1000
+    if (suffix === 'M') return num * 1000000
+  }
+  // Handle French format: "2 000" or "16 800" (spaces as thousands separators)
+  // Handle European format: "2.000" (dots as thousands separators with no decimals)
+  // Handle standard: "2,000" or "16,800"
+  cleaned = cleaned.replace(/\s/g, '') // remove all spaces first
+  // If pattern is like 2.000 (dot as thousands sep, no decimal), convert
+  if (/^\d{1,3}(\.\d{3})+$/.test(cleaned)) {
+    cleaned = cleaned.replace(/\./g, '')
+  }
+  cleaned = cleaned.replace(/,/g, '')
+  const num = parseFloat(cleaned)
+  return isNaN(num) ? 0 : num
 }
 
 function getPotentialSavings(deal: any): number {
   const latestRound = getLatestRound(deal)
   const savings = latestRound?.output_json?.potential_savings || []
   return savings.reduce((sum: number, item: any) => {
-    const match = item.annual_impact?.match(/[\d,]+/)
-    return sum + (match ? parseInt(match[0].replace(/,/g, ''), 10) : 0)
+    return sum + parseSavingsNumber(item.annual_impact || '')
   }, 0)
 }
 
@@ -147,6 +172,8 @@ export function DealListClient({ deals }: DealListClientProps) {
           const vendorName = deal.vendor || latestOutput?.vendor || deal.title
           const rawCategory = latestOutput?.category || ''
           const category = rawCategory ? normalizeCategory(rawCategory) : null
+          const quoteScore = latestOutput?.score as number | undefined
+          const scoreLabel = latestOutput?.score_label as string | undefined
           const isClosed = deal.status?.startsWith('closed_')
           const totalCommitment = latestOutput?.snapshot?.total_commitment
           const redFlagCount = latestOutput?.red_flags?.length || 0
@@ -163,10 +190,20 @@ export function DealListClient({ deals }: DealListClientProps) {
 
                   {/* Left: vendor + category */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2.5 mb-1">
-                      <h3 className="text-[15px] font-bold text-slate-900 truncate group-hover:text-emerald-700 transition-colors">
+                    <div className="flex items-start gap-2.5 mb-1 flex-wrap">
+                      <h3 className="text-[15px] font-bold text-slate-900 group-hover:text-emerald-700 transition-colors break-words">
                         {vendorName}
                       </h3>
+                      {quoteScore != null && (
+                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0 ${
+                          quoteScore >= 80 ? 'bg-emerald-100 text-emerald-700' :
+                          quoteScore >= 60 ? 'bg-amber-100 text-amber-700' :
+                          quoteScore >= 40 ? 'bg-orange-100 text-orange-700' :
+                          'bg-red-100 text-red-700'
+                        }`} title={`${quoteScore}/100 — ${scoreLabel || ''}`}>
+                          {quoteScore}
+                        </span>
+                      )}
                       <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border flex-shrink-0 ${status.badge}`}>
                         {status.icon}{status.label}
                       </span>
@@ -191,11 +228,27 @@ export function DealListClient({ deals }: DealListClientProps) {
                       {totalCommitment && (
                         <p className="text-base font-bold text-slate-900">{formatAmount(totalCommitment)}</p>
                       )}
-                      {savingsToShow > 0 && (
-                        <p className="text-xs font-semibold text-emerald-600 mt-0.5">
-                          {formatSavings(savingsToShow, locale)} {isClosed && achievedSavings > 0 ? (locale === 'fr' ? 'économisés' : 'saved') : (locale === 'fr' ? 'potentiel' : 'potential')}
-                        </p>
-                      )}
+                      {savingsToShow > 0 && (() => {
+                        const totalAmount = parseSavingsNumber(totalCommitment || '0')
+                        const savingsPct = totalAmount > 0 ? (savingsToShow / totalAmount) * 100 : 0
+                        const isMeaningful = savingsToShow >= 100 && savingsPct >= 1
+
+                        if (isClosed && achievedSavings > 0) {
+                          return (
+                            <p className="text-xs font-semibold text-emerald-600 mt-0.5">
+                              {formatSavings(savingsToShow, locale, totalCommitment)} {locale === 'fr' ? 'économisés' : 'saved'}
+                            </p>
+                          )
+                        }
+                        if (isMeaningful) {
+                          return (
+                            <p className="text-xs font-semibold text-emerald-600 mt-0.5">
+                              {formatSavings(savingsToShow, locale, totalCommitment)} {locale === 'fr' ? 'potentiel' : 'potential'}
+                            </p>
+                          )
+                        }
+                        return null
+                      })()}
                     </div>
                     <DealMenu
                       dealId={deal.id} isClosed={!!isClosed} totalCommitment={totalCommitment}

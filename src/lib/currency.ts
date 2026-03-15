@@ -156,6 +156,57 @@ export function formatCurrency(amount: number, currency: Currency): string {
 }
 
 /**
+ * Normalize a raw currency string from AI output into consistent format.
+ * Handles: "21 456,00 €", "40 998€", "$16,328.40", "€110,170", "15 000 €/an"
+ * Returns: "€21,456", "$16,328", etc. (symbol before, comma thousands, no decimals)
+ */
+export function normalizeAmount(raw: string): string {
+  if (!raw || typeof raw !== 'string') return raw
+
+  // Detect currency
+  const currency = detectCurrency(raw)
+  const symbols: Record<Currency, string> = {
+    EUR: '€', USD: '$', GBP: '£', CAD: 'C$', AUD: 'A$', CHF: 'CHF ', JPY: '¥',
+  }
+  const symbol = symbols[currency]
+
+  // Strip all currency symbols and text suffixes
+  let cleaned = raw
+    .replace(/€|EUR|\$|USD|£|GBP|C\$|CAD|A\$|AUD|CHF|¥|JPY/gi, '')
+    .replace(/\/(an|year|yr|month|mo|mois)/gi, '')
+    .trim()
+
+  // Handle French-style numbers: "21 456,00" → "21456.00"
+  // If we see digits with spaces as thousands separators and comma as decimal
+  if (/\d\s\d/.test(cleaned) || /\d,\d{2}$/.test(cleaned)) {
+    cleaned = cleaned.replace(/\s/g, '') // remove spaces
+    cleaned = cleaned.replace(/,(\d{2})$/, '.$1') // convert trailing ,XX to .XX
+    // If comma is thousands separator (e.g., "21,456"), leave as-is after space removal
+    if (/,\d{3}/.test(cleaned)) {
+      cleaned = cleaned.replace(/,/g, '')
+    }
+  }
+
+  // Remove any remaining non-numeric chars except . and ,
+  cleaned = cleaned.replace(/[^\d.,]/g, '')
+
+  // Handle remaining commas as thousands separators
+  cleaned = cleaned.replace(/,/g, '')
+
+  const num = parseFloat(cleaned)
+  if (isNaN(num)) return raw // Can't parse, return original
+
+  // Format: symbol + number with commas, no decimals for amounts >= 1
+  if (num >= 1000000) {
+    return `${symbol}${(num / 1000000).toFixed(1)}M`
+  }
+  if (num >= 1) {
+    return `${symbol}${Math.round(num).toLocaleString('en-US')}`
+  }
+  return `${symbol}${num.toFixed(2)}`
+}
+
+/**
  * Parse money string and return amount + currency
  */
 export function parseMoney(str: string): { amount: number; currency: Currency } {

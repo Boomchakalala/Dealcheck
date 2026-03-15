@@ -31,8 +31,22 @@ async function convertDealAmount(totalStr: string, dealCurrency: Currency | unde
 
 function parseSavingsAmount(str?: string): number {
   if (!str) return 0
-  const match = str.match(/[\d,]+/)
-  return match ? parseInt(match[0].replace(/,/g, ''), 10) : 0
+  // Remove currency symbols and text suffixes
+  let cleaned = str.replace(/[€$£¥]/g, '').replace(/saved|économisés?|potentiel|per year|\/year|\/yr|\/an/gi, '').trim()
+  // Handle K/M suffixes
+  const kmMatch = cleaned.match(/([\d.,\s]+)\s*([KkMm])/)
+  if (kmMatch) {
+    const num = parseFloat(kmMatch[1].replace(/[\s,]/g, ''))
+    const suffix = kmMatch[2].toUpperCase()
+    if (suffix === 'K') return num * 1000
+    if (suffix === 'M') return num * 1000000
+  }
+  // Remove spaces (French thousands), handle dots as thousands sep
+  cleaned = cleaned.replace(/\s/g, '')
+  if (/^\d{1,3}(\.\d{3})+$/.test(cleaned)) cleaned = cleaned.replace(/\./g, '')
+  cleaned = cleaned.replace(/,/g, '')
+  const num = parseFloat(cleaned)
+  return isNaN(num) ? 0 : num
 }
 
 export default async function DashboardPage() {
@@ -116,6 +130,20 @@ export default async function DashboardPage() {
   // Win rate
   const wonDeals = closedDeals.filter(d => d.status === 'closed_won' || d.status === 'closed_paused')
   const winRate = closedDeals.length > 0 ? (wonDeals.length / closedDeals.length) * 100 : 0
+
+  // Average quote score
+  const dealsWithScores = enrichedDeals.filter(d => {
+    const rounds = (d as any).rounds || []
+    const latest = rounds.sort((a: any, b: any) => (b.round_number || 0) - (a.round_number || 0))[0]
+    return latest?.output_json?.score != null
+  })
+  const averageQuoteScore = dealsWithScores.length > 0
+    ? dealsWithScores.reduce((sum, d) => {
+        const rounds = (d as any).rounds || []
+        const latest = rounds.sort((a: any, b: any) => (b.round_number || 0) - (a.round_number || 0))[0]
+        return sum + (latest?.output_json?.score || 0)
+      }, 0) / dealsWithScores.length
+    : 0
 
   // Category breakdown
   const categoryMap = new Map<string, { spend: number; count: number; identified: number; achieved: number }>()
@@ -323,6 +351,7 @@ export default async function DashboardPage() {
         winRate={winRate}
         closedDealCount={closedDeals.length}
         wonDealCount={wonDeals.length}
+        averageQuoteScore={averageQuoteScore}
       />
     </div>
   )

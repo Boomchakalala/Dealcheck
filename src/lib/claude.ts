@@ -448,7 +448,12 @@ Each section serves a DIFFERENT purpose. DO NOT repeat the same points:
    - These should be MORE SPECIFIC than quick_read concerns
 
 5. **negotiation_plan.leverage_you_have** = Your bargaining power (0-5 items)
-   - Example: "Multi-year commitment", "Enterprise scale", "Multiple vendors evaluated"
+   - CRITICAL: Only state leverage the user ACTUALLY HAS based on facts in the quote or context they provided
+   - NEVER fabricate facts like "You have competing quotes" or "You've been evaluating alternatives" unless the user explicitly said so
+   - If leverage is SUGGESTED (not confirmed), frame it as a suggestion: "Consider getting competing quotes — vendors in this range typically charge €X–Y"
+   - Factual leverage (from quote): "12-month commitment gives negotiating power", "Volume of 100+ seats justifies discount"
+   - Suggested leverage (not from quote): "Consider mentioning alternative vendors if you have other quotes"
+   - Example: "Multi-year commitment", "Enterprise scale"
 
 CRITICAL: If you put "overage risk" in whats_concerning, the red_flag should provide DETAILED analysis with specific $ numbers, and must_have should give SPECIFIC mitigation request.
 
@@ -806,7 +811,7 @@ Return valid JSON only. Match this structure exactly:
   ],
   "NOTE": "See how red_flag is MUCH MORE DETAILED than the quick_read concern? This is correct.",
   "negotiation_plan": {
-    "leverage_you_have": ["max 5 bullets, no bluffing — only real leverage from quote/context"],
+    "leverage_you_have": ["max 5 bullets — ONLY facts from the quote/context. For suggested leverage not confirmed by user, prefix with 'Consider:' e.g. 'Consider getting competing quotes if you haven't already'"],
     "must_have_asks": ["1-3 critical items ONLY, should typically include price improvement"],
     "nice_to_have_asks": ["0-3 secondary items if justified"],
     "trades_you_can_offer": ["0-3 pragmatic concessions you can make"]
@@ -841,6 +846,15 @@ Return valid JSON only. Match this structure exactly:
     }
   ],
   "NOTE_CASHFLOW": "Include payment term improvements, risk protection clauses, liability caps, and other non-cash improvements here. Each must have type, recommendation, and category (cash_flow | risk_protection | liability). Omit if none relevant. NEVER include these in potential_savings.",
+  "score": 67,
+  "score_label": "Room to Negotiate",
+  "score_breakdown": {
+    "pricing_fairness": 28,
+    "terms_protections": 22,
+    "leverage_position": 17
+  },
+  "score_rationale": "20% ad management fee and no overage cap are the main drivers of risk here.",
+  "NOTE_SCORE": "See QUOTE SCORE CALCULATION section below for scoring rules.",
   "email_drafts": {
     "neutral": {"subject": "...", "body": "..."},
     "firm": {"subject": "...", "body": "..."},
@@ -873,6 +887,46 @@ Before returning your JSON response, verify ALL of these:
 4. Are savings proportional to the deal? (3-40% of total, not 0.5% or 80%)
 5. Would a smart procurement person find this analysis sharp and useful, or generic and bland?
 6. Did you reference actual numbers from the quote (not made-up benchmarks)?
+
+==================================================
+QUOTE SCORE CALCULATION
+==================================================
+
+Calculate a score from 0-100 composed of three weighted components:
+
+1. PRICING FAIRNESS (0-50 points):
+   - Are rates at, below, or above market for this category?
+   - Are there hidden fees or unusual pricing structures?
+   - Is the total reasonable for the scope?
+   - 50 = at or below market, transparent pricing
+   - 0 = significantly above market, opaque or punitive fees
+
+2. TERMS AND PROTECTIONS (0-30 points):
+   - Reasonable cancellation clause? (30 days = good, 60+ days = bad)
+   - Auto-renewal addressed with adequate notice?
+   - Overage/excess fees capped or defined?
+   - Deliverables and SLAs clearly specified?
+   - Liability reasonably limited?
+   - 30 = all protections present and fair
+   - 0 = one-sided terms heavily favoring vendor
+
+3. LEVERAGE POSITION (0-20 points):
+   - Renewal (more leverage) or new purchase?
+   - Hard deadline creating pressure?
+   - Commitment length reasonable for the category?
+   - Competing alternatives in market?
+   - 20 = strong leverage, flexibility
+   - 0 = weak position, locked in, no alternatives
+
+score = pricing_fairness + terms_protections + leverage_position
+
+SCORE LABELS:
+- 80-100: "Mostly Fair"
+- 60-79: "Room to Negotiate"
+- 40-59: "Overpriced"
+- 0-39: "High Risk"
+
+score_rationale: One punchy sentence explaining the biggest factor dragging the score down (or up if mostly fair).
 
 ==================================================
 EMAIL GENERATION RULES

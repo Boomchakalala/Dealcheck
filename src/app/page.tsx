@@ -84,7 +84,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href="/example"
-                  className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-xl bg-white text-slate-700 hover:bg-slate-50 transition-all border-2 border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md"
+                  className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium rounded-xl text-slate-500 hover:text-emerald-600 transition-all"
                 >
                   {t('hero.ctaSecondary')}
                 </Link>

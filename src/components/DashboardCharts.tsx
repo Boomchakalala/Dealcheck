@@ -7,8 +7,16 @@ import { AlertTriangle, Lock } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 
 const CHART_COLORS = [
-  '#10b981', '#14b8a6', '#0d9488', '#059669', '#047857',
-  '#6366f1', '#8b5cf6', '#a78bfa', '#64748b', '#94a3b8',
+  '#10b981', // emerald (primary)
+  '#6366f1', // indigo
+  '#f59e0b', // amber
+  '#0d9488', // teal
+  '#8b5cf6', // violet
+  '#ef4444', // red
+  '#14b8a6', // cyan-teal
+  '#ec4899', // pink
+  '#64748b', // slate
+  '#059669', // green-dark
 ]
 
 interface Category {
@@ -49,12 +57,13 @@ interface Props {
   winRate: number
   closedDealCount: number
   wonDealCount: number
+  averageQuoteScore?: number
 }
 
-function formatMoney(n: number, currency: string, locale: string): string {
+function formatMoney(n: number, currency: string, _locale: string): string {
   const symbol = currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : currency === 'CAD' ? 'C$' : currency === 'AUD' ? 'A$' : '$'
   if (n >= 1000000) return `${symbol}${Math.round(n / 100000) / 10}M`
-  if (n >= 1000) return `${symbol}${Math.round(n).toLocaleString(locale === 'fr' ? 'fr-FR' : 'en-US')}`
+  if (n >= 1000) return `${symbol}${Math.round(n).toLocaleString('en-US')}`
   return `${symbol}${Math.round(n)}`
 }
 
@@ -180,24 +189,33 @@ function DonutChart({
             />
           )
         })}
-        <text
-          x={size / 2}
-          y={size / 2 - 6}
-          textAnchor="middle"
-          className="fill-slate-900 text-sm font-bold rotate-90"
-          style={{ transformOrigin: 'center' }}
-        >
-          {formatMoney(total, currency, locale)}
-        </text>
-        <text
-          x={size / 2}
-          y={size / 2 + 10}
-          textAnchor="middle"
-          className="fill-slate-400 text-[9px] rotate-90"
-          style={{ transformOrigin: 'center' }}
-        >
-          {t('charts.totalSpendLabel')}
-        </text>
+        {(() => {
+          const selected = selectedCategory ? data.find(d => d.name === selectedCategory) : null
+          const centerAmount = selected ? selected.spend : total
+          const centerLabel = selected ? selected.name : `${data.length} ${t('charts.categories')}`
+          return (
+            <>
+              <text
+                x={size / 2}
+                y={size / 2 - 6}
+                textAnchor="middle"
+                className="fill-slate-900 text-sm font-bold rotate-90"
+                style={{ transformOrigin: 'center' }}
+              >
+                {formatMoney(centerAmount, currency, locale)}
+              </text>
+              <text
+                x={size / 2}
+                y={size / 2 + 10}
+                textAnchor="middle"
+                className="fill-slate-400 text-[9px] rotate-90"
+                style={{ transformOrigin: 'center' }}
+              >
+                {centerLabel.length > 18 ? centerLabel.slice(0, 16) + '…' : centerLabel}
+              </text>
+            </>
+          )
+        })()}
       </svg>
 
       {/* Legend */}
@@ -298,7 +316,7 @@ function SavingsBarChart({ data, currency, t, locale }: { data: Category[]; curr
   )
 }
 
-export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency, savingsAchieved, isPro, isAdmin, winRate, closedDealCount, wonDealCount }: Props) {
+export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency, savingsAchieved, isPro, isAdmin, winRate, closedDealCount, wonDealCount, averageQuoteScore }: Props) {
   const showProLock = !isPro && !isAdmin
   const { t, locale } = useI18n()
   const router = useRouter()
@@ -341,8 +359,8 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
         </div>
       </div>
 
-      {/* Middle: Charts + Win Rate */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      {/* Middle: Charts + Win Rate + Score */}
+      <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
         {/* Spend by Category — 2 cols */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
           <h3 className="text-sm font-bold text-slate-900 mb-4">{t('charts.spendByCategory')}</h3>
@@ -365,6 +383,44 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
         {/* Win Rate — 1 col */}
         <div className="lg:col-span-1">
           <WinRateCircle closedCount={closedDealCount} wonCount={wonDealCount} t={t} locale={locale} />
+        </div>
+
+        {/* Average Quote Score — 1 col */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm h-full flex flex-col items-center justify-center text-center">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{locale === 'fr' ? 'Score moyen' : 'Avg Score'}</h3>
+            {averageQuoteScore != null && averageQuoteScore > 0 ? (() => {
+              const s = Math.round(averageQuoteScore)
+              const color = s >= 80 ? 'text-emerald-600 stroke-emerald-500 stroke-emerald-100'
+                : s >= 60 ? 'text-amber-600 stroke-amber-500 stroke-amber-100'
+                : s >= 40 ? 'text-orange-600 stroke-orange-500 stroke-orange-100'
+                : 'text-red-600 stroke-red-500 stroke-red-100'
+              const colors = color.split(' ')
+              const circ = 2 * Math.PI * 36
+              const dash = (s / 100) * circ
+              const label = s >= 80 ? (locale === 'fr' ? 'Équitable' : 'Mostly Fair')
+                : s >= 60 ? (locale === 'fr' ? 'Négociable' : 'Room to Negotiate')
+                : s >= 40 ? (locale === 'fr' ? 'Surcoté' : 'Overpriced')
+                : (locale === 'fr' ? 'Risque élevé' : 'High Risk')
+              return (
+                <>
+                  <svg width="88" height="88" viewBox="0 0 88 88" className="-rotate-90 mb-2">
+                    <circle cx="44" cy="44" r="36" fill="none" className={colors[2]} strokeWidth="6" />
+                    <circle cx="44" cy="44" r="36" fill="none" className={colors[1]} strokeWidth="6"
+                      strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round" />
+                    <text x="44" y="44" textAnchor="middle" dominantBaseline="central"
+                      className={`${colors[0]} text-xl font-bold rotate-90 fill-current`}
+                      style={{ transformOrigin: 'center' }}
+                    >{s}</text>
+                  </svg>
+                  <p className={`text-xs font-semibold ${colors[0]}`}>{label}</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">{locale === 'fr' ? 'sur 100' : 'out of 100'}</p>
+                </>
+              )
+            })() : (
+              <div className="text-slate-400 text-sm">—</div>
+            )}
+          </div>
         </div>
 
         {/* Savings Overview — 2 cols */}

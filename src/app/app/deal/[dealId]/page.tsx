@@ -9,21 +9,13 @@ import { Breadcrumb } from '@/components/Breadcrumb'
 import { DealStickyBar } from '@/components/DealStickyBar'
 import { ScrollToTopButton } from '@/components/DealHistoryActions'
 import { FeatureGate } from '@/components/FeatureGate'
-import { FileText, AlertTriangle, TrendingUp, DollarSign, ChevronRight, CheckCircle2, TrendingDown, Minus } from 'lucide-react'
+import { FileText, AlertTriangle, TrendingUp, DollarSign, ChevronRight, CheckCircle2, TrendingDown, Minus, Target } from 'lucide-react'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { AddRoundForm } from './AddRoundForm'
 import type { Plan } from '@/lib/tiers'
 import type { DealOutput, DealOutputV2 } from '@/types'
-
-function parseMoney(str: string): number {
-  if (!str) return 0
-  const cleaned = str.replace(/[^0-9.,KkMm]/g, '')
-  const upper = cleaned.toUpperCase()
-  if (upper.includes('K')) return parseFloat(upper.replace('K', '')) * 1000
-  if (upper.includes('M')) return parseFloat(upper.replace('M', '')) * 1000000
-  return parseFloat(cleaned.replace(/,/g, '')) || 0
-}
+import { normalizeAmount, detectCurrency, formatCurrency, parseMoney as parseMoneyLib } from '@/lib/currency'
 
 export default async function DealPage({
   params,
@@ -88,25 +80,23 @@ export default async function DealPage({
     : (latestOutput as DealOutput)?.red_flags?.length || 0
 
   const potentialSavings = (latestOutput as DealOutput)?.potential_savings?.reduce((sum, saving) => {
-    const match = saving.annual_impact?.match(/[\d,]+/)
-    if (match) {
-      return sum + parseInt(match[0].replace(/,/g, ''), 10)
-    }
-    return sum
+    return sum + parseMoneyLib(saving.annual_impact || '').amount
   }, 0) || 0
 
-  const currencySymbol = totalCommitment?.includes('€') ? '€' : totalCommitment?.includes('£') ? '£' : totalCommitment?.includes('C$') ? 'C$' : totalCommitment?.includes('A$') ? 'A$' : totalCommitment?.includes('$') ? '$' : '€'
-  const formatSavings = (amount: number) => {
-    if (amount >= 1000000) return `${currencySymbol}${(amount / 1000000).toFixed(1)}M`
-    if (amount >= 1000) return `${currencySymbol}${(amount / 1000).toFixed(1)}K`
-    return `${currencySymbol}${amount.toFixed(0)}`
-  }
+  const dealCurrency = detectCurrency(totalCommitment || '')
+  const formatSavings = (amount: number) => formatCurrency(amount, dealCurrency)
 
-  // Clean title format: replace " - " or " -- " with " · "
-  const cleanTitle = deal.title
-    ?.replace(/\s*--\s*/g, ' · ')
-    ?.replace(/\s*-\s*/g, ' · ')
-    || dealName
+  // Use the AI's deal_type from snapshot as source of truth (falls back to DB deal_type)
+  const snapshotDealType = (latestOutput as DealOutput)?.snapshot?.deal_type
+  const effectiveDealType = snapshotDealType || (deal.deal_type === 'New' ? 'New purchase' : 'Renewal')
+
+  // Short vendor name for header (strip legal suffixes), full name as subtitle
+  const fullVendorName = dealName
+  const shortVendorName = dealName
+    .replace(/\s*(International|Inc\.?|LLC|Ltd\.?|Limited|Corp\.?|Corporation|GmbH|S\.?A\.?S?\.?|B\.?V\.?|PLC|AG|SE|\(.*?\))\s*/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const hasLongName = fullVendorName !== shortVendorName && fullVendorName.length > 25
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -143,8 +133,11 @@ export default async function DealPage({
         {/* Top: Title + Actions */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{cleanTitle}</h1>
+            <div className="mb-1.5">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{shortVendorName}</h1>
+              {hasLongName && (
+                <p className="text-xs text-slate-400 mt-0.5">{fullVendorName}</p>
+              )}
             </div>
             <div className="flex items-center gap-2 flex-wrap mb-2">
               {category && (
@@ -152,10 +145,10 @@ export default async function DealPage({
                   {category}
                 </span>
               )}
-              <Badge variant={deal.deal_type === 'New' ? 'default' : 'secondary'}>
-                {deal.deal_type === 'New' ? t('deal.newPurchase') : t('deal.renewal')}
+              <Badge variant="secondary">
+                {effectiveDealType}
               </Badge>
-              <span className="text-xs text-slate-400">{t('deal.roundsCompleted', { count: sortedRounds.length, s: sortedRounds.length !== 1 ? 's' : '' })}</span>
+              <span className="text-xs text-slate-400">{t(sortedRounds.length === 1 ? 'deal.roundsCompleted_one' : 'deal.roundsCompleted_other', { count: sortedRounds.length })}</span>
             </div>
             {/* AI-generated deal summary */}
             {description && (
@@ -176,13 +169,13 @@ export default async function DealPage({
         </div>
 
         {/* Stats row inside the header card */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-slate-100">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100">
           <div className="text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
               <DollarSign className="w-3.5 h-3.5 text-slate-400" />
               <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('deal.totalValue')}</span>
             </div>
-            <p className="text-lg sm:text-xl font-bold text-slate-900">{totalCommitment || 'N/A'}</p>
+            <p className="text-lg sm:text-xl font-bold text-slate-900">{totalCommitment ? normalizeAmount(totalCommitment) : 'N/A'}</p>
             {term && <p className="text-[10px] text-slate-400">{term}</p>}
           </div>
           <div className="text-center sm:text-left">
@@ -203,15 +196,33 @@ export default async function DealPage({
             </p>
             {potentialSavings > 0 && <p className="text-[10px] text-emerald-600">{t('deal.potentialYear')}</p>}
           </div>
+          {(() => {
+            const score = (latestOutput as any)?.score as number | undefined
+            const scoreLabel = (latestOutput as any)?.score_label as string | undefined
+            if (score == null) return null
+            const color = score >= 80 ? 'text-emerald-600' : score >= 60 ? 'text-amber-600' : score >= 40 ? 'text-orange-600' : 'text-red-600'
+            return (
+              <div className="text-center sm:text-left">
+                <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
+                  <Target className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Score</span>
+                </div>
+                <p className={`text-lg sm:text-xl font-bold ${color}`}>
+                  {score}<span className="text-sm font-medium text-slate-400">/100</span>
+                </p>
+                {scoreLabel && <p className={`text-[10px] ${color}`}>{scoreLabel}</p>}
+              </div>
+            )
+          })()}
         </div>
       </Card>
 
       {/* Outcome Card — closed deals */}
       {deal.status?.startsWith('closed_') && (() => {
-        const dealCurrency = totalCommitment?.includes('€') ? '€' : totalCommitment?.includes('£') ? '£' : totalCommitment?.includes('C$') ? 'C$' : totalCommitment?.includes('A$') ? 'A$' : totalCommitment?.includes('$') ? '$' : '€'
+        const closedCurrency = dealCurrency
         const isWon = deal.status === 'closed_won'
         const isLost = deal.status === 'closed_lost'
-        const locStr = locale === 'fr' ? 'fr-FR' : 'en-US'
+        const locStr = 'en-US'
 
         // Parse structured summary — supports v3 (starting_position + wins with description/financial_impact),
         // v2 (wins with title/impact/cash_value), v1 (key_wins string array), or legacy text
@@ -250,7 +261,7 @@ export default async function DealPage({
               wins = parsed.wins.map((w: any) => ({
                 category: w.category || 'OTHER',
                 description: w.title || w.description || '',
-                financial_impact: w.financial_impact || w.impact || (w.cash_value ? `${dealCurrency}${Math.round(w.cash_value).toLocaleString(locStr)}` : null),
+                financial_impact: w.financial_impact || w.impact || (w.cash_value ? formatCurrency(Math.round(w.cash_value), closedCurrency) : null),
               }))
               nextAction = parsed.next_action || null
               parsedOriginal = parsed.original_amount || null
@@ -277,12 +288,12 @@ export default async function DealPage({
           ...(deal.what_changed || []),
         ])]
 
-        const originalAmount = parsedOriginal || totalCommitment || '—'
+        const originalAmount = parsedOriginal ? normalizeAmount(parsedOriginal) : totalCommitment ? normalizeAmount(totalCommitment) : '—'
         const hasCashSavings = (parsedCashSavings ?? deal.savings_amount ?? 0) > 0
         const cashSavingsNum = parsedCashSavings ?? deal.savings_amount ?? 0
         const cashSavingsPct = parsedCashPercent ?? deal.savings_percent ?? null
         const finalAmount = parsedFinal || (hasCashSavings
-          ? `${dealCurrency}${Math.round(parseMoney(totalCommitment || '0') - cashSavingsNum).toLocaleString(locStr)}`
+          ? formatCurrency(Math.round(parseMoneyLib(totalCommitment || '0').amount - cashSavingsNum), dealCurrency)
           : (locale === 'fr' ? 'Inchangé' : 'Unchanged'))
 
         const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
@@ -341,7 +352,7 @@ export default async function DealPage({
                     </p>
                     {hasCashSavings ? (
                       <>
-                        <p className="text-base sm:text-lg font-bold text-emerald-900">{dealCurrency}{Math.round(cashSavingsNum).toLocaleString(locStr)}</p>
+                        <p className="text-base sm:text-lg font-bold text-emerald-900">{formatCurrency(Math.round(cashSavingsNum), closedCurrency)}</p>
                         {cashSavingsPct != null && <p className="text-xs font-bold text-emerald-600">({cashSavingsPct.toFixed(1)}%)</p>}
                       </>
                     ) : (
@@ -454,12 +465,37 @@ export default async function DealPage({
         </div>
       )}
 
+      {/* Next Round CTA — only for active deals with at least 1 round */}
+      {!deal.status?.startsWith('closed_') && sortedRounds.length > 0 && (
+        <div className="bg-gradient-to-br from-sky-50 to-cyan-50 rounded-xl border-2 border-sky-200 p-5 sm:p-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <h3 className="text-base font-bold text-slate-900 mb-1">
+                {locale === 'fr' ? 'Le fournisseur a répondu ?' : 'Vendor replied?'}
+              </h3>
+              <p className="text-sm text-slate-600">
+                {locale === 'fr'
+                  ? `Téléchargez sa réponse et nous mettrons à jour votre stratégie pour le round ${sortedRounds.length + 1}.`
+                  : `Upload their response and we'll update your strategy for Round ${sortedRounds.length + 1}.`}
+              </p>
+            </div>
+            <a
+              href="#add-round"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-sky-600 text-white text-sm font-semibold rounded-lg hover:bg-sky-700 transition-colors shadow-sm flex-shrink-0"
+            >
+              {locale === 'fr' ? 'Ajouter la réponse' : 'Upload vendor response'}
+              <ChevronRight className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Analysis History */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <h2 className="text-base font-bold text-slate-900">{t('deal.analysisHistory')}</h2>
-            <span className="text-xs text-slate-400">{t('deal.roundsCompleted', { count: sortedRounds.length, s: sortedRounds.length !== 1 ? 's' : '' })}</span>
+            <span className="text-xs text-slate-400">{t(sortedRounds.length === 1 ? 'deal.roundsCompleted_one' : 'deal.roundsCompleted_other', { count: sortedRounds.length })}</span>
           </div>
         </div>
 

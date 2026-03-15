@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { X, Loader2, Upload, FileText, ArrowRight } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
+import { detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
 import Link from 'next/link'
 
 interface CloseDealModalProps {
@@ -13,26 +14,12 @@ interface CloseDealModalProps {
   onSuccess: () => void
 }
 
-function detectCurrency(str: string): string {
-  if (str.includes('€') || str.toUpperCase().includes('EUR')) return '€'
-  if (str.includes('£') || str.toUpperCase().includes('GBP')) return '£'
-  if (str.includes('C$') || str.toUpperCase().includes('CAD')) return 'C$'
-  if (str.includes('A$') || str.toUpperCase().includes('AUD')) return 'A$'
-  return '€'
+function parseMoneyLocal(str: string): number {
+  return parseMoney(str).amount
 }
 
-function parseMoney(str: string): number {
-  if (!str) return 0
-  const cleaned = str.replace(/[^0-9.,KkMm]/g, '')
-  const upper = cleaned.toUpperCase()
-  if (upper.includes('K')) return parseFloat(upper.replace('K', '')) * 1000
-  if (upper.includes('M')) return parseFloat(upper.replace('M', '')) * 1000000
-  return parseFloat(cleaned.replace(/,/g, '')) || 0
-}
-
-function formatMoney(amount: number, currency: string): string {
-  if (amount >= 1000000) return `${currency}${(amount / 1000000).toFixed(1)}M`
-  return `${currency}${Math.round(amount).toLocaleString('en-US')}`
+function formatMoney(amount: number, currencyCode: ReturnType<typeof detectCurrency>): string {
+  return formatCurrency(amount, currencyCode)
 }
 
 type Outcome = 'won' | 'lost'
@@ -44,7 +31,7 @@ const outcomeDescriptions: Record<Outcome, string> = {
 
 export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, onSuccess }: CloseDealModalProps) {
   const currency = detectCurrency(currentTotal || '')
-  const originalAmount = parseMoney(currentTotal || '')
+  const originalAmount = parseMoneyLocal(currentTotal || '')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [outcome, setOutcome] = useState<Outcome>('won')
@@ -61,7 +48,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
   const [aiLoading, setAiLoading] = useState(false)
   const [aiSummary, setAiSummary] = useState<{ reduction: string; changedTerms: string[]; totalSaved: string } | null>(null)
 
-  const finalAmount = parseMoney(finalTotal)
+  const finalAmount = parseMoneyLocal(finalTotal)
   const savingsAmount = originalAmount > 0 && finalAmount > 0 ? originalAmount - finalAmount : 0
   const savingsPercent = originalAmount > 0 && savingsAmount > 0 ? (savingsAmount / originalAmount) * 100 : 0
 

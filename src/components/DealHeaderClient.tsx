@@ -10,6 +10,7 @@ import { CheckCircle2, TrendingDown, Minus, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { trackEvent } from '@/lib/analytics'
 import { useT } from '@/i18n/context'
+import { detectCurrency as detectCurrencyLib, formatCurrency } from '@/lib/currency'
 
 interface DealHeaderClientProps {
   dealId: string
@@ -23,20 +24,10 @@ interface DealHeaderClientProps {
   whatChanged?: string[] | null
 }
 
-// Helper to detect currency from total commitment
-function detectCurrency(str?: string): string {
-  if (!str) return '$'
-  if (str.includes('€') || str.toUpperCase().includes('EUR')) return '€'
-  if (str.includes('£') || str.toUpperCase().includes('GBP')) return '£'
-  if (str.includes('C$') || str.toUpperCase().includes('CAD')) return 'C$'
-  if (str.includes('A$') || str.toUpperCase().includes('AUD')) return 'A$'
-  return '$'
-}
-
-// Format savings with proper currency
-function formatSavings(amount: number, currency: string): string {
-  const rounded = Math.round(amount)
-  return `${currency}${rounded.toLocaleString('en-US')}`
+// Format savings with proper currency detection
+function formatSavingsLocal(amount: number, totalStr?: string): string {
+  const currency = detectCurrencyLib(totalStr || '')
+  return formatCurrency(amount, currency)
 }
 
 export function DealHeaderClient({
@@ -57,7 +48,7 @@ export function DealHeaderClient({
 
   const isClosed = dealStatus.startsWith('closed_')
   const outcome = isClosed ? dealStatus.replace('closed_', '') : null
-  const currency = detectCurrency(currentTotal)
+  const currency = detectCurrencyLib(currentTotal || '')
 
   const handleReopen = async () => {
     setReopening(true)
