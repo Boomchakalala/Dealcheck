@@ -746,7 +746,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
             <span className="text-white font-bold text-sm">1</span>
           </div>
-          <h2 className="text-xl font-bold text-slate-900 uppercase tracking-wide text-sm">{t('output.strategy')}</h2>
+          <h2 id="strategy-section" className="text-xl font-bold text-slate-900 uppercase tracking-wide text-sm">{t('output.strategy')}</h2>
           <ChevronDown className="w-5 h-5 text-slate-400" />
         </div>
 
@@ -985,12 +985,12 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                 </div>
                 {output.what_to_ask_for?.must_have && output.what_to_ask_for.must_have.length > 2 && (
                   <button
-                    onClick={() => setShowStrategy(true)}
+                    onClick={() => document.getElementById('strategy-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                     className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors group"
                   >
                     {t('output.moreInStrategySection', { count: output.what_to_ask_for.must_have.length - 2 })}
-                    <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    <svg className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7" />
                     </svg>
                   </button>
                 )}
