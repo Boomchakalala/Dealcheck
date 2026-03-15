@@ -138,9 +138,14 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Create deal error:', error)
-    // CRITICAL: Never send raw error.message to client - may contain sensitive data
-    return NextResponse.json({
-      error: 'Failed to create deal. Please try again or contact support.'
-    }, { status: 500 })
+    // Provide a hint about the failure type without leaking sensitive details
+    const msg = error instanceof Error ? error.message : ''
+    const hint = msg.includes('AI_OVERLOADED') ? 'The AI service is temporarily busy. Please try again in a moment.'
+      : msg.includes('AI_PARSE_ERROR') ? 'The AI returned an unexpected format. Please try again.'
+      : msg.includes('AI_VALIDATION_ERROR') ? 'The AI response was incomplete. Please try again.'
+      : msg.includes('AI_ANALYSIS_ERROR') ? 'The analysis failed. Please try again or use a shorter quote.'
+      : (msg.includes('timeout') || msg.includes('aborted')) ? 'The analysis took too long. Please try again with a shorter quote.'
+      : 'Failed to create deal. Please try again or contact support.'
+    return NextResponse.json({ error: hint }, { status: 500 })
   }
 }

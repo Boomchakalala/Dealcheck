@@ -1440,8 +1440,17 @@ export async function analyzeDeal(
     return withScore
   } catch (error) {
     // CRITICAL: Never expose raw error messages - they may contain API keys in headers
-    console.error('AI analysis error:', error)
-    throw new Error('AI analysis failed. Please try again or contact support.')
+    console.error('AI analysis error:', error instanceof Error ? error.message : error)
+    if (error instanceof SyntaxError) {
+      throw new Error('AI_PARSE_ERROR: AI returned invalid response format')
+    }
+    if (error instanceof Error && error.name === 'ZodError') {
+      throw new Error('AI_VALIDATION_ERROR: AI response missing required fields')
+    }
+    if (error instanceof Error && (error.message.includes('overloaded') || error.message.includes('529'))) {
+      throw new Error('AI_OVERLOADED: AI service is temporarily overloaded')
+    }
+    throw new Error('AI_ANALYSIS_ERROR: AI analysis failed')
   }
 }
 
