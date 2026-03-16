@@ -8,7 +8,7 @@ import { examples, type ExampleType } from '@/lib/examples'
 import { examplesFr } from '@/lib/examples-fr'
 import { useI18n } from '@/i18n/context'
 import Link from 'next/link'
-import { Check } from 'lucide-react'
+import { Check, CheckCircle2 } from 'lucide-react'
 
 export default function ExamplePage() {
   const { locale, t } = useI18n()
@@ -125,7 +125,7 @@ export default function ExamplePage() {
         {/* Closed Deal Banner — compact, eye-catching */}
         <div className="mb-8 bg-emerald-600 rounded-xl px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <span className="text-xl" role="img" aria-label="trophy">🏆</span>
+            <CheckCircle2 className="w-5 h-5 text-white" />
             <span className="text-sm sm:text-base font-bold text-white">
               {locale === 'fr' ? 'Contrat gagné' : 'Deal Won'} — {closedDeals[selectedExample].savings} {locale === 'fr' ? 'économisés' : 'saved'}
             </span>
