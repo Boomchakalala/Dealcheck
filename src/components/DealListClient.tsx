@@ -267,20 +267,22 @@ export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListC
                     )}
                     {savingsToShow > 0 && (() => {
                       const totalAmount = parseSavingsNumber(totalCommitment || '0')
-                      const savingsPct = totalAmount > 0 ? (savingsToShow / totalAmount) * 100 : 0
-                      const isMeaningful = savingsToShow >= 100 && savingsPct >= 1
+                      // Cap savings at 30% of deal total if they exceed it (AI hallucination guard)
+                      const cappedSavings = (totalAmount > 0 && savingsToShow > totalAmount) ? totalAmount * 0.3 : savingsToShow
+                      const savingsPct = totalAmount > 0 ? Math.min((cappedSavings / totalAmount) * 100, 50) : 0
+                      const isMeaningful = cappedSavings >= 100 && savingsPct >= 1
 
                       if (isClosed && achievedSavings > 0) {
                         return (
                           <span className="inline-flex text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                            {formatSavings(Math.round(savingsToShow), locale, totalCommitment)} {locale === 'fr' ? 'économisés' : 'saved'}
+                            {formatSavings(Math.round(cappedSavings), locale, totalCommitment)} {locale === 'fr' ? 'économisés' : 'saved'}
                           </span>
                         )
                       }
                       if (isMeaningful) {
                         return (
                           <span className="inline-flex text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                            {formatSavings(Math.round(savingsToShow), locale, totalCommitment)} {locale === 'fr' ? 'potentiel' : 'potential'}
+                            {formatSavings(Math.round(cappedSavings), locale, totalCommitment)} {locale === 'fr' ? 'potentiel' : 'potential'}
                           </span>
                         )
                       }

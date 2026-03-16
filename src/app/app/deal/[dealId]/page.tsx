@@ -213,8 +213,10 @@ export default async function DealPage({
         const circumference = 2 * Math.PI * 42
         const dashLength = (score / 100) * circumference
 
-        const savingsPct = (potentialSavings > 0 && parseMoneyLib(totalCommitment || '0').amount > 0)
-          ? Math.round((potentialSavings / parseMoneyLib(totalCommitment || '0').amount) * 100)
+        const commitAmt = parseMoneyLib(totalCommitment || '0').amount
+        const cappedSavings = (commitAmt > 0 && potentialSavings > commitAmt) ? commitAmt * 0.3 : potentialSavings
+        const savingsPct = (cappedSavings > 0 && commitAmt > 0)
+          ? Math.min(Math.round((cappedSavings / commitAmt) * 100), 50)
           : 0
 
         return (
@@ -275,10 +277,10 @@ export default async function DealPage({
                   <div>
                     <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('deal.savings')}</p>
                     <p className="text-lg font-bold text-emerald-700">
-                      {potentialSavings > 0 ? formatSavings(potentialSavings) : '—'}
+                      {cappedSavings > 0 ? formatSavings(cappedSavings) : '—'}
                     </p>
                     <p className="text-[11px] text-slate-500">
-                      {savingsPct > 0 ? `${savingsPct}% potential savings` : potentialSavings > 0 ? t('deal.potentialYear') : ''}
+                      {savingsPct > 0 ? `${savingsPct}% potential savings` : cappedSavings > 0 ? t('deal.potentialYear') : ''}
                     </p>
                   </div>
                 </div>
