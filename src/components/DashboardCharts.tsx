@@ -3,19 +3,19 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { AlertTriangle, Lock } from 'lucide-react'
+import { AlertTriangle, Lock, TrendingUp, ArrowRight } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 
 const CHART_COLORS = [
-  '#10b981', // emerald (primary)
-  '#6366f1', // indigo
+  '#10b981', // emerald
+  '#64748b', // slate
   '#f59e0b', // amber
   '#0d9488', // teal
-  '#8b5cf6', // violet
+  '#6366f1', // indigo
   '#ef4444', // red
   '#14b8a6', // cyan-teal
-  '#ec4899', // pink
-  '#64748b', // slate
+  '#8b5cf6', // violet
+  '#475569', // slate-dark
   '#059669', // green-dark
 ]
 
@@ -37,6 +37,7 @@ interface DealRow {
   updatedAt: string
   potentialSavings: number
   achievedSavings: number
+  quoteScore?: number
 }
 
 interface Supplier {
@@ -82,7 +83,7 @@ function getStatusLabel(status: string, t: (key: string, vars?: Record<string, s
   if (status === 'closed_lost') return { text: t('charts.lost'), cls: 'bg-red-100 text-red-700' }
   if (status === 'closed_paused' || status === 'closed_partial') return { text: t('charts.partialWin'), cls: 'bg-amber-100 text-amber-700' }
   if (status?.startsWith('closed')) return { text: t('charts.closed'), cls: 'bg-slate-100 text-slate-600' }
-  return { text: t('charts.active'), cls: 'bg-blue-50 text-blue-700' }
+  return { text: t('charts.active'), cls: 'bg-emerald-50 text-emerald-700' }
 }
 
 function filterDealsByDateRange(deals: DealRow[], dateRange: 'all' | '30' | '90'): DealRow[] {
@@ -99,43 +100,7 @@ function filterCategoriesByDeals(categories: Category[], filteredDeals: DealRow[
   return categories.filter(c => activeCats.has(c.name))
 }
 
-// Win Rate circular indicator — only counts formally closed deals
-function WinRateCircle({ closedCount, wonCount, t, locale }: { closedCount: number; wonCount: number; t: (key: string, vars?: Record<string, string | number>) => string; locale: string }) {
-  if (closedCount === 0) {
-    return (
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col items-center justify-center h-full">
-        <h3 className="text-sm font-bold text-slate-900 mb-3">{t('charts.winRate')}</h3>
-        <div className="text-xs text-slate-400 text-center">{locale === 'fr' ? 'Aucun contrat clôturé' : 'No closed deals yet'}</div>
-      </div>
-    )
-  }
-  const rate = Math.round((wonCount / closedCount) * 100)
-  const size = 100
-  const strokeWidth = 10
-  const radius = (size - strokeWidth) / 2
-  const circumference = 2 * Math.PI * radius
-  const filled = (rate / 100) * circumference
-
-  return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col items-center justify-center h-full">
-      <h3 className="text-sm font-bold text-slate-900 mb-3">{t('charts.winRate')}</h3>
-      <div className="relative">
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
-          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#e2e8f0" strokeWidth={strokeWidth} />
-          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#10b981" strokeWidth={strokeWidth} strokeDasharray={`${filled} ${circumference - filled}`} strokeLinecap="round" className="transition-all duration-700" />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xl font-bold text-slate-900">{rate}%</span>
-        </div>
-      </div>
-      <p className="text-[10px] text-slate-400 mt-2">
-        {wonCount} {locale === 'fr' ? 'sur' : 'of'} {closedCount} {locale === 'fr' ? (closedCount === 1 ? 'contrat clôturé' : 'contrats clôturés') : (closedCount === 1 ? 'closed deal' : 'closed deals')}
-      </p>
-    </div>
-  )
-}
-
-// SVG Donut Chart
+// Donut Chart
 function DonutChart({
   data,
   currency,
@@ -154,14 +119,14 @@ function DonutChart({
   const total = data.reduce((s, d) => s + d.spend, 0)
   if (total === 0) return null
 
-  const size = 160
-  const strokeWidth = 28
+  const size = 140
+  const strokeWidth = 24
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
   let offset = 0
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-6">
+    <div className="flex flex-col sm:flex-row items-center gap-5">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="flex-shrink-0 -rotate-90">
         {data.map((cat, i) => {
           const pct = cat.spend / total
@@ -179,12 +144,12 @@ function DonutChart({
               r={radius}
               fill="none"
               stroke={CHART_COLORS[i % CHART_COLORS.length]}
-              strokeWidth={isSelected ? strokeWidth + 4 : strokeWidth}
+              strokeWidth={isSelected ? strokeWidth + 3 : strokeWidth}
               strokeDasharray={`${dashLength} ${circumference - dashLength}`}
               strokeDashoffset={-currentOffset}
               strokeLinecap="round"
               className="transition-all duration-300 cursor-pointer"
-              style={{ opacity: isDimmed ? 0.3 : 1 }}
+              style={{ opacity: isDimmed ? 0.25 : 1 }}
               onClick={() => onSelectCategory(isSelected ? null : cat.name)}
             />
           )
@@ -195,20 +160,14 @@ function DonutChart({
           const centerLabel = selected ? selected.name : `${data.length} ${t('charts.categories')}`
           return (
             <>
-              <text
-                x={size / 2}
-                y={size / 2 - 6}
-                textAnchor="middle"
-                className="fill-slate-900 text-sm font-bold rotate-90"
+              <text x={size / 2} y={size / 2 - 6} textAnchor="middle"
+                className="fill-slate-900 text-xs font-bold rotate-90"
                 style={{ transformOrigin: 'center' }}
               >
                 {formatMoney(centerAmount, currency, locale)}
               </text>
-              <text
-                x={size / 2}
-                y={size / 2 + 10}
-                textAnchor="middle"
-                className="fill-slate-400 text-[9px] rotate-90"
+              <text x={size / 2} y={size / 2 + 8} textAnchor="middle"
+                className="fill-slate-400 text-[8px] rotate-90"
                 style={{ transformOrigin: 'center' }}
               >
                 {centerLabel.length > 18 ? centerLabel.slice(0, 16) + '…' : centerLabel}
@@ -219,28 +178,25 @@ function DonutChart({
       </svg>
 
       {/* Legend */}
-      <div className="flex-1 space-y-2 w-full">
+      <div className="flex-1 space-y-1.5 w-full min-w-0 overflow-hidden">
         {data.slice(0, 6).map((cat, i) => {
           const isSelected = selectedCategory === cat.name
           const isDimmed = selectedCategory !== null && !isSelected
           return (
             <div
               key={cat.name}
-              className={`flex items-center justify-between gap-2 cursor-pointer rounded-md px-1.5 py-1 transition-all duration-200 ${
+              className={`flex items-center gap-2 cursor-pointer rounded-md px-1.5 py-1 transition-all duration-200 ${
                 isSelected ? 'bg-emerald-50 ring-1 ring-emerald-200' : 'hover:bg-slate-50'
               }`}
               style={{ opacity: isDimmed ? 0.4 : 1 }}
               onClick={() => onSelectCategory(isSelected ? null : cat.name)}
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <div
-                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
-                />
-                <span className="text-xs text-slate-700 truncate">{cat.name}</span>
-                <span className="text-[10px] text-slate-400">{cat.count}</span>
-              </div>
-              <span className="text-xs font-semibold text-slate-900 flex-shrink-0">
+              <div
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+              />
+              <span className="text-[11px] text-slate-600 truncate flex-1 min-w-0">{cat.name}</span>
+              <span className="text-[11px] font-semibold text-slate-900 flex-shrink-0 tabular-nums">
                 {formatMoney(cat.spend, currency, locale)}
               </span>
             </div>
@@ -251,51 +207,49 @@ function DonutChart({
   )
 }
 
-// SVG Bar Chart for savings — Identified vs Achieved
+// Savings Bar Chart — Identified vs Achieved
 function SavingsBarChart({ data, currency, t, locale }: { data: Category[]; currency: string; t: (key: string, vars?: Record<string, string | number>) => string; locale: string }) {
   const maxVal = Math.max(...data.map(d => Math.max(d.identified, d.achieved)), 1)
   const catsWithSavings = data.filter(d => d.identified > 0 || d.achieved > 0).slice(0, 5)
 
   if (catsWithSavings.length === 0) {
     return (
-      <div className="flex items-center justify-center h-40 text-sm text-slate-400">
-        {t('charts.noSavingsData')}
+      <div className="flex flex-col items-center justify-center h-40 text-center">
+        <TrendingUp className="w-6 h-6 text-slate-200 mb-2" />
+        <p className="text-xs text-slate-400">
+          {locale === 'fr' ? 'Les économies apparaîtront ici après analyse' : 'Savings will appear here after analysis'}
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
-      <p className="text-[10px] text-slate-400">
-        {locale === 'fr'
-          ? 'Identifiées = économies potentielles de l\'analyse. Réalisées = économies confirmées des contrats clôturés.'
-          : 'Identified = potential savings from analysis. Achieved = confirmed savings from closed deals.'}
-      </p>
+    <div className="space-y-3.5">
       {catsWithSavings.map((cat) => (
         <div key={cat.name}>
-          <div className="flex items-center justify-between mb-1.5">
+          <div className="flex items-center justify-between mb-1">
             <span className="text-xs font-medium text-slate-700 truncate">{cat.name}</span>
           </div>
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <div className="flex-1 h-4 bg-slate-100 rounded-md overflow-hidden">
-                <div className="h-full rounded-md bg-emerald-200 transition-all duration-500" style={{ width: `${Math.max((cat.identified / maxVal) * 100, 2)}%` }} />
+              <div className="flex-1 h-3.5 bg-slate-100 rounded overflow-hidden">
+                <div className="h-full rounded bg-emerald-200 transition-all duration-500" style={{ width: `${Math.max((cat.identified / maxVal) * 100, 2)}%` }} />
               </div>
-              <span className="text-[10px] font-medium text-slate-500 w-24 text-right flex-shrink-0">
+              <span className="text-[10px] font-medium text-slate-500 w-20 text-right flex-shrink-0 tabular-nums">
                 {formatMoney(cat.identified, currency, locale)}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex-1 h-4 bg-slate-100 rounded-md overflow-hidden">
+              <div className="flex-1 h-3.5 bg-slate-100 rounded overflow-hidden">
                 {cat.achieved > 0 ? (
-                  <div className="h-full rounded-md bg-emerald-500 transition-all duration-500" style={{ width: `${Math.max((cat.achieved / maxVal) * 100, 2)}%` }} />
+                  <div className="h-full rounded bg-emerald-500 transition-all duration-500" style={{ width: `${Math.max((cat.achieved / maxVal) * 100, 2)}%` }} />
                 ) : null}
               </div>
-              <span className="text-[10px] font-medium text-right w-24 flex-shrink-0">
+              <span className="text-[10px] font-medium text-right w-20 flex-shrink-0 tabular-nums">
                 {cat.achieved > 0 ? (
                   <span className="text-emerald-600">{formatMoney(cat.achieved, currency, locale)}</span>
                 ) : (
-                  <span className="text-slate-300">{locale === 'fr' ? 'Aucun clôturé' : 'No closed deals'}</span>
+                  <span className="text-slate-300">—</span>
                 )}
               </span>
             </div>
@@ -304,12 +258,12 @@ function SavingsBarChart({ data, currency, t, locale }: { data: Category[]; curr
       ))}
       <div className="flex items-center gap-4 pt-1">
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded bg-emerald-200" />
-          <span className="text-[10px] text-slate-500">{t('charts.identified')}</span>
+          <div className="w-3 h-2 rounded bg-emerald-200" />
+          <span className="text-[10px] text-slate-400">{t('charts.identified')}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded bg-emerald-500" />
-          <span className="text-[10px] text-slate-500">{t('charts.achieved')}</span>
+          <div className="w-3 h-2 rounded bg-emerald-500" />
+          <span className="text-[10px] text-slate-400">{t('charts.achieved')}</span>
         </div>
       </div>
     </div>
@@ -323,11 +277,8 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [dateRange, setDateRange] = useState<'all' | '30' | '90'>('all')
 
-  // Filter deals by date range
   const filteredDeals = filterDealsByDateRange(deals, dateRange)
-  // Filter categories based on filtered deals
   const filteredCategories = filterCategoriesByDeals(categories, filteredDeals, deals)
-  // Further filter deals by selected category
   const displayDeals = selectedCategory
     ? filteredDeals.filter(d => d.category === selectedCategory)
     : filteredDeals
@@ -359,10 +310,10 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
         </div>
       </div>
 
-      {/* Middle: Charts + Win Rate + Score */}
-      <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
-        {/* Spend by Category — 2 cols */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+      {/* Charts Row: Spend by Category + Savings */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Spend by Category */}
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
           <h3 className="text-sm font-bold text-slate-900 mb-4">{t('charts.spendByCategory')}</h3>
           {filteredCategories.length > 0 ? (
             <DonutChart
@@ -374,58 +325,15 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
               onSelectCategory={setSelectedCategory}
             />
           ) : (
-            <div className="flex items-center justify-center h-40 text-sm text-slate-400">
-              {t('charts.noCategoryData')}
+            <div className="flex flex-col items-center justify-center h-40 text-center">
+              <p className="text-xs text-slate-400">{t('charts.noCategoryData')}</p>
             </div>
           )}
         </div>
 
-        {/* Win Rate — 1 col */}
-        <div className="lg:col-span-1">
-          <WinRateCircle closedCount={closedDealCount} wonCount={wonDealCount} t={t} locale={locale} />
-        </div>
-
-        {/* Average Quote Score — 1 col */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm h-full flex flex-col items-center justify-center text-center">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">{locale === 'fr' ? 'Score moyen' : 'Avg Score'}</h3>
-            {averageQuoteScore != null && averageQuoteScore > 0 ? (() => {
-              const s = Math.round(averageQuoteScore)
-              const color = s >= 85 ? 'text-emerald-600 stroke-emerald-500 stroke-emerald-100'
-                : s >= 65 ? 'text-amber-600 stroke-amber-500 stroke-amber-100'
-                : s >= 40 ? 'text-orange-600 stroke-orange-500 stroke-orange-100'
-                : 'text-red-600 stroke-red-500 stroke-red-100'
-              const colors = color.split(' ')
-              const circ = 2 * Math.PI * 36
-              const dash = (s / 100) * circ
-              const label = s >= 85 ? (locale === 'fr' ? 'Bon deal' : 'Strong deal')
-                : s >= 65 ? (locale === 'fr' ? 'Négociable' : 'Negotiate a few points')
-                : s >= 40 ? (locale === 'fr' ? 'Surcoté' : 'Overpriced')
-                : (locale === 'fr' ? 'À fuir' : 'Walk away')
-              return (
-                <>
-                  <svg width="88" height="88" viewBox="0 0 88 88" className="-rotate-90 mb-2">
-                    <circle cx="44" cy="44" r="36" fill="none" className={colors[2]} strokeWidth="6" />
-                    <circle cx="44" cy="44" r="36" fill="none" className={colors[1]} strokeWidth="6"
-                      strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round" />
-                    <text x="44" y="44" textAnchor="middle" dominantBaseline="central"
-                      className={`${colors[0]} text-xl font-bold rotate-90 fill-current`}
-                      style={{ transformOrigin: 'center' }}
-                    >{s}</text>
-                  </svg>
-                  <p className={`text-xs font-semibold ${colors[0]}`}>{label}</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">{locale === 'fr' ? 'sur 100' : 'out of 100'}</p>
-                </>
-              )
-            })() : (
-              <div className="text-slate-400 text-sm">—</div>
-            )}
-          </div>
-        </div>
-
-        {/* Savings Overview — 2 cols */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm relative">
-          <h3 className="text-sm font-bold text-slate-900 mb-4">{locale === 'fr' ? 'Économies : identifiées vs réalisées' : 'Savings: Identified vs Achieved'}</h3>
+        {/* Savings: Identified vs Achieved */}
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm relative">
+          <h3 className="text-sm font-bold text-slate-900 mb-4">{locale === 'fr' ? 'Économies par catégorie' : 'Savings by category'}</h3>
           {showProLock ? (
             <div className="relative">
               <div className="filter blur-[4px] pointer-events-none select-none">
@@ -447,123 +355,189 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
         </div>
       </div>
 
-      {/* Bottom: Table + Suppliers */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* Recent Deals — 3 cols */}
-        <div className="lg:col-span-3 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h3 className="text-sm font-bold text-slate-900">{t('charts.recentDeals')}</h3>
-              {selectedCategory && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                  {selectedCategory}
-                  <button
-                    onClick={() => setSelectedCategory(null)}
-                    className="ml-0.5 text-emerald-500 hover:text-emerald-700"
+      {/* Recent Deals — Full width, the main table */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h3 className="text-sm font-bold text-slate-900">{t('charts.recentDeals')}</h3>
+            {selectedCategory && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                {selectedCategory}
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className="ml-0.5 text-emerald-500 hover:text-emerald-700"
+                >
+                  ×
+                </button>
+              </span>
+            )}
+          </div>
+          <Link href="/app" className="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1">
+            {t('charts.viewAll')} <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/50">
+                <th className="text-left px-5 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('charts.vendor')}</th>
+                <th className="text-left px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{t('charts.category')}</th>
+                <th className="text-right px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('charts.value')}</th>
+                <th className="text-center px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('charts.status')}</th>
+                <th className="text-right px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{locale === 'fr' ? 'Économies' : 'Savings'}</th>
+                <th className="text-center px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{t('charts.flags')}</th>
+                <th className="text-center px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden lg:table-cell">Score</th>
+                <th className="text-right px-5 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{t('charts.updated')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayDeals.slice(0, 10).map((deal) => {
+                const status = getStatusLabel(deal.status, t)
+                const scoreColor = deal.quoteScore != null
+                  ? (deal.quoteScore >= 80 ? 'text-emerald-600' : deal.quoteScore >= 65 ? 'text-amber-600' : deal.quoteScore >= 45 ? 'text-orange-600' : 'text-red-600')
+                  : ''
+                return (
+                  <tr
+                    key={deal.id}
+                    className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors cursor-pointer"
+                    onClick={() => router.push(`/app/deal/${deal.id}`)}
                   >
-                    ×
-                  </button>
-                </span>
-              )}
+                    <td className="px-5 py-3">
+                      <span
+                        className="text-xs font-semibold text-slate-900 hover:text-emerald-700 transition-colors block max-w-[180px] truncate"
+                        title={deal.vendor}
+                      >
+                        {deal.vendor}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 hidden sm:table-cell">
+                      <span className="text-[11px] text-slate-500">{deal.category}</span>
+                    </td>
+                    <td className="px-3 py-3 text-right">
+                      <span className="text-xs font-semibold text-slate-900 tabular-nums">{deal.amount || '—'}</span>
+                    </td>
+                    <td className="px-3 py-3 text-center">
+                      <span className={`inline-flex text-[10px] font-semibold px-2 py-0.5 rounded ${status.cls}`}>
+                        {status.text}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 text-right hidden sm:table-cell">
+                      {deal.status?.startsWith('closed') && deal.achievedSavings > 0 ? (
+                        <span className="text-[11px] font-semibold text-emerald-600 tabular-nums">{formatMoney(deal.achievedSavings, baseCurrency, locale)}</span>
+                      ) : deal.potentialSavings > 0 ? (
+                        <span className="text-[11px] font-medium text-emerald-400 tabular-nums">~{formatMoney(deal.potentialSavings, baseCurrency, locale)}</span>
+                      ) : (
+                        <span className="text-[11px] text-slate-300">—</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3 text-center hidden sm:table-cell">
+                      {deal.redFlags > 0 ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-red-500 font-medium">
+                          <AlertTriangle className="w-3 h-3" />
+                          {deal.redFlags}
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-emerald-400">&#10003;</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3 text-center hidden lg:table-cell">
+                      {deal.quoteScore != null ? (
+                        <span className={`text-[11px] font-bold ${scoreColor} tabular-nums`}>{deal.quoteScore}</span>
+                      ) : (
+                        <span className="text-[11px] text-slate-300">—</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3 text-right hidden sm:table-cell">
+                      <span className="text-[11px] text-slate-400">{getTimeAgo(deal.updatedAt, t, locale)}</span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Bottom: Win Rate + Top Suppliers */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* Win Rate — 2 cols */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <h3 className="text-sm font-bold text-slate-900 mb-4">{t('charts.winRate')}</h3>
+          {closedDealCount > 0 ? (() => {
+            const rate = Math.round((wonDealCount / closedDealCount) * 100)
+            const circ = 2 * Math.PI * 40
+            const dash = (rate / 100) * circ
+            return (
+              <div className="flex items-center gap-6">
+                <div className="relative flex-shrink-0">
+                  <svg width="100" height="100" viewBox="0 0 96 96" className="-rotate-90">
+                    <circle cx="48" cy="48" r="40" fill="none" stroke="#f1f5f9" strokeWidth="8" />
+                    <circle cx="48" cy="48" r="40" fill="none" stroke="#10b981" strokeWidth="8"
+                      strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round" className="transition-all duration-700" />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-slate-900">{rate}%</span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900 mb-1">{wonDealCount} {locale === 'fr' ? 'sur' : 'of'} {closedDealCount}</p>
+                  <p className="text-xs text-slate-500">
+                    {locale === 'fr' ? 'contrats clôturés avec succès' : 'deals closed successfully'}
+                  </p>
+                </div>
+              </div>
+            )
+          })() : (
+            <div className="flex items-center gap-6">
+              <div className="relative flex-shrink-0">
+                <svg width="100" height="100" viewBox="0 0 96 96" className="-rotate-90">
+                  <circle cx="48" cy="48" r="40" fill="none" stroke="#f1f5f9" strokeWidth="8" />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xl font-bold text-slate-200">—</span>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-400 mb-1">{locale === 'fr' ? 'Pas encore de résultats' : 'No results yet'}</p>
+                <p className="text-xs text-slate-400">
+                  {locale === 'fr' ? 'Clôturez un contrat pour suivre votre taux de succès' : 'Close a deal to start tracking your success rate'}
+                </p>
+              </div>
             </div>
-            <Link href="/app" className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
-              {t('charts.viewAll')} &rarr;
-            </Link>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100">
-                  <th className="text-left px-5 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('charts.vendor')}</th>
-                  <th className="text-left px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{t('charts.category')}</th>
-                  <th className="text-right px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('charts.value')}</th>
-                  <th className="text-center px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('charts.status')}</th>
-                  <th className="text-right px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{locale === 'fr' ? 'Économies' : 'Savings'}</th>
-                  <th className="text-center px-3 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{t('charts.flags')}</th>
-                  <th className="text-right px-5 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide hidden sm:table-cell">{t('charts.updated')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayDeals.slice(0, 8).map((deal) => {
-                  const status = getStatusLabel(deal.status, t)
-                  return (
-                    <tr
-                      key={deal.id}
-                      className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors cursor-pointer"
-                      onClick={() => router.push(`/app/deal/${deal.id}`)}
-                    >
-                      <td className="px-5 py-2.5">
-                        <span
-                          className="text-xs font-medium text-slate-900 hover:text-emerald-700 transition-colors block max-w-[140px] truncate"
-                          title={deal.vendor}
-                        >
-                          {deal.vendor}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2.5 hidden sm:table-cell">
-                        <span className="text-[10px] text-slate-500">{deal.category}</span>
-                      </td>
-                      <td className="px-3 py-2.5 text-right">
-                        <span className="text-xs font-semibold text-slate-900">{deal.amount || '—'}</span>
-                      </td>
-                      <td className="px-3 py-2.5 text-center">
-                        <span className={`inline-flex text-[10px] font-semibold px-2 py-0.5 rounded ${status.cls}`}>
-                          {status.text}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2.5 text-right hidden sm:table-cell">
-                        {deal.status?.startsWith('closed') && deal.achievedSavings > 0 ? (
-                          <span className="text-[10px] font-semibold text-emerald-600">{formatMoney(deal.achievedSavings, baseCurrency, locale)}</span>
-                        ) : deal.potentialSavings > 0 ? (
-                          <span className="text-[10px] font-medium text-emerald-400">~{formatMoney(deal.potentialSavings, baseCurrency, locale)}</span>
-                        ) : (
-                          <span className="text-[10px] text-slate-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2.5 text-center hidden sm:table-cell">
-                        {deal.redFlags > 0 ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] text-red-500 font-medium">
-                            <AlertTriangle className="w-3 h-3" />
-                            {deal.redFlags}
-                          </span>
-                        ) : (
-                          <span className="text-[10px] text-slate-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-5 py-2.5 text-right hidden sm:table-cell">
-                        <span className="text-[10px] text-slate-400">{getTimeAgo(deal.updatedAt, t, locale)}</span>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          )}
         </div>
 
-        {/* Top Suppliers — 2 cols */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-          <h3 className="text-sm font-bold text-slate-900 mb-4">{t('charts.topSuppliers')}</h3>
+        {/* Top Suppliers — 3 cols */}
+        <div className="lg:col-span-3 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-slate-900">{t('charts.topSuppliers')}</h3>
+          </div>
           {topSuppliers.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {topSuppliers.map((supplier, i) => {
                 const maxSpend = topSuppliers[0]?.spend || 1
-                const tooltipText = `${t('charts.totalSpendLabel')}: ${formatMoney(supplier.spend, baseCurrency, locale)} | ${supplier.count} ${t('charts.dealsLabel')}${supplier.savings > 0 ? ` | ${formatMoney(supplier.savings, baseCurrency, locale)} ${t('charts.savingsLabel')}` : ''}`
                 return (
-                  <div key={supplier.name} className="group relative" title={tooltipText}>
+                  <div key={supplier.name}>
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-[10px] font-bold text-slate-400 w-4">{i + 1}</span>
-                        <span className="text-xs text-slate-700 truncate max-w-[140px]" title={supplier.name}>{supplier.name}</span>
+                        <span className="text-[10px] font-bold text-slate-300 w-4 flex-shrink-0">{i + 1}</span>
+                        <span className="text-xs text-slate-700 truncate" title={supplier.name}>{supplier.name}</span>
                         <span className="text-[10px] text-slate-400 flex-shrink-0">{supplier.count} {supplier.count === 1 ? (locale === 'fr' ? 'contrat' : 'deal') : t('charts.dealsLabel')}</span>
                       </div>
-                      <span className="text-xs font-semibold text-slate-900 flex-shrink-0 ml-2">
-                        {formatMoney(supplier.spend, baseCurrency, locale)}
-                      </span>
+                      <div className="flex items-center gap-3 flex-shrink-0 ml-2">
+                        {supplier.savings > 0 && (
+                          <span className="text-[10px] font-medium text-emerald-600 tabular-nums">
+                            {formatMoney(supplier.savings, baseCurrency, locale)} {locale === 'fr' ? 'potentiel' : 'potential'}
+                          </span>
+                        )}
+                        <span className="text-xs font-semibold text-slate-900 tabular-nums">
+                          {formatMoney(supplier.spend, baseCurrency, locale)}
+                        </span>
+                      </div>
                     </div>
                     <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-emerald-400 transition-all duration-500"
+                        className="h-full rounded-full bg-slate-300 transition-all duration-500"
                         style={{ width: `${(supplier.spend / maxSpend) * 100}%` }}
                       />
                     </div>
@@ -572,8 +546,10 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
               })}
             </div>
           ) : (
-            <div className="flex items-center justify-center h-32 text-sm text-slate-400">
-              {t('charts.noSupplierData')}
+            <div className="flex flex-col items-center justify-center h-32 text-center">
+              <p className="text-xs text-slate-400">
+                {locale === 'fr' ? 'Les fournisseurs apparaîtront après analyse' : 'Suppliers will appear after analysis'}
+              </p>
             </div>
           )}
         </div>

@@ -2,8 +2,34 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { analyzeDeal } from '@/lib/claude'
 
-// Allow up to 60s for classification + analysis (Vercel Pro plan)
-export const maxDuration = 60
+// Allow up to 120s for classification + analysis with retries (Vercel Pro plan)
+export const maxDuration = 120
+
+/** Retry a function with exponential backoff on transient failures */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  { maxAttempts = 3, baseDelayMs = 1000 } = {}
+): Promise<T> {
+  let lastError: Error | undefined
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+      const msg = lastError.message.toLowerCase()
+      const isTransient = msg.includes('overloaded') || msg.includes('529')
+        || msg.includes('rate') || msg.includes('timeout')
+        || msg.includes('econnreset') || msg.includes('socket')
+        || msg.includes('503') || msg.includes('500')
+        || msg.includes('ai_overloaded') || msg.includes('ai_analysis_error')
+      if (!isTransient || attempt === maxAttempts) throw lastError
+      const delay = baseDelayMs * Math.pow(2, attempt - 1)
+      console.warn(`[TermLift] Trial attempt ${attempt}/${maxAttempts} failed (${lastError.message}), retrying in ${delay}ms...`)
+      await new Promise(r => setTimeout(r, delay))
+    }
+  }
+  throw lastError
+}
 
 // Guest trial - no auth required, uses V1 schema (full text analysis)
 // 1 free analysis per IP without signup — then prompt to create account
@@ -87,8 +113,8 @@ export async function POST(request: Request) {
     // Determine locale from cookie or request body
     const resolvedLocale = (await cookies()).get('termlift_lang')?.value || locale || 'en'
 
-    // Analyze with V1 (full text analysis - catches everything)
-    const output = await analyzeDeal(
+    // Analyze with V1 (full text analysis — auto-retry on transient failures)
+    const output = await withRetry(() => analyzeDeal(
       extractedText || '',
       dealType || 'New',
       goal,
@@ -98,7 +124,7 @@ export async function POST(request: Request) {
       validAllPages && validAllPages.length > 0 ? validAllPages : undefined,
       resolvedLocale,
       validPdfData
-    )
+    ))
 
     return NextResponse.json({
       success: true,

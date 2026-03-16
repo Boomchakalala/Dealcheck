@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { CloseDealModal } from '@/components/CloseDealModal'
-import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, MoreHorizontal } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, MoreHorizontal, Info } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
 import { useI18n } from '@/i18n/context'
 import { normalizeAmount, detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
@@ -36,11 +36,11 @@ function getStatusConfig(deal: any, t: (key: string, vars?: Record<string, strin
   if (deal.status?.startsWith('closed_')) {
     const outcome = deal.status.replace('closed_', '')
     if (outcome === 'won') return { label: t('dealList.won'), badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', border: 'border-l-emerald-500', icon: <CheckCircle2 className="w-3 h-3" /> }
-    if (outcome === 'lost') return { label: t('dealList.lost'), badge: 'bg-red-100 text-red-700 border-red-200', border: 'border-l-slate-300', icon: <TrendingDown className="w-3 h-3" /> }
-    if (outcome === 'paused') return { label: t('dealList.noChange'), badge: 'bg-amber-100 text-amber-700 border-amber-200', border: 'border-l-amber-400', icon: <Pause className="w-3 h-3" /> }
+    if (outcome === 'lost') return { label: t('dealList.lost'), badge: 'bg-red-100 text-red-700 border-red-200', border: 'border-l-red-400', icon: <TrendingDown className="w-3 h-3" /> }
+    if (outcome === 'paused') return { label: t('dealList.noChange'), badge: 'bg-amber-100 text-amber-700 border-amber-200', border: 'border-l-slate-300', icon: <Pause className="w-3 h-3" /> }
     return { label: t('dealList.noChange'), badge: 'bg-slate-100 text-slate-600 border-slate-200', border: 'border-l-slate-300', icon: null }
   }
-  return { label: t('dealList.active'), badge: 'bg-blue-50 text-blue-700 border-blue-200', border: 'border-l-blue-500', icon: null }
+  return { label: t('dealList.active'), badge: 'bg-amber-50 text-amber-700 border-amber-200', border: 'border-l-amber-400', icon: null }
 }
 
 function normalizeCategory(raw: string): string {
@@ -203,16 +203,9 @@ export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListC
           // Determine negotiation step: 1=Analyzed, 2=Negotiating, 3=Closed
           const step = isClosed ? 3 : roundCount > 1 ? 2 : 1
 
-          // Left border color based on score
-          const borderColor = quoteScore == null ? 'border-l-slate-300'
-            : quoteScore >= 85 ? 'border-l-emerald-500'
-            : quoteScore >= 65 ? 'border-l-amber-500'
-            : quoteScore >= 40 ? 'border-l-orange-500'
-            : 'border-l-red-500'
-
           return (
             <Link key={deal.id} href={`/app/deal/${deal.id}`}>
-              <div className={`bg-white rounded-xl border border-slate-200 border-l-4 ${borderColor} px-5 py-4 hover:shadow-lg transition-all cursor-pointer group ${deletingId === deal.id ? 'opacity-50' : ''}`}>
+              <div className={`bg-white rounded-xl border border-slate-200 border-l-4 ${status.border} px-5 py-4 hover:shadow-lg transition-all cursor-pointer group ${deletingId === deal.id ? 'opacity-50' : ''}`}>
                 <div className="flex items-start gap-4">
 
                   {/* Left: vendor + category + meta */}
@@ -222,11 +215,7 @@ export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListC
                         {vendorName}
                       </h3>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                          isClosed ? 'bg-slate-100 text-slate-500' :
-                          roundCount === 0 ? 'bg-blue-50 text-blue-600' :
-                          'bg-emerald-50 text-emerald-600'
-                        }`}>
+                        <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${status.badge}`}>
                           {status.label}
                         </span>
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
@@ -238,9 +227,17 @@ export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListC
                         </div>
                       </div>
                     </div>
-                    {category && (
-                      <span className="inline-flex text-[10px] text-slate-400 font-medium bg-slate-50 px-2 py-0.5 rounded-full mb-2">{category}</span>
-                    )}
+                    <div className="flex items-center gap-2 flex-wrap mb-2">
+                      {category && (
+                        <span className="inline-flex text-[10px] text-slate-400 font-medium bg-slate-50 px-2 py-0.5 rounded-full">{category}</span>
+                      )}
+                      {redFlagCount > 0 && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                          <AlertTriangle className="w-3 h-3" />
+                          {redFlagCount}
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 text-[11px] text-slate-400">
                       <span>{t(roundCount !== 1 ? 'time.rounds' : 'time.round', { count: roundCount })}</span>
                       <span className="text-slate-300">·</span>
@@ -276,14 +273,14 @@ export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListC
                       if (isClosed && achievedSavings > 0) {
                         return (
                           <span className="inline-flex text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                            {formatSavings(savingsToShow, locale, totalCommitment)} {locale === 'fr' ? 'économisés' : 'saved'}
+                            {formatSavings(Math.round(savingsToShow), locale, totalCommitment)} {locale === 'fr' ? 'économisés' : 'saved'}
                           </span>
                         )
                       }
                       if (isMeaningful) {
                         return (
                           <span className="inline-flex text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                            {formatSavings(savingsToShow, locale, totalCommitment)} {locale === 'fr' ? 'potentiel' : 'potential'}
+                            {formatSavings(Math.round(savingsToShow), locale, totalCommitment)} {locale === 'fr' ? 'potentiel' : 'potential'}
                           </span>
                         )
                       }
@@ -291,28 +288,37 @@ export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListC
                     })()}
                     {quoteScore != null && (() => {
                       const sc = quoteScore
-                      const ringColor = sc >= 85 ? 'stroke-emerald-500' : sc >= 65 ? 'stroke-amber-500' : sc >= 40 ? 'stroke-orange-500' : 'stroke-red-500'
-                      const trackColor = sc >= 85 ? 'stroke-emerald-100' : sc >= 65 ? 'stroke-amber-100' : sc >= 40 ? 'stroke-orange-100' : 'stroke-red-100'
-                      const textColor = sc >= 85 ? 'text-emerald-600' : sc >= 65 ? 'text-amber-600' : sc >= 40 ? 'text-orange-600' : 'text-red-600'
-                      const circ = 2 * Math.PI * 15
+                      const ringColor = sc >= 80 ? 'stroke-emerald-500' : sc >= 65 ? 'stroke-amber-500' : sc >= 45 ? 'stroke-orange-500' : 'stroke-red-500'
+                      const trackColor = sc >= 80 ? 'stroke-emerald-100' : sc >= 65 ? 'stroke-amber-100' : sc >= 45 ? 'stroke-orange-100' : 'stroke-red-100'
+                      const textColor = sc >= 80 ? 'text-emerald-600' : sc >= 65 ? 'text-amber-600' : sc >= 45 ? 'text-orange-600' : 'text-red-600'
+                      const circ = 2 * Math.PI * 13
                       const dash = (sc / 100) * circ
-                      const lbl = sc >= 85 ? (locale === 'fr' ? 'Bon deal' : 'Strong')
-                        : sc >= 65 ? (locale === 'fr' ? 'Négociable' : 'Negotiate')
-                        : sc >= 40 ? (locale === 'fr' ? 'Surcoté' : 'Overpriced')
+                      const lbl = sc >= 80 ? (locale === 'fr' ? 'Prêt' : 'Ready')
+                        : sc >= 65 ? (locale === 'fr' ? 'Solide' : 'Solid')
+                        : sc >= 45 ? (locale === 'fr' ? 'À négocier' : 'Negotiate')
+                        : sc >= 25 ? (locale === 'fr' ? 'Surcoté' : 'Overpriced')
                         : (locale === 'fr' ? 'À fuir' : 'Walk away')
                       return (
                         <div className="flex items-center justify-end gap-1.5 mt-0.5">
-                          <svg width="36" height="36" viewBox="0 0 36 36" className="-rotate-90 flex-shrink-0">
-                            <circle cx="18" cy="18" r="15" fill="none" className={trackColor} strokeWidth="3" />
-                            <circle cx="18" cy="18" r="15" fill="none" className={ringColor} strokeWidth="3"
+                          <svg width="30" height="30" viewBox="0 0 30 30" className="-rotate-90 flex-shrink-0">
+                            <circle cx="15" cy="15" r="13" fill="none" className={trackColor} strokeWidth="2.5" />
+                            <circle cx="15" cy="15" r="13" fill="none" className={ringColor} strokeWidth="2.5"
                               strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
                             />
-                            <text x="18" y="18" textAnchor="middle" dominantBaseline="central"
-                              className={`${textColor} text-[9px] font-extrabold rotate-90 fill-current`}
+                            <text x="15" y="15" textAnchor="middle" dominantBaseline="central"
+                              className={`${textColor} text-[8px] font-extrabold rotate-90 fill-current`}
                               style={{ transformOrigin: 'center' }}
                             >{sc}</text>
                           </svg>
                           <span className={`text-[10px] font-bold ${textColor}`}>{lbl}</span>
+                          <span
+                            className="text-slate-300 hover:text-slate-500 cursor-help"
+                            title={locale === 'fr'
+                              ? 'Le score reflète la qualité des termes et le risque, pas le prix. Les économies montrent votre opportunité de négociation.'
+                              : 'Score reflects contract terms and risk quality, not price. Savings shows your negotiation opportunity.'}
+                          >
+                            <Info className="w-3 h-3" />
+                          </span>
                         </div>
                       )
                     })()}

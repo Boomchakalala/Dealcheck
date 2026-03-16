@@ -5,10 +5,11 @@ import { ArrowRight, Upload, Search, Send, Lock, ShieldCheck, Globe, Check, User
 import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { useScrollReveal, useCountUp } from '@/hooks/useScrollReveal'
-import { useT } from '@/i18n/context'
+import { useT, useI18n } from '@/i18n/context'
 
 export default function LandingPage() {
   const t = useT()
+  const { locale } = useI18n()
 
   // Scroll reveal for each section
   const statsReveal = useScrollReveal()
@@ -112,33 +113,70 @@ export default function LandingPage() {
                 </div>
 
                 <div className="p-4 sm:p-5 space-y-3">
-                  {/* Quote Score — first for impact */}
-                  <div className="border border-orange-200 bg-orange-50/50 rounded-lg px-3 py-2 flex items-center gap-2.5">
-                    <svg width="32" height="32" viewBox="0 0 32 32" className="-rotate-90 flex-shrink-0">
-                      <circle cx="16" cy="16" r="13" fill="none" stroke="#fed7aa" strokeWidth="3" />
-                      <circle cx="16" cy="16" r="13" fill="none" stroke="#f97316" strokeWidth="3"
-                        strokeDasharray={`${(52/100) * 2 * Math.PI * 13} ${(1 - 52/100) * 2 * Math.PI * 13}`}
-                        strokeLinecap="round"
-                      />
-                      <text x="16" y="16" textAnchor="middle" dominantBaseline="central"
-                        className="fill-orange-700 text-[8px] font-extrabold rotate-90"
-                        style={{ transformOrigin: 'center' }}
-                      >52</text>
-                    </svg>
-                    <div>
-                      <p className="text-[9px] font-bold text-orange-700 uppercase tracking-wider">{t('example.quoteScore')}</p>
-                      <p className="text-[11px] font-extrabold text-orange-600">{t('example.quoteScoreLabel')}</p>
+                  {/* Unified Score Hero Banner */}
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                    <div className="flex items-center gap-3 mb-2.5">
+                      <svg width="48" height="48" viewBox="0 0 100 100" className="-rotate-90 flex-shrink-0">
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#fed7aa" strokeWidth="7" />
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#f97316" strokeWidth="7"
+                          strokeDasharray={`${(52/100) * 2 * Math.PI * 42} ${(1 - 52/100) * 2 * Math.PI * 42}`}
+                          strokeLinecap="round"
+                        />
+                        <text x="50" y="44" textAnchor="middle" dominantBaseline="central"
+                          className="fill-orange-700 text-[28px] font-extrabold rotate-90"
+                          style={{ transformOrigin: 'center' }}
+                        >52</text>
+                        <text x="50" y="66" textAnchor="middle" dominantBaseline="central"
+                          className="fill-slate-400 text-[11px] font-medium rotate-90"
+                          style={{ transformOrigin: 'center' }}
+                        >/ 100</text>
+                      </svg>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('example.quoteScore')}</p>
+                        <p className="text-[11px] font-bold text-orange-700">{t('example.quoteScoreLabel')}</p>
+                      </div>
+                    </div>
+                    {/* Inline stats row */}
+                    <div className="flex items-center gap-2 text-[9px]">
+                      <div className="flex-1 text-center">
+                        <p className="font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.totalCommitment')}</p>
+                        <p className="text-[11px] font-bold text-slate-900">€111,600</p>
+                      </div>
+                      <div className="w-px h-6 bg-orange-200" />
+                      <div className="flex-1 text-center">
+                        <p className="font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.redFlags')}</p>
+                        <p className="text-[11px] font-bold text-red-600">2</p>
+                      </div>
+                      <div className="w-px h-6 bg-orange-200" />
+                      <div className="flex-1 text-center">
+                        <p className="font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('output.potentialSavings')}</p>
+                        <p className="text-[11px] font-bold text-emerald-700">{t('example.savingsAmount')}</p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Verdict */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-[9px] sm:text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">{t('hero.verdict')}</span>
+                  {/* Score Breakdown */}
+                  <div className="border border-slate-200 rounded-lg p-3">
+                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">{t('example.quoteScore')}</p>
+                    <div className="space-y-2">
+                      {[
+                        { label: t('example.scorePricing'), pct: 38, summary: 'Above market rate' },
+                        { label: t('example.scoreTerms'), pct: 67, summary: 'Auto-renew clause' },
+                        { label: t('example.scoreLeverage'), pct: 65, summary: 'Room to negotiate' },
+                      ].map((bar) => (
+                        <div key={bar.label}>
+                          <div className="flex items-center justify-between mb-0.5">
+                            <span className="text-[9px] font-medium text-slate-600">{bar.label}</span>
+                            <span className={`text-[9px] font-bold ${bar.pct >= 65 ? 'text-amber-600' : 'text-orange-600'}`}>{bar.pct}%</span>
+                          </div>
+                          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-0.5">
+                            <div className={`h-full rounded-full ${bar.pct >= 65 ? 'bg-amber-500' : 'bg-orange-500'}`}
+                              style={{ width: `${bar.pct}%` }} />
+                          </div>
+                          <p className="text-[8px] text-slate-400">{bar.summary}</p>
+                        </div>
+                      ))}
                     </div>
-                    <p className="text-[11px] sm:text-xs text-slate-700 leading-relaxed">
-                      {t('hero.verdictDesc')}
-                    </p>
                   </div>
 
                   {/* Red flag */}
@@ -388,9 +426,8 @@ export default function LandingPage() {
                   <p className="text-sm font-semibold text-slate-300">{t('example.termliftReturns')}</p>
                 </div>
                 <div className="flex flex-col gap-3">
-                  {/* 1. Quote Score — shown first for impact */}
-                  <div className="bg-white rounded-xl border border-orange-200 p-3.5 sm:p-4 shadow-sm">
-                    <p className="text-[10px] font-bold text-orange-700 uppercase tracking-wider mb-2.5">{t('example.quoteScore')}</p>
+                  {/* 1. Unified Score Hero */}
+                  <div className="bg-orange-50 rounded-xl border border-orange-200 p-3.5 sm:p-4 shadow-sm">
                     <div className="flex items-center gap-3 mb-3">
                       <svg width="44" height="44" viewBox="0 0 44 44" className="-rotate-90 flex-shrink-0">
                         <circle cx="22" cy="22" r="18" fill="none" stroke="#fed7aa" strokeWidth="3.5" />
@@ -403,21 +440,32 @@ export default function LandingPage() {
                           style={{ transformOrigin: 'center' }}
                         >52</text>
                       </svg>
-                      <span className="text-base font-extrabold text-orange-600">{t('example.quoteScoreLabel')}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-orange-600 mb-1">{t('example.quoteScoreLabel')}</p>
+                        <div className="flex items-center gap-1.5 flex-wrap text-[9px] text-slate-500">
+                          <span className="font-semibold">{t('example.savingsAmount').replace(/[^\d.,€$£]/g, '') || '€111,600'} total</span>
+                          <span className="text-slate-300">|</span>
+                          <span className="font-semibold">2 red flags</span>
+                          <span className="text-slate-300">|</span>
+                          <span className="font-semibold text-emerald-600">{t('example.savingsAmount')} savings</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-1.5">
+                    <div className="grid grid-cols-3 gap-3">
                       {[
-                        { label: t('example.scorePricing'), value: 19, max: 50 },
-                        { label: t('example.scoreTerms'), value: 20, max: 30 },
-                        { label: t('example.scoreLeverage'), value: 13, max: 20 },
+                        { label: t('example.scorePricing'), pct: 38 },
+                        { label: t('example.scoreTerms'), pct: 67 },
+                        { label: t('example.scoreLeverage'), pct: 65 },
                       ].map((bar) => (
-                        <div key={bar.label} className="flex items-center gap-2">
-                          <span className="text-[9px] text-slate-400 w-12 text-right">{bar.label}</span>
-                          <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
-                            <div className={`h-full rounded-full ${bar.value / bar.max >= 0.7 ? 'bg-emerald-500' : bar.value / bar.max >= 0.4 ? 'bg-amber-500' : 'bg-red-500'}`}
-                              style={{ width: `${(bar.value / bar.max) * 100}%` }} />
+                        <div key={bar.label}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[9px] text-slate-500">{bar.label}</span>
+                            <span className={`text-[9px] font-bold ${bar.pct >= 65 ? 'text-amber-600' : 'text-orange-600'}`}>{bar.pct}%</span>
                           </div>
-                          <span className="text-[9px] font-semibold text-slate-400 w-8">{bar.value}/{bar.max}</span>
+                          <div className="h-1.5 bg-orange-100 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full ${bar.pct >= 65 ? 'bg-amber-500' : 'bg-orange-500'}`}
+                              style={{ width: `${bar.pct}%` }} />
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -428,6 +476,7 @@ export default function LandingPage() {
                     <div className="flex items-center gap-2 mb-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                       <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">{t('example.commercial')}</span>
+                      <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-red-100 text-red-700 border border-red-200 uppercase tracking-wider">High</span>
                     </div>
                     <p className="text-xs sm:text-sm font-semibold text-slate-900 mb-1">{t('example.redFlag1Title')}</p>
                     <p className="text-xs text-slate-500">{t('example.redFlag1Desc')}</p>
@@ -438,6 +487,7 @@ export default function LandingPage() {
                     <div className="flex items-center gap-2 mb-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                       <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">{t('example.commercial')}</span>
+                      <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-red-100 text-red-700 border border-red-200 uppercase tracking-wider">High</span>
                     </div>
                     <p className="text-xs sm:text-sm font-semibold text-slate-900 mb-1">{t('example.redFlag2Title')}</p>
                     <p className="text-xs text-slate-500">{t('example.redFlag2Desc')}</p>
@@ -468,6 +518,83 @@ export default function LandingPage() {
                       <p className="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed">
                         {t('hero.emailSnippet')}
                       </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 3: Deal Closed — Outcome */}
+            <div className="mt-8">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center">
+                  <span className="text-xs font-bold text-white">3</span>
+                </div>
+                <p className="text-sm font-semibold text-slate-300">
+                  {locale === 'fr' ? 'Vous clôturez et mesurez les gains' : 'You close the deal and track the win'}
+                </p>
+              </div>
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                {/* Green closed header */}
+                <div className="bg-emerald-600 px-5 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-white/90" />
+                    <span className="text-sm font-bold text-white">{locale === 'fr' ? 'Contrat clôturé' : 'Deal closed'}</span>
+                  </div>
+                  <span className="text-[11px] text-white/70 font-medium">Mar 18, 2026</span>
+                </div>
+                <div className="p-4 sm:p-5 space-y-4">
+                  {/* Stats: Original → Final → Savings */}
+                  <div className="grid grid-cols-3 gap-2.5">
+                    <div className="bg-slate-50 rounded-lg border border-slate-200 p-3 text-center">
+                      <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">{locale === 'fr' ? 'Devis initial' : 'Original quote'}</p>
+                      <p className="text-sm sm:text-base font-bold text-slate-900">€111,600</p>
+                    </div>
+                    <div className="bg-slate-50 rounded-lg border border-slate-200 p-3 text-center">
+                      <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">{locale === 'fr' ? 'Montant final' : 'Final agreed'}</p>
+                      <p className="text-sm sm:text-base font-bold text-slate-900">€94,800</p>
+                    </div>
+                    <div className="bg-emerald-50 rounded-lg border border-emerald-200 p-3 text-center">
+                      <p className="text-[9px] font-semibold text-emerald-600 uppercase tracking-wide mb-0.5">{locale === 'fr' ? 'Économies' : 'Savings captured'}</p>
+                      <p className="text-sm sm:text-base font-bold text-emerald-800">€16,800</p>
+                      <p className="text-[10px] font-semibold text-emerald-600">15.1%</p>
+                    </div>
+                  </div>
+
+                  {/* What changed pills */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      locale === 'fr' ? 'Prix réduit' : 'Price reduced',
+                      locale === 'fr' ? 'Frais publicitaires réduits' : 'Ad fee cut',
+                      locale === 'fr' ? 'Résiliation mise à jour' : 'Cancellation updated',
+                      locale === 'fr' ? 'Livrables ajoutés' : 'Deliverables added',
+                    ].map((tag) => (
+                      <span key={tag} className="px-2 py-0.5 text-[9px] font-semibold text-slate-500 bg-slate-100 rounded-full">{tag}</span>
+                    ))}
+                  </div>
+
+                  {/* Top wins */}
+                  <div>
+                    <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-2">{locale === 'fr' ? 'Gains obtenus' : 'Wins secured'}</p>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2.5 pb-2 border-b border-slate-100">
+                        <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex-shrink-0 mt-0.5">Price</span>
+                        <div>
+                          <p className="text-xs text-slate-800">{locale === 'fr' ? 'Honoraires mensuels réduits de €7 500 à €7 000' : 'Monthly retainer reduced from €7,500 to €7,000'}</p>
+                          <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">€6,000/yr</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2.5 pb-2 border-b border-slate-100">
+                        <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex-shrink-0 mt-0.5">Price</span>
+                        <div>
+                          <p className="text-xs text-slate-800">{locale === 'fr' ? 'Frais de gestion publicitaire réduits de 20% à 10%' : 'Ad management fee cut from 20% to 10%'}</p>
+                          <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">€10,800/yr</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2.5">
+                        <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-slate-100 text-slate-600 border border-slate-200 flex-shrink-0 mt-0.5">Terms</span>
+                        <p className="text-xs text-slate-800">{locale === 'fr' ? 'Délai de résiliation réduit de 60 à 30 jours' : 'Cancellation notice cut from 60 to 30 days'}</p>
+                      </div>
                     </div>
                   </div>
                 </div>

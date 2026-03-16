@@ -200,17 +200,27 @@ export default async function DealPage({
             const score = (latestOutput as any)?.score as number | undefined
             const scoreLabel = (latestOutput as any)?.score_label as string | undefined
             if (score == null) return null
-            const color = score >= 85 ? 'text-emerald-600' : score >= 65 ? 'text-amber-600' : score >= 40 ? 'text-orange-600' : 'text-red-600'
+            const ringColor = score >= 80 ? 'stroke-emerald-500' : score >= 65 ? 'stroke-amber-500' : score >= 45 ? 'stroke-orange-500' : 'stroke-red-500'
+            const trackColor = score >= 80 ? 'stroke-emerald-100' : score >= 65 ? 'stroke-amber-100' : score >= 45 ? 'stroke-orange-100' : 'stroke-red-100'
+            const textColor = score >= 80 ? 'text-emerald-600' : score >= 65 ? 'text-amber-600' : score >= 45 ? 'text-orange-600' : 'text-red-600'
+            const circ = 2 * Math.PI * 20
+            const dash = (score / 100) * circ
             return (
-              <div className="text-center sm:text-left">
-                <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
-                  <Target className="w-3.5 h-3.5 text-slate-400" />
+              <div className="flex items-center gap-3 justify-center sm:justify-start">
+                <svg width="52" height="52" viewBox="0 0 48 48" className="-rotate-90 flex-shrink-0">
+                  <circle cx="24" cy="24" r="20" fill="none" className={trackColor} strokeWidth="4" />
+                  <circle cx="24" cy="24" r="20" fill="none" className={ringColor} strokeWidth="4"
+                    strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
+                  />
+                  <text x="24" y="24" textAnchor="middle" dominantBaseline="central"
+                    className={`${textColor} text-[11px] font-extrabold rotate-90 fill-current`}
+                    style={{ transformOrigin: 'center' }}
+                  >{score}</text>
+                </svg>
+                <div>
                   <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Score</span>
+                  {scoreLabel && <p className={`text-[10px] font-semibold ${textColor} leading-tight`}>{scoreLabel}</p>}
                 </div>
-                <p className={`text-lg sm:text-xl font-bold ${color}`}>
-                  {score}<span className="text-sm font-medium text-slate-400">/100</span>
-                </p>
-                {scoreLabel && <p className={`text-[10px] ${color}`}>{scoreLabel}</p>}
               </div>
             )
           })()}
@@ -296,124 +306,125 @@ export default async function DealPage({
           ? formatCurrency(Math.round(parseMoneyLib(totalCommitment || '0').amount - cashSavingsNum), dealCurrency)
           : (locale === 'fr' ? 'Inchangé' : 'Unchanged'))
 
+        // Category badge colors — disciplined palette: slate + emerald for financial, slate for everything else
         const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
           'PRICE': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-          'CASH FLOW': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-          'PAYMENT TERMS': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
-          'LEGAL': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+          'CASH FLOW': { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-200' },
+          'PAYMENT TERMS': { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-200' },
+          'LEGAL': { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-200' },
           'RISK': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-          'TERMS': { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200' },
-          'SCOPE': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
-          'SLA': { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200' },
-          'OTHER': { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200' },
+          'TERMS': { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-200' },
+          'SCOPE': { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-200' },
+          'SLA': { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-200' },
+          'COMMERCIAL': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+          'IMPLEMENTATION': { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-200' },
+          'OTHER': { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-200' },
+        }
+
+        // Normalize "What changed" labels to be outcome-oriented
+        const normalizeChangeLabel = (label: string): string => {
+          const map: Record<string, string> = {
+            'Price': 'Price reduced',
+            'price': 'Price reduced',
+            'Term length': 'Term revised',
+            'Term Length': 'Term revised',
+            'Payment terms': 'Payment terms improved',
+            'Payment Terms': 'Payment terms improved',
+            'Cancellation policy': 'Cancellation updated',
+            'Cancellation Policy': 'Cancellation updated',
+            'Auto-renewal': 'Auto-renewal changed',
+            'Auto-Renewal': 'Auto-renewal changed',
+            'Scope': 'Scope adjusted',
+            'SLA/Support': 'SLA improved',
+            'SLA': 'SLA improved',
+            'Liability': 'Liability protected',
+            'Security': 'Security strengthened',
+            'Other': 'Other terms changed',
+          }
+          return map[label] || label
         }
 
         return (
-          <Card className={`overflow-hidden border-2 shadow-lg ${isWon ? 'border-emerald-300' : 'border-slate-300'}`}>
-            {/* Header bar */}
-            <div className={`px-5 sm:px-6 py-4 flex items-center justify-between ${isWon ? 'bg-gradient-to-r from-emerald-600 to-green-600' : 'bg-gradient-to-r from-slate-600 to-slate-700'}`}>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                  {isWon ? <CheckCircle2 className="w-5 h-5 text-white" /> : isLost ? <TrendingDown className="w-5 h-5 text-white" /> : <Minus className="w-5 h-5 text-white" />}
-                </div>
-                <h3 className="text-base font-bold text-white">{t('deal.dealClosed')}</h3>
+          <Card className={`overflow-hidden shadow-sm ${isWon ? 'border border-slate-200' : 'border border-slate-200'}`}>
+            {/* Header bar — green for won, slate for lost, but restrained */}
+            <div className={`px-5 sm:px-6 py-3.5 flex items-center justify-between ${isWon ? 'bg-emerald-600' : 'bg-slate-600'}`}>
+              <div className="flex items-center gap-2.5">
+                {isWon ? <CheckCircle2 className="w-4.5 h-4.5 text-white/90" /> : isLost ? <TrendingDown className="w-4.5 h-4.5 text-white/90" /> : <Minus className="w-4.5 h-4.5 text-white/90" />}
+                <h3 className="text-sm font-bold text-white">{t('deal.dealClosed')}</h3>
               </div>
               {deal.closed_at && (
-                <span className="text-xs text-white/80 font-medium">
+                <span className="text-[11px] text-white/70 font-medium">
                   {new Date(deal.closed_at).toLocaleDateString(locStr, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
               )}
             </div>
 
-            <div className="px-5 sm:px-6 py-5 space-y-5 bg-gradient-to-b from-slate-50/80 to-white">
+            <div className="px-5 sm:px-6 py-5 space-y-5">
 
-              {/* Starting Position — one clean sentence */}
+              {/* Starting Position — structured, scannable */}
               {startingPosition && (
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">{locale === 'fr' ? 'Situation initiale' : 'Starting Position'}</p>
-                  <p className="text-sm text-slate-600 leading-relaxed">{startingPosition}</p>
-                </div>
+                <p className="text-sm text-slate-500 leading-relaxed">{startingPosition}</p>
               )}
 
-              {/* Stats row — 3 boxes */}
+              {/* Financial outcome — 3 stat cards */}
               {isWon && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="bg-white rounded-xl border border-slate-200 p-3.5 text-center">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Devis initial' : 'Original Quote'}</p>
+                  <div className="bg-slate-50 rounded-lg border border-slate-200 p-3.5 text-center">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Devis initial' : 'Original quote'}</p>
                     <p className="text-base sm:text-lg font-bold text-slate-900">{originalAmount}</p>
                   </div>
-                  <div className="bg-white rounded-xl border border-slate-200 p-3.5 text-center">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Montant final' : 'Final Agreed'}</p>
+                  <div className="bg-slate-50 rounded-lg border border-slate-200 p-3.5 text-center">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Montant final' : 'Final agreed'}</p>
                     <p className="text-base sm:text-lg font-bold text-slate-900">{finalAmount}</p>
                   </div>
-                  <div className={`rounded-xl p-3.5 text-center ${hasCashSavings ? 'bg-emerald-50 border-2 border-emerald-200' : 'bg-white border border-slate-200'}`}>
-                    <p className={`text-[10px] font-bold uppercase tracking-wide mb-1 ${hasCashSavings ? 'text-emerald-700' : 'text-slate-400'}`}>
-                      {locale === 'fr' ? 'Économies' : 'Cash Savings'}
+                  <div className={`rounded-lg p-3.5 text-center ${hasCashSavings ? 'bg-emerald-50 border border-emerald-200' : 'bg-slate-50 border border-slate-200'}`}>
+                    <p className={`text-[10px] font-semibold uppercase tracking-wide mb-1 ${hasCashSavings ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      {locale === 'fr' ? 'Économies capturées' : 'Savings captured'}
                     </p>
                     {hasCashSavings ? (
-                      <>
-                        <p className="text-base sm:text-lg font-bold text-emerald-900">{formatCurrency(Math.round(cashSavingsNum), closedCurrency)}</p>
-                        {cashSavingsPct != null && <p className="text-xs font-bold text-emerald-600">({cashSavingsPct.toFixed(1)}%)</p>}
-                      </>
+                      <div>
+                        <p className="text-base sm:text-lg font-bold text-emerald-800">{formatCurrency(Math.round(cashSavingsNum), closedCurrency)}</p>
+                        {cashSavingsPct != null && <p className="text-[11px] font-semibold text-emerald-600">{cashSavingsPct.toFixed(1)}% reduction</p>}
+                      </div>
                     ) : (
-                      <p className="text-base sm:text-lg font-bold text-slate-400">—</p>
+                      <p className="text-base sm:text-lg font-bold text-slate-300">—</p>
                     )}
                   </div>
                 </div>
               )}
 
-              {/* What Changed — auto-detected + user-selected tag pills */}
+              {/* What Changed — outcome-oriented pills, integrated */}
               {allWhatChanged.length > 0 && (
-                <div>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-2">{t('deal.whatChanged')}</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {allWhatChanged.map((item: string) => (
-                      <span key={item} className="px-2.5 py-1 text-[10px] font-bold bg-white text-emerald-700 rounded-lg border border-emerald-200">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {allWhatChanged.map((item: string) => (
+                    <span key={item} className="px-2.5 py-1 text-[10px] font-semibold text-slate-500 bg-slate-100 rounded-full">
+                      {normalizeChangeLabel(item)}
+                    </span>
+                  ))}
                 </div>
               )}
 
-              {/* Wins Secured — individual win cards */}
+              {/* Wins Secured */}
               {wins.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <p className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                      {locale === 'fr' ? 'Gains obtenus' : 'Wins secured'}
-                    </p>
-                  </div>
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-3">
+                    {locale === 'fr' ? 'Gains obtenus' : 'Wins secured'}
+                  </p>
                   <div className="space-y-2">
                     {wins.map((win, i) => {
                       const cat = (win.category || 'OTHER').toUpperCase()
                       const colors = categoryColors[cat] || categoryColors['OTHER']
                       const hasFinancialImpact = win.financial_impact != null && win.financial_impact.length > 0
                       return (
-                        <div key={i} className="bg-white rounded-xl border border-slate-200 p-3.5 hover:border-slate-300 transition-colors">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1.5">
-                                <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md border ${colors.bg} ${colors.text} ${colors.border}`}>
-                                  {cat}
-                                </span>
-                                {hasFinancialImpact ? (
-                                  <span className="text-xs font-bold text-emerald-600">{win.financial_impact}</span>
-                                ) : (
-                                  <span className="px-1.5 py-0.5 text-[9px] font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded-md">
-                                    {locale === 'fr' ? 'Gain non financier' : 'Non-financial win'}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-sm text-slate-800">{win.description}</p>
-                            </div>
-                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${hasFinancialImpact ? 'bg-emerald-100' : 'bg-blue-50'}`}>
-                              {hasFinancialImpact
-                                ? <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-                                : <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
-                              }
-                            </div>
+                        <div key={i} className="flex items-start gap-3 py-2.5 border-b border-slate-100 last:border-0">
+                          <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md border flex-shrink-0 mt-0.5 ${colors.bg} ${colors.text} ${colors.border}`}>
+                            {cat}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-slate-800 leading-snug">{win.description}</p>
+                            {hasFinancialImpact && (
+                              <p className="text-xs font-semibold text-emerald-600 mt-0.5">{win.financial_impact}</p>
+                            )}
                           </div>
                         </div>
                       )
@@ -425,20 +436,20 @@ export default async function DealPage({
               {/* Legacy text summary — for old deals before structured JSON */}
               {legacySummary && (
                 <div>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-2">{t('deal.summary')}</p>
-                  <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{legacySummary}</p>
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-2">{t('deal.summary')}</p>
+                  <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">{legacySummary}</p>
                 </div>
               )}
 
-              {/* Next Step — clean CTA-style row */}
+              {/* Next Step */}
               {nextAction && (
-                <div className="flex items-center gap-3 p-3.5 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                <div className="flex items-start gap-3 p-3.5 bg-slate-50 rounded-lg border border-slate-200">
+                  <div className="w-6 h-6 rounded-md bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{locale === 'fr' ? 'Prochaine étape' : 'Next Step'}</p>
-                    <p className="text-sm text-slate-800 mt-0.5">{nextAction}</p>
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">{locale === 'fr' ? 'Prochaine étape' : 'Recommended next step'}</p>
+                    <p className="text-sm text-slate-700">{nextAction}</p>
                   </div>
                 </div>
               )}

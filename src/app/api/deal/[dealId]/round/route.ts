@@ -5,8 +5,35 @@ import { AddRoundSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/claude'
 import { checkRateLimit } from '@/lib/rate-limit'
 
-// Allow up to 60s for classification + analysis (Vercel Pro plan)
-export const maxDuration = 60
+// Allow up to 120s for classification + analysis with retries (Vercel Pro plan)
+export const maxDuration = 120
+
+/** Retry a function with exponential backoff on transient failures */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  { maxAttempts = 3, baseDelayMs = 1000 } = {}
+): Promise<T> {
+  let lastError: Error | undefined
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+      const msg = lastError.message.toLowerCase()
+      // Only retry on transient errors (overloaded, rate limit, network, timeout)
+      const isTransient = msg.includes('overloaded') || msg.includes('529')
+        || msg.includes('rate') || msg.includes('timeout')
+        || msg.includes('econnreset') || msg.includes('socket')
+        || msg.includes('503') || msg.includes('500')
+        || msg.includes('ai_overloaded') || msg.includes('ai_analysis_error')
+      if (!isTransient || attempt === maxAttempts) throw lastError
+      const delay = baseDelayMs * Math.pow(2, attempt - 1)
+      console.warn(`[TermLift] Attempt ${attempt}/${maxAttempts} failed (${lastError.message}), retrying in ${delay}ms...`)
+      await new Promise(r => setTimeout(r, delay))
+    }
+  }
+  throw lastError
+}
 
 const FREE_ANALYSIS_LIMIT = 5
 
@@ -91,8 +118,8 @@ export async function POST(
     // Determine locale from cookie
     const locale = (await cookies()).get('termlift_lang')?.value || 'en'
 
-    // Analyze with context from previous round
-    const output = await analyzeDeal(
+    // Analyze with context from previous round (auto-retry on transient failures)
+    const output = await withRetry(() => analyzeDeal(
       validated.extractedText,
       deal.deal_type,
       deal.goal || undefined,
@@ -101,7 +128,7 @@ export async function POST(
       undefined,
       undefined,
       locale
-    )
+    ))
 
     // Create new round
     const { data: round, error: roundError } = await supabase

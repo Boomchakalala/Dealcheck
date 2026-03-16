@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Plus, TrendingUp, DollarSign, BarChart3, Users, Target, ArrowRight, AlertTriangle, CheckCircle2, Lock } from 'lucide-react'
+import { Plus, TrendingUp, DollarSign, BarChart3, AlertTriangle, ArrowRight, Lock } from 'lucide-react'
 import { parseMoney, formatCurrency, convertCurrency, type Currency } from '@/lib/currency'
 import { cookies } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
@@ -112,6 +112,7 @@ export default async function DashboardPage() {
       const category = normalizeCategory(rawCategory)
       const vendor = deal.vendor || output?.vendor || 'Unknown'
       const redFlagCount = output?.red_flags?.length || 0
+      const quoteScore = output?.score as number | undefined
 
       return {
         ...deal,
@@ -122,6 +123,7 @@ export default async function DashboardPage() {
         _vendor: vendor,
         _redFlagCount: redFlagCount,
         _totalCommitment: totalStr || '',
+        _quoteScore: quoteScore,
       }
     })
   )
@@ -134,12 +136,10 @@ export default async function DashboardPage() {
   const closedDeals = enrichedDeals.filter(d => d.status?.startsWith('closed_'))
   const savingsAchieved = closedDeals.reduce((s, d) => s + d._achievedSavings, 0)
   const activeDeals = enrichedDeals.filter(d => !d.status?.startsWith('closed_'))
-  const uniqueVendors = new Set(enrichedDeals.map(d => d._vendor)).size
-  const avgDealSize = enrichedDeals.length > 0 ? totalSpend / enrichedDeals.length : 0
+  const totalRedFlags = enrichedDeals.reduce((s, d) => s + d._redFlagCount, 0)
 
   // Win rate
   const wonDeals = closedDeals.filter(d => d.status === 'closed_won' || d.status === 'closed_paused')
-  const winRate = closedDeals.length > 0 ? (wonDeals.length / closedDeals.length) * 100 : 0
 
   // Average quote score
   const dealsWithScores = enrichedDeals.filter(d => {
@@ -154,6 +154,9 @@ export default async function DashboardPage() {
         return sum + (latest?.output_json?.score || 0)
       }, 0) / dealsWithScores.length
     : 0
+
+  // Savings conversion rate
+  const savingsConversionRate = savingsIdentified > 0 ? Math.round((savingsAchieved / savingsIdentified) * 100) : 0
 
   // Category breakdown
   const categoryMap = new Map<string, { spend: number; count: number; identified: number; achieved: number }>()
@@ -238,106 +241,107 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* 6 Metric Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
-              <DollarSign className="w-3.5 h-3.5 text-blue-600" />
+      {/* Savings Hero + KPI Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Savings Hero — takes 1 col, stronger visual weight */}
+        <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl p-5 text-white shadow-sm">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-200 mb-3">
+            {locale === 'fr' ? 'Économies identifiées' : 'Savings identified'}
+          </p>
+          <p className="text-3xl font-bold mb-1">{fmt(savingsIdentified)}</p>
+          <p className="text-sm text-emerald-200 mb-4">
+            {locale === 'fr' ? `sur ${enrichedDeals.length} contrats analysés` : `across ${enrichedDeals.length} deals analyzed`}
+          </p>
+          {/* Pipeline: identified → achieved */}
+          <div className="bg-white/10 rounded-lg p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-medium text-emerald-200 uppercase tracking-wide">{locale === 'fr' ? 'Réalisées' : 'Achieved'}</span>
+              <span className="text-sm font-bold">{savingsAchieved > 0 ? fmt(savingsAchieved) : '—'}</span>
             </div>
-            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('dashboard.totalSpend')}</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-medium text-emerald-200 uppercase tracking-wide">{locale === 'fr' ? 'Conversion' : 'Conversion'}</span>
+              <span className="text-sm font-bold">{savingsConversionRate > 0 ? `${savingsConversionRate}%` : '—'}</span>
+            </div>
           </div>
-          <p className="text-lg font-bold text-slate-900">{fmt(totalSpend)}</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">{t('dashboard.dealsTracked', { count: enrichedDeals.length })}</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
-              <Target className="w-3.5 h-3.5 text-amber-600" />
+        {/* KPI grid — 2 cols for the remaining 4 cards */}
+        <div className="lg:col-span-2 grid grid-cols-2 gap-3">
+          {/* Spend Analyzed */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
+                <DollarSign className="w-3.5 h-3.5 text-slate-500" />
+              </div>
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{locale === 'fr' ? 'Dépenses analysées' : 'Spend analyzed'}</span>
             </div>
-            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('dashboard.savingsFound')}</span>
+            <p className="text-xl font-bold text-slate-900">{fmt(totalSpend)}</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">{t('dashboard.dealsTracked', { count: enrichedDeals.length })}</p>
           </div>
-          <p className="text-lg font-bold text-slate-900">{fmt(savingsIdentified)}</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">{t('dashboard.potentialIdentified')}</p>
-        </div>
 
-        <div className="bg-white rounded-xl border border-emerald-200 p-4 shadow-sm bg-gradient-to-br from-emerald-50/50 to-white">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+          {/* Active Deals */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
+                <BarChart3 className="w-3.5 h-3.5 text-slate-500" />
+              </div>
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('dashboard.active')}</span>
             </div>
-            <span className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wide">{t('dashboard.savingsAchieved')}</span>
+            <p className="text-xl font-bold text-slate-900">{activeDeals.length}</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">{t('dashboard.inProgressDeals')}</p>
           </div>
-          <p className="text-lg font-bold text-emerald-900">{savingsAchieved > 0 ? fmt(savingsAchieved) : '—'}</p>
-          <p className="text-[10px] text-emerald-500 mt-0.5">{savingsAchieved > 0 ? t('dashboard.closedDeals', { count: closedDeals.length }) : t('dashboard.closeDealToTrack')}</p>
-        </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center">
-              <BarChart3 className="w-3.5 h-3.5 text-purple-600" />
+          {/* Avg Quote Score */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
+                <TrendingUp className="w-3.5 h-3.5 text-slate-500" />
+              </div>
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{locale === 'fr' ? 'Score moyen' : 'Avg score'}</span>
             </div>
-            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('dashboard.active')}</span>
+            {averageQuoteScore > 0 ? (() => {
+              const s = Math.round(averageQuoteScore)
+              const color = s >= 80 ? 'text-emerald-600' : s >= 65 ? 'text-amber-600' : s >= 45 ? 'text-orange-600' : 'text-red-600'
+              const label = s >= 80 ? (locale === 'fr' ? 'Prêt à signer' : 'Ready to sign')
+                : s >= 65 ? (locale === 'fr' ? 'Solide' : 'Solid')
+                : s >= 45 ? (locale === 'fr' ? 'À négocier' : 'Negotiate')
+                : (locale === 'fr' ? 'Attention' : 'Push back')
+              return (
+                <>
+                  <p className={`text-xl font-bold ${color}`}>{s}<span className="text-sm font-medium text-slate-300">/100</span></p>
+                  <p className={`text-[10px] ${color} mt-0.5`}>{label}</p>
+                </>
+              )
+            })() : (
+              <>
+                <p className="text-xl font-bold text-slate-300">—</p>
+                <p className="text-[10px] text-slate-400 mt-0.5">{locale === 'fr' ? 'En attente d\'analyses' : 'Awaiting analyses'}</p>
+              </>
+            )}
           </div>
-          <p className="text-lg font-bold text-slate-900">{activeDeals.length}</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">{t('dashboard.inProgressDeals')}</p>
-        </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-teal-50 flex items-center justify-center">
-              <Users className="w-3.5 h-3.5 text-teal-600" />
+          {/* Red Flags */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
+                <AlertTriangle className="w-3.5 h-3.5 text-slate-500" />
+              </div>
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{locale === 'fr' ? 'Risques détectés' : 'Risks flagged'}</span>
             </div>
-            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('dashboard.suppliers')}</span>
+            <p className={`text-xl font-bold ${totalRedFlags > 0 ? 'text-red-600' : 'text-slate-900'}`}>{totalRedFlags}</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">
+              {totalRedFlags > 0
+                ? (locale === 'fr' ? 'points à traiter' : 'across all deals')
+                : (locale === 'fr' ? 'aucun risque détecté' : 'no risks detected')}
+            </p>
           </div>
-          <p className="text-lg font-bold text-slate-900">{uniqueVendors}</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">{t('dashboard.uniqueVendors')}</p>
-        </div>
-
-        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
-              <DollarSign className="w-3.5 h-3.5 text-slate-600" />
-            </div>
-            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('dashboard.avgDeal')}</span>
-          </div>
-          <p className="text-lg font-bold text-slate-900">{fmt(avgDealSize)}</p>
-          <p className="text-[10px] text-slate-400 mt-0.5">{t('dashboard.averageDealSize')}</p>
         </div>
       </div>
 
       {/* Currency note */}
-      <p className="text-[10px] text-slate-400 text-right -mt-2">
+      <p className="text-[10px] text-slate-400 text-right -mt-3">
         {locale === 'fr' ? `Converti en ${baseCurrency} aux taux du jour` : `Converted to ${baseCurrency} at today's rates`}
       </p>
-
-      {/* Savings Summary Card */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-        <h3 className="text-sm font-bold text-slate-900 mb-4">{locale === 'fr' ? 'Résumé des économies' : 'Savings Summary'}</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="text-center p-3 bg-amber-50 rounded-lg">
-            <p className="text-[10px] font-bold text-amber-700 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Identifiées' : 'Identified'}</p>
-            <p className="text-lg font-bold text-slate-900">{fmt(savingsIdentified)}</p>
-            <p className="text-[10px] text-slate-400">{locale === 'fr' ? 'potentiel total' : 'total potential'}</p>
-          </div>
-          <div className="text-center p-3 bg-emerald-50 rounded-lg">
-            <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Réalisées' : 'Achieved'}</p>
-            <p className="text-lg font-bold text-emerald-900">{savingsAchieved > 0 ? fmt(savingsAchieved) : '—'}</p>
-            <p className="text-[10px] text-slate-400">{locale === 'fr' ? 'contrats clôturés' : 'from closed deals'}</p>
-          </div>
-          <div className="text-center p-3 bg-blue-50 rounded-lg">
-            <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Taux de conversion' : 'Conversion Rate'}</p>
-            <p className="text-lg font-bold text-slate-900">{savingsIdentified > 0 ? `${Math.round((savingsAchieved / savingsIdentified) * 100)}%` : '—'}</p>
-            <p className="text-[10px] text-slate-400">{locale === 'fr' ? 'identifiées → réalisées' : 'identified → achieved'}</p>
-          </div>
-          <div className="text-center p-3 bg-slate-50 rounded-lg">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Moyenne par contrat' : 'Avg per Deal'}</p>
-            <p className="text-lg font-bold text-slate-900">{enrichedDeals.length > 0 ? fmt(savingsIdentified / enrichedDeals.length) : '—'}</p>
-            <p className="text-[10px] text-slate-400">{locale === 'fr' ? 'économies identifiées' : 'savings identified'}</p>
-          </div>
-        </div>
-      </div>
 
       {/* Charts — Client Component */}
       <DashboardCharts
@@ -353,12 +357,13 @@ export default async function DashboardPage() {
           updatedAt: d.updated_at,
           potentialSavings: d._potentialSavings,
           achievedSavings: d._achievedSavings,
+          quoteScore: d._quoteScore,
         }))}
         baseCurrency={baseCurrency}
         savingsAchieved={savingsAchieved}
         isPro={isPro}
         isAdmin={isAdmin}
-        winRate={winRate}
+        winRate={0}
         closedDealCount={closedDeals.length}
         wonDealCount={wonDeals.length}
         averageQuoteScore={averageQuoteScore}

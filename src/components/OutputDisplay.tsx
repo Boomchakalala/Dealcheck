@@ -4,7 +4,7 @@ import { type DealOutput } from '@/types'
 import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, TrendingDown, TrendingUp, Zap, Loader2, Sparkles, Clock, DollarSign, Calendar, Target, Layers, Info, AlertCircle } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { useT, useI18n } from '@/i18n/context'
-import { normalizeAmount, detectCurrency, formatCurrency } from '@/lib/currency'
+import { normalizeAmount, detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
 
 interface OutputDisplayProps {
   output: DealOutput
@@ -238,165 +238,173 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
       </div>}
 
       {/* METRIC CARDS ROW — hidden when inside deal page */}
-      {!hideHeader && <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {/* Quote Score Card — always first */}
-        {output.score != null && (() => {
-          const score = output.score
-          const scoreColor = score >= 80 ? { bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200', text: 'text-emerald-700', ring: 'stroke-emerald-500', track: 'stroke-emerald-100', label: 'bg-emerald-100 text-emerald-700' }
-            : score >= 65 ? { bg: 'from-blue-50 to-sky-50', border: 'border-blue-200', text: 'text-blue-700', ring: 'stroke-blue-500', track: 'stroke-blue-100', label: 'bg-blue-100 text-blue-700' }
-            : score >= 45 ? { bg: 'from-amber-50 to-yellow-50', border: 'border-amber-200', text: 'text-amber-700', ring: 'stroke-amber-500', track: 'stroke-amber-100', label: 'bg-amber-100 text-amber-700' }
-            : score >= 25 ? { bg: 'from-orange-50 to-amber-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100', label: 'bg-orange-100 text-orange-700' }
-            : { bg: 'from-red-50 to-pink-50', border: 'border-red-200', text: 'text-red-700', ring: 'stroke-red-500', track: 'stroke-red-100', label: 'bg-red-100 text-red-700' }
+      {!hideHeader && (() => {
+        const score = output.score ?? 0
+        const scoreColor = score >= 80 ? { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', ring: 'stroke-emerald-500', track: 'stroke-emerald-100', badge: 'bg-emerald-100 text-emerald-700' }
+          : score >= 65 ? { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', ring: 'stroke-amber-500', track: 'stroke-amber-100', badge: 'bg-amber-100 text-amber-700' }
+          : score >= 45 ? { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100', badge: 'bg-orange-100 text-orange-700' }
+          : { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', ring: 'stroke-red-500', track: 'stroke-red-100', badge: 'bg-red-100 text-red-700' }
 
-          const circumference = 2 * Math.PI * 34
-          const dashLength = (score / 100) * circumference
+        const circumference = 2 * Math.PI * 42
+        const dashLength = (score / 100) * circumference
 
-          return (
-            <div className={`bg-gradient-to-br ${scoreColor.bg} rounded-xl border-2 ${scoreColor.border} p-5 shadow-sm flex flex-col`}>
-              <div className="flex items-center gap-2 mb-3">
-                <div className={`w-8 h-8 rounded-lg ${scoreColor.label} flex items-center justify-center`}>
-                  <Target className="w-4 h-4" />
+        // Parse total commitment properly (handles European formats with . as thousands sep)
+        const commitmentParsed = output.snapshot?.total_commitment ? parseMoney(output.snapshot.total_commitment) : null
+        const commitmentNum = commitmentParsed?.amount || 0
+
+        // Calculate savings percentage using properly parsed values
+        const savingsPct = (totalSavings > 0 && commitmentNum > 0) ? Math.round((totalSavings / commitmentNum) * 100) : 0
+
+        return (
+          <div className="mb-6 space-y-4">
+            {/* Top hero: Score + Verdict + Key stats */}
+            <div className={`${scoreColor.bg} rounded-xl border ${scoreColor.border} p-6`}>
+              <div className="flex flex-col md:flex-row md:items-center gap-6">
+                {/* Score ring */}
+                {output.score != null && (
+                  <div className="flex-shrink-0 flex items-center gap-5">
+                    <svg width="100" height="100" viewBox="0 0 100 100" className="-rotate-90">
+                      <circle cx="50" cy="50" r="42" fill="none" className={scoreColor.track} strokeWidth="7" />
+                      <circle cx="50" cy="50" r="42" fill="none" className={scoreColor.ring} strokeWidth="7"
+                        strokeDasharray={`${dashLength} ${circumference - dashLength}`}
+                        strokeLinecap="round"
+                      />
+                      <text x="50" y="46" textAnchor="middle" dominantBaseline="central"
+                        className={`${scoreColor.text} text-[28px] font-extrabold rotate-90 fill-current`}
+                        style={{ transformOrigin: 'center' }}
+                      >
+                        {score}
+                      </text>
+                      <text x="50" y="64" textAnchor="middle" dominantBaseline="central"
+                        className="text-[10px] font-medium text-slate-400 rotate-90 fill-current"
+                        style={{ transformOrigin: 'center' }}
+                      >
+                        / 100
+                      </text>
+                    </svg>
+                    <div className="md:hidden">
+                      <p className={`text-lg font-bold ${scoreColor.text} mb-0.5`}>{output.score_label}</p>
+                      {output.score_rationale && (
+                        <p className="text-xs text-slate-500 leading-relaxed max-w-[240px]">{output.score_rationale}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Verdict + stats */}
+                <div className="flex-1 min-w-0">
+                  <div className="hidden md:block mb-3">
+                    <p className={`text-lg font-bold ${scoreColor.text} mb-0.5`}>{output.score_label}</p>
+                    {output.score_rationale && (
+                      <p className="text-sm text-slate-500 leading-relaxed">{output.score_rationale}</p>
+                    )}
+                  </div>
+
+                  {/* Inline stats row */}
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                    <div>
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.totalCommitment')}</p>
+                      <p className="text-lg font-bold text-slate-900">
+                        {output.snapshot?.total_commitment ? normalizeAmount(output.snapshot.total_commitment) : t('output.na')}
+                      </p>
+                      <p className="text-[11px] text-slate-500">{output.snapshot?.term || t('output.12MonthContract')}</p>
+                    </div>
+                    <div className="w-px h-10 bg-slate-200 hidden sm:block" />
+                    <div>
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.redFlags')}</p>
+                      <p className="text-lg font-bold text-red-600">{output.red_flags?.length || 0}</p>
+                      <p className="text-[11px] text-slate-500">{output.red_flags?.length === 1 ? t('output.issueToAddress') : t('output.issuesToAddress')}</p>
+                    </div>
+                    <div className="w-px h-10 bg-slate-200 hidden sm:block" />
+                    <div>
+                      <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('output.potentialSavings')}</p>
+                      <p className="text-lg font-bold text-emerald-700">
+                        {totalSavings > 0 ? formatSavings(totalSavings) : t('output.na')}
+                      </p>
+                      <p className="text-[11px] text-slate-500">
+                        {savingsPct > 0 ? t('output.percentPotentialSavings', { pct: String(savingsPct) }) : t('output.noSavingsCalculated')}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <p className={`text-xs font-semibold ${scoreColor.text} uppercase tracking-wide`}>{t('output.quoteScore')}</p>
-              </div>
-              <div className="flex items-center gap-4 flex-1">
-                <svg width="80" height="80" viewBox="0 0 80 80" className="-rotate-90 flex-shrink-0">
-                  <circle cx="40" cy="40" r="34" fill="none" className={scoreColor.track} strokeWidth="6" />
-                  <circle cx="40" cy="40" r="34" fill="none" className={scoreColor.ring} strokeWidth="6"
-                    strokeDasharray={`${dashLength} ${circumference - dashLength}`}
-                    strokeLinecap="round"
-                  />
-                  <text x="40" y="40" textAnchor="middle" dominantBaseline="central"
-                    className={`${scoreColor.text} text-2xl font-extrabold rotate-90 fill-current`}
-                    style={{ transformOrigin: 'center' }}
-                  >
-                    {score}
-                  </text>
-                </svg>
-                <div className="min-w-0">
-                  <p className={`text-base font-extrabold ${scoreColor.text} mb-0.5`}>{output.score_label}</p>
-                  {output.score_rationale && (
-                    <p className="text-xs text-slate-500 leading-relaxed">{output.score_rationale}</p>
-                  )}
-                </div>
               </div>
             </div>
-          )
-        })()}
 
-        {/* Total Commitment Card */}
-        <div className="bg-white rounded-xl border-2 border-slate-200 p-5 shadow-sm flex flex-col">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-              <DollarSign className="w-4 h-4 text-slate-600" />
-            </div>
-            <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">{t('output.totalCommitment')}</p>
           </div>
-          <p className="text-3xl font-bold text-slate-900 mb-1">
-            {output.snapshot?.total_commitment ? normalizeAmount(output.snapshot.total_commitment) : t('output.na')}
-          </p>
-          <p className="text-sm text-slate-600">
-            {output.snapshot?.term || t('output.12MonthContract')}
-          </p>
-        </div>
+        )
+      })()}
 
-        {/* Red Flags Card */}
-        <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl border-2 border-red-200 p-5 shadow-sm flex flex-col">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
-              <AlertTriangle className="w-4 h-4 text-red-600" />
-            </div>
-            <p className="text-xs font-semibold text-red-700 uppercase tracking-wide">{t('output.redFlags')}</p>
-          </div>
-          <p className="text-3xl font-bold text-red-700 mb-1">
-            {output.red_flags?.length || 0}
-          </p>
-          <button
-            onClick={() => setShowRedFlags(!showRedFlags)}
-            className="text-sm text-red-700 hover:text-red-800 font-medium hover:underline"
-          >
-            {output.red_flags?.length === 1 ? t('output.issueToAddress') : t('output.issuesToAddress')}
-          </button>
-        </div>
-
-        {/* Potential Savings Card */}
-        <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200 p-5 shadow-sm flex flex-col">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-emerald-600" />
-            </div>
-            <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">{t('output.potentialSavings')}</p>
-          </div>
-          <p className="text-3xl font-bold text-emerald-700 mb-1">
-            {totalSavings > 0 ? formatSavings(totalSavings) : t('output.na')}
-          </p>
-          <p className="text-sm text-emerald-700">
-            {totalSavings > 0 && output.snapshot?.total_commitment ? (
-              (() => {
-                const totalCommitment = output.snapshot.total_commitment.replace(/[^0-9.]/g, '')
-                const commitmentNum = parseFloat(totalCommitment)
-                if (!isNaN(commitmentNum) && commitmentNum > 0) {
-                  const percentage = ((totalSavings / commitmentNum) * 100).toFixed(0)
-                  return t('output.percentPotentialSavings', { pct: percentage })
-                }
-                return t('output.identifiedSavingsOpportunities')
-              })()
-            ) : t('output.noSavingsCalculated')}
-          </p>
-        </div>
-
-      </div>}
-
-      {/* Score Breakdown — always visible */}
+      {/* Score breakdown (always visible) */}
       {output.score != null && output.score_breakdown && (() => {
         const bd = output.score_breakdown
         type Deduction = { points: number; reason: string }
+
         const categories = [
-          { label: locale === 'fr' ? 'Équité prix' : 'Pricing fairness', value: bd.pricing_fairness, max: 50, deductions: (bd.pricing_deductions || []) as Deduction[], noIssueLabel: locale === 'fr' ? 'Aucun problème détecté' : 'No issues found' },
-          { label: locale === 'fr' ? 'Termes & protections' : 'Terms & protections', value: bd.terms_protections, max: 30, deductions: (bd.terms_deductions || []) as Deduction[], noIssueLabel: locale === 'fr' ? 'Aucun problème détecté' : 'No issues found' },
-          { label: locale === 'fr' ? 'Position de levier' : 'Leverage position', value: bd.leverage_position, max: 20, deductions: (bd.leverage_deductions || []) as Deduction[], noIssueLabel: locale === 'fr' ? 'Aucun problème détecté' : 'No issues found' },
+          {
+            key: 'pricing',
+            label: locale === 'fr' ? 'Prix' : 'Pricing',
+            value: bd.pricing_fairness,
+            max: 50,
+            deductions: (bd.pricing_deductions || []) as Deduction[],
+            goodPhrase: locale === 'fr' ? 'Prix cohérent avec le marché' : 'Pricing looks fair',
+            badPhrase: (d: Deduction[]) => d.length > 0 ? d.reduce((a, b) => a.points >= b.points ? a : b).reason : '',
+          },
+          {
+            key: 'terms',
+            label: locale === 'fr' ? 'Termes' : 'Terms',
+            value: bd.terms_protections,
+            max: 30,
+            deductions: (bd.terms_deductions || []) as Deduction[],
+            goodPhrase: locale === 'fr' ? 'Clauses contractuelles acceptables' : 'Contract terms look solid',
+            badPhrase: (d: Deduction[]) => d.length > 0 ? d.reduce((a, b) => a.points >= b.points ? a : b).reason : '',
+          },
+          {
+            key: 'leverage',
+            label: locale === 'fr' ? 'Levier' : 'Leverage',
+            value: bd.leverage_position,
+            max: 20,
+            deductions: (bd.leverage_deductions || []) as Deduction[],
+            goodPhrase: locale === 'fr' ? 'Bonne position de négociation' : 'You have room to negotiate',
+            badPhrase: (d: Deduction[]) => d.length > 0 ? d.reduce((a, b) => a.points >= b.points ? a : b).reason : '',
+          },
         ]
-        const barColor = (v: number, max: number) => {
-          const pct = v / max
-          if (pct >= 0.8) return 'bg-emerald-500'
-          if (pct >= 0.65) return 'bg-blue-500'
-          if (pct >= 0.45) return 'bg-amber-500'
-          if (pct >= 0.25) return 'bg-orange-500'
-          return 'bg-red-500'
+
+        const getStatus = (v: number, max: number) => {
+          const pct = (v / max) * 100
+          if (pct >= 85) return { color: 'text-emerald-600', bg: 'bg-emerald-500', trackBg: 'bg-emerald-100' }
+          if (pct >= 65) return { color: 'text-amber-600', bg: 'bg-amber-500', trackBg: 'bg-amber-100' }
+          if (pct >= 40) return { color: 'text-orange-600', bg: 'bg-orange-500', trackBg: 'bg-orange-100' }
+          return { color: 'text-red-600', bg: 'bg-red-500', trackBg: 'bg-red-100' }
         }
-        const scoreTextColor = (v: number, max: number) => {
-          const pct = v / max
-          if (pct >= 0.8) return 'text-emerald-700'
-          if (pct >= 0.65) return 'text-blue-700'
-          if (pct >= 0.45) return 'text-amber-700'
-          if (pct >= 0.25) return 'text-orange-700'
-          return 'text-red-700'
-        }
+
         return (
-          <div className="bg-white rounded-xl border-2 border-slate-200 p-5 shadow-sm mb-6">
-            <h3 className="text-sm font-bold text-slate-900 mb-4">{locale === 'fr' ? 'Détail du score' : 'Score breakdown'}</h3>
-            <div className="space-y-4">
+          <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4">
+              {locale === 'fr' ? 'Détail du score' : 'Score breakdown'}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {categories.map((cat) => {
-                // Find the worst deduction (highest points) for the one-line reason
-                const worst = cat.deductions.length > 0
-                  ? cat.deductions.reduce((a, b) => a.points >= b.points ? a : b)
-                  : null
+                const status = getStatus(cat.value, cat.max)
+                const pct = Math.round((cat.value / cat.max) * 100)
+                const hasIssues = cat.deductions.length > 0
+                const phrase = hasIssues ? cat.badPhrase(cat.deductions) : cat.goodPhrase
+
                 return (
-                  <div key={cat.label}>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-slate-800">{cat.label}</span>
-                      <span className={`text-sm font-extrabold ${scoreTextColor(cat.value, cat.max)}`}>{cat.value}/{cat.max}</span>
+                  <div key={cat.key}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-sm font-semibold text-slate-800">{cat.label}</p>
+                      <span className={`text-sm font-bold ${status.color}`}>{pct}%</span>
                     </div>
-                    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5 mb-1">
-                      <div className={`h-full rounded-full ${barColor(cat.value, cat.max)}`}
-                        style={{ width: `${(cat.value / cat.max) * 100}%` }}
+                    <div className={`w-full h-1.5 ${status.trackBg} rounded-full overflow-hidden mb-2`}>
+                      <div className={`h-full rounded-full ${status.bg} transition-all duration-500`}
+                        style={{ width: `${pct}%` }}
                       />
                     </div>
-                    {worst ? (
-                      <p className="text-xs text-slate-500 leading-snug">{worst.reason}</p>
+                    {hasIssues ? (
+                      <p className="text-[11px] text-slate-500 leading-snug line-clamp-2">{phrase}</p>
                     ) : (
-                      <p className="text-xs text-emerald-600 leading-snug flex items-center gap-1">
-                        <span>&#10003;</span> {cat.noIssueLabel}
+                      <p className="text-[11px] text-emerald-600 leading-snug flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" /> {phrase}
                       </p>
                     )}
                   </div>
@@ -751,7 +759,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
             <span className="text-white font-bold text-sm">1</span>
           </div>
-          <h2 id="strategy-section" className="text-xl font-bold text-slate-900 uppercase tracking-wide text-sm">{t('output.strategy')}</h2>
+          <h2 id="strategy-section" className="text-base font-bold text-slate-900 uppercase tracking-wide">{t('output.strategy')}</h2>
           <ChevronDown className="w-5 h-5 text-slate-400" />
         </div>
 
@@ -912,7 +920,8 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
             <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
               <span className="text-white font-bold text-sm">2</span>
             </div>
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">{t('output.savingsImpact')}</h2>
+            <h2 className="text-base font-bold text-slate-900 uppercase tracking-wide">{t('output.savingsImpact')}</h2>
+            <ChevronDown className="w-5 h-5 text-slate-400" />
           </div>
 
           <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm">
@@ -1045,7 +1054,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
             <span className="text-white font-bold text-sm">3</span>
           </div>
-          <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">{t('output.takeAction')}</h2>
+          <h2 className="text-base font-bold text-slate-900 uppercase tracking-wide">{t('output.takeAction')}</h2>
           <ChevronDown className="w-5 h-5 text-slate-400" />
         </div>
 

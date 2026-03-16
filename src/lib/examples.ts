@@ -505,7 +505,7 @@ Thanks,
     },
   },
   score: 72,
-  score_label: "Almost there — push on a few points",
+  score_label: "Solid — negotiate the details",
   score_breakdown: {
     pricing_fairness: 34,
     terms_protections: 22,
