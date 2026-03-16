@@ -1172,14 +1172,14 @@ type DeductionItem = { points: number; reason: string }
 
 function getSeverity(flag: { issue: string; why_it_matters: string; type: string }): 'HIGH' | 'MEDIUM' | 'LOW' {
   const text = `${flag.issue} ${flag.why_it_matters}`.toLowerCase()
-  const amounts = flag.why_it_matters.match(/[\d,]+/g)?.map(s => parseInt(s.replace(/,/g, ''), 10)).filter(n => !isNaN(n) && n > 0) || []
-  const maxAmount = Math.max(...amounts, 0)
-  if (maxAmount > 10000 || text.includes('double') || text.includes('significant') || text.includes('major')) return 'HIGH'
-  if (maxAmount > 2000 || text.includes('above market') || text.includes('au-dessus')) return 'MEDIUM'
+  // HIGH = strong language indicating serious overpay or dangerous terms
+  if (text.includes('double') || text.includes('triple') || text.includes('walk away') || text.includes('predatory') || text.includes('hidden') || text.includes('caché')) return 'HIGH'
+  // MEDIUM = above market or notable concern
+  if (text.includes('above market') || text.includes('au-dessus') || text.includes('significant') || text.includes('major') || text.includes('overpay') || text.includes('surpay')) return 'MEDIUM'
   return 'LOW'
 }
 
-const SEVERITY_POINTS: Record<string, number> = { HIGH: 15, MEDIUM: 8, LOW: 3 }
+const SEVERITY_POINTS: Record<string, number> = { HIGH: 10, MEDIUM: 5, LOW: 2 }
 
 function classifyFlag(flag: { issue: string; why_it_matters: string; type: string }): 'pricing' | 'terms' | 'leverage' {
   const text = `${flag.issue} ${flag.why_it_matters} ${flag.type}`.toLowerCase()
@@ -1223,6 +1223,8 @@ function calculateQuoteScore(output: DealOutputType): {
   }
 
   // --- STEP 2: Additional pricing signals from savings % ---
+  // Only penalize if savings are very high (>25%), indicating genuinely overpriced.
+  // Moderate savings (5-15%) are normal negotiation room, not a sign of a bad deal.
   const totalCommitment = output.snapshot?.total_commitment || ''
   const commitNum = parseFloat(totalCommitment.replace(/[^\d.]/g, '')) || 0
   const totalSavings = (output.potential_savings || []).reduce((sum, s) => {
@@ -1231,17 +1233,19 @@ function calculateQuoteScore(output: DealOutputType): {
 
   if (commitNum > 0 && totalSavings > 0) {
     const savingsPct = (totalSavings / commitNum) * 100
-    if (savingsPct > 20) pricingItems.push({ points: 8, reason: `Savings exceed 20% of contract value (${Math.round(savingsPct)}%)` })
-    else if (savingsPct > 10) pricingItems.push({ points: 4, reason: `Savings exceed 10% of contract value (${Math.round(savingsPct)}%)` })
+    if (savingsPct > 30) pricingItems.push({ points: 8, reason: `Savings exceed 30% of contract value (${Math.round(savingsPct)}%)` })
+    else if (savingsPct > 25) pricingItems.push({ points: 4, reason: `Savings exceed 25% of contract value (${Math.round(savingsPct)}%)` })
+    // Under 25% savings = normal negotiation room, no penalty
   }
 
   // --- STEP 3: Terms signals from whats_concerning ---
+  // Only penalize for truly problematic terms, not standard contract boilerplate.
+  // Auto-renewal + notice periods are standard in most contracts — only flag if extreme.
   for (const concern of output.quick_read?.whats_concerning || []) {
     const text = concern.toLowerCase()
-    if (text.includes('auto-renew') || text.includes('renouvellement auto')) termsItems.push({ points: 5, reason: concern })
-    else if (text.includes('cancel') || text.includes('résiliation')) termsItems.push({ points: 5, reason: concern })
-    else if (text.includes('escalat') || text.includes('augmentation')) termsItems.push({ points: 5, reason: concern })
-    else if (text.includes('notice') || text.includes('préavis')) termsItems.push({ points: 3, reason: concern })
+    if (text.includes('escalat') || text.includes('augmentation')) termsItems.push({ points: 4, reason: concern })
+    else if (text.includes('auto-renew') && (text.includes('no opt') || text.includes('silent') || text.includes('tacite'))) termsItems.push({ points: 3, reason: concern })
+    // Standard auto-renewal and notice periods are not penalized — they're industry norm
   }
 
   let pricingDeduction = Math.min(pricingItems.reduce((s, i) => s + i.points, 0), 50)
@@ -1259,10 +1263,10 @@ function calculateQuoteScore(output: DealOutputType): {
     leverageItems.push({ points: 5, reason: 'Long commitment term (>12 months)' })
 
   if (allText.includes('upfront') || allText.includes('annual in advance') || allText.includes('avance'))
-    leverageItems.push({ points: 5, reason: 'Upfront or advance payment required' })
+    leverageItems.push({ points: 3, reason: 'Upfront or advance payment required' })
 
   if (output.snapshot?.signing_deadline)
-    leverageItems.push({ points: 3, reason: 'Signing deadline creates time pressure' })
+    leverageItems.push({ points: 2, reason: 'Signing deadline creates time pressure' })
 
   let leverageDeduction = Math.min(leverageItems.reduce((s, i) => s + i.points, 0), 20)
 
@@ -1274,9 +1278,10 @@ function calculateQuoteScore(output: DealOutputType): {
   const totalScore = Math.max(5, Math.min(98, rawScore))
 
   let label: string
-  if (totalScore >= 85) label = 'Strong deal'
-  else if (totalScore >= 65) label = 'Negotiate a few points'
-  else if (totalScore >= 40) label = 'Overpriced'
+  if (totalScore >= 85) label = 'Fair deal'
+  else if (totalScore >= 70) label = 'Mostly fair — negotiate a few points'
+  else if (totalScore >= 55) label = 'Push back on pricing'
+  else if (totalScore >= 40) label = 'Overpriced — negotiate hard'
   else label = 'Walk away'
 
   // Build rationale from the biggest area + flag count
