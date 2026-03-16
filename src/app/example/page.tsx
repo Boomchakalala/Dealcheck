@@ -121,11 +121,29 @@ export default function ExamplePage() {
           </div>
         </div>
 
-        {/* Deal Closed — Win Summary (shown at top like real closed deals) */}
+        {/* Closed Deal Banner — compact, eye-catching */}
+        <div className="mb-8 bg-emerald-600 rounded-xl px-5 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xl" role="img" aria-label="trophy">🏆</span>
+            <span className="text-sm sm:text-base font-bold text-white">
+              {locale === 'fr' ? 'Contrat gagné' : 'Deal Won'} — {closedDeals[selectedExample].savings} {locale === 'fr' ? 'économisés' : 'saved'}
+            </span>
+          </div>
+          <button
+            onClick={() => document.getElementById('negotiation-outcome')?.scrollIntoView({ behavior: 'smooth' })}
+            className="px-4 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap"
+          >
+            {locale === 'fr' ? 'Voir le résultat →' : 'See outcome →'}
+          </button>
+        </div>
+
+        <OutputDisplay output={currentExamples[selectedExample]} />
+
+        {/* Deal Closed — Win Summary (full outcome card) */}
         {(() => {
           const deal = closedDeals[selectedExample]
           return (
-            <div className="mb-8">
+            <div id="negotiation-outcome" className="mt-10 mb-8">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
                   <Check className="w-4 h-4 text-white" strokeWidth={3} />
@@ -194,8 +212,6 @@ export default function ExamplePage() {
             </div>
           )
         })()}
-
-        <OutputDisplay output={currentExamples[selectedExample]} />
 
         {/* Bottom CTA */}
         <div className="mt-12 text-center">

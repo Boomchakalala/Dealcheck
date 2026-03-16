@@ -241,8 +241,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
       {!hideHeader && (() => {
         const score = output.score ?? 0
         const scoreColor = score >= 80 ? { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', ring: 'stroke-emerald-500', track: 'stroke-emerald-100', badge: 'bg-emerald-100 text-emerald-700' }
-          : score >= 65 ? { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', ring: 'stroke-amber-500', track: 'stroke-amber-100', badge: 'bg-amber-100 text-amber-700' }
-          : score >= 45 ? { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100', badge: 'bg-orange-100 text-orange-700' }
+          : score >= 60 ? { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100', badge: 'bg-orange-100 text-orange-700' }
           : { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', ring: 'stroke-red-500', track: 'stroke-red-100', badge: 'bg-red-100 text-red-700' }
 
         const circumference = 2 * Math.PI * 42
@@ -371,9 +370,8 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
 
         const getStatus = (v: number, max: number) => {
           const pct = (v / max) * 100
-          if (pct >= 85) return { color: 'text-emerald-600', bg: 'bg-emerald-500', trackBg: 'bg-emerald-100' }
-          if (pct >= 65) return { color: 'text-amber-600', bg: 'bg-amber-500', trackBg: 'bg-amber-100' }
-          if (pct >= 40) return { color: 'text-orange-600', bg: 'bg-orange-500', trackBg: 'bg-orange-100' }
+          if (pct >= 80) return { color: 'text-emerald-600', bg: 'bg-emerald-500', trackBg: 'bg-emerald-100' }
+          if (pct >= 60) return { color: 'text-orange-600', bg: 'bg-orange-500', trackBg: 'bg-orange-100' }
           return { color: 'text-red-600', bg: 'bg-red-500', trackBg: 'bg-red-100' }
         }
 

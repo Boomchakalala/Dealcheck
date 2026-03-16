@@ -200,9 +200,9 @@ export default async function DealPage({
             const score = (latestOutput as any)?.score as number | undefined
             const scoreLabel = (latestOutput as any)?.score_label as string | undefined
             if (score == null) return null
-            const ringColor = score >= 80 ? 'stroke-emerald-500' : score >= 65 ? 'stroke-amber-500' : score >= 45 ? 'stroke-orange-500' : 'stroke-red-500'
-            const trackColor = score >= 80 ? 'stroke-emerald-100' : score >= 65 ? 'stroke-amber-100' : score >= 45 ? 'stroke-orange-100' : 'stroke-red-100'
-            const textColor = score >= 80 ? 'text-emerald-600' : score >= 65 ? 'text-amber-600' : score >= 45 ? 'text-orange-600' : 'text-red-600'
+            const ringColor = score >= 80 ? 'stroke-emerald-500' : score >= 60 ? 'stroke-orange-500' : 'stroke-red-500'
+            const trackColor = score >= 80 ? 'stroke-emerald-100' : score >= 60 ? 'stroke-orange-100' : 'stroke-red-100'
+            const textColor = score >= 80 ? 'text-emerald-600' : score >= 60 ? 'text-orange-600' : 'text-red-600'
             const circ = 2 * Math.PI * 20
             const dash = (score / 100) * circ
             return (
@@ -226,6 +226,153 @@ export default async function DealPage({
           })()}
         </div>
       </Card>
+
+      {/* Closed Deal Banner */}
+      {deal.status?.startsWith('closed_') && (
+        deal.status === 'closed_won' ? (
+          <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-between px-6 py-3.5">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-5 h-5 text-white" />
+              <span className="text-sm font-bold text-white">
+                Deal Won{(deal.savings_amount ?? 0) > 0 && ` — ${formatCurrency(Math.round(deal.savings_amount), dealCurrency)} saved`}
+              </span>
+            </div>
+            <a
+              href="#negotiation-outcome"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+            >
+              See outcome →
+            </a>
+          </div>
+        ) : (
+          <div className="bg-slate-600 rounded-xl flex items-center justify-between px-6 py-3.5">
+            <div className="flex items-center gap-2.5">
+              <TrendingDown className="w-5 h-5 text-white" />
+              <span className="text-sm font-bold text-white">
+                Deal Closed — Signed at original terms
+              </span>
+            </div>
+            <a
+              href="#negotiation-outcome"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+            >
+              See outcome →
+            </a>
+          </div>
+        )
+      )}
+
+      {/* Analysis Output — no duplicate title section */}
+      {latestOutput && (
+        <div id="email-drafts">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="px-3.5 py-1 bg-emerald-600 text-white rounded-full text-xs font-bold">
+              {t('deal.round')} {latestRound.round_number}
+            </div>
+            <span className="text-xs text-slate-500">{t('deal.latestAnalysis')}</span>
+            <div className="flex-1 h-px bg-slate-200" />
+          </div>
+          {isV2 ? (
+            <OutputDisplayV2 output={latestOutput as DealOutputV2} roundId={latestRound.id} />
+          ) : (
+            <OutputDisplay output={latestOutput as DealOutput} roundId={latestRound.id} hideHeader />
+          )}
+        </div>
+      )}
+
+      {/* Next Round CTA — only for active deals with at least 1 round */}
+      {!deal.status?.startsWith('closed_') && sortedRounds.length > 0 && (
+        <div className="bg-gradient-to-br from-sky-50 to-cyan-50 rounded-xl border-2 border-sky-200 p-5 sm:p-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <h3 className="text-base font-bold text-slate-900 mb-1">
+                {locale === 'fr' ? 'Le fournisseur a répondu ?' : 'Vendor replied?'}
+              </h3>
+              <p className="text-sm text-slate-600">
+                {locale === 'fr'
+                  ? `Téléchargez sa réponse et nous mettrons à jour votre stratégie pour le round ${sortedRounds.length + 1}.`
+                  : `Upload their response and we'll update your strategy for Round ${sortedRounds.length + 1}.`}
+              </p>
+            </div>
+            <a
+              href="#add-round"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-sky-600 text-white text-sm font-semibold rounded-lg hover:bg-sky-700 transition-colors shadow-sm flex-shrink-0"
+            >
+              {locale === 'fr' ? 'Ajouter la réponse' : 'Upload vendor response'}
+              <ChevronRight className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Analysis History */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <h2 className="text-base font-bold text-slate-900">{t('deal.analysisHistory')}</h2>
+            <span className="text-xs text-slate-400">{t(sortedRounds.length === 1 ? 'deal.roundsCompleted_one' : 'deal.roundsCompleted_other', { count: sortedRounds.length })}</span>
+          </div>
+        </div>
+
+        {/* Round cards */}
+        {sortedRounds.length > 0 && (
+          <div className="space-y-2">
+            {sortedRounds.map((round: any) => {
+              const roundOutput = round.output_json as any
+              const roundTotal = roundOutput?.snapshot?.total_commitment
+              const roundRedFlags = roundOutput?.red_flags?.length || 0
+              const isLatest = round.id === latestRound?.id
+
+              return (
+                <Card key={round.id} className={`px-4 py-3 transition-all ${isLatest ? 'border-emerald-200 bg-emerald-50/30' : 'hover:border-slate-300'}`}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                      <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex-shrink-0 ${
+                        isLatest ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        R{round.round_number}
+                      </div>
+                      {isLatest && <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />}
+                      <span className="text-xs text-slate-500">
+                        {new Date(round.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}
+                      </span>
+                      {round.note && (
+                        <span className="text-xs text-slate-600 truncate">{round.note}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2.5 flex-shrink-0">
+                      {roundRedFlags > 0 && (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-red-500 font-medium">
+                          <AlertTriangle className="w-3 h-3" />
+                          {roundRedFlags}
+                        </span>
+                      )}
+                      {roundTotal && (
+                        <span className="text-xs font-bold text-slate-900">{roundTotal}</span>
+                      )}
+                      {!isLatest && (
+                        <Link href={`/app/round/${round.id}`} className="text-[10px] font-medium text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5">
+                          {t('deal.view')} <ChevronRight className="w-3 h-3" />
+                        </Link>
+                      )}
+                      {isLatest && <ScrollToTopButton />}
+                    </div>
+                  </div>
+                </Card>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Add Round — gated for Starter users */}
+      {!deal.status?.startsWith('closed_') && (
+        <FeatureGate feature="multi_round" plan={userPlan} isAdmin={isAdmin}>
+          <div id="add-round">
+            <AddRoundForm dealId={dealId} roundNumber={sortedRounds.length + 1} />
+          </div>
+        </FeatureGate>
+      )}
 
       {/* Outcome Card — closed deals */}
       {deal.status?.startsWith('closed_') && (() => {
@@ -345,6 +492,7 @@ export default async function DealPage({
         }
 
         return (
+          <div id="negotiation-outcome">
           <Card className={`overflow-hidden shadow-sm ${isWon ? 'border border-slate-200' : 'border border-slate-200'}`}>
             {/* Header bar — green for won, slate for lost, but restrained */}
             <div className={`px-5 sm:px-6 py-3.5 flex items-center justify-between ${isWon ? 'bg-emerald-600' : 'bg-slate-600'}`}>
@@ -455,120 +603,9 @@ export default async function DealPage({
               )}
             </div>
           </Card>
+          </div>
         )
       })()}
-
-      {/* Analysis Output — no duplicate title section */}
-      {latestOutput && (
-        <div id="email-drafts">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="px-3.5 py-1 bg-emerald-600 text-white rounded-full text-xs font-bold">
-              {t('deal.round')} {latestRound.round_number}
-            </div>
-            <span className="text-xs text-slate-500">{t('deal.latestAnalysis')}</span>
-            <div className="flex-1 h-px bg-slate-200" />
-          </div>
-          {isV2 ? (
-            <OutputDisplayV2 output={latestOutput as DealOutputV2} roundId={latestRound.id} />
-          ) : (
-            <OutputDisplay output={latestOutput as DealOutput} roundId={latestRound.id} hideHeader />
-          )}
-        </div>
-      )}
-
-      {/* Next Round CTA — only for active deals with at least 1 round */}
-      {!deal.status?.startsWith('closed_') && sortedRounds.length > 0 && (
-        <div className="bg-gradient-to-br from-sky-50 to-cyan-50 rounded-xl border-2 border-sky-200 p-5 sm:p-6 mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="flex-1">
-              <h3 className="text-base font-bold text-slate-900 mb-1">
-                {locale === 'fr' ? 'Le fournisseur a répondu ?' : 'Vendor replied?'}
-              </h3>
-              <p className="text-sm text-slate-600">
-                {locale === 'fr'
-                  ? `Téléchargez sa réponse et nous mettrons à jour votre stratégie pour le round ${sortedRounds.length + 1}.`
-                  : `Upload their response and we'll update your strategy for Round ${sortedRounds.length + 1}.`}
-              </p>
-            </div>
-            <a
-              href="#add-round"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-sky-600 text-white text-sm font-semibold rounded-lg hover:bg-sky-700 transition-colors shadow-sm flex-shrink-0"
-            >
-              {locale === 'fr' ? 'Ajouter la réponse' : 'Upload vendor response'}
-              <ChevronRight className="w-4 h-4" />
-            </a>
-          </div>
-        </div>
-      )}
-
-      {/* Analysis History */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <h2 className="text-base font-bold text-slate-900">{t('deal.analysisHistory')}</h2>
-            <span className="text-xs text-slate-400">{t(sortedRounds.length === 1 ? 'deal.roundsCompleted_one' : 'deal.roundsCompleted_other', { count: sortedRounds.length })}</span>
-          </div>
-        </div>
-
-        {/* Round cards */}
-        {sortedRounds.length > 0 && (
-          <div className="space-y-2">
-            {sortedRounds.map((round: any) => {
-              const roundOutput = round.output_json as any
-              const roundTotal = roundOutput?.snapshot?.total_commitment
-              const roundRedFlags = roundOutput?.red_flags?.length || 0
-              const isLatest = round.id === latestRound?.id
-
-              return (
-                <Card key={round.id} className={`px-4 py-3 transition-all ${isLatest ? 'border-emerald-200 bg-emerald-50/30' : 'hover:border-slate-300'}`}>
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                      <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex-shrink-0 ${
-                        isLatest ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'
-                      }`}>
-                        R{round.round_number}
-                      </div>
-                      {isLatest && <div className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />}
-                      <span className="text-xs text-slate-500">
-                        {new Date(round.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}
-                      </span>
-                      {round.note && (
-                        <span className="text-xs text-slate-600 truncate">{round.note}</span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2.5 flex-shrink-0">
-                      {roundRedFlags > 0 && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-red-500 font-medium">
-                          <AlertTriangle className="w-3 h-3" />
-                          {roundRedFlags}
-                        </span>
-                      )}
-                      {roundTotal && (
-                        <span className="text-xs font-bold text-slate-900">{roundTotal}</span>
-                      )}
-                      {!isLatest && (
-                        <Link href={`/app/round/${round.id}`} className="text-[10px] font-medium text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5">
-                          {t('deal.view')} <ChevronRight className="w-3 h-3" />
-                        </Link>
-                      )}
-                      {isLatest && <ScrollToTopButton />}
-                    </div>
-                  </div>
-                </Card>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Add Round — gated for Starter users */}
-      {!deal.status?.startsWith('closed_') && (
-        <FeatureGate feature="multi_round" plan={userPlan} isAdmin={isAdmin}>
-          <div id="add-round">
-            <AddRoundForm dealId={dealId} roundNumber={sortedRounds.length + 1} />
-          </div>
-        </FeatureGate>
-      )}
 
       {/* Subtle metadata footer */}
       <div className="text-center text-[10px] text-slate-300 pt-2 pb-4">
