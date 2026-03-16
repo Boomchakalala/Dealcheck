@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+
 import { OutputDisplay } from '@/components/OutputDisplay'
 import { OutputDisplayV2 } from '@/components/OutputDisplayV2'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
@@ -163,47 +163,39 @@ export default async function DealPage({
         )
       )}
 
-      {/* Unified Deal Header Card */}
-      <Card className="p-5 sm:p-6 overflow-hidden">
-        {/* Top: Title + Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
-          <div className="flex-1 min-w-0">
-            <div className="mb-1.5">
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{shortVendorName}</h1>
-              {hasLongName && (
-                <p className="text-xs text-slate-400 mt-0.5">{fullVendorName}</p>
-              )}
-            </div>
-            <div className="flex items-center gap-2 flex-wrap mb-2">
-              {category && (
-                <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
-                  {category}
-                </span>
-              )}
-              <Badge variant="secondary">
-                {effectiveDealType}
-              </Badge>
-              <span className="text-xs text-slate-400">{t(sortedRounds.length === 1 ? 'deal.roundsCompleted_one' : 'deal.roundsCompleted_other', { count: sortedRounds.length })}</span>
-            </div>
-            {/* AI-generated deal summary */}
-            {description && (
-              <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">{description}</p>
-            )}
+      {/* Deal Header — clean, open layout */}
+      <div>
+        <div className="flex items-start justify-between gap-4 mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{shortVendorName}</h1>
+          <div className="flex-shrink-0">
+            <DealHeaderClient
+              dealId={dealId}
+              dealStatus={deal.status || 'in_progress'}
+              closeSummary={deal.close_summary}
+              savingsAmount={deal.savings_amount}
+              savingsPercent={deal.savings_percent}
+              closedAt={deal.closed_at}
+              currentTotal={totalCommitment}
+              roundCount={sortedRounds.length}
+              whatChanged={deal.what_changed}
+            />
           </div>
-          <DealHeaderClient
-            dealId={dealId}
-            dealStatus={deal.status || 'in_progress'}
-            closeSummary={deal.close_summary}
-            savingsAmount={deal.savings_amount}
-            savingsPercent={deal.savings_percent}
-            closedAt={deal.closed_at}
-            currentTotal={totalCommitment}
-            roundCount={sortedRounds.length}
-            whatChanged={deal.what_changed}
-          />
         </div>
-
-      </Card>
+        <div className="flex items-center gap-2 flex-wrap mb-2">
+          {category && (
+            <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+              {category}
+            </span>
+          )}
+          <span className="inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+            {effectiveDealType}
+          </span>
+          <span className="text-xs text-slate-400">{t(sortedRounds.length === 1 ? 'deal.roundsCompleted_one' : 'deal.roundsCompleted_other', { count: sortedRounds.length })}</span>
+        </div>
+        {description && (
+          <p className="text-sm text-slate-500 leading-relaxed">{description}</p>
+        )}
+      </div>
 
       {/* Score Hero Banner — matches OutputDisplay example style */}
       {(() => {
