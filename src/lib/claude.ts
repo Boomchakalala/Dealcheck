@@ -50,7 +50,7 @@ export async function getClaudeResponse(params: {
   max_tokens?: number
   temperature?: number
 }): Promise<string> {
-  const { system, userContent, max_tokens = 1024, temperature = 0.7 } = params
+  const { system, userContent, max_tokens = 1024, temperature = 0 } = params
   const response = await anthropic.messages.create({
     model: CLAUDE_MODEL,
     max_tokens,
@@ -169,7 +169,7 @@ export async function classifyQuote(
     max_tokens: 500,
     system: CLASSIFICATION_PROMPT,
     messages: [{ role: 'user', content: userContent }],
-    temperature: 0.3,
+    temperature: 0,
   })
 
   const content = getResponseText(response)
@@ -833,7 +833,7 @@ Return valid JSON only. Match this structure exactly:
     "renewal_date": "March 15, 2026",
     "signing_deadline": "February 28, 2026"
   },
-  "NOTE_TOTAL": "total_commitment = Use the EXACT total from the quote. Look for 'Total Contract Value', 'Annual Total', 'Total Amount', 'Grand Total', 'Net amount due'. If you find a stated total, use it AS-IS — do NOT multiply it by anything. Only calculate (monthly × 12) if the amount is EXPLICITLY labeled '/month' or 'per month' and no total is stated.",
+  "NOTE_TOTAL": "STEP-BY-STEP total_commitment extraction: 1) Search for an explicit total: 'Total Contract Value', 'Annual Total', 'Net Amount Due', 'Grand Total'. If found, use that number AS-IS. DONE. 2) If only monthly amounts exist with a stated term, calculate but label clearly in billing_payment (e.g. '$1,360/mo × 12 = $16,328'). 3) NEVER multiply a stated total by the term length — if the quote says 'Net Amount Due: $16,328' for a 12-month term, the total IS $16,328, not $195,936. The billing_payment field should describe HOW they pay (monthly, annual, etc). The total_commitment field is WHAT they pay in total.",
   "NOTE_CURRENCY": "currency = Detect from the quote: 'USD' ($ or USD), 'EUR' (€ or EUR), 'GBP' (£ or GBP), 'CAD' (C$ or CAD), 'AUD' (A$ or AUD). Default to 'USD' if unclear.",
   "NOTE_BILLING": "billing_payment = 'Monthly', 'Quarterly', 'Annual upfront', etc. Keep it simple.",
   "NOTE_DEAL_TYPE": "deal_type = 'Renewal' if renewing existing, 'New purchase' if new vendor",
@@ -1441,7 +1441,16 @@ export async function analyzeDeal(
     classification && buildClassificationContext(classification),
     goal && `User Goal: ${goal}`,
     notes && `User Notes: ${notes}`,
-    previousRoundOutput && `Previous Round Context: ${JSON.stringify(previousRoundOutput, null, 2)}`,
+    previousRoundOutput && `MULTI-ROUND ANALYSIS CONTEXT:
+This is a follow-up round of analysis. The user has submitted a revised or updated quote from the same vendor.
+Previous analysis output: ${JSON.stringify(previousRoundOutput, null, 2)}
+
+INSTRUCTIONS FOR MULTI-ROUND CONSISTENCY:
+- Keep scoring methodology consistent with the previous round
+- Use the SAME total_commitment calculation approach — if the previous round correctly identified the total, do not recalculate differently
+- Only change findings if the quote has materially changed
+- Note what improved or worsened compared to the previous round in your verdict
+- If the vendor addressed a red flag from the previous round, acknowledge it and remove or downgrade that flag`,
     userLocale === 'fr' && `OUTPUT LANGUAGE INSTRUCTION: Write ALL analysis sections (verdict, quick_read, red_flags, what_to_ask_for, negotiation_plan, potential_savings, assumptions, disclaimer) in FRENCH. However, write the email_drafts (subject and body) in the SAME LANGUAGE AS THE INPUT DOCUMENT. If the quote is in English, emails must be in English. If the quote is in French, emails must be in French. The user reads French but needs to send emails the vendor can understand.`,
   ].filter(Boolean)
 
@@ -1508,7 +1517,7 @@ export async function analyzeDeal(
       max_tokens: 4500,
       system: enhancedSystemPrompt + getLanguageInstruction(userLocale || 'en') + '\n\nFINAL REMINDER — TOTAL CONTRACT VALUE:\n1. If a "Net Amount Due", "Total", or "Grand Total" is stated, use it AS-IS for total_commitment. Do NOT multiply by term length.\n2. VERIFY: Many quotes show per-unit monthly prices but the TOTAL AMOUNT column already multiplies by quantity AND by the contract term (e.g. 12 months). Check the math before multiplying again — you will likely be double-counting.\n3. Only multiply a stated total by 12 if you are 100% certain it represents a single month and no annual/full-term total exists in the document.',
       messages: [{ role: 'user', content: userContent }],
-      temperature: 0.4,
+      temperature: 0,
     })
 
     const content = getResponseText(response)
@@ -1602,7 +1611,7 @@ export async function analyzeDealV2(
       max_tokens: 2000,
       system: SYSTEM_PROMPT_V2 + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: userPrompt }],
-      temperature: 0.7,
+      temperature: 0,
     })
 
     const content = getResponseText(response)
@@ -1712,7 +1721,7 @@ Return ONLY JSON with this structure:
       max_tokens: 2000,
       system: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails that match the provided analysis. Be concise and specific. Return only valid JSON.' + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
+      temperature: 0,
     })
 
     const content = getResponseText(response)
@@ -1831,7 +1840,7 @@ Return ONLY JSON:
       max_tokens: 1500,
       system: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails. Adapt to user preferences. Be concise and specific. Return only valid JSON.' + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
+      temperature: 0,
     })
 
     const content = getResponseText(response)
