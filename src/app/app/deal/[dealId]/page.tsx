@@ -128,6 +128,41 @@ export default async function DealPage({
         </Link>
       </div>
 
+      {/* Closed Deal Banner — first element, impossible to miss */}
+      {deal.status?.startsWith('closed_') && (
+        deal.status === 'closed_won' ? (
+          <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-between px-6 py-3.5">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-5 h-5 text-white" />
+              <span className="text-sm font-bold text-white">
+                Deal Won{(deal.savings_amount ?? 0) > 0 && ` — ${formatCurrency(Math.round(deal.savings_amount), dealCurrency)} saved`}
+              </span>
+            </div>
+            <a
+              href="#negotiation-outcome"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+            >
+              See outcome →
+            </a>
+          </div>
+        ) : (
+          <div className="bg-slate-600 rounded-xl flex items-center justify-between px-6 py-3.5">
+            <div className="flex items-center gap-2.5">
+              <TrendingDown className="w-5 h-5 text-white" />
+              <span className="text-sm font-bold text-white">
+                Deal Closed — Signed at original terms
+              </span>
+            </div>
+            <a
+              href="#negotiation-outcome"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+            >
+              See outcome →
+            </a>
+          </div>
+        )
+      )}
+
       {/* Unified Deal Header Card */}
       <Card className="p-5 sm:p-6 overflow-hidden">
         {/* Top: Title + Actions */}
@@ -260,41 +295,6 @@ export default async function DealPage({
           </div>
         )
       })()}
-
-      {/* Closed Deal Banner */}
-      {deal.status?.startsWith('closed_') && (
-        deal.status === 'closed_won' ? (
-          <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-between px-6 py-3.5">
-            <div className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-5 h-5 text-white" />
-              <span className="text-sm font-bold text-white">
-                Deal Won{(deal.savings_amount ?? 0) > 0 && ` — ${formatCurrency(Math.round(deal.savings_amount), dealCurrency)} saved`}
-              </span>
-            </div>
-            <a
-              href="#negotiation-outcome"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
-            >
-              See outcome →
-            </a>
-          </div>
-        ) : (
-          <div className="bg-slate-600 rounded-xl flex items-center justify-between px-6 py-3.5">
-            <div className="flex items-center gap-2.5">
-              <TrendingDown className="w-5 h-5 text-white" />
-              <span className="text-sm font-bold text-white">
-                Deal Closed — Signed at original terms
-              </span>
-            </div>
-            <a
-              href="#negotiation-outcome"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
-            >
-              See outcome →
-            </a>
-          </div>
-        )
-      )}
 
       {/* Analysis Output — no duplicate title section */}
       {latestOutput && (
