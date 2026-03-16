@@ -6,6 +6,7 @@ import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { useScrollReveal, useCountUp } from '@/hooks/useScrollReveal'
 import { useT, useI18n } from '@/i18n/context'
+import { ScoreCircle } from '@/components/ScoreCircle'
 
 export default function LandingPage() {
   const t = useT()
@@ -116,17 +117,11 @@ export default function LandingPage() {
                   {/* Unified Score Hero Banner */}
                   <div className="bg-orange-50 border border-orange-200 rounded p-2">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <svg width="34" height="34" viewBox="0 0 100 100" className="-rotate-90 flex-shrink-0">
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="#fed7aa" strokeWidth="8" />
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="#f97316" strokeWidth="8"
-                          strokeDasharray={`${(52/100) * 2 * Math.PI * 42} ${(1 - 52/100) * 2 * Math.PI * 42}`}
-                          strokeLinecap="round"
-                        />
-                        <text x="50" y="46" textAnchor="middle" dominantBaseline="central"
-                          className="fill-orange-700 text-[28px] font-extrabold rotate-90"
-                          style={{ transformOrigin: 'center' }}
-                        >52</text>
-                      </svg>
+                      <ScoreCircle
+                        score={52} size={34} strokeWidth={3}
+                        trackClass="stroke-orange-200" ringClass="stroke-orange-500" textClass="text-orange-700"
+                        showOutOf={false}
+                      />
                       <div className="min-w-0">
                         <p className="text-[8px] font-semibold text-slate-400 uppercase tracking-wide">{t('example.quoteScore')}</p>
                         <p className="text-[10px] font-bold text-orange-700">{t('example.quoteScoreLabel')}</p>
@@ -423,17 +418,11 @@ export default function LandingPage() {
                   {/* 1. Unified Score Hero */}
                   <div className="bg-orange-50 rounded-xl border border-orange-200 p-3.5 sm:p-4 shadow-sm">
                     <div className="flex items-center gap-3 mb-3">
-                      <svg width="44" height="44" viewBox="0 0 44 44" className="-rotate-90 flex-shrink-0">
-                        <circle cx="22" cy="22" r="18" fill="none" stroke="#fed7aa" strokeWidth="3.5" />
-                        <circle cx="22" cy="22" r="18" fill="none" stroke="#f97316" strokeWidth="3.5"
-                          strokeDasharray={`${(52/100) * 2 * Math.PI * 18} ${(1 - 52/100) * 2 * Math.PI * 18}`}
-                          strokeLinecap="round"
-                        />
-                        <text x="22" y="22" textAnchor="middle" dominantBaseline="central"
-                          className="fill-orange-700 text-xs font-extrabold rotate-90"
-                          style={{ transformOrigin: 'center' }}
-                        >52</text>
-                      </svg>
+                      <ScoreCircle
+                        score={52} size={44} strokeWidth={3.5}
+                        trackClass="stroke-orange-200" ringClass="stroke-orange-500" textClass="text-orange-700"
+                        showOutOf={false}
+                      />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-orange-600 mb-1">{t('example.quoteScoreLabel')}</p>
                         <div className="flex items-center gap-1.5 flex-wrap text-[9px] text-slate-500">

@@ -5,6 +5,7 @@ import { AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Mail, TrendingDown
 import { useState, useMemo } from 'react'
 import { useT, useI18n } from '@/i18n/context'
 import { normalizeAmount, detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
+import { ScoreCircle } from '@/components/ScoreCircle'
 
 interface OutputDisplayProps {
   output: DealOutput
@@ -245,9 +246,6 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           : score >= 60 ? { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100', badge: 'bg-orange-100 text-orange-700' }
           : { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', ring: 'stroke-red-500', track: 'stroke-red-100', badge: 'bg-red-100 text-red-700' }
 
-        const circumference = 2 * Math.PI * 42
-        const dashLength = (score / 100) * circumference
-
         // Parse total commitment properly (handles European formats with . as thousands sep)
         const commitmentParsed = output.snapshot?.total_commitment ? parseMoney(output.snapshot.total_commitment) : null
         const commitmentNum = commitmentParsed?.amount || 0
@@ -263,25 +261,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                 {/* Score ring */}
                 {output.score != null && (
                   <div className="flex-shrink-0 flex items-center gap-5">
-                    <svg width="100" height="100" viewBox="0 0 100 100" className="-rotate-90">
-                      <circle cx="50" cy="50" r="42" fill="none" className={scoreColor.track} strokeWidth="7" />
-                      <circle cx="50" cy="50" r="42" fill="none" className={scoreColor.ring} strokeWidth="7"
-                        strokeDasharray={`${dashLength} ${circumference - dashLength}`}
-                        strokeLinecap="round"
-                      />
-                      <text x="50" y="46" textAnchor="middle" dominantBaseline="central"
-                        className={`${scoreColor.text} text-[28px] font-extrabold rotate-90 fill-current`}
-                        style={{ transformOrigin: 'center' }}
-                      >
-                        {score}
-                      </text>
-                      <text x="50" y="64" textAnchor="middle" dominantBaseline="central"
-                        className="text-[10px] font-medium text-slate-400 rotate-90 fill-current"
-                        style={{ transformOrigin: 'center' }}
-                      >
-                        / 100
-                      </text>
-                    </svg>
+                    <ScoreCircle score={score} size={100} trackClass={scoreColor.track} ringClass={scoreColor.ring} textClass={scoreColor.text} />
                     <div className="md:hidden">
                       <p className={`text-lg font-bold ${scoreColor.text} mb-0.5`}>{output.score_label}</p>
                       {output.score_rationale && (

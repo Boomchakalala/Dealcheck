@@ -7,6 +7,7 @@ import { CloseDealModal } from '@/components/CloseDealModal'
 import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, MoreHorizontal, Info } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
 import { useI18n } from '@/i18n/context'
+import { ScoreCircle } from '@/components/ScoreCircle'
 import { normalizeAmount, detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
 
 interface DealListClientProps {
@@ -291,8 +292,6 @@ export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListC
                       const ringColor = sc >= 80 ? 'stroke-emerald-500' : sc >= 65 ? 'stroke-amber-500' : sc >= 45 ? 'stroke-orange-500' : 'stroke-red-500'
                       const trackColor = sc >= 80 ? 'stroke-emerald-100' : sc >= 65 ? 'stroke-amber-100' : sc >= 45 ? 'stroke-orange-100' : 'stroke-red-100'
                       const textColor = sc >= 80 ? 'text-emerald-600' : sc >= 65 ? 'text-amber-600' : sc >= 45 ? 'text-orange-600' : 'text-red-600'
-                      const circ = 2 * Math.PI * 13
-                      const dash = (sc / 100) * circ
                       const lbl = sc >= 80 ? (locale === 'fr' ? 'Prêt' : 'Ready')
                         : sc >= 65 ? (locale === 'fr' ? 'Solide' : 'Solid')
                         : sc >= 45 ? (locale === 'fr' ? 'À négocier' : 'Negotiate')
@@ -300,16 +299,11 @@ export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListC
                         : (locale === 'fr' ? 'À fuir' : 'Walk away')
                       return (
                         <div className="flex items-center justify-end gap-1.5 mt-0.5">
-                          <svg width="30" height="30" viewBox="0 0 30 30" className="-rotate-90 flex-shrink-0">
-                            <circle cx="15" cy="15" r="13" fill="none" className={trackColor} strokeWidth="2.5" />
-                            <circle cx="15" cy="15" r="13" fill="none" className={ringColor} strokeWidth="2.5"
-                              strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
-                            />
-                            <text x="15" y="15" textAnchor="middle" dominantBaseline="central"
-                              className={`${textColor} text-[8px] font-extrabold rotate-90 fill-current`}
-                              style={{ transformOrigin: 'center' }}
-                            >{sc}</text>
-                          </svg>
+                          <ScoreCircle
+                            score={sc} size={30} strokeWidth={2.5}
+                            trackClass={trackColor} ringClass={ringColor} textClass={textColor}
+                            showOutOf={false}
+                          />
                           <span className={`text-[10px] font-bold ${textColor}`}>{lbl}</span>
                           <span
                             className="text-slate-300 hover:text-slate-500 cursor-help"
