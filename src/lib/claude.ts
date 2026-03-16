@@ -419,7 +419,8 @@ PRICING STRUCTURE - READ CAREFULLY:
 ⚠️ CRITICAL — HOW TO DETERMINE TOTAL CONTRACT VALUE:
 - ALWAYS look for a stated total FIRST: "Net amount due", "Total amount", "Grand total", "Contract value", "Total commitment". If you find one, that IS the total. Full stop. Do NOT multiply it by anything.
 - VERIFY before multiplying: Many quotes show per-unit monthly prices but the TOTAL AMOUNT column already accounts for quantity × term. Check if the line item totals already include the full contract period by doing the math: if (unit price × quantity × months) = line total, then the final total already includes the full term.
-- Example: A quote says "USD 16.50 per Host per month", Quantity: 5, Total Amount: $990.00. Math check: $16.50 × 5 = $82.50/month, but $82.50 × 12 = $990. So the Total Amount column ALREADY includes 12 months. The "Net Amount Due" summing these totals is the FULL CONTRACT VALUE — do NOT multiply it by 12 again.
+- Example 1: A quote says "USD 16.50 per Host per month", Quantity: 5, Total Amount: $990.00. Math check: $16.50 × 5 = $82.50/month, but $82.50 × 12 = $990. So the Total Amount column ALREADY includes 12 months. The "Net Amount Due" summing these totals is the FULL CONTRACT VALUE — do NOT multiply it by 12 again.
+- Example 2: A Datadog/SaaS quote has multiple line items with "Total Amount" per line, and "Net Amount Due: $16,328" at the bottom. The $16,328 IS the annual contract value. Do NOT multiply by 12 to get $195,936 — that would be wrong by 12x.
 - Only multiply if you are certain the final total represents a single month's charges and no full-term total is stated anywhere.
 - When in doubt, use the stated total as-is and note "as stated in quote" rather than risk doubling it.
 
@@ -934,8 +935,9 @@ FINAL SELF-CHECK (do this mentally before returning JSON)
 
 Before returning your JSON response, verify ALL of these:
 1. Does total_commitment match what the quote ACTUALLY STATES? Did you accidentally double or halve it? Can you point to the exact line in the quote where this number appears or show the exact calculation?
-2. Did you multiply the total by the term length? STOP. Check: does the "Total Amount" column already include the full term? Do the math: (unit price × quantity × months). If it equals the line total, the total already covers the full contract. "Net Amount Due" summing those line totals is the FULL contract value — do NOT multiply again.
-3. Did you INVENT any numbers? Every amount in your output must trace back to a specific number in the quote. If you cannot, remove it.
+2. Did you multiply the total by the term length? STOP. This is the #1 most common error. Check: does the "Total Amount" or "Net Amount Due" column already include the full term? Do the math: (unit price × quantity × months). If it equals the line total, the total already covers the full contract. "Net Amount Due" summing those line totals is the FULL contract value — do NOT multiply again. If you see a "Total" or "Net Amount Due" at the bottom of a table, USE THAT NUMBER AS-IS.
+3. MULTIPLICATION TRAP: If the quote shows line items with "Total Amount" already calculated, and a "Net Amount Due" that sums them — that IS the contract value. Example: 5 hosts × $16.50/mo = $990/yr shown as line total. Net Amount Due = $16,328. Use $16,328, NOT $16,328 × 12 = $195,936. The quote already did the multiplication for you.
+4. Did you INVENT any numbers? Every amount in your output must trace back to a specific number in the quote. If you cannot, remove it.
 4. Are potential_savings amounts realistic? Are they properly formatted (€4,000 not €4, €2,500 not €2)?
 5. Is the first must_have ask a direct price reduction with a specific € or $ amount?
 6. Are savings proportional to the deal? (under 30% of total — if over 30% you are inflating, cut back)
