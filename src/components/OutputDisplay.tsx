@@ -112,15 +112,12 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
     return isNaN(num) ? 0 : num
   }
 
-  // Calculate total savings from all savings breakdown items — capped at deal value
+  // Calculate total savings from all savings breakdown items
   const totalSavings = useMemo(() => {
     if (!output.potential_savings || output.potential_savings.length === 0) return 0
-    const raw = output.potential_savings.reduce((sum, saving) => sum + parseSavingsAmount(saving.annual_impact), 0)
-    // Guard against AI hallucinations: if savings exceed deal total, cap at 30%
-    const dealTotal = output.snapshot?.total_commitment ? parseMoney(output.snapshot.total_commitment).amount : 0
-    if (dealTotal > 0 && raw > dealTotal) return Math.round(dealTotal * 0.3)
-    return raw
-  }, [output.potential_savings, output.snapshot?.total_commitment])
+    // Use parseMoney (same parser the deal page uses) — NOT the old parseSavingsAmount
+    return output.potential_savings.reduce((sum, saving) => sum + parseMoney(saving.annual_impact || '').amount, 0)
+  }, [output.potential_savings])
 
   const formatSavings = (amount: number) => {
     const dealTotal = output.snapshot?.total_commitment || ''
@@ -912,8 +909,8 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           return `${currencySymbol}${Math.round(amount)}`
         }
 
-        // Parse deal total for comparison bar (totalSavings already capped at source)
-        const dealTotalNum = parseSavingsAmount(dealTotal)
+        // Parse deal total for comparison bar
+        const dealTotalNum = parseMoney(dealTotal).amount
         const savingsPct = dealTotalNum > 0 ? Math.min((totalSavings / dealTotalNum) * 100, 50) : 0
 
         return (
