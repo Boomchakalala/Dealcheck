@@ -1280,18 +1280,18 @@ function calculateQuoteScore(output: DealOutputType): {
   const totalScore = Math.max(5, Math.min(98, rawScore))
 
   let label: string
-  if (totalScore >= 85) label = 'Fair deal'
-  else if (totalScore >= 70) label = 'Mostly fair — negotiate a few points'
-  else if (totalScore >= 55) label = 'Push back on pricing'
-  else if (totalScore >= 40) label = 'Overpriced — negotiate hard'
-  else label = 'Walk away'
+  if (totalScore >= 80) label = 'Good to sign'
+  else if (totalScore >= 65) label = 'Almost there — push on a few points'
+  else if (totalScore >= 45) label = 'Needs work before signing'
+  else if (totalScore >= 25) label = "You're overpaying"
+  else label = "Don't sign this"
 
   // Build rationale from the biggest area + flag count
   const biggestArea = pricingDeduction >= termsDeduction && pricingDeduction >= leverageDeduction
     ? 'pricing' : termsDeduction >= leverageDeduction ? 'terms' : 'leverage'
 
   let rationale: string
-  if (totalScore >= 85) {
+  if (totalScore >= 80) {
     rationale = 'Deal terms are broadly fair with minor optimization possible.'
   } else if (biggestArea === 'pricing') {
     const count = pricingItems.length

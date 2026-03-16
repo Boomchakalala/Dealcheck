@@ -242,9 +242,10 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
         {/* Quote Score Card — always first */}
         {output.score != null && (() => {
           const score = output.score
-          const scoreColor = score >= 85 ? { bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200', text: 'text-emerald-700', ring: 'stroke-emerald-500', track: 'stroke-emerald-100', label: 'bg-emerald-100 text-emerald-700' }
-            : score >= 65 ? { bg: 'from-amber-50 to-yellow-50', border: 'border-amber-200', text: 'text-amber-700', ring: 'stroke-amber-500', track: 'stroke-amber-100', label: 'bg-amber-100 text-amber-700' }
-            : score >= 40 ? { bg: 'from-orange-50 to-amber-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100', label: 'bg-orange-100 text-orange-700' }
+          const scoreColor = score >= 80 ? { bg: 'from-emerald-50 to-green-50', border: 'border-emerald-200', text: 'text-emerald-700', ring: 'stroke-emerald-500', track: 'stroke-emerald-100', label: 'bg-emerald-100 text-emerald-700' }
+            : score >= 65 ? { bg: 'from-blue-50 to-sky-50', border: 'border-blue-200', text: 'text-blue-700', ring: 'stroke-blue-500', track: 'stroke-blue-100', label: 'bg-blue-100 text-blue-700' }
+            : score >= 45 ? { bg: 'from-amber-50 to-yellow-50', border: 'border-amber-200', text: 'text-amber-700', ring: 'stroke-amber-500', track: 'stroke-amber-100', label: 'bg-amber-100 text-amber-700' }
+            : score >= 25 ? { bg: 'from-orange-50 to-amber-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100', label: 'bg-orange-100 text-orange-700' }
             : { bg: 'from-red-50 to-pink-50', border: 'border-red-200', text: 'text-red-700', ring: 'stroke-red-500', track: 'stroke-red-100', label: 'bg-red-100 text-red-700' }
 
           const circumference = 2 * Math.PI * 34
@@ -357,14 +358,18 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
         ]
         const barColor = (v: number, max: number) => {
           const pct = v / max
-          if (pct >= 0.75) return 'bg-emerald-500'
-          if (pct >= 0.4) return 'bg-amber-500'
+          if (pct >= 0.8) return 'bg-emerald-500'
+          if (pct >= 0.65) return 'bg-blue-500'
+          if (pct >= 0.45) return 'bg-amber-500'
+          if (pct >= 0.25) return 'bg-orange-500'
           return 'bg-red-500'
         }
         const scoreTextColor = (v: number, max: number) => {
           const pct = v / max
-          if (pct >= 0.75) return 'text-emerald-700'
-          if (pct >= 0.4) return 'text-amber-700'
+          if (pct >= 0.8) return 'text-emerald-700'
+          if (pct >= 0.65) return 'text-blue-700'
+          if (pct >= 0.45) return 'text-amber-700'
+          if (pct >= 0.25) return 'text-orange-700'
           return 'text-red-700'
         }
         return (

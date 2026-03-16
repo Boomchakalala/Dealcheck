@@ -140,7 +140,7 @@ Cordialement,
     },
   },
   score: 52,
-  score_label: "Surcoté",
+  score_label: "À retravailler avant de signer",
   score_breakdown: {
     pricing_fairness: 19, terms_protections: 20, leverage_position: 13,
     pricing_deductions: [
@@ -310,7 +310,7 @@ Cordialement,
     },
   },
   score: 47,
-  score_label: "Surcoté",
+  score_label: "À retravailler avant de signer",
   score_breakdown: {
     pricing_fairness: 17, terms_protections: 15, leverage_position: 15,
     pricing_deductions: [
@@ -491,7 +491,7 @@ Cordialement,
     },
   },
   score: 72,
-  score_label: "Négociable",
+  score_label: "Presque bon — négociez quelques points",
   score_breakdown: {
     pricing_fairness: 34, terms_protections: 22, leverage_position: 16,
     pricing_deductions: [
