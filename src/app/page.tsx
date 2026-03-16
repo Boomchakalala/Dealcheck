@@ -95,120 +95,114 @@ export default function LandingPage() {
               <p className="text-xs text-slate-500 mt-3 sm:mt-4">{t('hero.noSignup')}</p>
             </div>
 
-            {/* Right: Product Preview — real content */}
-            <div className="relative lg:pl-8 mt-8 lg:mt-0 animate-hero-card">
+            {/* Right: Product Preview — compact mini-preview */}
+            <div className="relative lg:pl-8 mt-8 lg:mt-0 animate-hero-card max-w-[420px] lg:max-w-none lg:w-full">
               {/* Decorative blur orbs */}
-              <div className="absolute -top-10 -right-10 w-40 h-40 sm:w-64 sm:h-64 bg-emerald-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
-              <div className="absolute -bottom-10 -left-10 w-40 h-40 sm:w-64 sm:h-64 bg-teal-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
+              <div className="absolute -top-8 -right-8 w-32 h-32 sm:w-48 sm:h-48 bg-emerald-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
+              <div className="absolute -bottom-8 -left-8 w-32 h-32 sm:w-48 sm:h-48 bg-teal-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
 
-              <div className="relative bg-white rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200/60 overflow-hidden hover:shadow-[0_20px_70px_-10px_rgba(0,0,0,0.15)] transition-shadow duration-500">
+              <div className="relative bg-white rounded-xl shadow-2xl border border-slate-200/60 overflow-hidden hover:shadow-[0_20px_70px_-10px_rgba(0,0,0,0.15)] transition-shadow duration-500">
                 {/* Mock browser chrome */}
-                <div className="bg-gradient-to-br from-slate-50 to-slate-100 px-4 sm:px-6 pt-4 sm:pt-5 pb-3 sm:pb-4 border-b border-slate-200">
-                  <div className="flex items-center gap-1.5 sm:gap-2 mb-3">
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-400" />
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-400" />
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-400" />
+                <div className="bg-gradient-to-br from-slate-50 to-slate-100 px-3 pt-3 pb-2 border-b border-slate-200">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <div className="w-2 h-2 rounded-full bg-red-400" />
+                    <div className="w-2 h-2 rounded-full bg-yellow-400" />
+                    <div className="w-2 h-2 rounded-full bg-green-400" />
                   </div>
-                  <p className="text-[10px] sm:text-xs font-semibold text-slate-500">{t('example.quoteVendor')} — €111,600</p>
+                  <p className="text-[9px] font-semibold text-slate-500">{t('example.quoteVendor')} — €111,600</p>
                 </div>
 
-                <div className="p-4 sm:p-5 space-y-3">
+                <div className="p-3 space-y-2">
                   {/* Unified Score Hero Banner */}
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                    <div className="flex items-center gap-3 mb-2.5">
-                      <svg width="48" height="48" viewBox="0 0 100 100" className="-rotate-90 flex-shrink-0">
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="#fed7aa" strokeWidth="7" />
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="#f97316" strokeWidth="7"
+                  <div className="bg-orange-50 border border-orange-200 rounded p-2">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <svg width="34" height="34" viewBox="0 0 100 100" className="-rotate-90 flex-shrink-0">
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#fed7aa" strokeWidth="8" />
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="#f97316" strokeWidth="8"
                           strokeDasharray={`${(52/100) * 2 * Math.PI * 42} ${(1 - 52/100) * 2 * Math.PI * 42}`}
                           strokeLinecap="round"
                         />
-                        <text x="50" y="44" textAnchor="middle" dominantBaseline="central"
+                        <text x="50" y="46" textAnchor="middle" dominantBaseline="central"
                           className="fill-orange-700 text-[28px] font-extrabold rotate-90"
                           style={{ transformOrigin: 'center' }}
                         >52</text>
-                        <text x="50" y="66" textAnchor="middle" dominantBaseline="central"
-                          className="fill-slate-400 text-[11px] font-medium rotate-90"
-                          style={{ transformOrigin: 'center' }}
-                        >/ 100</text>
                       </svg>
                       <div className="min-w-0">
-                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('example.quoteScore')}</p>
-                        <p className="text-[11px] font-bold text-orange-700">{t('example.quoteScoreLabel')}</p>
+                        <p className="text-[8px] font-semibold text-slate-400 uppercase tracking-wide">{t('example.quoteScore')}</p>
+                        <p className="text-[10px] font-bold text-orange-700">{t('example.quoteScoreLabel')}</p>
                       </div>
                     </div>
                     {/* Inline stats row */}
-                    <div className="flex items-center gap-2 text-[9px]">
+                    <div className="flex items-center gap-1.5 text-[8px]">
                       <div className="flex-1 text-center">
-                        <p className="font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.totalCommitment')}</p>
-                        <p className="text-[11px] font-bold text-slate-900">€111,600</p>
+                        <p className="font-semibold text-slate-400 uppercase tracking-wider">{t('output.totalCommitment')}</p>
+                        <p className="text-[9px] font-bold text-slate-900">€111,600</p>
                       </div>
-                      <div className="w-px h-6 bg-orange-200" />
+                      <div className="w-px h-4 bg-orange-200" />
                       <div className="flex-1 text-center">
-                        <p className="font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.redFlags')}</p>
-                        <p className="text-[11px] font-bold text-red-600">2</p>
+                        <p className="font-semibold text-slate-400 uppercase tracking-wider">{t('output.redFlags')}</p>
+                        <p className="text-[9px] font-bold text-red-600">2</p>
                       </div>
-                      <div className="w-px h-6 bg-orange-200" />
+                      <div className="w-px h-4 bg-orange-200" />
                       <div className="flex-1 text-center">
-                        <p className="font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('output.potentialSavings')}</p>
-                        <p className="text-[11px] font-bold text-emerald-700">{t('example.savingsAmount')}</p>
+                        <p className="font-semibold text-emerald-600 uppercase tracking-wider">{t('output.potentialSavings')}</p>
+                        <p className="text-[9px] font-bold text-emerald-700">{t('example.savingsAmount')}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Score Breakdown */}
-                  <div className="border border-slate-200 rounded-lg p-3">
-                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-2">{t('example.quoteScore')}</p>
-                    <div className="space-y-2">
+                  <div className="border border-slate-200 rounded p-2">
+                    <div className="space-y-1.5">
                       {[
-                        { label: t('example.scorePricing'), pct: 38, summary: 'Above market rate' },
-                        { label: t('example.scoreTerms'), pct: 67, summary: 'Auto-renew clause' },
-                        { label: t('example.scoreLeverage'), pct: 65, summary: 'Room to negotiate' },
+                        { label: t('example.scorePricing'), pct: 38 },
+                        { label: t('example.scoreTerms'), pct: 67 },
+                        { label: t('example.scoreLeverage'), pct: 65 },
                       ].map((bar) => (
                         <div key={bar.label}>
                           <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-[9px] font-medium text-slate-600">{bar.label}</span>
-                            <span className={`text-[9px] font-bold ${bar.pct >= 65 ? 'text-amber-600' : 'text-orange-600'}`}>{bar.pct}%</span>
+                            <span className="text-[8px] font-medium text-slate-500">{bar.label}</span>
+                            <span className={`text-[8px] font-bold ${bar.pct >= 65 ? 'text-amber-600' : 'text-orange-600'}`}>{bar.pct}%</span>
                           </div>
-                          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-0.5">
+                          <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
                             <div className={`h-full rounded-full ${bar.pct >= 65 ? 'bg-amber-500' : 'bg-orange-500'}`}
                               style={{ width: `${bar.pct}%` }} />
                           </div>
-                          <p className="text-[8px] text-slate-400">{bar.summary}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Red flag */}
-                  <div className="border border-red-200 rounded-lg p-3">
-                    <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider mb-1">{t('hero.redFlagLabel')}</p>
-                    <p className="text-[11px] sm:text-xs font-semibold text-slate-900 mb-1">{t('hero.redFlagTitle')}</p>
-                    <p className="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed">{t('hero.redFlagDesc')}</p>
+                  <div className="border border-red-200 rounded p-2">
+                    <p className="text-[8px] font-bold text-red-600 uppercase tracking-wider mb-0.5">{t('hero.redFlagLabel')}</p>
+                    <p className="text-[9px] font-semibold text-slate-900 mb-0.5">{t('hero.redFlagTitle')}</p>
+                    <p className="text-[8px] text-slate-600 leading-relaxed">{t('hero.redFlagDesc')}</p>
                   </div>
 
                   {/* Savings */}
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded p-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-0.5">{t('example.savingsLabel')}</p>
-                        <p className="text-[10px] sm:text-[11px] text-slate-600">{t('hero.savingsDesc')}</p>
+                        <p className="text-[8px] font-bold text-emerald-700 uppercase tracking-wider">{t('example.savingsLabel')}</p>
+                        <p className="text-[8px] text-slate-600">{t('hero.savingsDesc')}</p>
                       </div>
-                      <span className="text-sm sm:text-base font-bold text-emerald-700">{t('example.savingsAmount')}</span>
+                      <span className="text-xs font-bold text-emerald-700">{t('example.savingsAmount')}</span>
                     </div>
                   </div>
 
                   {/* Email preview */}
-                  <div className="border border-slate-200 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wider">{t('example.emailLabel')}</p>
-                      <div className="flex gap-1">
-                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 border border-emerald-200">{t('hero.emailToneFriendly')}</span>
-                        <span className="text-[9px] font-medium px-2 py-0.5 rounded text-slate-400">{t('hero.emailToneDirect')}</span>
-                        <span className="text-[9px] font-medium px-2 py-0.5 rounded text-slate-400">{t('hero.emailToneFirm')}</span>
+                  <div className="border border-slate-200 rounded p-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-[8px] font-bold text-slate-700 uppercase tracking-wider">{t('example.emailLabel')}</p>
+                      <div className="flex gap-0.5">
+                        <span className="text-[7px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 border border-emerald-200">{t('hero.emailToneFriendly')}</span>
+                        <span className="text-[7px] font-medium px-1.5 py-0.5 rounded text-slate-400">{t('hero.emailToneDirect')}</span>
+                        <span className="text-[7px] font-medium px-1.5 py-0.5 rounded text-slate-400">{t('hero.emailToneFirm')}</span>
                       </div>
                     </div>
-                    <div className="bg-slate-50 rounded p-2">
-                      <p className="text-[10px] sm:text-[11px] text-slate-600 leading-relaxed line-clamp-2">
+                    <div className="bg-slate-50 rounded p-1.5">
+                      <p className="text-[8px] text-slate-600 leading-relaxed line-clamp-2">
                         {t('hero.emailSnippet')}
                       </p>
                     </div>
