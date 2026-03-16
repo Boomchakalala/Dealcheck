@@ -9,7 +9,7 @@ import { Breadcrumb } from '@/components/Breadcrumb'
 import { DealStickyBar } from '@/components/DealStickyBar'
 import { ScrollToTopButton } from '@/components/DealHistoryActions'
 import { FeatureGate } from '@/components/FeatureGate'
-import { FileText, AlertTriangle, TrendingUp, DollarSign, ChevronRight, CheckCircle2, TrendingDown, Minus, Target } from 'lucide-react'
+import { FileText, AlertTriangle, TrendingUp, ChevronRight, CheckCircle2, TrendingDown, Minus } from 'lucide-react'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { AddRoundForm } from './AddRoundForm'
@@ -168,64 +168,98 @@ export default async function DealPage({
           />
         </div>
 
-        {/* Stats row inside the header card */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100">
-          <div className="text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
-              <DollarSign className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('deal.totalValue')}</span>
-            </div>
-            <p className="text-lg sm:text-xl font-bold text-slate-900">{totalCommitment ? normalizeAmount(totalCommitment) : 'N/A'}</p>
-            {term && <p className="text-[10px] text-slate-400">{term}</p>}
-          </div>
-          <div className="text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
-              <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('deal.redFlags')}</span>
-            </div>
-            <p className="text-lg sm:text-xl font-bold text-red-600">{redFlagCount}</p>
-            <p className="text-[10px] text-slate-400">{t('deal.issuesFound')}</p>
-          </div>
-          <div className="text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{t('deal.savings')}</span>
-            </div>
-            <p className="text-lg sm:text-xl font-bold text-emerald-700">
-              {potentialSavings > 0 ? formatSavings(potentialSavings) : '—'}
-            </p>
-            {potentialSavings > 0 && <p className="text-[10px] text-emerald-600">{t('deal.potentialYear')}</p>}
-          </div>
-          {(() => {
-            const score = (latestOutput as any)?.score as number | undefined
-            const scoreLabel = (latestOutput as any)?.score_label as string | undefined
-            if (score == null) return null
-            const ringColor = score >= 80 ? 'stroke-emerald-500' : score >= 60 ? 'stroke-orange-500' : 'stroke-red-500'
-            const trackColor = score >= 80 ? 'stroke-emerald-100' : score >= 60 ? 'stroke-orange-100' : 'stroke-red-100'
-            const textColor = score >= 80 ? 'text-emerald-600' : score >= 60 ? 'text-orange-600' : 'text-red-600'
-            const circ = 2 * Math.PI * 20
-            const dash = (score / 100) * circ
-            return (
-              <div className="flex items-center gap-3 justify-center sm:justify-start">
-                <svg width="52" height="52" viewBox="0 0 48 48" className="-rotate-90 flex-shrink-0">
-                  <circle cx="24" cy="24" r="20" fill="none" className={trackColor} strokeWidth="4" />
-                  <circle cx="24" cy="24" r="20" fill="none" className={ringColor} strokeWidth="4"
-                    strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
+      </Card>
+
+      {/* Score Hero Banner — matches OutputDisplay example style */}
+      {(() => {
+        const score = (latestOutput as any)?.score as number | undefined
+        const scoreLabel = (latestOutput as any)?.score_label as string | undefined
+        const scoreRationale = (latestOutput as any)?.score_rationale as string | undefined
+        if (score == null) return null
+
+        const scoreColor = score >= 80
+          ? { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', ring: 'stroke-emerald-500', track: 'stroke-emerald-100' }
+          : score >= 60
+          ? { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', ring: 'stroke-orange-500', track: 'stroke-orange-100' }
+          : { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', ring: 'stroke-red-500', track: 'stroke-red-100' }
+
+        const circumference = 2 * Math.PI * 42
+        const dashLength = (score / 100) * circumference
+
+        const savingsPct = (potentialSavings > 0 && parseMoneyLib(totalCommitment || '0').amount > 0)
+          ? Math.round((potentialSavings / parseMoneyLib(totalCommitment || '0').amount) * 100)
+          : 0
+
+        return (
+          <div className={`${scoreColor.bg} rounded-xl border ${scoreColor.border} p-6`}>
+            <div className="flex flex-col md:flex-row md:items-center gap-6">
+              {/* Score ring */}
+              <div className="flex-shrink-0 flex items-center gap-5">
+                <svg width="100" height="100" viewBox="0 0 100 100" className="-rotate-90">
+                  <circle cx="50" cy="50" r="42" fill="none" className={scoreColor.track} strokeWidth="7" />
+                  <circle cx="50" cy="50" r="42" fill="none" className={scoreColor.ring} strokeWidth="7"
+                    strokeDasharray={`${dashLength} ${circumference - dashLength}`}
+                    strokeLinecap="round"
                   />
-                  <text x="24" y="24" textAnchor="middle" dominantBaseline="central"
-                    className={`${textColor} text-[11px] font-extrabold rotate-90 fill-current`}
+                  <text x="50" y="46" textAnchor="middle" dominantBaseline="central"
+                    className={`${scoreColor.text} text-[28px] font-extrabold rotate-90 fill-current`}
                     style={{ transformOrigin: 'center' }}
-                  >{score}</text>
+                  >
+                    {score}
+                  </text>
+                  <text x="50" y="64" textAnchor="middle" dominantBaseline="central"
+                    className="text-[10px] font-medium text-slate-400 rotate-90 fill-current"
+                    style={{ transformOrigin: 'center' }}
+                  >
+                    / 100
+                  </text>
                 </svg>
-                <div>
-                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Score</span>
-                  {scoreLabel && <p className={`text-[10px] font-semibold ${textColor} leading-tight`}>{scoreLabel}</p>}
+                <div className="md:hidden">
+                  {scoreLabel && <p className={`text-lg font-bold ${scoreColor.text} mb-0.5`}>{scoreLabel}</p>}
+                  {scoreRationale && (
+                    <p className="text-xs text-slate-500 leading-relaxed max-w-[240px]">{scoreRationale}</p>
+                  )}
                 </div>
               </div>
-            )
-          })()}
-        </div>
-      </Card>
+
+              {/* Verdict + stats */}
+              <div className="flex-1 min-w-0">
+                <div className="hidden md:block mb-3">
+                  {scoreLabel && <p className={`text-lg font-bold ${scoreColor.text} mb-0.5`}>{scoreLabel}</p>}
+                  {scoreRationale && (
+                    <p className="text-sm text-slate-500 leading-relaxed">{scoreRationale}</p>
+                  )}
+                </div>
+
+                {/* Inline stats row */}
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                  <div>
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('deal.totalValue')}</p>
+                    <p className="text-lg font-bold text-slate-900">{totalCommitment ? normalizeAmount(totalCommitment) : 'N/A'}</p>
+                    {term && <p className="text-[11px] text-slate-500">{term}</p>}
+                  </div>
+                  <div className="w-px h-10 bg-slate-200 hidden sm:block" />
+                  <div>
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('deal.redFlags')}</p>
+                    <p className="text-lg font-bold text-red-600">{redFlagCount}</p>
+                    <p className="text-[11px] text-slate-500">{t('deal.issuesFound')}</p>
+                  </div>
+                  <div className="w-px h-10 bg-slate-200 hidden sm:block" />
+                  <div>
+                    <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('deal.savings')}</p>
+                    <p className="text-lg font-bold text-emerald-700">
+                      {potentialSavings > 0 ? formatSavings(potentialSavings) : '—'}
+                    </p>
+                    <p className="text-[11px] text-slate-500">
+                      {savingsPct > 0 ? `${savingsPct}% potential savings` : potentialSavings > 0 ? t('deal.potentialYear') : ''}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Closed Deal Banner */}
       {deal.status?.startsWith('closed_') && (
