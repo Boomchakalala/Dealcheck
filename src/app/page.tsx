@@ -531,7 +531,7 @@ export default function LandingPage() {
                   <span className="text-xs font-bold text-white">3</span>
                 </div>
                 <p className="text-sm font-semibold text-slate-300">
-                  {locale === 'fr' ? 'Vous clôturez et mesurez les gains' : 'You close the deal and track the win'}
+                  {locale === 'fr' ? 'Envoyez votre email et enregistrez vos gains' : 'Send your negotiation email and record your win'}
                 </p>
               </div>
               <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
