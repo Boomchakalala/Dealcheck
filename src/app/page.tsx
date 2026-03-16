@@ -96,7 +96,7 @@ export default function LandingPage() {
             </div>
 
             {/* Right: Product Preview — compact mini-preview */}
-            <div className="relative lg:pl-8 mt-8 lg:mt-0 animate-hero-card max-w-[420px] lg:max-w-none lg:w-full">
+            <div className="relative lg:pl-8 mt-8 lg:mt-0 animate-hero-card max-w-[462px] lg:max-w-none lg:w-full">
               {/* Decorative blur orbs */}
               <div className="absolute -top-8 -right-8 w-32 h-32 sm:w-48 sm:h-48 bg-emerald-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
               <div className="absolute -bottom-8 -left-8 w-32 h-32 sm:w-48 sm:h-48 bg-teal-200 rounded-full blur-3xl opacity-20 pointer-events-none" />
