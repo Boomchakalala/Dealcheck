@@ -449,12 +449,12 @@ RULE 4 — CURRENCY CONSISTENCY:
 - If the quote is in USD, all amounts must be in USD. If EUR, all in EUR.
 - If currency is ambiguous, flag it as missing information
 
-SPECIFIC MATH RULES:
-- total_commitment = the FULL amount the buyer will pay over the ENTIRE contract duration
-- If quote says "$X/month for 12 months" → Total is $X * 12 (ANNUAL), not monthly
-- If quote says "annual commitment of $Y, billed monthly" → Total is $Y/year
-- If quote says "€27,500/year for 2 years" → Total is €55,000 (not €27,500 and not €110,000)
-- Example: "$50K total contract, paid $4,166/month" → Total: $50K, NOT $4,166
+SPECIFIC MATH RULES FOR total_commitment:
+Follow these steps IN ORDER:
+1. SEARCH the document for a final total: "Net Amount Due", "Total", "Grand Total", "Total Contract Value", "Annual Total". If found → use that number. DONE. Do not calculate further.
+2. If NO final total exists, check if line item totals already include the full term. Math test: does (unit_price × quantity × months) = line_total? If yes → sum the line totals. That sum is the total_commitment. DONE.
+3. ONLY if amounts are explicitly labeled as monthly/recurring AND no totals exist → multiply by term length.
+4. The total_commitment field must contain ONLY a clean currency amount: "$16,328" or "€40,000". No calculations, no formulas, no parenthetical notes, no "× 12 =" text. Just the number.
 - NEVER double-count: if a total is stated, trust it. Do not re-derive it by multiplying sub-components.
 
 SECTION INDEPENDENCE - NO REPETITION:
@@ -538,14 +538,16 @@ SAVINGS CALCULATION — STRICT RULES:
   * Payment term improvements (NET 30 → NET 60 is cash flow, not savings — put these in cash_flow_improvements)
   * Non-financial term improvements (SLAs, warranties, support levels)
   * Worst-case scenario avoidance (these go in risk_improvements)
-- Be conservative — only include savings the user will definitely realise if the ask is accepted
-- Show a range where appropriate: "$500-$1,200 depending on usage"
+- Be ASSERTIVE on pricing — always push for a discount. Even fair quotes have room. A 5-10% discount ask is standard and expected in any negotiation.
+- Identify specific line items where pricing can be challenged: volume discounts, competitive alternatives, bundled vs. unbundled pricing, list-to-sale price gaps.
+- Show specific dollar/euro amounts for each savings item — not vague ranges.
 - Never inflate with risk protection or hypothetical worst-case values
 
 SAVINGS SANITY CHECK — VERIFY BEFORE RETURNING:
-- potential_savings should include realistic, defensible savings based on the quote.
-- If the quote looks fair and competitive, it's OK to have modest savings (5-10% range) or even minimal savings. Do NOT inflate.
-- Total savings MUST be less than 30% of total_commitment. If you exceed this, you are almost certainly inflating — cut back.
+- potential_savings should include realistic but assertive savings based on the quote.
+- ALWAYS include at least one direct price reduction ask with a specific amount.
+- If the quote looks fair, push for 5-10% off — this is normal and expected. No vendor prices at their floor.
+- Total savings MUST be less than 30% of total_commitment. If you exceed this, you are inflating — cut back.
 - Every savings amount must be in the SAME CURRENCY as the deal.
 - Format amounts consistently: "€4,000 saved" or "$2,500-$3,500 saved".
 - Savings should be ANNUAL figures, not multi-year totals.
@@ -1443,6 +1445,18 @@ export async function analyzeDeal(
     // Parse and validate JSON (strip markdown code fences if present)
     const parsed = parseJsonFromContent(content)
     const validated = DealOutputSchema.parse(parsed)
+
+    // Sanitize total_commitment — AI sometimes returns calculation notes like
+    // "€5,280/mo × 12 = €52,800 ($440.0M estimated)" which breaks display.
+    // Extract just the first clean currency amount.
+    if (validated.snapshot?.total_commitment) {
+      const tc = validated.snapshot.total_commitment
+      // Try to extract the first currency amount pattern: €52,800 or $16,328.40 or USD 15,000
+      const amountMatch = tc.match(/[€$£¥][\s]?[\d,]+\.?\d*|(?:USD|EUR|GBP|CAD|AUD)\s?[\d,]+\.?\d*/i)
+      if (amountMatch) {
+        validated.snapshot.total_commitment = amountMatch[0].trim()
+      }
+    }
 
     // Calculate deterministic quote score from analysis output
     const scoreData = calculateQuoteScore(validated)
