@@ -121,13 +121,11 @@ export default function ExamplePage() {
           </div>
         </div>
 
-        <OutputDisplay output={currentExamples[selectedExample]} />
-
-        {/* Deal Closed — Win Summary */}
+        {/* Deal Closed — Win Summary (shown at top like real closed deals) */}
         {(() => {
           const deal = closedDeals[selectedExample]
           return (
-            <div className="mt-8 mb-2">
+            <div className="mb-8">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
                   <Check className="w-4 h-4 text-white" strokeWidth={3} />
@@ -196,6 +194,8 @@ export default function ExamplePage() {
             </div>
           )
         })()}
+
+        <OutputDisplay output={currentExamples[selectedExample]} />
 
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
