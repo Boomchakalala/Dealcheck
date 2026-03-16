@@ -18,29 +18,30 @@ export default function ExamplePage() {
 
   const closedDeals: Record<ExampleType, { original: string; final: string; savings: string; savingsPct: string; date: string; tags: string[]; wins: { type: string; label: string; amount?: string }[] }> = {
     marketing: {
-      original: '€111,600', final: '€94,800', savings: '€16,800', savingsPct: '15.1%', date: 'Mar 18, 2026',
+      original: '€111,600', final: '€98,400', savings: '€13,200', savingsPct: '11.8%', date: 'Mar 18, 2026',
       tags: ['Price reduced', 'Ad fee cut', 'Cancellation updated', 'Deliverables added'],
       wins: [
-        { type: 'Price', label: 'Monthly retainer reduced from €7,500 to €7,000', amount: '€6,000/yr' },
-        { type: 'Price', label: 'Ad management fee cut from 20% to 10%', amount: '€10,800/yr' },
+        { type: 'Price', label: 'Monthly retainer reduced from €7,500 to €7,250', amount: '€3,000/yr' },
+        { type: 'Price', label: 'Ad management fee cut from 20% to 12%', amount: '€8,640/yr' },
         { type: 'Terms', label: 'Cancellation notice cut from 60 to 30 days' },
+        { type: 'Scope', label: 'Minimum 6 blog posts/month guaranteed in writing' },
       ],
     },
     saas: {
-      original: '€36,000', final: '€26,496', savings: '€9,504', savingsPct: '26.4%', date: 'Apr 2, 2026',
+      original: '€36,000', final: '€28,350', savings: '€7,650', savingsPct: '21.3%', date: 'Apr 2, 2026',
       tags: ['Seats right-sized', 'Multi-year discount', 'Price locked'],
       wins: [
-        { type: 'Price', label: 'Right-sized from 40 to 32 seats', amount: '€7,200/yr' },
-        { type: 'Price', label: '2-year commitment at 8% discount', amount: '€2,304/yr' },
-        { type: 'Terms', label: 'Price locked for full 2-year term' },
+        { type: 'Price', label: 'Right-sized from 40 to 34 seats', amount: '€5,400/yr' },
+        { type: 'Price', label: '2-year commitment at 6% discount', amount: '€1,890/yr' },
+        { type: 'Terms', label: 'Price capped at 3% annual increase' },
       ],
     },
     supplies: {
-      original: '€42,750', final: '€37,170', savings: '€5,580', savingsPct: '13.1%', date: 'Apr 10, 2026',
-      tags: ['Volume discount', 'Delivery fees waived', 'Pricing locked'],
+      original: '€42,750', final: '€38,250', savings: '€4,500', savingsPct: '10.5%', date: 'Apr 10, 2026',
+      tags: ['Volume discount', 'Delivery fees reduced', 'Pricing locked'],
       wins: [
-        { type: 'Price', label: 'Discount increased from 5% to 15%', amount: '€4,500/yr' },
-        { type: 'Price', label: 'Delivery fees waived on all orders', amount: '€1,080/yr' },
+        { type: 'Price', label: 'Discount increased from 5% to 12%', amount: '€3,150/yr' },
+        { type: 'Price', label: 'Delivery fee threshold lowered from €50 to €25', amount: '€720/yr' },
         { type: 'Terms', label: 'Top 20 item prices locked for 12 months' },
       ],
     },

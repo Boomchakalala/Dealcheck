@@ -552,12 +552,12 @@ export default function LandingPage() {
                     </div>
                     <div className="bg-slate-50 rounded-lg border border-slate-200 p-3 text-center">
                       <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">{locale === 'fr' ? 'Montant final' : 'Final agreed'}</p>
-                      <p className="text-sm sm:text-base font-bold text-slate-900">€94,800</p>
+                      <p className="text-sm sm:text-base font-bold text-slate-900">€98,400</p>
                     </div>
                     <div className="bg-emerald-50 rounded-lg border border-emerald-200 p-3 text-center">
                       <p className="text-[9px] font-semibold text-emerald-600 uppercase tracking-wide mb-0.5">{locale === 'fr' ? 'Économies' : 'Savings captured'}</p>
-                      <p className="text-sm sm:text-base font-bold text-emerald-800">€16,800</p>
-                      <p className="text-[10px] font-semibold text-emerald-600">15.1%</p>
+                      <p className="text-sm sm:text-base font-bold text-emerald-800">€13,200</p>
+                      <p className="text-[10px] font-semibold text-emerald-600">11.8%</p>
                     </div>
                   </div>
 
@@ -580,15 +580,15 @@ export default function LandingPage() {
                       <div className="flex items-start gap-2.5 pb-2 border-b border-slate-100">
                         <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex-shrink-0 mt-0.5">Price</span>
                         <div>
-                          <p className="text-xs text-slate-800">{locale === 'fr' ? 'Honoraires mensuels réduits de €7 500 à €7 000' : 'Monthly retainer reduced from €7,500 to €7,000'}</p>
-                          <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">€6,000/yr</p>
+                          <p className="text-xs text-slate-800">{locale === 'fr' ? 'Honoraires mensuels réduits de €7 500 à €7 250' : 'Monthly retainer reduced from €7,500 to €7,250'}</p>
+                          <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">€3,000/yr</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-2.5 pb-2 border-b border-slate-100">
                         <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex-shrink-0 mt-0.5">Price</span>
                         <div>
-                          <p className="text-xs text-slate-800">{locale === 'fr' ? 'Frais de gestion publicitaire réduits de 20% à 10%' : 'Ad management fee cut from 20% to 10%'}</p>
-                          <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">€10,800/yr</p>
+                          <p className="text-xs text-slate-800">{locale === 'fr' ? 'Frais de gestion publicitaire réduits de 20% à 12%' : 'Ad management fee cut from 20% to 12%'}</p>
+                          <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">€8,640/yr</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-2.5">
