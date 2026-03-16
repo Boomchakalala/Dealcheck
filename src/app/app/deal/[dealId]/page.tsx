@@ -263,19 +263,19 @@ export default async function DealPage({
                 {/* Inline stats row */}
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
                   <div>
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('deal.totalValue')}</p>
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.totalCommitment')}</p>
                     <p className="text-lg font-bold text-slate-900">{totalCommitment ? normalizeAmount(totalCommitment) : 'N/A'}</p>
                     {term && <p className="text-[11px] text-slate-500">{term}</p>}
                   </div>
                   <div className="w-px h-10 bg-slate-200 hidden sm:block" />
                   <div>
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('deal.redFlags')}</p>
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.redFlags')}</p>
                     <p className="text-lg font-bold text-red-600">{redFlagCount}</p>
                     <p className="text-[11px] text-slate-500">{t('deal.issuesFound')}</p>
                   </div>
                   <div className="w-px h-10 bg-slate-200 hidden sm:block" />
                   <div>
-                    <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('deal.savings')}</p>
+                    <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('output.potentialSavings')}</p>
                     <p className="text-lg font-bold text-emerald-700">
                       {cappedSavings > 0 ? formatSavings(cappedSavings) : '—'}
                     </p>

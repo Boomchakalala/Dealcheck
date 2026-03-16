@@ -779,6 +779,14 @@ Structure:
 6. Optional: Offer call if helpful
 7. Professional close
 
+Subject lines:
+- Must be professional and specific — NOT casual or vague
+- Include the vendor name and purpose: "[Vendor] [Deal Type] — [Purpose]"
+- Good: "Datadog Renewal — Questions on Pricing Before We Sign"
+- Good: "Brightwave Proposal — A Few Points to Align On"
+- Bad: "Quick question" / "Couple of quick points" / "Following up"
+- The subject should signal professionalism and intent
+
 Email variations:
 - neutral: warm & collaborative, gentle questions
 - firm: direct but respectful follow-up, clearer deadline emphasis

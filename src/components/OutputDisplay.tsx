@@ -112,11 +112,15 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
     return isNaN(num) ? 0 : num
   }
 
-  // Calculate total savings from all savings breakdown items
+  // Calculate total savings from all savings breakdown items — capped at deal value
   const totalSavings = useMemo(() => {
     if (!output.potential_savings || output.potential_savings.length === 0) return 0
-    return output.potential_savings.reduce((sum, saving) => sum + parseSavingsAmount(saving.annual_impact), 0)
-  }, [output.potential_savings])
+    const raw = output.potential_savings.reduce((sum, saving) => sum + parseSavingsAmount(saving.annual_impact), 0)
+    // Guard against AI hallucinations: if savings exceed deal total, cap at 30%
+    const dealTotal = output.snapshot?.total_commitment ? parseMoney(output.snapshot.total_commitment).amount : 0
+    if (dealTotal > 0 && raw > dealTotal) return Math.round(dealTotal * 0.3)
+    return raw
+  }, [output.potential_savings, output.snapshot?.total_commitment])
 
   const formatSavings = (amount: number) => {
     const dealTotal = output.snapshot?.total_commitment || ''
@@ -251,9 +255,8 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
         const commitmentParsed = output.snapshot?.total_commitment ? parseMoney(output.snapshot.total_commitment) : null
         const commitmentNum = commitmentParsed?.amount || 0
 
-        // Calculate savings percentage — cap savings at deal total to prevent absurd values
-        const cappedSavings = (commitmentNum > 0 && totalSavings > commitmentNum) ? commitmentNum * 0.3 : totalSavings
-        const savingsPct = (cappedSavings > 0 && commitmentNum > 0) ? Math.min(Math.round((cappedSavings / commitmentNum) * 100), 50) : 0
+        // Calculate savings percentage (totalSavings already capped at source)
+        const savingsPct = (totalSavings > 0 && commitmentNum > 0) ? Math.min(Math.round((totalSavings / commitmentNum) * 100), 50) : 0
 
         return (
           <div className="mb-6 space-y-4">
@@ -319,7 +322,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                     <div>
                       <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('output.potentialSavings')}</p>
                       <p className="text-lg font-bold text-emerald-700">
-                        {cappedSavings > 0 ? formatSavings(cappedSavings) : t('output.na')}
+                        {totalSavings > 0 ? formatSavings(totalSavings) : t('output.na')}
                       </p>
                       <p className="text-[11px] text-slate-500">
                         {savingsPct > 0 ? t('output.percentPotentialSavings', { pct: String(savingsPct) }) : t('output.noSavingsCalculated')}
@@ -909,10 +912,9 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           return `${currencySymbol}${Math.round(amount)}`
         }
 
-        // Parse deal total for comparison bar — cap savings at deal total
+        // Parse deal total for comparison bar (totalSavings already capped at source)
         const dealTotalNum = parseSavingsAmount(dealTotal)
-        const cappedTotalSavings = (dealTotalNum > 0 && totalSavings > dealTotalNum) ? dealTotalNum * 0.3 : totalSavings
-        const savingsPct = dealTotalNum > 0 ? Math.min((cappedTotalSavings / dealTotalNum) * 100, 50) : 0
+        const savingsPct = dealTotalNum > 0 ? Math.min((totalSavings / dealTotalNum) * 100, 50) : 0
 
         return (
         <div className="mb-8">
@@ -938,7 +940,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
               </div>
               <div className="text-right bg-emerald-50 rounded-xl px-5 py-3 border-2 border-emerald-200">
                 <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide mb-0.5">{t('output.totalOpportunity')}</p>
-                <p className="text-2xl sm:text-3xl font-bold text-emerald-700">{fmtCurrency(cappedTotalSavings)}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-emerald-700">{fmtCurrency(totalSavings)}</p>
                 <p className="text-[10px] text-emerald-600 mt-0.5">{t('output.ifAllRecommendedAsksAccepted')}</p>
               </div>
             </div>
@@ -948,7 +950,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
               <div className="mb-6">
                 <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1.5">
                   <span>{t('output.originalQuote')} <span className="font-semibold text-slate-700">{dealTotal}</span></span>
-                  <span>{t('output.potentialSavingsLabel')} <span className="font-semibold text-emerald-700">{fmtCurrency(cappedTotalSavings)}</span></span>
+                  <span>{t('output.potentialSavingsLabel')} <span className="font-semibold text-emerald-700">{fmtCurrency(totalSavings)}</span></span>
                 </div>
                 <div className="h-4 bg-slate-100 rounded-full overflow-hidden flex">
                   <div
@@ -961,7 +963,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   />
                 </div>
                 <div className="flex items-center justify-between text-[10px] mt-1">
-                  <span className="text-slate-400">{t('output.afterSavings', { amount: fmtCurrency(Math.max(0, dealTotalNum - cappedTotalSavings)) })}</span>
+                  <span className="text-slate-400">{t('output.afterSavings', { amount: fmtCurrency(Math.max(0, dealTotalNum - totalSavings)) })}</span>
                   <span className="font-semibold text-emerald-600">{t('output.percentSavings', { pct: savingsPct.toFixed(0) })}</span>
                 </div>
               </div>
