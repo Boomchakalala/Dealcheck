@@ -72,8 +72,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Redirect to app if authenticated and trying to access login
-  if (user && request.nextUrl.pathname === '/login') {
+  // Redirect to app if authenticated and on login or landing page
+  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/')) {
     return NextResponse.redirect(new URL('/app', request.url))
   }
 
