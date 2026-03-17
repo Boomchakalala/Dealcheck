@@ -1514,11 +1514,17 @@ INSTRUCTIONS FOR MULTI-ROUND CONSISTENCY:
 
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
-      max_tokens: 4500,
+      max_tokens: 8192,
       system: enhancedSystemPrompt + getLanguageInstruction(userLocale || 'en') + '\n\nFINAL REMINDER — TOTAL CONTRACT VALUE:\n1. If a "Net Amount Due", "Total", or "Grand Total" is stated, use it AS-IS for total_commitment. Do NOT multiply by term length.\n2. VERIFY: Many quotes show per-unit monthly prices but the TOTAL AMOUNT column already multiplies by quantity AND by the contract term (e.g. 12 months). Check the math before multiplying again — you will likely be double-counting.\n3. Only multiply a stated total by 12 if you are 100% certain it represents a single month and no annual/full-term total exists in the document.',
       messages: [{ role: 'user', content: userContent }],
       temperature: 0,
     })
+
+    // Check if response was truncated (hit max_tokens limit)
+    if (response.stop_reason === 'max_tokens') {
+      console.error('[TermLift] AI response truncated — hit max_tokens limit')
+      throw new Error('AI_PARSE_ERROR: AI returned invalid response format')
+    }
 
     const content = getResponseText(response)
     if (!content) {
@@ -1608,11 +1614,16 @@ export async function analyzeDealV2(
   try {
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
-      max_tokens: 2000,
+      max_tokens: 8192,
       system: SYSTEM_PROMPT_V2 + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: userPrompt }],
       temperature: 0,
     })
+
+    if (response.stop_reason === 'max_tokens') {
+      console.error('[TermLift] V2 AI response truncated — hit max_tokens limit')
+      throw new Error('AI_PARSE_ERROR: AI returned invalid response format')
+    }
 
     const content = getResponseText(response)
     if (!content) {
@@ -1718,7 +1729,7 @@ Return ONLY JSON with this structure:
   try {
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
-      max_tokens: 2000,
+      max_tokens: 4096,
       system: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails that match the provided analysis. Be concise and specific. Return only valid JSON.' + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
       temperature: 0,
@@ -1837,7 +1848,7 @@ Return ONLY JSON:
   try {
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
-      max_tokens: 1500,
+      max_tokens: 4096,
       system: 'You are an intelligent email generation engine. Write natural, selective, commercially aware emails. Adapt to user preferences. Be concise and specific. Return only valid JSON.' + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
       temperature: 0,

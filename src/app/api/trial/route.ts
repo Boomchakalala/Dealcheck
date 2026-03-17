@@ -22,6 +22,7 @@ async function withRetry<T>(
         || msg.includes('econnreset') || msg.includes('socket')
         || msg.includes('503') || msg.includes('500')
         || msg.includes('ai_overloaded') || msg.includes('ai_analysis_error')
+        || msg.includes('ai_parse_error') || msg.includes('ai_validation_error')
       if (!isTransient || attempt === maxAttempts) throw lastError
       const delay = baseDelayMs * Math.pow(2, attempt - 1)
       console.warn(`[TermLift] Trial attempt ${attempt}/${maxAttempts} failed (${lastError.message}), retrying in ${delay}ms...`)
