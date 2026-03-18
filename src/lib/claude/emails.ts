@@ -80,10 +80,30 @@ LENGTH:
 - Keep it tight. 4-8 sentences for simple quotes, 7-12 for complex ones.
 - If you can say it in fewer sentences, do.
 
+==================================================
+GREETING & SIGN-OFF — MANDATORY
+==================================================
+
+GREETING (first line of every email body):
+- If a contact name is available from the quote (e.g., sales rep, account manager, any person's name): use "Hi [First Name]," or "Hey [First Name],"
+- If no contact name is available: use "Hi," or "Hi there,"
+- NEVER skip the greeting. NEVER jump straight into the body.
+- For firm/final_push: "Hi [Name]," (not "Hey") — slightly more formal
+
+SIGN-OFF (last lines of every email body):
+- ALWAYS end with "Best regards," followed by a new line with "[Your Name]"
+- Use exactly "[Your Name]" as a placeholder — the user will replace it
+- NEVER skip the sign-off. NEVER end with just the last sentence of the body.
+- Format:
+  Best regards,
+  [Your Name]
+
 QUALITY SELF-CHECK:
 - Does it sound like a human wrote it in 3 minutes, not a bot in 3 seconds?
 - Would you actually send this email? Or would you rewrite it first?
 - Is every sentence earning its place?
+- Does it start with a greeting?
+- Does it end with "Best regards," + "[Your Name]"?
 `
 
 // ---------------------------------------------------------------------------
