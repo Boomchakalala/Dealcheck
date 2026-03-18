@@ -3,6 +3,8 @@ import { anthropic, CLAUDE_MODEL, getResponseText, parseJsonFromContent, getLang
 
 const EXTRACTION_PROMPT = `You are a financial data extraction engine. Your ONLY job is to extract factual information from vendor quotes. Do NOT analyze, judge, or recommend — just extract.
 
+CRITICAL: You MUST always return valid JSON. NEVER respond with conversational text like "I don't see a quote" or "I need more information". If the input is unclear, extract whatever you can and use "Unknown" for missing fields.
+
 EXTRACT THESE FIELDS:
 
 1. vendor: Company or person name providing the quote
@@ -72,9 +74,12 @@ export async function extractFinancialFacts(
   pdfData?: { base64: string; mimeType: string },
   userLocale?: string,
 ): Promise<ExtractedFacts> {
-  const userPrompt = `Deal Type: ${dealType}\n\nExtract the financial facts from this quote:\n${extractedText || '(see attached document)'}`
-
   const visualContent = buildImageContent(imageData, allPages, pdfData)
+  const hasVisualInput = !!visualContent
+
+  const userPrompt = hasVisualInput
+    ? `Deal Type: ${dealType}\n\nPlease extract the financial facts from the attached quote document. Read the entire document carefully — pay close attention to tables, pricing columns, totals, terms, and dates.${extractedText ? `\n\nExtracted text (for reference):\n${extractedText}` : ''}`
+    : `Deal Type: ${dealType}\n\nExtract the financial facts from this quote:\n${extractedText}`
 
   let userContent: Anthropic.MessageParam['content']
   if (visualContent) {
@@ -87,7 +92,10 @@ export async function extractFinancialFacts(
     model: CLAUDE_MODEL,
     max_tokens: 1024,
     system: EXTRACTION_PROMPT + getLanguageInstruction(userLocale || 'en'),
-    messages: [{ role: 'user', content: userContent }],
+    messages: [
+      { role: 'user', content: userContent },
+      { role: 'assistant', content: '{' },
+    ],
     temperature: 0,
   })
 
@@ -97,12 +105,17 @@ export async function extractFinancialFacts(
 
   const content = getResponseText(response)
   if (!content) throw new Error('No response from AI')
+  console.log('[TermLift] Extract raw response (first 500 chars):', content.substring(0, 500))
 
   const parsed = parseJsonFromContent(content) as ExtractedFacts
+  console.log('[TermLift] Extract parsed keys:', Object.keys(parsed))
 
   // Validate required fields
   if (!parsed.vendor || !parsed.total_commitment) {
-    throw new Error('AI_VALIDATION_ERROR: Extraction missing required fields')
+    const keys = Object.keys(parsed)
+    const sample = JSON.stringify(parsed).substring(0, 300)
+    console.error('[TermLift] Extract validation failed. Keys:', keys, 'Sample:', sample)
+    throw new Error(`AI_VALIDATION_ERROR: Extraction missing required fields. Got keys: [${keys.join(', ')}]. Sample: ${sample}`)
   }
 
   return parsed

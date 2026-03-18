@@ -172,7 +172,6 @@ export async function POST(
     })
   } catch (error) {
     console.error('Add round error:', error)
-    // CRITICAL: Never send raw error.message to client - may contain sensitive data
     return NextResponse.json({
       error: 'Failed to add round. Please try again or contact support.'
     }, { status: 500 })

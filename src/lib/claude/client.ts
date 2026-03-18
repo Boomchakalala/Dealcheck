@@ -27,7 +27,26 @@ export function getResponseText(response: Anthropic.Message): string {
 export function parseJsonFromContent(content: string): unknown {
   const trimmed = content.trim()
   const stripped = trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
-  return JSON.parse(stripped)
+  // Prepend '{' if needed (assistant prefill strips the leading brace)
+  const full = stripped.startsWith('{') ? stripped : '{' + stripped
+  // Extract only the JSON object — Claude sometimes adds trailing text after the closing '}'
+  let depth = 0
+  let inString = false
+  let escape = false
+  for (let i = 0; i < full.length; i++) {
+    const ch = full[i]
+    if (escape) { escape = false; continue }
+    if (ch === '\\' && inString) { escape = true; continue }
+    if (ch === '"' && !escape) { inString = !inString; continue }
+    if (inString) continue
+    if (ch === '{') depth++
+    else if (ch === '}') {
+      depth--
+      if (depth === 0) return JSON.parse(full.substring(0, i + 1))
+    }
+  }
+  // Fallback: try parsing the whole thing
+  return JSON.parse(full)
 }
 
 export function getLanguageInstruction(locale: string): string {

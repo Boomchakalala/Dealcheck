@@ -49,6 +49,7 @@ export async function analyzeDeal(
 
     // ─── Step 1: Extract financial facts (~5s) ───
     console.log('[TermLift] Step 1: Extracting financial facts...')
+    console.log('[TermLift] Input: text length =', extractedText?.length || 0, '| hasImage =', !!imageData, '| hasPages =', !!allPages?.length, '| hasPdf =', !!pdfData)
     const rawFacts = await extractFinancialFacts(extractedText, dealType, imageData, allPages, pdfData, userLocale)
     console.log('[TermLift] Step 1 done:', rawFacts.vendor, rawFacts.total_commitment)
 
@@ -154,8 +155,10 @@ export async function analyzeDeal(
     }
 
     if (error instanceof Error && error.name === 'ZodError') {
-      console.error('[TermLift] Zod validation details:', JSON.stringify((error as any).errors, null, 2))
-      throw new Error('AI_VALIDATION_ERROR: AI response missing required fields')
+      const issues = (error as any).issues || (error as any).errors || []
+      const summary = issues.map((i: any) => `${i.path?.join('.')}: ${i.message}`).join('; ')
+      console.error('[TermLift] Zod validation details:', JSON.stringify(issues, null, 2))
+      throw new Error(`AI_VALIDATION_ERROR: ${summary || 'AI response missing required fields'}`)
     }
 
     if (msg.includes('overloaded') || msg.includes('529')) {

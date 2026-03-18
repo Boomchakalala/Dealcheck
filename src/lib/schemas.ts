@@ -191,14 +191,14 @@ export const DealOutputSchemaV2 = z.object({
 
 // Quote Classification Schema (Step 1 of two-step pipeline)
 export const QuoteClassificationSchema = z.object({
-  quote_type: z.enum(['saas', 'professional_services', 'product_hardware', 'household', 'event_project', 'construction']),
-  deal_size_bracket: z.enum(['micro', 'small', 'medium', 'large', 'enterprise']),
-  recurring: z.boolean(),
-  leverage_level: z.enum(['high', 'medium', 'low', 'unclear']),
-  audience: z.enum(['business', 'personal']),
+  quote_type: z.enum(['saas', 'professional_services', 'product_hardware', 'household', 'event_project', 'construction']).catch('professional_services'),
+  deal_size_bracket: z.enum(['micro', 'small', 'medium', 'large', 'enterprise']).catch('medium'),
+  recurring: z.boolean().catch(false),
+  leverage_level: z.enum(['high', 'medium', 'low', 'unclear']).catch('medium'),
+  audience: z.enum(['business', 'personal']).catch('business'),
   savings_strategy: z.object({
-    target_percent_min: z.number(),
-    target_percent_max: z.number(),
+    target_percent_min: z.number().catch(5),
+    target_percent_max: z.number().catch(15),
     approach: z.enum([
       'line_item_reduction',
       'volume_discount',
@@ -207,9 +207,9 @@ export const QuoteClassificationSchema = z.object({
       'scope_optimization',
       'payment_restructure',
       'competitive_leverage',
-    ]),
-    rationale: z.string(),
-  }),
+    ]).catch('package_discount'),
+    rationale: z.string().catch('General negotiation approach'),
+  }).catch({ target_percent_min: 5, target_percent_max: 15, approach: 'package_discount' as const, rationale: 'General negotiation approach' }),
 })
 
 export type QuoteClassificationType = z.infer<typeof QuoteClassificationSchema>

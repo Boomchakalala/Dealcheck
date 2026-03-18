@@ -13,6 +13,8 @@ You will receive:
 
 Your job: analyze the deal and find negotiation opportunities. Do NOT extract financial facts (already done). Do NOT generate emails (separate step).
 
+CRITICAL: You MUST always return valid JSON. NEVER respond with conversational text. If information is limited, still return the full JSON structure with your best analysis.
+
 ==================================================
 ABSOLUTE RULES — DO NOT VIOLATE
 ==================================================
@@ -484,9 +486,12 @@ export async function analyzeDealFacts(
     options.previousRoundOutput && `MULTI-ROUND ANALYSIS CONTEXT:\nThis is a follow-up round. Previous analysis: ${JSON.stringify(options.previousRoundOutput, null, 2)}\nKeep scoring consistent. Only change findings if the quote materially changed.`,
   ].filter(Boolean)
 
-  const userPrompt = `${contextParts.join('\n\n')}\n\nQuote text:\n${rawText || '(see attached document)'}`
-
   const visualContent = buildImageContent(options.imageData, options.allPages, options.pdfData)
+  const hasVisualInput = !!visualContent
+
+  const userPrompt = hasVisualInput
+    ? `${contextParts.join('\n\n')}\n\nPlease analyze the quote/contract shown in the attached document. Read the entire document carefully — pay close attention to tables, pricing, terms, dates, and any fine print.${rawText ? `\n\nExtracted text (for reference):\n${rawText}` : ''}`
+    : `${contextParts.join('\n\n')}\n\nSupplier Document/Quote:\n${rawText}`
 
   let userContent: Anthropic.MessageParam['content']
   if (visualContent) {
@@ -510,12 +515,17 @@ export async function analyzeDealFacts(
 
   const content = getResponseText(response)
   if (!content) throw new Error('No response from AI')
+  console.log('[TermLift] Analyze raw response (first 500 chars):', content.substring(0, 500))
 
   const parsed = parseJsonFromContent(content) as AnalysisOutput
+  console.log('[TermLift] Analyze parsed keys:', Object.keys(parsed))
 
   // Basic validation
   if (!parsed.verdict || !parsed.red_flags || !parsed.what_to_ask_for) {
-    throw new Error('AI_VALIDATION_ERROR: Analysis missing required fields')
+    const keys = Object.keys(parsed)
+    const sample = JSON.stringify(parsed).substring(0, 300)
+    console.error('[TermLift] Analysis validation failed. Keys:', keys, 'Sample:', sample)
+    throw new Error(`AI_VALIDATION_ERROR: Analysis missing required fields. Got keys: [${keys.join(', ')}]. Sample: ${sample}`)
   }
 
   return parsed

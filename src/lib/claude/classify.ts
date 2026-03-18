@@ -5,7 +5,7 @@ import { QuoteClassificationSchema, QuoteClassificationType } from '../schemas'
 export const CLASSIFICATION_PROMPT = `You are a quote classification engine. Read the quote and return a JSON classification.
 
 RULES:
-- quote_type: What kind of vendor/service is this?
+- quote_type: MUST be one of the listed values — never "unclear" or "other". Pick the closest match.
   - "saas" = Software subscriptions, licenses, cloud services, SaaS platforms
   - "professional_services" = Consulting, agencies, marketing, legal, accounting, freelancers
   - "product_hardware" = Physical products, equipment, supplies, shipping, inventory
@@ -13,7 +13,7 @@ RULES:
   - "event_project" = One-time events: conferences, weddings, trade shows, campaigns, launches
   - "construction" = Building, renovation, remodeling, architecture, structural work
 
-- deal_size_bracket: Based on total contract value
+- deal_size_bracket: MUST be one of the listed values — never "unclear". Estimate if unsure.
   - "micro" = under €1K / $1K
   - "small" = €1K-€10K / $1K-$10K
   - "medium" = €10K-€50K / $10K-$50K
@@ -28,7 +28,7 @@ RULES:
   - "low" = Niche vendor, small deal, urgent timeline, few alternatives
   - "unclear" = Not enough info to determine
 
-- audience: "business" or "personal"
+- audience: MUST be exactly "business" or "personal" — never "unclear" or any other value. Pick the best fit.
 
 - savings_strategy: How should we approach savings?
   - target_percent_min / target_percent_max: The realistic savings range to push for
@@ -103,7 +103,10 @@ export async function classifyQuote(
     model: CLAUDE_CLASSIFY_MODEL,
     max_tokens: 500,
     system: CLASSIFICATION_PROMPT,
-    messages: [{ role: 'user', content: userContent }],
+    messages: [
+      { role: 'user', content: userContent },
+      { role: 'assistant', content: '{' },
+    ],
     temperature: 0,
   })
 

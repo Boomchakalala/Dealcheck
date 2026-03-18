@@ -8,130 +8,82 @@ import type { DealOutput, DealOutputV2 } from '@/types'
 
 const EMAIL_PROMPT = `
 ==================================================
+VOICE & TONE — SOUND LIKE A REAL PERSON
+==================================================
+
+Write like a sharp, confident buyer — not a template engine.
+
+These emails should read like they were written by someone who actually reviewed the quote, knows what they want, and is comfortable negotiating. Think: a senior ops lead or founder who writes clear, no-fluff emails.
+
+GOLDEN RULE: Read the email out loud. If it sounds like a procurement bot wrote it, rewrite it.
+
+DO NOT USE THESE PHRASES (they scream "AI-generated"):
+- "I hope this email finds you well"
+- "Thanks for sharing the quote/proposal"
+- "We reviewed the proposal and would like to discuss"
+- "Would it be possible to explore..."
+- "We believe there may be an opportunity to..."
+- "I wanted to reach out regarding..."
+- "We appreciate the detailed proposal"
+- "We look forward to your response"
+- "Please don't hesitate to reach out"
+
+USE NATURAL LANGUAGE LIKE:
+- "Hey [name], had a look at the quote — a few things I'd like to go over before we move forward."
+- "Appreciate the quick turnaround on this. Before we sign off, there are a couple of points worth revisiting."
+- "Overall this looks solid, but the [specific thing] stood out — can we talk through that?"
+- "We're keen to get this done, but I want to make sure we're aligned on [specific point] first."
+- "One thing that jumped out: [specific concern]. What's the flexibility there?"
+- "Happy to hop on a quick call if easier, but the main thing is [specific ask]."
+
+VARY YOUR SENTENCE STRUCTURE:
+- Mix short and long sentences
+- Don't start every sentence with "We" or "I"
+- Use contractions naturally (we'd, it's, that's, won't, can't)
+- Throw in a casual connector: "That said,", "On that note,", "Quick one —"
+
+==================================================
 EMAIL RULES
 ==================================================
 
-CRITICAL: Emails use DIFFERENT language than must-have asks section!
-- Must-have asks section: ASSERTIVE ("Negotiate...", "Push for...")
-- Emails: POLITE QUESTIONS ("Could we...", "Would you consider...")
+Emails should feel like the OPPOSITE of the analysis section:
+- Analysis section: ASSERTIVE, data-driven ("Negotiate 10% off", "Push for cap")
+- Emails: CONVERSATIONAL, relationship-aware — you're writing to a real person
 
-Email tone:
-- Professional, warm, collaborative
-- Use polite questions: "Could we...", "Would you consider...", "Would it be possible to...", "Can we discuss..."
-- Never aggressive or demanding
-- Build rapport while making clear requests
+Three variations, each with a different posture:
+- neutral: friendly, collaborative opener. You're interested and engaged, just want to sort a few things. Warm but clear.
+- firm: you've already asked nicely or the quote needs real pushback. Direct, professional, no fluff. Still respectful but the tone says "we need this resolved."
+- final_push: deadline-driven close. Signals you're ready to move on or go elsewhere. Urgent but never rude.
 
-Structure:
-1. Warm opening (reference quote/conversation)
-2. Brief context (1 sentence on what you reviewed)
-3. Specific asks as polite questions (2-4 bullets):
-   - Could we [specific request]? [Brief why]
-   - Would you consider [specific request]? [Brief benefit]
-   - Would it be possible to [specific request]? [Brief impact]
-4. Request for updated quote in writing
-5. Deadline: [DATE]
-6. Optional: Offer call if helpful
-7. Professional close
+CORE RULES:
+- Only include asks from the analysis — never invent new ones
+- If 0 real asks → write a light confirmation email, not a negotiation
+- If 1 ask → focus the whole email on it, don't pad
+- If 2-3 asks → structure cleanly but keep it tight
+- Reference REAL details from the quote (amounts, terms, dates)
+- Every email must end with a clear next step
 
 Subject lines:
-- Must be professional and specific — NOT casual or vague
-- Include the vendor name and purpose: "[Vendor] [Deal Type] — [Purpose]"
-- Good: "Datadog Renewal — Questions on Pricing Before We Sign"
-- Good: "Brightwave Proposal — A Few Points to Align On"
-- Bad: "Quick question" / "Couple of quick points" / "Following up"
-- The subject should signal professionalism and intent
+- Professional and specific, not vague clickbait
+- Good: "Re: Datadog Renewal — a couple of points before we sign"
+- Good: "Brightwave proposal — quick follow-up"
+- Bad: "Quick question" / "Following up" / "Checking in"
 
-Email variations:
-- neutral: warm & collaborative, gentle questions
-- firm: direct but respectful follow-up, clearer deadline emphasis
-- final_push: urgent but professional close, strong deadline language
+ADAPT TO CONTEXT:
+- Business: commercially literate, structured, confident
+- Personal/Household: simpler, practical, friendly — sound like a smart homeowner, not a procurement team
+- SaaS: reference seats, billing, renewal terms
+- Services: reference scope, deliverables, rates
+- Household: reference labor/materials split, timeline, warranty
 
-Example email bullets (POLITE):
-- "Could we explore a volume discount at 100+ seats? Current per-seat pricing doesn't reflect enterprise scale."
-- "Would you consider adding an overage cap at 120% of commit? This would help us manage budget predictability."
-- "Would it be possible to adjust payment terms to quarterly? This would improve our cash flow planning."
+LENGTH:
+- Keep it tight. 4-8 sentences for simple quotes, 7-12 for complex ones.
+- If you can say it in fewer sentences, do.
 
-==================================================
-EMAIL GENERATION RULES
-==================================================
-
-Generate 3 email variations (neutral, firm, final_push) that follow from the analysis.
-
-CORE RULE: Write only emails that match the analysis.
-- Do NOT invent extra asks
-- Do NOT add issues not in the analysis
-- Include ONLY the real priority points
-- If 0 real asks -> write light confirmation/clarification email
-- If 1 real ask -> focus email on that single point
-- If 2-3 real asks -> keep selective and structured
-
-EMAIL PURPOSE (choose based on analysis):
-- clarification_request (vague scope)
-- negotiation_request (pricing/structure issues)
-- confirmation_with_minor_changes (mostly acceptable)
-- pushback_on_price (clear overpay signals)
-- request_for_breakdown (bundled/unclear pricing)
-- acceptance_with_small_point (nearly perfect quote)
-
-TONE GUIDANCE:
-- neutral: warm, collaborative, good starting point (5-9 sentences)
-- firm: direct but respectful follow-up if they dodge (6-10 sentences)
-- final_push: urgent but professional deadline-driven close (5-8 sentences)
-
-ADAPT TO AUDIENCE:
-- Business -> commercially literate, professional but natural, structured
-- Personal/Household -> simpler language, practical, avoid procurement jargon, sound like smart buyer
-
-ADAPT TO QUOTE TYPE:
-- SaaS/Software -> seats, term, modules, billing, renewal
-- Consulting -> scope, deliverables, assumptions, milestones, rates
-- Agency/Marketing -> deliverables, reporting, ownership, pricing model
-- Hardware -> units, delivery, installation, warranty, lead times
-- Household -> labor/materials, timeline, extras, warranty, deposit, clarity
-
-STRUCTURE (natural, not rigid):
-1. Brief opening (grounded, not generic)
-2. Short reference to quote/proposal
-3. Main point or framing
-4. The specific ask(s) - max 4 bullets
-5. Request for updated quote in writing
-6. Deadline placeholder [DATE]
-7. Optional: "If easier, happy to do 15 min call — otherwise please send revised quote."
-8. Professional close
-
-AVOID:
-- "Thanks for sharing the quote" (generic)
-- "We reviewed the proposal and would like to discuss pricing and flexibility" (robotic)
-- Listing every possible concern
-- Apologizing for negotiating
-- Sounding hostile or aggressive
-
-PREFER:
-- "We reviewed the 12-month proposal and would like to revisit a couple of points."
-- "The quote looks broadly in line, but there's one area we'd want to tighten."
-- "The main point for us is [specific issue]."
-- "Before we move ahead, could we revisit [specific detail]?"
-- "What would help on our side is [concrete ask]."
-
-GROUND IN SPECIFICS:
-Mention 1-3 real quote details:
-- term length, annual billing, onboarding fee, minimum commitment
-- vague scope, bundled items, payment schedule
-- lack of breakdown, missing warranty, milestone structure
-
-LENGTH GUIDANCE:
-- Simple personal quote: 4-8 sentences
-- Simple business quote: 5-9 sentences
-- Complex business quote: 7-12 sentences
-
-Do not write long emails unless complexity requires it.
-
-QUALITY CHECK:
-- Does email follow the analysis (not redo it)?
-- Includes only real asks from analysis?
-- Sounds adapted to quote type and audience?
-- More specific than generic template?
-- Concise and natural?
+QUALITY SELF-CHECK:
+- Does it sound like a human wrote it in 3 minutes, not a bot in 3 seconds?
+- Would you actually send this email? Or would you rewrite it first?
+- Is every sentence earning its place?
 `
 
 // ---------------------------------------------------------------------------
