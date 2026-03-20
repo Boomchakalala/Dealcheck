@@ -118,25 +118,68 @@ SAVINGS CALCULATION — STRICT RULES:
   * Payment term improvements (NET 30 → NET 60 is cash flow, not savings — put these in cash_flow_improvements)
   * Non-financial term improvements (SLAs, warranties, support levels)
   * Worst-case scenario avoidance (these go in risk_improvements)
-- Be ASSERTIVE on pricing — always push for a discount. Even fair quotes have room. A 5-10% discount ask is standard and expected in any negotiation.
-- Identify specific line items where pricing can be challenged: volume discounts, competitive alternatives, bundled vs. unbundled pricing, list-to-sale price gaps.
 - Show specific dollar/euro amounts for each savings item — not vague ranges.
 - Never inflate with risk protection or hypothetical worst-case values
 
+SAVINGS POTENTIAL — BE COMMERCIALLY REALISTIC:
+Use your judgment based on the SPECIFIC context of this deal. Consider these factors:
+
+WHAT DRIVES SAVINGS POTENTIAL UP:
+- Custom/negotiated quote with visible line items (each line can be challenged)
+- Reseller or middleman with markup (margin is negotiable)
+- Large deal size (€20K+) — volume discounts and package deals become realistic
+- Renewal deal — you have leverage (switching costs go both ways)
+- Multiple alternatives exist in the market
+- Itemized quote where individual costs can be compared
+
+WHAT DRIVES SAVINGS POTENTIAL DOWN:
+- Published/fixed pricing (self-serve SaaS, catalog products, published rates)
+- Direct from manufacturer with standard pricing
+- Sole provider or proprietary technology (no competitive pressure)
+- Micro/small deals (under €5K) — no negotiation room at €500/yr
+- Freelancer or solo provider (margins are already thin)
+- Commodity pricing where the market sets the rate
+
+RULES:
+- If savings are realistic in this context → push for them with specific amounts
+- If pricing is fixed or non-negotiable (self-serve SaaS, published rates) → do NOT fabricate savings asks. Focus on terms instead.
+- If the deal is genuinely fair and there's nothing meaningful to push on → return an EMPTY potential_savings array. Do NOT invent fake savings.
+- If there's room to push but it's modest → be honest about the confidence level
+- NEVER suggest "go direct to [manufacturer]" unless you are CERTAIN they sell direct. Most enterprise software (Adobe, Microsoft, SAP, Oracle) is sold through channels.
+
+SAVINGS CONFIDENCE & RATIONALE — REQUIRED FOR EVERY ITEM:
+Each savings item MUST include:
+- "confidence": "high", "medium", or "low"
+- "rationale": One short sentence explaining WHY this saving is achievable (or uncertain)
+
+HIGH confidence — you would bet on this working:
+- Removing unused/excess seats or licenses the user clearly doesn't need
+- Volume discounts that are standard at this scale
+- Concrete line items that are visibly overpriced vs the rest of the quote
+- Renegotiating fees that are explicitly optional or waivable
+- Savings based on FACTS in the quote (e.g., "20 seats but only 12 employees mentioned")
+- Reseller markup that can be challenged with direct pricing
+
+MEDIUM confidence — reasonable ask, outcome depends on vendor flexibility:
+- Requesting a 5-10% package discount on a negotiated (not published) price
+- Multi-year commitment discount when the user hasn't confirmed they'd commit
+- Bundling/unbundling to optimize pricing
+- Asking vendor to match a known market rate
+
+LOW confidence — speculative, depends on factors outside the quote:
+- Switching to a competitor product
+- Leveraging competing quotes the user may not have
+- Assumptions about the user's flexibility or willingness to change scope
+- Generic "ask for X% off" on published/fixed pricing
+
+Only HIGH confidence savings count toward the headline savings number. MEDIUM and LOW are shown as bonus opportunities.
+
 SAVINGS SANITY CHECK — VERIFY BEFORE RETURNING:
-- potential_savings should include realistic but assertive savings based on the quote.
-- ALWAYS include at least one direct price reduction ask with a specific amount.
-- If the quote looks fair, push for 5-10% off — this is normal and expected. No vendor prices at their floor.
-- Total savings MUST be less than 30% of total_commitment. If you exceed this, you are inflating — cut back.
+- Total savings MUST be less than 30% of total_commitment. If over 30%, you are inflating — cut back.
 - Every savings amount must be in the SAME CURRENCY as the deal.
 - Format amounts consistently: "€4,000 saved" or "$2,500-$3,500 saved".
 - Savings should be ANNUAL figures, not multi-year totals.
-- At least ONE must_have ask should be a price-related request with a specific € or $ target.
-
-PERCENTAGE DISCOUNT:
-- If no clear line-item overpricing exists, consider suggesting a 5-10% package discount.
-- Frame as: "Request X% overall discount in exchange for [fast signing / commitment / referral]"
-- Calculate the actual amount: "10% on €40K = €4,000/year saved"
+- If the deal is genuinely clean and fair → potential_savings CAN be empty. That's fine.
 
 IF INFO IS MISSING: Frame as "This vagueness will cost you X%" NOT "please provide contact info"
 
@@ -375,12 +418,16 @@ Return valid JSON only. Match this structure exactly:
   },
   "potential_savings": [
     {
-      "ask": "10% volume discount (200+ users)",
-      "annual_impact": "$3,000 saved"
+      "ask": "Remove 20 unused seats",
+      "annual_impact": "$2,400 saved",
+      "confidence": "high",
+      "rationale": "Quote shows 200 seats but user context mentions 180 active users"
     },
     {
-      "ask": "Remove 20 unused seats",
-      "annual_impact": "$2,400 saved"
+      "ask": "10% volume discount (200+ users)",
+      "annual_impact": "$3,000 saved",
+      "confidence": "medium",
+      "rationale": "Standard volume tier at this seat count — depends on vendor flexibility"
     }
   ],
   "cash_flow_improvements": [
@@ -401,9 +448,9 @@ CRITICAL REMINDERS:
 - Adapt to business vs personal context
 - Only include price_insight if quote contains pricing signals
 - red_flags: flag ALL significant issues — no arbitrary cap
-- must_have asks: 1-3 items, FIRST ONE MUST be a price reduction with specific € or $ amount
-- potential_savings: MUST NOT be empty — always include at least one concrete savings item
-- If quote is mostly acceptable, say so clearly — but still push for a modest discount
+- must_have asks: 1-3 items. Include a price reduction ask ONLY if savings are realistically achievable in this context.
+- potential_savings: can be empty if the deal is genuinely fair. Every item must have "confidence" and "rationale" fields.
+- If the quote is clean — fair pricing, standard terms, no red flags — say so clearly. Do NOT invent problems.
 - Never pad output just to fill the template
 - Savings MUST be less than 30% of total_commitment
 - Format savings: "$X saved" in the deal's currency
@@ -416,8 +463,10 @@ Before returning your JSON response, verify ALL of these:
 1. Did you use the PROVIDED total_commitment from the verified facts? You must NOT recalculate it.
 2. Did you INVENT any numbers? Every amount in your output must trace back to a specific number in the quote. If you cannot, remove it.
 3. Are potential_savings amounts realistic? Are they properly formatted (€4,000 not €4, €2,500 not €2)?
-4. Is the first must_have ask a direct price reduction with a specific € or $ amount?
+4. Does every savings item have a "confidence" AND "rationale" field?
 5. Are savings proportional to the deal? (under 30% of total — if over 30% you are inflating, cut back)
+6. Is the savings confidence honest? If pricing is published/fixed, savings should NOT be "high" confidence.
+7. If you found 0 real issues — is potential_savings empty or very modest? A clean deal should not have aggressive savings targets.
 6. Is the currency consistent throughout? (all USD or all EUR, never mixed)
 
 Return ONLY valid JSON.`
@@ -450,7 +499,7 @@ export interface AnalysisOutput {
     must_have: string[]
     nice_to_have: string[]
   }
-  potential_savings?: Array<{ ask: string; annual_impact: string }>
+  potential_savings?: Array<{ ask: string; annual_impact: string; confidence: 'high' | 'medium' | 'low'; rationale?: string }>
   cash_flow_improvements?: Array<{ type: string; recommendation: string; category: string }>
   assumptions: string[]
   disclaimer: string
@@ -469,12 +518,14 @@ export async function analyzeDealFacts(
     imageData?: { base64: string; mimeType: string }
     allPages?: Array<{ base64: string; mimeType: string }>
     pdfData?: { base64: string; mimeType: string }
+    userPreferences?: { payment_terms?: string; top_priority?: string; auto_renewal?: string }
   }
 ): Promise<AnalysisOutput> {
   // Build the enhanced prompt with overlays
   const overlay = QUOTE_TYPE_OVERLAYS[classification.quote_type] || ''
   const savingsDirective = buildSavingsDirective(classification)
-  const enhancedPrompt = ANALYSIS_PROMPT + '\n\n' + overlay + '\n\n' + savingsDirective
+  const preferencesDirective = buildPreferencesDirective(options.userPreferences)
+  const enhancedPrompt = ANALYSIS_PROMPT + '\n\n' + overlay + '\n\n' + savingsDirective + '\n\n' + preferencesDirective
 
   // Build context parts
   const contextParts = [
@@ -529,4 +580,42 @@ export async function analyzeDealFacts(
   }
 
   return parsed
+}
+
+function buildPreferencesDirective(prefs?: { payment_terms?: string; top_priority?: string; auto_renewal?: string }): string {
+  if (!prefs) return ''
+
+  const parts: string[] = []
+
+  if (prefs.payment_terms && prefs.payment_terms !== 'no_preference') {
+    const label = prefs.payment_terms === 'net_30' ? 'Net 30' : prefs.payment_terms === 'net_60' ? 'Net 60' : 'Net 90'
+    parts.push(`- PAYMENT TERMS: User prefers ${label}. If the quote offers worse terms (e.g., upfront or shorter net), flag it and recommend negotiating to ${label}. If the quote already matches or exceeds this preference, do NOT flag payment terms as an issue.`)
+  }
+
+  if (prefs.top_priority) {
+    if (prefs.top_priority === 'lowest_price') {
+      parts.push(`- TOP PRIORITY: LOWEST PRICE. Weight your analysis toward pricing issues. Push harder on discounts, volume pricing, and line-item reductions. Pricing red flags should be given higher severity.`)
+    } else if (prefs.top_priority === 'best_terms') {
+      parts.push(`- TOP PRIORITY: BEST CONTRACT TERMS. Weight your analysis toward contract protections — SLAs, liability caps, termination clauses, scope clarity. Flag unfavorable terms more aggressively than pricing issues.`)
+    } else if (prefs.top_priority === 'max_flexibility') {
+      parts.push(`- TOP PRIORITY: MAXIMUM FLEXIBILITY. Weight your analysis toward lock-in risks — long commitments, auto-renewal, switching costs, exit clauses. Flag anything that reduces the user's ability to change course.`)
+    }
+  }
+
+  if (prefs.auto_renewal === 'fine') {
+    parts.push(`- AUTO-RENEWAL: User is fine with auto-renewal clauses. Do NOT flag auto-renewal as a red flag unless the notice period is unreasonably short (<30 days) or there's a price escalation tied to it.`)
+  } else if (prefs.auto_renewal === 'prefer_opt_in') {
+    parts.push(`- AUTO-RENEWAL: User prefers opt-in renewal. If the quote has auto-renewal, flag it as a red flag and recommend switching to opt-in renewal or adding a reasonable notice period.`)
+  }
+
+  if (parts.length === 0) return ''
+
+  return `
+==================================================
+USER PREFERENCES (tailor your analysis to these)
+==================================================
+
+${parts.join('\n\n')}
+
+These preferences reflect the user's standing priorities. Apply them to every analysis — they override default assumptions.`
 }

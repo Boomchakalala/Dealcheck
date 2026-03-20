@@ -8,6 +8,12 @@ import { Loader2, AlertTriangle, Check } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import { ManageSubscriptionButton } from '@/components/UpgradeButton'
 
+interface NegotiationPrefs {
+  payment_terms: 'net_30' | 'net_60' | 'net_90' | 'no_preference'
+  top_priority: 'lowest_price' | 'best_terms' | 'max_flexibility'
+  auto_renewal: 'fine' | 'prefer_opt_in'
+}
+
 interface SettingsClientProps {
   email: string
   firstName: string
@@ -25,12 +31,14 @@ interface SettingsClientProps {
   memberSince: string
   joinedAgo: string
   locale: string
+  negotiationPreferences?: NegotiationPrefs | null
 }
 
 export function SettingsClient({
   email, firstName: initFirst, lastName: initLast, plan, planLabel,
   usageCount, dealCount, activeDeals, closedDeals, roundCount,
   isAdmin, baseCurrency: initCurrency, totalSavings, memberSince, joinedAgo, locale: initLocale,
+  negotiationPreferences: initPrefs,
 }: SettingsClientProps) {
   const router = useRouter()
   const supabase = createClient()
@@ -49,6 +57,28 @@ export function SettingsClient({
   const [currencySaving, setCurrencySaving] = useState(false)
   const [saveExtractedText, setSaveExtractedText] = useState(false)
   const [productEmails, setProductEmails] = useState(true)
+
+  // Negotiation preferences
+  const defaultPrefs: NegotiationPrefs = { payment_terms: 'no_preference', top_priority: 'lowest_price', auto_renewal: 'prefer_opt_in' }
+  const [negPrefs, setNegPrefs] = useState<NegotiationPrefs>(initPrefs || defaultPrefs)
+  const [prefsSaving, setPrefsSaving] = useState(false)
+  const [prefsSaved, setPrefsSaved] = useState(false)
+
+  const handleSavePrefs = async () => {
+    setPrefsSaving(true)
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(negPrefs),
+      })
+      if (res.ok) {
+        setPrefsSaved(true)
+        setTimeout(() => setPrefsSaved(false), 2000)
+      }
+    } catch {}
+    setPrefsSaving(false)
+  }
 
   // Delete
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -295,6 +325,57 @@ export function SettingsClient({
             </select>
           </div>
         </div>
+      </div>
+
+      {/* Negotiation Preferences */}
+      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">{t('settingsClient.negotiationPreferences')}</h2>
+        <p className="text-xs text-slate-400 mb-4">{t('settingsClient.negotiationPreferencesDesc')}</p>
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium text-slate-700 mb-1.5 block">{t('settingsClient.paymentTerms')}</label>
+            <select
+              value={negPrefs.payment_terms}
+              onChange={(e) => setNegPrefs({ ...negPrefs, payment_terms: e.target.value as NegotiationPrefs['payment_terms'] })}
+              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <option value="no_preference">{t('settingsClient.noPreference')}</option>
+              <option value="net_30">Net 30</option>
+              <option value="net_60">Net 60</option>
+              <option value="net_90">Net 90</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-slate-700 mb-1.5 block">{t('settingsClient.topPriority')}</label>
+            <select
+              value={negPrefs.top_priority}
+              onChange={(e) => setNegPrefs({ ...negPrefs, top_priority: e.target.value as NegotiationPrefs['top_priority'] })}
+              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <option value="lowest_price">{t('settingsClient.lowestPrice')}</option>
+              <option value="best_terms">{t('settingsClient.bestTerms')}</option>
+              <option value="max_flexibility">{t('settingsClient.maxFlexibility')}</option>
+            </select>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-slate-700 mb-1.5 block">{t('settingsClient.autoRenewal')}</label>
+            <select
+              value={negPrefs.auto_renewal}
+              onChange={(e) => setNegPrefs({ ...negPrefs, auto_renewal: e.target.value as NegotiationPrefs['auto_renewal'] })}
+              className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <option value="fine">{t('settingsClient.autoRenewalFine')}</option>
+              <option value="prefer_opt_in">{t('settingsClient.autoRenewalOptIn')}</option>
+            </select>
+          </div>
+        </div>
+        <button
+          onClick={handleSavePrefs}
+          disabled={prefsSaving}
+          className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all disabled:opacity-50"
+        >
+          {prefsSaved ? <><Check className="w-3 h-3" /> {t('settingsClient.saved')}</> : prefsSaving ? t('settingsClient.saving') : t('settingsClient.savePreferences')}
+        </button>
       </div>
 
       {/* Privacy Preferences */}

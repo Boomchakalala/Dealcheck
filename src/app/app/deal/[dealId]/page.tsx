@@ -80,9 +80,9 @@ export default async function DealPage({
     ? (latestOutput as DealOutputV2)?.priority_points?.length || 0
     : (latestOutput as DealOutput)?.red_flags?.length || 0
 
-  const potentialSavings = (latestOutput as DealOutput)?.potential_savings?.reduce((sum, saving) => {
-    return sum + parseMoneyLib(saving.annual_impact || '').amount
-  }, 0) || 0
+  const potentialSavings = (latestOutput as DealOutput)?.potential_savings
+    ?.filter(s => (s as any).confidence === 'high')
+    ?.reduce((sum, saving) => sum + parseMoneyLib(saving.annual_impact || '').amount, 0) || 0
 
   const dealCurrency = detectCurrency(totalCommitment || '')
   const formatSavings = (amount: number) => formatCurrency(amount, dealCurrency)

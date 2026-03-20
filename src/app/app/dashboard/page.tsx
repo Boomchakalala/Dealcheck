@@ -103,8 +103,11 @@ export default async function DashboardPage() {
           : await convertCurrency(deal.savings_amount, fromCurrency, baseCurrency)
       }
 
-      // Parse potential savings from AI output
-      const potentialSavings = (output?.potential_savings || []).reduce((s: number, item: any) => {
+      // Parse potential savings from AI output — only high-confidence
+      const allSavings = output?.potential_savings || []
+      const hasConfidence = allSavings.some((item: any) => item.confidence)
+      const savingsToCount = hasConfidence ? allSavings.filter((item: any) => item.confidence === 'high') : allSavings
+      const potentialSavings = savingsToCount.reduce((s: number, item: any) => {
         return s + parseSavingsAmount(item.annual_impact)
       }, 0)
 

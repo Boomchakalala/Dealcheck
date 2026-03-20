@@ -75,10 +75,14 @@ export const marketingAgencyExampleFr: DealOutput = {
     {
       ask: "Réduire les frais publicitaires de 20 % à 10 %",
       annual_impact: "10 800 € économisés",
+      confidence: "high",
+      rationale: "Le standard du marché est 10–15 % de frais de gestion",
     },
     {
       ask: "Réduire le mandat de 7 500 € à 7 000 €/mois",
       annual_impact: "6 000 € économisés",
+      confidence: "medium",
+      rationale: "Agences comparables facturent 6 000–6 500 € pour ce périmètre",
     },
   ],
   email_drafts: {
@@ -248,10 +252,14 @@ export const saasEmailExampleFr: DealOutput = {
     {
       ask: "Redimensionner de 40 à 32 licences",
       annual_impact: "7 200 € économisés",
+      confidence: "high",
+      rationale: "12 licences inutilisées — suppression du gaspillage pur",
     },
     {
       ask: "Remise engagement 2 ans (8 %)",
       annual_impact: "2 304 € économisés",
+      confidence: "medium",
+      rationale: "Remise standard multi-année — dépend de l'engagement",
     },
   ],
   email_drafts: {
@@ -419,10 +427,14 @@ export const officeSuppliesExampleFr: DealOutput = {
     {
       ask: "Augmenter la remise de 5 % à 15 %",
       annual_impact: "4 500 € économisés",
+      confidence: "medium",
+      rationale: "15–20 % est la norme pour 45 000 €/an de volume",
     },
     {
       ask: "Supprimer les frais de livraison",
       annual_impact: "1 020 € économisés",
+      confidence: "high",
+      rationale: "Livraison gratuite est standard sur les contrats pro",
     },
   ],
   email_drafts: {

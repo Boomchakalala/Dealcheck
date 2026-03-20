@@ -82,6 +82,7 @@ export default async function SettingsPage() {
         memberSince={createdAt.toLocaleDateString(locale, { month: 'long', year: 'numeric' })}
         joinedAgo={joinedAgo}
         locale={profile?.locale || 'en'}
+        negotiationPreferences={(profile as any)?.negotiation_preferences || null}
       />
     </div>
   )

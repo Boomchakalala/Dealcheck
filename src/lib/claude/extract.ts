@@ -13,6 +13,7 @@ EXTRACT THESE FIELDS:
 4. description: One sentence describing what this vendor does
 5. term: Contract duration (e.g., "12 months", "6 months", "one-time")
 6. total_commitment: The TOTAL contract value
+7. contact_name: The name of the sales rep, account manager, or person who sent/signed the quote. Look for: signatures, "Prepared by", "Your contact", "Account Manager", "Sales Rep", email sign-offs, or any person's name associated with the vendor. Extract FIRST NAME ONLY (e.g., "Sarah" not "Sarah Johnson"). If no person name found, omit this field.
 
    CRITICAL RULES FOR total_commitment:
    - SEARCH for a stated total FIRST: "Net Amount Due", "Total", "Grand Total", "Total Contract Value", "Annual Total"
@@ -40,6 +41,7 @@ Return ONLY valid JSON:
   "pricing_model": "Per-seat, billed annually",
   "currency": "USD",
   "deal_type": "Renewal",
+  "contact_name": "Sarah",
   "renewal_date": "March 15, 2026",
   "signing_deadline": "February 28, 2026"
 }
@@ -62,6 +64,7 @@ export interface ExtractedFacts {
   pricing_model: string
   currency: string
   deal_type: string
+  contact_name?: string
   renewal_date?: string
   signing_deadline?: string
 }

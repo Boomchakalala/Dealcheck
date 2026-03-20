@@ -190,6 +190,8 @@ export type DealOutput = {
   potential_savings?: Array<{
     ask: string
     annual_impact: string
+    confidence: 'high' | 'medium' | 'low'
+    rationale?: string
   }>
   cash_flow_improvements?: Array<{
     type: string
@@ -296,6 +298,13 @@ export type DealOutputV2 = {
     success_looks_like: string
   }
   email_controls: EmailControls
+}
+
+// Negotiation preferences (stored in profiles.negotiation_preferences JSONB)
+export type NegotiationPreferences = {
+  payment_terms: 'net_30' | 'net_60' | 'net_90' | 'no_preference'
+  top_priority: 'lowest_price' | 'best_terms' | 'max_flexibility'
+  auto_renewal: 'fine' | 'prefer_opt_in'
 }
 
 // UI types

@@ -52,6 +52,8 @@ export const DealOutputSchema = z.object({
   potential_savings: z.array(z.object({
     ask: z.string(),
     annual_impact: z.string(),
+    confidence: z.enum(['high', 'medium', 'low']).default('medium'),
+    rationale: z.string().optional().default(''),
   })).optional().default([]),
   cash_flow_improvements: z.array(z.object({
     type: z.string(),

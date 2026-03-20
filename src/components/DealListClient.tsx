@@ -103,7 +103,11 @@ function parseSavingsNumber(str: string): number {
 function getPotentialSavings(deal: any): number {
   const latestRound = getLatestRound(deal)
   const savings = latestRound?.output_json?.potential_savings || []
-  return savings.reduce((sum: number, item: any) => {
+  // Only count high-confidence savings for the headline number
+  const highConf = savings.filter((item: any) => item.confidence === 'high')
+  // Fallback: if no items have confidence (old data), count all
+  const items = highConf.length > 0 ? highConf : savings
+  return items.reduce((sum: number, item: any) => {
     return sum + parseMoney(item.annual_impact || '').amount
   }, 0)
 }

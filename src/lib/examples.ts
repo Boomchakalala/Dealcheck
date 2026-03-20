@@ -84,10 +84,14 @@ export const marketingAgencyExample: DealOutput = {
     {
       ask: "Reduce ad fee from 20% to 10%",
       annual_impact: "€10,800 saved",
+      confidence: 'high',
+      rationale: "Industry standard is 10-15% — 20% is double the norm",
     },
     {
       ask: "Reduce retainer from €7,500 to €7,000/month",
       annual_impact: "€6,000 saved",
+      confidence: 'medium',
+      rationale: "Comparable agencies quote €6,000-6,500 for this scope",
     },
   ],
   email_drafts: {
@@ -259,10 +263,14 @@ export const saasEmailExample: DealOutput = {
     {
       ask: "Right-size from 40 to 32 seats",
       annual_impact: "€7,200 saved",
+      confidence: 'high',
+      rationale: "12 seats are unused — cutting waste requires no concession",
     },
     {
       ask: "2-year commitment discount (8%)",
       annual_impact: "€2,304 saved",
+      confidence: 'medium',
+      rationale: "Standard multi-year discount — depends on willingness to commit",
     },
   ],
   email_drafts: {
@@ -433,10 +441,14 @@ export const officeSuppliesExample: DealOutput = {
     {
       ask: "Increase discount from 5% to 15%",
       annual_impact: "€4,500 saved",
+      confidence: 'medium',
+      rationale: "15-20% is standard at €45K spend — 5% is well below market",
     },
     {
       ask: "Waive delivery fees",
       annual_impact: "€1,080 saved",
+      confidence: 'high',
+      rationale: "Free delivery is table stakes for business accounts at this volume",
     },
   ],
   email_drafts: {

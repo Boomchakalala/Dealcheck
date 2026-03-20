@@ -63,11 +63,18 @@ CORE RULES:
 - Reference REAL details from the quote (amounts, terms, dates)
 - Every email must end with a clear next step
 
-Subject lines:
-- Professional and specific, not vague clickbait
-- Good: "Re: Datadog Renewal — a couple of points before we sign"
-- Good: "Brightwave proposal — quick follow-up"
-- Bad: "Quick question" / "Following up" / "Checking in"
+Subject lines — KEEP THEM SIMPLE AND GENERIC:
+- Use the vendor name + a plain reference. That's it.
+- Good: "Re: Datadog proposal"
+- Good: "Brightwave — follow-up"
+- Good: "Re: Adobe quote"
+- Good: "[Vendor] contract — quick follow-up"
+- Bad: "Re: Datadog Renewal — a couple of points before we sign" (too long, too specific)
+- Bad: "Points to discuss on your proposal" (screams AI)
+- Bad: "Following up on your quote — key considerations" (AI garbage)
+- Bad: "Quick question about your proposal" (vague clickbait)
+- Bad: Anything with "key considerations", "points to discuss", "a few thoughts", "important items"
+- The subject line should look like what a busy person would type in 2 seconds
 
 ADAPT TO CONTEXT:
 - Business: commercially literate, structured, confident
@@ -115,6 +122,7 @@ export async function generateEmailDrafts(
     vendor: string
     total_commitment: string
     term: string
+    contact_name?: string
     verdict: string
     red_flags: Array<{ issue: string; what_to_ask_for: string }>
     what_to_ask_for: { must_have: string[]; nice_to_have: string[] }
@@ -133,9 +141,12 @@ ${EMAIL_PROMPT}
 
 ANALYSIS CONTEXT:
 Vendor: ${analysisOutput.vendor}
+Contact Name: ${analysisOutput.contact_name || 'NOT AVAILABLE — use "Hi," or "Hi there," as greeting'}
 Total Commitment: ${analysisOutput.total_commitment}
 Term: ${analysisOutput.term}
 Verdict: ${analysisOutput.verdict}
+
+${analysisOutput.contact_name ? `IMPORTANT: The sales contact's first name is "${analysisOutput.contact_name}". You MUST use "Hi ${analysisOutput.contact_name}," or "Hey ${analysisOutput.contact_name}," as the greeting in EVERY email. Do NOT use generic greetings like "Hi," or "Hi there," when you have the name.` : ''}
 
 Must-Have Asks:
 ${analysisOutput.what_to_ask_for?.must_have?.join('\n') || 'None'}

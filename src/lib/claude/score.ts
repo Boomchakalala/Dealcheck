@@ -100,8 +100,6 @@ export function calculateQuoteScore(output: DealOutputType): {
   const termsItems: DeductionItem[] = []
   const leverageItems: DeductionItem[] = []
 
-  const allText = JSON.stringify(output).toLowerCase()
-
   // --- STEP 1: Score EVERY red flag by severity and classify into category ---
   for (const flag of output.red_flags || []) {
     if (flag.type?.toLowerCase() === 'source insight') continue
@@ -117,24 +115,20 @@ export function calculateQuoteScore(output: DealOutputType): {
     }
   }
 
-  // --- STEP 2: Additional pricing signals from savings % ---
-  // Only penalize if savings are very high (>25%), indicating genuinely overpriced.
-  // Moderate savings (5-15%) are normal negotiation room, not a sign of a bad deal.
+  // --- STEP 2: Additional pricing signals from HIGH-CONFIDENCE savings only ---
   const totalCommitment = output.snapshot?.total_commitment || ''
   const commitNum = parseMoneyAmount(totalCommitment)
-  const totalSavings = (output.potential_savings || []).reduce((sum, s) => {
-    return sum + parseMoneyAmount(s.annual_impact || '')
-  }, 0)
+  const highConfidenceSavings = (output.potential_savings || [])
+    .filter(s => (s as any).confidence === 'high')
+    .reduce((sum, s) => sum + parseMoneyAmount(s.annual_impact || ''), 0)
 
-  if (commitNum > 0 && totalSavings > 0) {
-    const savingsPct = (totalSavings / commitNum) * 100
-    if (savingsPct > 30) pricingItems.push({ points: 8, reason: `Savings exceed 30% of contract value (${Math.round(savingsPct)}%)` })
-    else if (savingsPct > 25) pricingItems.push({ points: 4, reason: `Savings exceed 25% of contract value (${Math.round(savingsPct)}%)` })
-    // Under 25% savings = normal negotiation room, no penalty
+  if (commitNum > 0 && highConfidenceSavings > 0) {
+    const savingsPct = (highConfidenceSavings / commitNum) * 100
+    if (savingsPct > 30) pricingItems.push({ points: 8, reason: `High-confidence savings exceed 30% of contract value (${Math.round(savingsPct)}%)` })
+    else if (savingsPct > 25) pricingItems.push({ points: 4, reason: `High-confidence savings exceed 25% of contract value (${Math.round(savingsPct)}%)` })
   }
 
   // --- STEP 3: Terms signals from whats_concerning ---
-  // Penalize genuine contract risks surfaced in whats_concerning.
   for (const concern of output.quick_read?.whats_concerning || []) {
     const text = concern.toLowerCase()
     if (text.includes('escalat') || text.includes('augmentation') || text.includes('increase')) termsItems.push({ points: 4, reason: concern })
@@ -148,9 +142,14 @@ export function calculateQuoteScore(output: DealOutputType): {
   let termsDeduction = Math.min(termsItems.reduce((s, i) => s + i.points, 0), 30)
 
   // --- LEVERAGE POSITION (max deduction: 20) ---
-  if (allText.includes('lock-in') || allText.includes('locked in') || allText.includes('verrouillé'))
+  // Only scan red_flags and quick_read text, NOT the entire output JSON
+  const flagsText = (output.red_flags || []).map(f => `${f.issue} ${f.why_it_matters}`).join(' ').toLowerCase()
+  const concernsText = (output.quick_read?.whats_concerning || []).join(' ').toLowerCase()
+  const leverageScanText = `${flagsText} ${concernsText}`
+
+  if (leverageScanText.includes('lock-in') || leverageScanText.includes('locked in') || leverageScanText.includes('verrouillé'))
     leverageItems.push({ points: 7, reason: 'Lock-in clause limits flexibility' })
-  if (allText.includes('sole provider') || allText.includes('no alternative') || allText.includes('seul fournisseur'))
+  if (leverageScanText.includes('sole provider') || leverageScanText.includes('no alternative') || leverageScanText.includes('seul fournisseur'))
     leverageItems.push({ points: 8, reason: 'No competing alternatives mentioned' })
 
   const termText = (output.snapshot?.term || '').toLowerCase()
@@ -158,13 +157,47 @@ export function calculateQuoteScore(output: DealOutputType): {
     termText.includes('2 ans') || termText.includes('3 ans'))
     leverageItems.push({ points: 5, reason: 'Long commitment term (>12 months)' })
 
-  if (allText.includes('upfront') || allText.includes('annual in advance') || allText.includes('avance'))
+  if (leverageScanText.includes('upfront') || leverageScanText.includes('annual in advance') || leverageScanText.includes('avance'))
     leverageItems.push({ points: 3, reason: 'Upfront or advance payment required' })
 
   if (output.snapshot?.signing_deadline)
     leverageItems.push({ points: 2, reason: 'Signing deadline creates time pressure' })
 
   let leverageDeduction = Math.min(leverageItems.reduce((s, i) => s + i.points, 0), 20)
+
+  // --- SCORE-SAVINGS COHERENCE ---
+  // If we have many red flags or high savings, the score shouldn't be too high
+  const redFlagCount = (output.red_flags || []).filter(f => f.type?.toLowerCase() !== 'source insight').length
+  const totalDeduction = pricingDeduction + termsDeduction + leverageDeduction
+
+  // Red flag floor: each real red flag should push the score down meaningfully
+  // A deal with 3+ red flags should not score above 80
+  // A deal with 5+ red flags should not score above 65
+  const redFlagMinDeduction = redFlagCount >= 5 ? 35 : redFlagCount >= 3 ? 20 : redFlagCount >= 2 ? 12 : 0
+  if (totalDeduction < redFlagMinDeduction) {
+    // Distribute the gap into pricing (most impactful category)
+    const gap = redFlagMinDeduction - totalDeduction
+    pricingDeduction = Math.min(50, pricingDeduction + gap)
+  }
+
+  // High-confidence savings coherence: if realistic savings are >15% of contract,
+  // the deal is not "ready to sign" — enforce minimum deduction
+  if (commitNum > 0 && highConfidenceSavings > 0) {
+    const hcPct = (highConfidenceSavings / commitNum) * 100
+    if (hcPct > 15) {
+      const savingsMinDeduction = 25
+      const currentTotal = pricingDeduction + termsDeduction + leverageDeduction
+      if (currentTotal < savingsMinDeduction) {
+        pricingDeduction = Math.min(50, pricingDeduction + (savingsMinDeduction - currentTotal))
+      }
+    } else if (hcPct > 10) {
+      const savingsMinDeduction = 15
+      const currentTotal = pricingDeduction + termsDeduction + leverageDeduction
+      if (currentTotal < savingsMinDeduction) {
+        pricingDeduction = Math.min(50, pricingDeduction + (savingsMinDeduction - currentTotal))
+      }
+    }
+  }
 
   // --- CALCULATE FINAL SCORE (floor 5, cap 98) ---
   const pricingScore = Math.max(0, 50 - pricingDeduction)

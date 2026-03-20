@@ -39,7 +39,8 @@ export async function analyzeDeal(
   imageData?: { base64: string; mimeType: string },
   allPages?: Array<{ base64: string; mimeType: string }>,
   userLocale?: string,
-  pdfData?: { base64: string; mimeType: string }
+  pdfData?: { base64: string; mimeType: string },
+  userPreferences?: { payment_terms?: string; top_priority?: string; auto_renewal?: string }
 ): Promise<DealOutputType> {
   try {
     // ─── Step 0: Classify the quote (fast, uses Haiku) ───
@@ -70,6 +71,7 @@ export async function analyzeDeal(
       imageData,
       allPages,
       pdfData,
+      userPreferences,
     })
     console.log('[TermLift] Step 2 done:', analysis.verdict_type, analysis.red_flags?.length, 'flags')
 
@@ -81,6 +83,7 @@ export async function analyzeDeal(
         vendor: rawFacts.vendor,
         total_commitment: rawFacts.total_commitment,
         term: rawFacts.term,
+        contact_name: rawFacts.contact_name,
         verdict: analysis.verdict,
         red_flags: analysis.red_flags,
         what_to_ask_for: analysis.what_to_ask_for,

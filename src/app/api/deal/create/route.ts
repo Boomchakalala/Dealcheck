@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     // Get user profile and check usage limit
     const { data: profile } = await supabase
       .from('profiles')
-      .select('usage_count, plan, is_admin')
+      .select('usage_count, plan, is_admin, negotiation_preferences')
       .eq('id', user.id)
       .single()
 
@@ -105,7 +105,8 @@ export async function POST(request: Request) {
       validated.imageData,
       (body as any).allPages || undefined,
       locale,
-      validPdfData
+      validPdfData,
+      (profile as any)?.negotiation_preferences || undefined
     ))
 
     // Auto-detect vendor

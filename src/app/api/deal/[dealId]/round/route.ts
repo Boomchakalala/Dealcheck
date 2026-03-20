@@ -55,7 +55,7 @@ export async function POST(
     // Get user profile and check usage limit
     const { data: profile } = await supabase
       .from('profiles')
-      .select('usage_count, plan, is_admin')
+      .select('usage_count, plan, is_admin, negotiation_preferences')
       .eq('id', user.id)
       .single()
 
@@ -128,7 +128,9 @@ export async function POST(
       previousOutput,
       undefined,
       undefined,
-      locale
+      locale,
+      undefined,
+      (profile as any)?.negotiation_preferences || undefined
     ))
 
     // Create new round
