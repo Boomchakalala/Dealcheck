@@ -449,16 +449,21 @@ Shown separately, not in the headline.
 - Including extras in the deal price
 
 HEADLINE NUMBER = sum of all must-have savings items.
-This number must be at least 5% of total_commitment. This is a hard minimum.
-If your must-have total is under 5%, add a "5% overall discount citing budget constraints" item.
-The only exception is genuinely fixed published pricing (government rates, regulated tariffs).
 
-Each challengeable element in the quote MUST be a separate savings item. Do NOT merge them.
-Example for a car quote:
-- Must-have: 5% off vehicle price = 650
+IMPORTANT: Every analysis must include a must-have item for a 5% discount on the total price.
+This 5% discount is ALWAYS a separate line item. Other savings (pack reduction, fee removal, quantity correction) are ADDITIONAL items on top of the 5%.
+
+The 5% is the baseline ask. Other savings stack on top. The headline should usually be ABOVE 5%.
+
+Example for a car quote at 14000 EUR:
+- Must-have: 5% off total price = 700
 - Must-have: Reduce pack fees by 300 = 300
 - Nice-to-have: Include accessories in the deal = 200
-- Headline = 650 + 300 = 950
+- Headline = 700 + 300 = 1000 (about 7%)
+
+The only exception to the 5% baseline is genuinely fixed published pricing (government rates, regulated tariffs).
+
+Each challengeable element MUST be a separate savings item. Do NOT merge them.
 
 RED FLAG TO SAVINGS CONSISTENCY:
 Every commercial red flag with a dollar amount MUST appear as a must-have savings item.

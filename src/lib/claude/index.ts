@@ -75,36 +75,39 @@ export async function analyzeDeal(
     })
     console.log('[TermLift] Step 2 done:', analysis.verdict_type, analysis.red_flags?.length, 'flags')
 
-    // ─── Step 2b: Enforce 5% savings floor in code ───
+    // ─── Step 2b: Ensure 5% baseline discount exists as a must-have item ───
     if (analysis.potential_savings && rawFacts.total_commitment) {
       const ps = analysis.potential_savings as any
       const commitAmount = parseMoneyAmount(rawFacts.total_commitment)
-      const minTotal = Math.round(commitAmount * 0.05)
+      const fivePercent = Math.round(commitAmount * 0.05)
 
       if (commitAmount > 0 && ps.must_have !== undefined) {
-        const currentTotal = typeof ps.total === 'number' ? ps.total : 0
-        if (currentTotal < minTotal) {
-          const gap = minTotal - currentTotal
-          // Add a budget constraint item
-          if (!ps.must_have) ps.must_have = []
-          ps.must_have.push({
+        if (!ps.must_have) ps.must_have = []
+        // Check if the AI already included a 5% discount item
+        const has5pct = ps.must_have.some((item: any) =>
+          (item.amount >= fivePercent * 0.9) && (item.ask?.toLowerCase().includes('discount') || item.ask?.toLowerCase().includes('remise') || item.ask?.toLowerCase().includes('5%'))
+        )
+        if (!has5pct) {
+          // Add the 5% baseline as the first must-have item
+          ps.must_have.unshift({
             ask: 'Request 5% overall discount citing budget constraints',
-            amount: gap,
+            amount: fivePercent,
             rationale: 'Standard budget constraint ask. No vendor prices at their floor.',
           })
-          ps.total = minTotal
           // Also ensure the email asks mention it
           const currency = rawFacts.currency === 'EUR' ? '€' : rawFacts.currency === 'GBP' ? '£' : '$'
           const hasDiscountAsk = analysis.what_to_ask_for?.must_have?.some(
-            (ask: string) => ask.includes('5%') || ask.includes(`${minTotal}`)
+            (ask: string) => ask.includes('5%') || ask.includes(`${fivePercent}`)
           )
           if (!hasDiscountAsk && analysis.what_to_ask_for?.must_have) {
-            analysis.what_to_ask_for.must_have.push(
-              `Request 5% overall discount (${currency}${minTotal.toLocaleString()}) citing budget constraints`
+            analysis.what_to_ask_for.must_have.unshift(
+              `Request 5% overall discount (${currency}${fivePercent.toLocaleString()}) citing budget constraints`
             )
           }
-          console.log(`[TermLift] Savings floor enforced: total ${currentTotal} -> ${minTotal} (5% of ${commitAmount})`)
+          console.log(`[TermLift] Added 5% baseline discount: ${fivePercent} (5% of ${commitAmount})`)
         }
+        // Recalculate total from must_have items
+        ps.total = ps.must_have.reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : 0), 0)
       }
     }
 
