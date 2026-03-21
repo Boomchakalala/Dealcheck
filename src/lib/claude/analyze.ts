@@ -147,6 +147,19 @@ RULES:
 - If there's room to push but it's modest → be honest about the confidence level
 - NEVER suggest "go direct to [manufacturer]" unless you are CERTAIN they sell direct. Most enterprise software (Adobe, Microsoft, SAP, Oracle) is sold through channels.
 
+RED FLAG → SAVINGS BRIDGE (CRITICAL):
+If you identified a red flag with a SPECIFIC DOLLAR IMPACT, that same dollar amount MUST appear in potential_savings. Do NOT put dollar amounts in red flags but leave potential_savings empty — they must be consistent.
+
+How to bridge:
+- COMMERCIAL red flags with dollar amounts → ALWAYS create a matching potential_savings entry
+  Example: Red flag says "15 unused seats = €9,000/year wasted" → potential_savings must include "Right-size seats" with "€6,000 saved" (the realistic saving after buffer)
+- COMMERCIAL red flags about above-market pricing → create a savings entry with the realistic target
+  Example: Red flag says "€210/hour is above market (€130-160)" → savings: "Hourly rate €210 to €150" with the calculated amount
+- TERMS red flags (auto-renewal, exit clauses, liability) → do NOT create savings entries. These are protections, not cash reductions.
+- COMMERCIAL red flags WITHOUT specific dollar amounts → do NOT force a savings entry. Only create savings when you can calculate a real number.
+
+In short: potential_savings = the dollar side of your commercial red flags + any additional pricing opportunities. Terms-only flags stay out of savings.
+
 SAVINGS CONFIDENCE & RATIONALE — REQUIRED FOR EVERY ITEM:
 Each savings item MUST include:
 - "confidence": "high", "medium", or "low"
@@ -179,7 +192,8 @@ SAVINGS SANITY CHECK — VERIFY BEFORE RETURNING:
 - Every savings amount must be in the SAME CURRENCY as the deal.
 - Format amounts consistently: "€4,000 saved" or "$2,500-$3,500 saved".
 - Savings should be ANNUAL figures, not multi-year totals.
-- If the deal is genuinely clean and fair → potential_savings CAN be empty. That's fine.
+- If the deal is genuinely clean with NO commercial red flags → potential_savings CAN be empty.
+- If you have commercial red flags with dollar amounts but potential_savings is empty → YOU HAVE A BUG. Fix it. Every commercial red flag with a $ impact must have a matching savings entry.
 
 IF INFO IS MISSING: Frame as "This vagueness will cost you X%" NOT "please provide contact info"
 
@@ -467,7 +481,8 @@ Before returning your JSON response, verify ALL of these:
 5. Are savings proportional to the deal? (under 30% of total — if over 30% you are inflating, cut back)
 6. Is the savings confidence honest? If pricing is published/fixed, savings should NOT be "high" confidence.
 7. If you found 0 real issues — is potential_savings empty or very modest? A clean deal should not have aggressive savings targets.
-6. Is the currency consistent throughout? (all USD or all EUR, never mixed)
+8. RED FLAG → SAVINGS CONSISTENCY: Do you have commercial red flags with dollar amounts? If yes, potential_savings MUST NOT be empty — those dollar amounts must appear as savings entries. If potential_savings is empty but you have commercial red flags with $ impact, go back and add them.
+9. Is the currency consistent throughout? (all USD or all EUR, never mixed)
 
 Return ONLY valid JSON.`
 
