@@ -69,35 +69,39 @@ Type-specific red flags:
 - no performance structure where relevant`,
 
   product_hardware: `
-QUOTE TYPE: Product / Hardware / Physical Goods
+QUOTE TYPE: Product / Hardware / Physical Goods / Equipment
 
 Use these as internal heuristics only.
 Do not cite them as market facts unless the user provided benchmark data.
 
 Focus on:
-- unit pricing at quantity
-- shipping and handling
-- installation or setup fees
-- warranty and support upsells
-- delivery timing and penalties
-- maintenance contracts
-- restocking or cancellation fees
+- dealer or reseller margin (dealers typically carry 10-25% margin on equipment)
+- cash purchase discount (cash buyers should always push for 5-10% off)
+- shipping, delivery, and installation fees
+- warranty coverage versus extended warranty upsells
+- maintenance contracts and service packages
+- financing versus cash pricing differential
+- trade-in or volume opportunities
+- seasonal or end-of-quarter pressure
+- restocking or cancellation terms
 
 Typical savings tests:
-- quantity discount
-- shipping reduction
-- installation fee challenge
-- warranty inclusion
-- bundle restructuring
-- restocking fee reduction
+- 5-10% cash purchase discount (standard for equipment and vehicle dealers)
+- delivery or shipping fee reduction or removal
+- installation or setup fee challenge
+- warranty extension at no cost
+- include accessories, spare parts, or training in the deal
+- maintenance package inclusion or discount
+- challenge any "handling" or "preparation" fees
 
 Type-specific red flags:
-- no quantity break
-- inflated handling or shipping
-- expensive mandatory setup
-- weak warranty with upsell
-- missing delivery commitments
-- high restocking fee`,
+- no discount despite significant purchase value
+- dealer preparation or handling fees on top of list price
+- short quote validity limiting negotiation time
+- weak warranty relative to equipment value
+- mandatory financing when cash is available
+- delivery charges on large purchases (often negotiable to free)
+- missing service or maintenance terms`,
 
   household: `
 QUOTE TYPE: Household / Personal Services
