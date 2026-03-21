@@ -158,7 +158,7 @@ This quote expires in 14 days.`
         name: 'trial_completed',
         properties: {
           redFlags: data.output.red_flags?.length || 0,
-          potentialSavings: data.output.potential_savings?.length || 0,
+          potentialSavings: Array.isArray(data.output.potential_savings) ? data.output.potential_savings.length : (data.output.potential_savings?.items?.length || 0),
           hasCategory: !!data.output.snapshot?.category,
         }
       })

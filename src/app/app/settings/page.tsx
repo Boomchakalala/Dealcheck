@@ -40,15 +40,16 @@ export default async function SettingsPage() {
   const totalSavingsIdentified = allDeals.reduce((sum, d) => {
     const rounds = (d as any).rounds || []
     const latest = rounds.sort((a: any, b: any) => (b.round_number || 0) - (a.round_number || 0))[0]
-    const savings = latest?.output_json?.potential_savings || []
-    return sum + savings.reduce((s: number, item: any) => {
-      return s + parseMoney(item.annual_impact || '').amount
-    }, 0)
+    const ps = latest?.output_json?.potential_savings as any
+    if (!ps) return sum
+    if (ps.optimistic_ceiling !== undefined) return sum + (typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseMoney(String(ps.optimistic_ceiling || '0')).amount)
+    if (Array.isArray(ps)) return sum + ps.reduce((s: number, item: any) => s + parseMoney(item.annual_impact || '').amount, 0)
+    return sum
   }, 0)
 
   const baseCurrency = (profile?.base_currency || 'EUR') as Currency
   const plan = profile?.plan || 'free'
-  const planLabel = plan === 'pro' ? 'Pro' : plan === 'business' ? 'Business' : 'Starter'
+  const planLabel = plan === 'essentials' ? 'Essentials' : plan === 'pro' ? 'Pro' : plan === 'business' ? 'Business' : 'Starter'
 
   // Calculate "joined X months ago"
   const createdAt = new Date(user.created_at)

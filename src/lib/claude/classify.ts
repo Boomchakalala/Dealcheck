@@ -12,6 +12,15 @@ RULES:
   - "household" = Home services: gardening, plumbing, cleaning, painting, moving, pest control
   - "event_project" = One-time events: conferences, weddings, trade shows, campaigns, launches
   - "construction" = Building, renovation, remodeling, architecture, structural work
+  - "staffing" = Staffing, EOR, recruitment, placement, contractor management
+  - "travel" = Hotels, venues, travel packages, accommodation, event spaces
+  - "media" = Media buying, advertising, sponsorship, PR campaigns
+  - "usage_based_infra" = Telecom, cloud infrastructure, bandwidth, usage-based utilities
+  - "managed_services" = Managed IT, support contracts, outsourced operations
+  - "insurance" = Commercial insurance, coverage policies, broker quotes
+  - "logistics" = Shipping contracts, freight, courier agreements, delivery services
+  - "leasing" = Equipment leases, vehicle leases, office equipment finance
+  - "garage" = Car repair, vehicle service, MOT, mechanic quotes, body work
 
 - deal_size_bracket: MUST be one of the listed values — never "unclear". Estimate if unsure.
   - "micro" = under €1K / $1K
@@ -46,13 +55,21 @@ RULES:
   - event_project: 5-15% (margins vary, package discount)
   - construction + medium+: 10-20% (line item reduction, material alternatives)
   - construction + small: 5-10% (package discount)
+  - staffing: 5-15% (competitive leverage, volume commitment)
+  - travel: 5-15% (package discount, off-peak timing, group rates)
+  - media: 10-20% (volume discount, long-term commitment, bundling)
+  - usage_based_infra: 10-20% (volume discount, committed usage tiers)
+  - managed_services: 5-15% (scope optimization, multi-year commitment)
+  - insurance: 5-15% (competitive leverage, bundling policies, deductible adjustment)
+  - logistics: 5-15% (volume discount, long-term contract, route optimization)
+  - leasing: 5-10% (competitive leverage, residual value negotiation, term adjustment)
   - Higher leverage = push toward top of range
   - Renewal with incumbent = add 5% to range (they want to keep you)
   - Enterprise deal = push toward top of range (more room to negotiate)
 
 Return ONLY valid JSON matching this structure:
 {
-  "quote_type": "saas|professional_services|product_hardware|household|event_project|construction",
+  "quote_type": "saas|professional_services|product_hardware|household|event_project|construction|staffing|travel|media|usage_based_infra|managed_services|insurance|logistics|leasing",
   "deal_size_bracket": "micro|small|medium|large|enterprise",
   "recurring": true|false,
   "leverage_level": "high|medium|low|unclear",

@@ -10,6 +10,12 @@ export function getStripe() {
 }
 
 export const PLANS = {
+  essentials: {
+    priceId: process.env.STRIPE_ESSENTIALS_PRICE_ID || 'price_essentials_placeholder',
+    name: 'Essentials',
+    price: 15,
+    currency: 'EUR',
+  },
   pro: {
     priceId: 'price_1TAybBRu4wsBOkv2lUj88gTs',
     name: 'Pro',

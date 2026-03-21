@@ -3,15 +3,15 @@ import type { DealOutputType } from '../schemas'
 import type { DealOutput, DealOutputV2 } from '@/types'
 
 // ---------------------------------------------------------------------------
-// EMAIL PROMPT — rules for generating supplier-facing negotiation emails
+// EMAIL PROMPT,rules for generating supplier-facing negotiation emails
 // ---------------------------------------------------------------------------
 
 const EMAIL_PROMPT = `
 ==================================================
-VOICE & TONE — SOUND LIKE A REAL PERSON
+VOICE & TONE,SOUND LIKE A REAL PERSON
 ==================================================
 
-Write like a sharp, confident buyer — not a template engine.
+Write like a sharp, confident buyer,not a template engine.
 
 These emails should read like they were written by someone who actually reviewed the quote, knows what they want, and is comfortable negotiating. Think: a senior ops lead or founder who writes clear, no-fluff emails.
 
@@ -29,9 +29,9 @@ DO NOT USE THESE PHRASES (they scream "AI-generated"):
 - "Please don't hesitate to reach out"
 
 USE NATURAL LANGUAGE LIKE:
-- "Hey [name], had a look at the quote — a few things I'd like to go over before we move forward."
+- "Hey [name], had a look at the quote,a few things I'd like to go over before we move forward."
 - "Appreciate the quick turnaround on this. Before we sign off, there are a couple of points worth revisiting."
-- "Overall this looks solid, but the [specific thing] stood out — can we talk through that?"
+- "Overall this looks solid, but the [specific thing] stood out,can we talk through that?"
 - "We're keen to get this done, but I want to make sure we're aligned on [specific point] first."
 - "One thing that jumped out: [specific concern]. What's the flexibility there?"
 - "Happy to hop on a quick call if easier, but the main thing is [specific ask]."
@@ -40,7 +40,10 @@ VARY YOUR SENTENCE STRUCTURE:
 - Mix short and long sentences
 - Don't start every sentence with "We" or "I"
 - Use contractions naturally (we'd, it's, that's, won't, can't)
-- Throw in a casual connector: "That said,", "On that note,", "Quick one —"
+- Throw in a casual connector: "That said,", "On that note,", "Quick one:"
+
+BANNED CHARACTERS:
+Never use en dash or em dash characters in emails. Use commas, colons, or normal hyphens instead.
 
 ==================================================
 EMAIL RULES
@@ -48,7 +51,7 @@ EMAIL RULES
 
 Emails should feel like the OPPOSITE of the analysis section:
 - Analysis section: ASSERTIVE, data-driven ("Negotiate 10% off", "Push for cap")
-- Emails: CONVERSATIONAL, relationship-aware — you're writing to a real person
+- Emails: CONVERSATIONAL, relationship-aware,you're writing to a real person
 
 Three variations, each with a different posture:
 - neutral: friendly, collaborative opener. You're interested and engaged, just want to sort a few things. Warm but clear.
@@ -56,29 +59,29 @@ Three variations, each with a different posture:
 - final_push: deadline-driven close. Signals you're ready to move on or go elsewhere. Urgent but never rude.
 
 CORE RULES:
-- Only include asks from the analysis — never invent new ones
+- Only include asks from the analysis,never invent new ones
 - If 0 real asks → write a light confirmation email, not a negotiation
 - If 1 ask → focus the whole email on it, don't pad
 - If 2-3 asks → structure cleanly but keep it tight
 - Reference REAL details from the quote (amounts, terms, dates)
 - Every email must end with a clear next step
 
-Subject lines — KEEP THEM SIMPLE AND GENERIC:
+Subject lines,KEEP THEM SIMPLE AND GENERIC:
 - Use the vendor name + a plain reference. That's it.
 - Good: "Re: Datadog proposal"
-- Good: "Brightwave — follow-up"
+- Good: "Brightwave,follow-up"
 - Good: "Re: Adobe quote"
-- Good: "[Vendor] contract — quick follow-up"
-- Bad: "Re: Datadog Renewal — a couple of points before we sign" (too long, too specific)
+- Good: "[Vendor] contract,quick follow-up"
+- Bad: "Re: Datadog Renewal,a couple of points before we sign" (too long, too specific)
 - Bad: "Points to discuss on your proposal" (screams AI)
-- Bad: "Following up on your quote — key considerations" (AI garbage)
+- Bad: "Following up on your quote,key considerations" (AI garbage)
 - Bad: "Quick question about your proposal" (vague clickbait)
 - Bad: Anything with "key considerations", "points to discuss", "a few thoughts", "important items"
 - The subject line should look like what a busy person would type in 2 seconds
 
 ADAPT TO CONTEXT:
 - Business: commercially literate, structured, confident
-- Personal/Household: simpler, practical, friendly — sound like a smart homeowner, not a procurement team
+- Personal/Household: simpler, practical, friendly,sound like a smart homeowner, not a procurement team
 - SaaS: reference seats, billing, renewal terms
 - Services: reference scope, deliverables, rates
 - Household: reference labor/materials split, timeline, warranty
@@ -88,18 +91,18 @@ LENGTH:
 - If you can say it in fewer sentences, do.
 
 ==================================================
-GREETING & SIGN-OFF — MANDATORY
+GREETING & SIGN-OFF,MANDATORY
 ==================================================
 
 GREETING (first line of every email body):
 - If a contact name is available from the quote (e.g., sales rep, account manager, any person's name): use "Hi [First Name]," or "Hey [First Name],"
 - If no contact name is available: use "Hi," or "Hi there,"
 - NEVER skip the greeting. NEVER jump straight into the body.
-- For firm/final_push: "Hi [Name]," (not "Hey") — slightly more formal
+- For firm/final_push: "Hi [Name]," (not "Hey"),slightly more formal
 
 SIGN-OFF (last lines of every email body):
 - ALWAYS end with "Best regards," followed by a new line with "[Your Name]"
-- Use exactly "[Your Name]" as a placeholder — the user will replace it
+- Use exactly "[Your Name]" as a placeholder,the user will replace it
 - NEVER skip the sign-off. NEVER end with just the last sentence of the body.
 - Format:
   Best regards,
@@ -114,12 +117,13 @@ QUALITY SELF-CHECK:
 `
 
 // ---------------------------------------------------------------------------
-// generateEmailDrafts — standalone email generation from analysis output
+// generateEmailDrafts,standalone email generation from analysis output
 // ---------------------------------------------------------------------------
 
 export async function generateEmailDrafts(
   analysisOutput: {
     vendor: string
+    vendor_product?: string
     total_commitment: string
     term: string
     contact_name?: string
@@ -141,10 +145,13 @@ ${EMAIL_PROMPT}
 
 ANALYSIS CONTEXT:
 Vendor: ${analysisOutput.vendor}
-Contact Name: ${analysisOutput.contact_name || 'NOT AVAILABLE — use "Hi," or "Hi there," as greeting'}
+Product/Service: ${analysisOutput.vendor_product || analysisOutput.vendor}
+Contact Name: ${analysisOutput.contact_name || 'NOT AVAILABLE, use "Hi," or "Hi there," as greeting'}
 Total Commitment: ${analysisOutput.total_commitment}
 Term: ${analysisOutput.term}
 Verdict: ${analysisOutput.verdict}
+
+CRITICAL: Use ONLY the product/service name shown above. NEVER invent, guess, or hallucinate a different product name. If the product is "Renault Kangoo", do NOT write "Citroën Jumper" or any other name.
 
 ${analysisOutput.contact_name ? `IMPORTANT: The sales contact's first name is "${analysisOutput.contact_name}". You MUST use "Hi ${analysisOutput.contact_name}," or "Hey ${analysisOutput.contact_name}," as the greeting in EVERY email. Do NOT use generic greetings like "Hi," or "Hi there," when you have the name.` : ''}
 
@@ -203,7 +210,7 @@ Return ONLY JSON with this structure:
 }
 
 // ---------------------------------------------------------------------------
-// regenerateEmailDrafts — regenerate emails from existing full analysis
+// regenerateEmailDrafts,regenerate emails from existing full analysis
 // ---------------------------------------------------------------------------
 
 export async function regenerateEmailDrafts(
@@ -256,7 +263,7 @@ STRUCTURE (natural, not rigid):
 4. Specific ask(s) - max 4 bullets if needed
 5. Request for updated quote in writing
 6. Deadline [DATE]
-7. Optional: "If easier, happy to do 15 min call — otherwise please send revised quote."
+7. Optional: "If easier, happy to do 15 min call,otherwise please send revised quote."
 8. Professional close
 
 ADAPT TO VERDICT TYPE:
@@ -316,7 +323,7 @@ Return ONLY JSON with this structure:
 }
 
 // ---------------------------------------------------------------------------
-// generateEmailV2 — on-demand V2 email with user controls
+// generateEmailV2,on-demand V2 email with user controls
 // ---------------------------------------------------------------------------
 
 export async function generateEmailV2(

@@ -9,7 +9,7 @@ export type Database = {
           first_name: string | null
           last_name: string | null
           created_at: string
-          plan: 'free' | 'pro' | 'business'
+          plan: 'free' | 'essentials' | 'pro' | 'business'
           usage_count: number
           is_admin: boolean
           base_currency: string | null
@@ -25,7 +25,7 @@ export type Database = {
           first_name?: string | null
           last_name?: string | null
           created_at?: string
-          plan?: 'free' | 'pro' | 'business'
+          plan?: 'free' | 'essentials' | 'pro' | 'business'
           usage_count?: number
           is_admin?: boolean
           base_currency?: string | null
@@ -41,7 +41,7 @@ export type Database = {
           first_name?: string | null
           last_name?: string | null
           created_at?: string
-          plan?: 'free' | 'pro' | 'business'
+          plan?: 'free' | 'essentials' | 'pro' | 'business'
           usage_count?: number
           is_admin?: boolean
           base_currency?: string | null
@@ -141,6 +141,8 @@ export type Database = {
 // Deal output structure (V1)
 export type RedFlag = {
   type: string
+  severity?: 'high' | 'medium' | 'low'
+  score_category?: 'pricing' | 'terms' | 'leverage'
   issue: string
   why_it_matters: string
   what_to_ask_for: string
@@ -179,24 +181,35 @@ export type DealOutput = {
   red_flags: RedFlag[]
   negotiation_plan: {
     leverage_you_have: string[]
-    must_have_asks: string[]
-    nice_to_have_asks: string[]
     trades_you_can_offer: string[]
   }
   what_to_ask_for: {
     must_have: string[]
     nice_to_have: string[]
   }
-  potential_savings?: Array<{
-    ask: string
-    annual_impact: string
-    confidence: 'high' | 'medium' | 'low'
-    rationale?: string
-  }>
+  potential_savings?: {
+    conservative_floor: string
+    optimistic_ceiling: string
+    floor_label: string
+    ceiling_label: string
+    summary: string
+    items: Array<{
+      ask: string
+      tier: 1 | 2
+      conservative_impact: string
+      optimistic_impact: string
+      rationale: string
+      note?: string
+    }>
+    bonus_opportunities?: Array<{
+      ask: string
+      range: string
+      note: string
+    }>
+  }
   cash_flow_improvements?: Array<{
-    type: string
     recommendation: string
-    category: 'cash_flow' | 'risk_protection' | 'liability'
+    category: 'cash_flow' | 'risk'
   }>
   score?: number
   score_label?: string

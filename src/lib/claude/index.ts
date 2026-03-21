@@ -81,6 +81,7 @@ export async function analyzeDeal(
     try {
       emails = await generateEmailDrafts({
         vendor: rawFacts.vendor,
+        vendor_product: rawFacts.vendor_product,
         total_commitment: rawFacts.total_commitment,
         term: rawFacts.term,
         contact_name: rawFacts.contact_name,
@@ -127,6 +128,10 @@ export async function analyzeDeal(
       what_to_ask_for: analysis.what_to_ask_for,
       potential_savings: analysis.potential_savings,
       cash_flow_improvements: analysis.cash_flow_improvements,
+      score: analysis.score,
+      score_label: analysis.score_label,
+      score_breakdown: analysis.score_breakdown,
+      score_rationale: analysis.score_rationale,
       assumptions: analysis.assumptions,
       disclaimer: analysis.disclaimer,
       email_drafts: emails,

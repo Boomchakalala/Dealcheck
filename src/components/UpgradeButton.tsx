@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 
-export function UpgradeButton({ plan, label, className }: { plan: 'pro' | 'business'; label: string; className?: string }) {
+export function UpgradeButton({ plan, label, className }: { plan: 'essentials' | 'pro' | 'business'; label: string; className?: string }) {
   const [loading, setLoading] = useState(false)
 
   const handleClick = async () => {

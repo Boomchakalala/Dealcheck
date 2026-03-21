@@ -55,8 +55,7 @@ export const docusignExampleFr: DealOutput = {
       "PandaDoc Business est à ~€35/utilisateur/mois pour des fonctionnalités équivalentes — 30 % moins cher",
       "Vous renouvelez, vous ne résiliez pas — c'est le moment où votre levier est maximal",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "Engagement sur 2 ans en échange d'une remise de 10 % et d'un gel tarifaire",
       "Avis sur G2 ou Capterra",
@@ -73,20 +72,29 @@ export const docusignExampleFr: DealOutput = {
       "Gel tarifaire sur 2 ans — supprimer la clause d'augmentation annuelle",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Ajustement de 40 à 30 licences",
-      annual_impact: "€6,000 saved",
-      confidence: 'high',
-      rationale: "15 licences inutilisées — supprimer le gaspillage ne nécessite aucune concession",
-    },
-    {
-      ask: "Remise de fidélité de 10 % sur le contrat ajusté",
-      annual_impact: "€1,800 saved",
-      confidence: 'medium',
-      rationale: "Remise de renouvellement standard — les responsables de comptes DocuSign ont l'autorité pour 10-15 %",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "€6,000",
+    optimistic_ceiling: "€7,800",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Le plancher repose sur l'ajustement des licences seul ; le plafond ajoute une remise de fidélité qui dépend de la négociation.",
+    items: [
+      {
+        ask: "Ajustement de 40 à 30 licences",
+        tier: 1,
+        conservative_impact: "€6,000 saved",
+        optimistic_impact: "€6,000 saved",
+        rationale: "15 licences inutilisées — supprimer le gaspillage ne nécessite aucune concession",
+      },
+      {
+        ask: "Remise de fidélité de 10 % sur le contrat ajusté",
+        tier: 2,
+        conservative_impact: "€0",
+        optimistic_impact: "€1,800 saved",
+        rationale: "Remise de renouvellement standard — les responsables de comptes DocuSign ont l'autorité pour 10-15 %",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re : Renouvellement DocuSign",
@@ -222,8 +230,7 @@ export const salesforceExampleFr: DealOutput = {
       "12 licences inutilisées sont la preuve documentée d'un sur-licenciement",
       "Vous avez 3 mois avant le renouvellement — assez pour mener une évaluation concurrentielle",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "Engagement de renouvellement sur 2 ans pour une remise et un gel tarifaire",
       "Ajout de 2 licences Service Cloud si le tarif unitaire descend à €70",
@@ -240,20 +247,29 @@ export const salesforceExampleFr: DealOutput = {
       "Réduire le préavis de renouvellement automatique de 90 à 30 jours",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Ajustement de 40 à 32 licences",
-      annual_impact: "€7,200 saved",
-      confidence: 'high',
-      rationale: "12 licences inutilisées — supprimer le gaspillage ne nécessite aucune concession",
-    },
-    {
-      ask: "Remise de fidélité de 8 % sur le contrat ajusté",
-      annual_impact: "€2,304 saved",
-      confidence: 'medium',
-      rationale: "Remise pluriannuelle standard — les responsables Salesforce proposent régulièrement 8-12 %",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "€7,200",
+    optimistic_ceiling: "€9,504",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Le plancher repose sur l'ajustement des licences seul ; le plafond ajoute une remise pluriannuelle qui dépend de la négociation.",
+    items: [
+      {
+        ask: "Ajustement de 40 à 32 licences",
+        tier: 1,
+        conservative_impact: "€7,200 saved",
+        optimistic_impact: "€7,200 saved",
+        rationale: "12 licences inutilisées — supprimer le gaspillage ne nécessite aucune concession",
+      },
+      {
+        ask: "Remise de fidélité de 8 % sur le contrat ajusté",
+        tier: 2,
+        conservative_impact: "€0",
+        optimistic_impact: "€2,304 saved",
+        rationale: "Remise pluriannuelle standard — les responsables Salesforce proposent régulièrement 8-12 %",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re : Renouvellement Salesforce",
@@ -389,8 +405,7 @@ export const microsoft365ExampleFr: DealOutput = {
       "Google Workspace Business Plus est à €13,20/utilisateur/mois — 67 % moins cher pour les utilisateurs non-avancés",
       "Le prépaiement annuel est la norme — vous êtes déjà en engagement annuel, sans bénéficier de la remise",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "Prépayer l'année complète d'avance pour un meilleur tarif",
       "Consolider toutes les licences Microsoft chez un seul revendeur",
@@ -407,20 +422,29 @@ export const microsoft365ExampleFr: DealOutput = {
       "Allonger le préavis de renouvellement automatique de 30 à 60 jours",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Ajustement de 60 à 48 licences",
-      annual_impact: "€5,760 saved",
-      confidence: 'high',
-      rationale: "18 licences inutilisées — gaspillage documenté",
-    },
-    {
-      ask: "Tarif prépayé annuel de €40 à €37/utilisateur",
-      annual_impact: "€1,728 saved",
-      confidence: 'high',
-      rationale: "La marge du revendeur est négociable — le tarif prépayé est standard",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "€7,488",
+    optimistic_ceiling: "€7,488",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Les deux demandes sont à forte probabilité — l'ajustement des licences et le tarif prépayé sont standards, donc plancher et plafond s'alignent.",
+    items: [
+      {
+        ask: "Ajustement de 60 à 48 licences",
+        tier: 1,
+        conservative_impact: "€5,760 saved",
+        optimistic_impact: "€5,760 saved",
+        rationale: "18 licences inutilisées — gaspillage documenté",
+      },
+      {
+        ask: "Tarif prépayé annuel de €40 à €37/utilisateur",
+        tier: 1,
+        conservative_impact: "€1,728 saved",
+        optimistic_impact: "€1,728 saved",
+        rationale: "La marge du revendeur est négociable — le tarif prépayé est standard",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re : Renouvellement Microsoft 365",
@@ -562,8 +586,7 @@ export const fedexExampleFr: DealOutput = {
       "La surcharge carburant non plafonnée est indéfendable — ils le savent",
       "L'engagement annuel leur apporte une certitude de revenus — exploitez-le pleinement",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "Augmenter l'engagement de volume minimum à 1 100 colis/mois pour un meilleur tarif de base",
       "Engagement de 2 ans pour un plafond GRI et un gel tarifaire",
@@ -581,20 +604,29 @@ export const fedexExampleFr: DealOutput = {
       "Seuil de remise volume à 1 200 colis/mois",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Tarif de base de $4,20 à $3,50 (1 000 moy./mois)",
-      annual_impact: "$8,400 saved",
-      confidence: 'high',
-      rationale: "Le tarif négocié du marché est de $3,20-3,60 à ce volume — bien documenté",
-    },
-    {
-      ask: "Surcharge carburant de 20 % à 12 %",
-      annual_impact: "$4,152 saved",
-      confidence: 'high',
-      rationale: "Les surcharges du marché se situent entre 10-14 % — 20 % est au-dessus du marché",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "$12,552",
+    optimistic_ceiling: "$12,552",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Les deux demandes sont à forte probabilité — le tarif de base et la surcharge carburant sont bien au-dessus des tarifs documentés du marché, donc plancher et plafond s'alignent.",
+    items: [
+      {
+        ask: "Tarif de base de $4,20 à $3,50 (1 000 moy./mois)",
+        tier: 1,
+        conservative_impact: "$8,400 saved",
+        optimistic_impact: "$8,400 saved",
+        rationale: "Le tarif négocié du marché est de $3,20-3,60 à ce volume — bien documenté",
+      },
+      {
+        ask: "Surcharge carburant de 20 % à 12 %",
+        tier: 1,
+        conservative_impact: "$4,152 saved",
+        optimistic_impact: "$4,152 saved",
+        rationale: "Les surcharges du marché se situent entre 10-14 % — 20 % est au-dessus du marché",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re : Accord FedEx",
@@ -742,8 +774,7 @@ export const konicaExampleFr: DealOutput = {
       "L'absence de clause de sortie est déséquilibrée et facile à contester",
       "La clause d'exclusivité des consommables est inhabituelle — tout concurrent proposera un approvisionnement ouvert",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "S'engager sur la durée complète de 3 ans d'emblée si la location descend à €700",
       "Acheter l'extension de garantie si l'exclusivité toner est supprimée",
@@ -761,20 +792,29 @@ export const konicaExampleFr: DealOutput = {
       "Inclure les frais de service annuels dans le mensuel — simplifier la facturation",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Tarif de location de €870 à €700/mois",
-      annual_impact: "€2,040 saved",
-      confidence: 'high',
-      rationale: "Ricoh, Canon, Xerox proposent tous €620-720 pour des appareils équivalents",
-    },
-    {
-      ask: "Économie toner marché ouvert (est.)",
-      annual_impact: "€360 saved",
-      confidence: 'medium',
-      rationale: "Les toners tiers coûtent 25-35 % moins cher — dépend de la suppression de la clause",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "€2,040",
+    optimistic_ceiling: "€2,400",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Le plancher repose sur la réduction du tarif de location seul ; le plafond ajoute les économies toner qui dépendent de la suppression de la clause d'exclusivité.",
+    items: [
+      {
+        ask: "Tarif de location de €870 à €700/mois",
+        tier: 1,
+        conservative_impact: "€2,040 saved",
+        optimistic_impact: "€2,040 saved",
+        rationale: "Ricoh, Canon, Xerox proposent tous €620-720 pour des appareils équivalents",
+      },
+      {
+        ask: "Économie toner marché ouvert (est.)",
+        tier: 2,
+        conservative_impact: "€0",
+        optimistic_impact: "€360 saved",
+        rationale: "Les toners tiers coûtent 25-35 % moins cher — dépend de la suppression de la clause",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re : Location Konica Minolta",
@@ -920,8 +960,7 @@ export const bdoExampleFr: DealOutput = {
       "La clause d'augmentation de 12 % est agressive et facile à contester",
       "Vous êtes une entreprise en croissance — ils veulent la relation à long terme",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "Engagement de 2 ans pour un gel tarifaire et un taux horaire réduit",
       "Recommandation d'un contact professionnel de votre réseau",
@@ -939,26 +978,36 @@ export const bdoExampleFr: DealOutput = {
       "Réduire le préavis de résiliation de 60 à 30 jours",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Taux horaire de €210 à €150 (35h/an)",
-      annual_impact: "€2,100 saved",
-      confidence: 'high',
-      rationale: "Le taux du marché est de €130-160/heure — €210 est bien au-dessus de la norme",
-    },
-    {
-      ask: "Augmentation annuelle de 12 % à 3 % (économie année 2)",
-      annual_impact: "€1,512 saved",
-      confidence: 'high',
-      rationale: "3-5 % indexé sur l'IPC est la norme du secteur — 12 % est indéfendable",
-    },
-    {
-      ask: "Plafonnement des heures — atténuation du risque (est.)",
-      annual_impact: "€1,500 saved",
-      confidence: 'medium',
-      rationale: "Empêche la facturation illimitée les années complexes — dépend de la négociation du plafond",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "€3,612",
+    optimistic_ceiling: "€5,112",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Le plancher couvre les réductions du taux horaire et de l'augmentation annuelle ; le plafond ajoute l'atténuation du risque lié au plafonnement des heures qui dépend de la négociation.",
+    items: [
+      {
+        ask: "Taux horaire de €210 à €150 (35h/an)",
+        tier: 1,
+        conservative_impact: "€2,100 saved",
+        optimistic_impact: "€2,100 saved",
+        rationale: "Le taux du marché est de €130-160/heure — €210 est bien au-dessus de la norme",
+      },
+      {
+        ask: "Augmentation annuelle de 12 % à 3 % (économie année 2)",
+        tier: 1,
+        conservative_impact: "€1,512 saved",
+        optimistic_impact: "€1,512 saved",
+        rationale: "3-5 % indexé sur l'IPC est la norme du secteur — 12 % est indéfendable",
+      },
+      {
+        ask: "Plafonnement des heures — atténuation du risque (est.)",
+        tier: 2,
+        conservative_impact: "€0",
+        optimistic_impact: "€1,500 saved",
+        rationale: "Empêche la facturation illimitée les années complexes — dépend de la négociation du plafond",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re : Proposition BDO",

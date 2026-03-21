@@ -81,7 +81,8 @@ export default async function DashboardPage() {
     .order('updated_at', { ascending: false })
 
   const allDeals = deals || []
-  const isPro = profile?.plan === 'pro'
+  const isPro = profile?.plan === 'pro' || profile?.plan === 'business'
+  const isEssentials = profile?.plan === 'essentials'
   const isAdmin = profile?.is_admin || false
   const baseCurrency = (profile?.base_currency as Currency) || 'EUR'
 
@@ -103,13 +104,16 @@ export default async function DashboardPage() {
           : await convertCurrency(deal.savings_amount, fromCurrency, baseCurrency)
       }
 
-      // Parse potential savings from AI output — only high-confidence
-      const allSavings = output?.potential_savings || []
-      const hasConfidence = allSavings.some((item: any) => item.confidence)
-      const savingsToCount = hasConfidence ? allSavings.filter((item: any) => item.confidence === 'high') : allSavings
-      const potentialSavings = savingsToCount.reduce((s: number, item: any) => {
-        return s + parseSavingsAmount(item.annual_impact)
-      }, 0)
+      // Parse potential savings from AI output
+      const ps = output?.potential_savings as any
+      let potentialSavings = 0
+      if (ps?.optimistic_ceiling !== undefined) {
+        potentialSavings = typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseSavingsAmount(String(ps.optimistic_ceiling))
+      } else if (Array.isArray(ps)) {
+        const hasConf = ps.some((item: any) => item.confidence)
+        const items = hasConf ? ps.filter((item: any) => item.confidence !== 'low') : ps
+        potentialSavings = items.reduce((s: number, item: any) => s + parseSavingsAmount(item.annual_impact), 0)
+      }
 
       const rawCategory = output?.category || 'Uncategorized'
       const category = normalizeCategory(rawCategory)
@@ -231,8 +235,8 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Upgrade banner for Starter */}
-      {!isPro && !isAdmin && (
+      {/* Upgrade banner for Starter/Essentials */}
+      {!isPro && !isEssentials && !isAdmin && (
         <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl px-5 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Lock className="w-4 h-4 text-emerald-600" />
@@ -364,7 +368,7 @@ export default async function DashboardPage() {
         }))}
         baseCurrency={baseCurrency}
         savingsAchieved={savingsAchieved}
-        isPro={isPro}
+        plan={profile?.plan || 'free'}
         isAdmin={isAdmin}
         winRate={0}
         closedDealCount={closedDeals.length}

@@ -113,24 +113,59 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
     return isNaN(num) ? 0 : num
   }
 
-  // Split savings by confidence tier
-  const { highConfSavings, bonusSavings, totalSavings, highConfTotal } = useMemo(() => {
-    if (!output.potential_savings || output.potential_savings.length === 0)
-      return { highConfSavings: [], bonusSavings: [], totalSavings: 0, highConfTotal: 0 }
+  // Parse savings from new range-based structure (with backward compat for old array format)
+  const savingsData = useMemo(() => {
+    const ps = output.potential_savings as any
+    if (!ps || (typeof ps === 'object' && !Array.isArray(ps) && !ps.items && !ps.conservative_floor)) {
+      return { floor: 0, ceiling: 0, floorLabel: '', ceilingLabel: '', summary: '', items: [], bonus: [], isRange: false }
+    }
 
-    const hasConfidence = output.potential_savings.some(s => (s as any).confidence)
-    const high = hasConfidence
-      ? output.potential_savings.filter(s => (s as any).confidence === 'high')
-      : output.potential_savings // Old data without confidence — show all as "realistic"
-    const bonus = hasConfidence
-      ? output.potential_savings.filter(s => (s as any).confidence === 'medium' || (s as any).confidence === 'low')
-      : []
+    // New range-based format
+    if (ps.conservative_floor !== undefined || ps.items) {
+      // Handle both raw numbers and formatted strings
+      const parseVal = (v: any) => typeof v === 'number' ? v : parseMoney(String(v || '0')).amount
+      const floor = parseVal(ps.conservative_floor)
+      const ceiling = parseVal(ps.optimistic_ceiling)
+      return {
+        floor,
+        ceiling,
+        currency: ps.currency || '',
+        floorLabel: ps.floor_label || '',
+        ceilingLabel: ps.ceiling_label || '',
+        summary: ps.summary || '',
+        items: (ps.items || []).map((item: any) => ({
+          ...item,
+          conservative_impact: typeof item.conservative_impact === 'number' ? item.conservative_impact : parseVal(item.conservative_impact),
+          optimistic_impact: typeof item.optimistic_impact === 'number' ? item.optimistic_impact : parseVal(item.optimistic_impact),
+        })),
+        bonus: ps.bonus_opportunities || [],
+        isRange: true,
+      }
+    }
 
-    const hcTotal = high.reduce((sum, s) => sum + parseMoney(s.annual_impact || '').amount, 0)
-    const allTotal = output.potential_savings.reduce((sum, s) => sum + parseMoney(s.annual_impact || '').amount, 0)
+    // Old array format (backward compat)
+    if (Array.isArray(ps)) {
+      const headline = ps.filter((s: any) => s.confidence !== 'low')
+      const bonus = ps.filter((s: any) => s.confidence === 'low')
+      const total = headline.reduce((sum: number, s: any) => sum + parseMoney(s.annual_impact || '').amount, 0)
+      return {
+        floor: total,
+        ceiling: total,
+        floorLabel: '',
+        ceilingLabel: '',
+        summary: '',
+        items: headline.map((s: any) => ({ ask: s.ask, tier: s.confidence === 'high' ? 1 : 2, conservative_impact: s.annual_impact, optimistic_impact: s.annual_impact, rationale: s.rationale || '' })),
+        bonus: bonus.map((s: any) => ({ ask: s.ask, range: s.annual_impact, note: s.rationale || '' })),
+        isRange: false,
+      }
+    }
 
-    return { highConfSavings: high, bonusSavings: bonus, totalSavings: allTotal, highConfTotal: hcTotal }
+    return { floor: 0, ceiling: 0, floorLabel: '', ceilingLabel: '', summary: '', items: [], bonus: [], isRange: false }
   }, [output.potential_savings])
+
+  // For backward compat in metric cards
+  const headlineTotal = savingsData.ceiling > 0 ? savingsData.ceiling : savingsData.floor
+  const hasOnlyBonus = savingsData.floor === 0 && savingsData.ceiling === 0 && savingsData.bonus.length > 0
 
   const formatSavings = (amount: number) => {
     const dealTotal = output.snapshot?.total_commitment || ''
@@ -263,7 +298,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
         const commitmentNum = commitmentParsed?.amount || 0
 
         // Calculate savings percentage from high-confidence savings only
-        const savingsPct = (highConfTotal > 0 && commitmentNum > 0) ? Math.min(Math.round((highConfTotal / commitmentNum) * 100), 50) : 0
+        const savingsPct = (headlineTotal > 0 && commitmentNum > 0) ? Math.min(Math.round((headlineTotal / commitmentNum) * 100), 50) : 0
 
         return (
           <div className="mb-6 space-y-4">
@@ -309,9 +344,13 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                     </div>
                     <div className="w-px h-10 bg-slate-200 hidden sm:block" />
                     <div>
-                      <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('output.realisticSavings')}</p>
+                      <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('output.potentialSavings')}</p>
                       <p className="text-lg font-bold text-emerald-700">
-                        {highConfTotal > 0 ? formatSavings(highConfTotal) : t('output.na')}
+                        {savingsData.ceiling > 0
+                          ? savingsData.floor > 0 && savingsData.floor !== savingsData.ceiling
+                            ? `${formatSavings(savingsData.floor)} - ${formatSavings(savingsData.ceiling)}`
+                            : formatSavings(savingsData.ceiling)
+                          : t('output.na')}
                       </p>
                       <p className="text-[11px] text-slate-500">
                         {savingsPct > 0 ? t('output.percentPotentialSavings', { pct: String(savingsPct) }) : t('output.noSavingsCalculated')}
@@ -884,26 +923,19 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
       {/* ══════════════════════════════════════════════════════════════ */}
       {/* SECTION 2: SAVINGS IMPACT - Simplified */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      {output.potential_savings && output.potential_savings.length > 0 && (() => {
-        // Detect currency from deal value
+      {(savingsData.items.length > 0 || savingsData.bonus.length > 0) && (() => {
         const dealTotal = output.snapshot?.total_commitment || ''
         const currencySymbol = dealTotal.includes('€') ? '€' : dealTotal.includes('£') ? '£' : dealTotal.includes('C$') ? 'C$' : dealTotal.includes('A$') ? 'A$' : '$'
-
-        // Detect if recurring contract
-        const termStr = (output.snapshot?.term || '').toLowerCase()
-        const isRecurring = termStr.includes('month') || termStr.includes('annual') || termStr.includes('year') || termStr.includes('/mo') || termStr.includes('/yr')
-        const savingsLabel = isRecurring ? t('output.perYear') : ''
-
-        // Format with correct currency
         const fmtCurrency = (amount: number) => {
           if (amount >= 1000000) return `${currencySymbol}${(amount / 1000000).toFixed(1)}M`
           if (amount >= 1000) return `${currencySymbol}${Math.round(amount).toLocaleString('en-US')}`
           return `${currencySymbol}${Math.round(amount)}`
         }
-
-        // Parse deal total for comparison bar — use high-confidence savings for the bar
         const dealTotalNum = parseMoney(dealTotal).amount
-        const savingsPct = dealTotalNum > 0 ? Math.min((highConfTotal / dealTotalNum) * 100, 50) : 0
+        const ceilingPct = dealTotalNum > 0 ? Math.min((savingsData.ceiling / dealTotalNum) * 100, 50) : 0
+        const floorPct = dealTotalNum > 0 ? Math.min((savingsData.floor / dealTotalNum) * 100, 50) : 0
+        const tier1Items = savingsData.items.filter((i: any) => i.tier === 1)
+        const tier2Items = savingsData.items.filter((i: any) => i.tier === 2)
 
         return (
         <div className="mb-8">
@@ -916,7 +948,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           </div>
 
           <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm">
-            {/* Header with total */}
+            {/* Range header */}
             <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-6 pb-6 border-b-2 border-slate-200">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
@@ -924,83 +956,101 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-900">{t('output.potentialSavingsTitle')}</h3>
-                  <p className="text-xs text-slate-600">{t('output.estimatedImpactIfNegotiate')}</p>
+                  {savingsData.summary && <p className="text-xs text-slate-600 mt-0.5">{savingsData.summary}</p>}
                 </div>
               </div>
-              <div className="text-right bg-emerald-50 rounded-xl px-5 py-3 border-2 border-emerald-200">
-                <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide mb-0.5">{t('output.realisticSavings')}</p>
-                <p className="text-2xl sm:text-3xl font-bold text-emerald-700">{fmtCurrency(highConfTotal)}</p>
-                {bonusSavings.length > 0 && (
-                  <p className="text-[10px] text-emerald-600 mt-0.5">+ {fmtCurrency(totalSavings - highConfTotal)} {t('output.bonusIfNegotiated')}</p>
+              <div className="flex gap-3">
+                {savingsData.floor > 0 && (
+                  <div className="text-center bg-emerald-50 rounded-xl px-4 py-3 border-2 border-emerald-200">
+                    <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-wide mb-0.5">{t('output.conservativeFloor')}</p>
+                    <p className="text-xl font-bold text-emerald-700">{fmtCurrency(savingsData.floor)}</p>
+                    {savingsData.floorLabel && <p className="text-[9px] text-emerald-600 mt-0.5">{savingsData.floorLabel}</p>}
+                  </div>
                 )}
+                <div className="text-center bg-emerald-50 rounded-xl px-4 py-3 border-2 border-emerald-200">
+                  <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-wide mb-0.5">{savingsData.floor > 0 ? t('output.optimisticCeiling') : t('output.potentialSavings')}</p>
+                  <p className="text-xl font-bold text-emerald-700">{fmtCurrency(savingsData.ceiling)}</p>
+                  {savingsData.ceilingLabel && <p className="text-[9px] text-emerald-600 mt-0.5">{savingsData.ceilingLabel}</p>}
+                </div>
               </div>
             </div>
 
             {/* Visual comparison bar */}
-            {dealTotalNum > 0 && savingsPct > 0 && (
+            {dealTotalNum > 0 && ceilingPct > 0 && (
               <div className="mb-6">
                 <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1.5">
                   <span>{t('output.originalQuote')} <span className="font-semibold text-slate-700">{dealTotal}</span></span>
-                  <span>{t('output.realisticSavings')} <span className="font-semibold text-emerald-700">{fmtCurrency(highConfTotal)}</span></span>
+                  <span>{t('output.potentialSavings')} <span className="font-semibold text-emerald-700">{fmtCurrency(savingsData.ceiling)}</span></span>
                 </div>
-                <div className="h-4 bg-slate-100 rounded-full overflow-hidden flex">
-                  <div
-                    className="h-full bg-slate-300 rounded-l-full transition-all duration-500"
-                    style={{ width: `${100 - savingsPct}%` }}
-                  />
-                  <div
-                    className="h-full bg-emerald-500 rounded-r-full transition-all duration-500"
-                    style={{ width: `${savingsPct}%` }}
-                  />
+                <div className="h-4 bg-slate-100 rounded-full overflow-hidden relative">
+                  <div className="h-full bg-slate-300 rounded-l-full" style={{ width: `${100 - ceilingPct}%` }} />
+                  <div className="h-full bg-emerald-400 absolute top-0 right-0 rounded-r-full" style={{ width: `${ceilingPct}%` }} />
+                  {floorPct > 0 && floorPct < ceilingPct && (
+                    <div className="h-full bg-emerald-600 absolute top-0 rounded-r-full" style={{ right: `${ceilingPct - floorPct}%`, width: `${floorPct}%` }} />
+                  )}
                 </div>
                 <div className="flex items-center justify-between text-[10px] mt-1">
-                  <span className="text-slate-400">{t('output.afterSavings', { amount: fmtCurrency(Math.max(0, dealTotalNum - highConfTotal)) })}</span>
-                  <span className="font-semibold text-emerald-600">{t('output.percentSavings', { pct: savingsPct.toFixed(0) })}</span>
+                  <span className="text-slate-400">{t('output.afterSavings', { amount: fmtCurrency(Math.max(0, dealTotalNum - savingsData.ceiling)) })}</span>
+                  <span className="font-semibold text-emerald-600">{t('output.percentSavings', { pct: ceilingPct.toFixed(0) })}</span>
                 </div>
               </div>
             )}
 
             <div className="space-y-6">
-              {/* Realistic savings */}
-              {highConfSavings.length > 0 && (
+              {/* Tier 1: Solid savings */}
+              {tier1Items.length > 0 && (
               <div>
-                <h4 className="text-sm font-bold text-slate-900 mb-1">{t('output.realisticSavings')}</h4>
-                <p className="text-xs text-slate-500 mb-4">{t('output.realisticSavingsDesc')}</p>
+                <h4 className="text-sm font-bold text-slate-900 mb-1">{t('output.solidSavings')}</h4>
+                <p className="text-xs text-slate-500 mb-4">{t('output.solidSavingsDesc')}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {highConfSavings.map((saving, idx) => (
+                  {tier1Items.map((item: any, idx: number) => (
                     <div key={idx} className="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4">
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="text-lg font-bold text-emerald-700 break-words min-w-0">{saving.annual_impact}</span>
-                        {savingsLabel && <span className="text-[10px] text-slate-400 text-right mt-1 flex-shrink-0">{savingsLabel}</span>}
+                        <span className="text-lg font-bold text-emerald-700 break-words min-w-0">{typeof item.optimistic_impact === 'number' ? fmtCurrency(item.optimistic_impact) : item.optimistic_impact}</span>
+                        <span className="text-[9px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold flex-shrink-0">TIER 1</span>
                       </div>
-                      <p className="text-sm text-slate-800 font-medium leading-relaxed">{saving.ask}</p>
-                      {(saving as any).rationale && (
-                        <p className="text-xs text-emerald-600 mt-1.5 italic">{(saving as any).rationale}</p>
-                      )}
+                      <p className="text-sm text-slate-800 font-medium leading-relaxed">{item.ask}</p>
+                      {item.rationale && <p className="text-xs text-emerald-600 mt-1.5 italic">{item.rationale}</p>}
                     </div>
                   ))}
                 </div>
               </div>
               )}
 
-              {/* Bonus opportunities */}
-              {bonusSavings.length > 0 && (
+              {/* Tier 2: Achievable savings */}
+              {tier2Items.length > 0 && (
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 mb-1">{t('output.achievableSavings')}</h4>
+                <p className="text-xs text-slate-500 mb-4">{t('output.achievableSavingsDesc')}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {tier2Items.map((item: any, idx: number) => (
+                    <div key={idx} className="bg-amber-50 border-2 border-amber-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <span className="text-lg font-bold text-amber-700 break-words min-w-0">{typeof item.optimistic_impact === 'number' ? fmtCurrency(item.optimistic_impact) : item.optimistic_impact}</span>
+                        <span className="text-[9px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold flex-shrink-0">TIER 2</span>
+                      </div>
+                      <p className="text-sm text-slate-800 font-medium leading-relaxed">{item.ask}</p>
+                      {item.rationale && <p className="text-xs text-amber-600 mt-1.5 italic">{item.rationale}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              )}
+
+              {/* Bonus opportunities (Tier 3) */}
+              {savingsData.bonus.length > 0 && (
               <div>
                 <h4 className="text-sm font-bold text-slate-900 mb-1">{t('output.bonusOpportunities')}</h4>
                 <p className="text-xs text-slate-500 mb-4">{t('output.bonusOpportunitiesDesc')}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {bonusSavings.map((saving, idx) => (
+                  {savingsData.bonus.map((item: any, idx: number) => (
                     <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4">
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="text-lg font-bold text-amber-600 break-words min-w-0">{saving.annual_impact}</span>
-                        <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold flex-shrink-0">
-                          {(saving as any).confidence === 'low' ? t('output.longShot') : t('output.worthAsking')}
-                        </span>
+                        <span className="text-lg font-bold text-slate-600 break-words min-w-0">{item.range}</span>
+                        <span className="text-[9px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold flex-shrink-0">{t('output.longShot')}</span>
                       </div>
-                      <p className="text-sm text-slate-800 font-medium leading-relaxed">{saving.ask}</p>
-                      {(saving as any).rationale && (
-                        <p className="text-xs text-slate-500 mt-1.5 italic">{(saving as any).rationale}</p>
-                      )}
+                      <p className="text-sm text-slate-800 font-medium leading-relaxed">{item.ask}</p>
+                      {item.note && <p className="text-xs text-slate-500 mt-1.5 italic">{item.note}</p>}
                     </div>
                   ))}
                 </div>
@@ -1060,10 +1110,9 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
                       item.category === 'cash_flow' ? 'bg-blue-100 text-blue-700 border border-blue-200' :
-                      item.category === 'risk_protection' ? 'bg-amber-100 text-amber-700 border border-amber-200' :
-                      'bg-purple-100 text-purple-700 border border-purple-200'
+                      'bg-amber-100 text-amber-700 border border-amber-200'
                     }`}>
-                      {item.type}
+                      {item.category === 'cash_flow' ? 'Cash Flow' : 'Risk'}
                     </span>
                   </div>
                   <p className="text-sm text-slate-800 leading-relaxed">{item.recommendation}</p>

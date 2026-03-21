@@ -202,11 +202,11 @@ export default function AppHomePage() {
     )
   }
 
-  const isPro = profile?.plan === 'pro'
+  const isPaid = ['essentials', 'pro', 'business'].includes(profile?.plan || '')
   const isAdmin = profile?.is_admin || false
   const usageCount = profile?.usage_count || 0
   const remaining = 4 - usageCount
-  const isAtLimit = !isPro && !isAdmin && usageCount >= 4
+  const isAtLimit = !isPaid && !isAdmin && usageCount >= 4
   const hasDeals = deals.length > 0
   const baseCurrency = profile?.base_currency || 'EUR'
   const currencySymbol = baseCurrency === 'EUR' ? '€' : baseCurrency === 'GBP' ? '£' : baseCurrency === 'CAD' ? 'C$' : baseCurrency === 'AUD' ? 'A$' : '$'
@@ -222,11 +222,22 @@ export default function AppHomePage() {
   })
   const totalPotentialSavings = deals.reduce((sum, d) => {
     const latest = d.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
-    const savings = latest?.output_json?.potential_savings || []
-    return sum + savings.reduce((s: number, item: any) => {
-      const match = item.annual_impact?.match(/[\d,]+/)
-      return s + (match ? parseInt(match[0].replace(/,/g, ''), 10) : 0)
-    }, 0)
+    const ps = latest?.output_json?.potential_savings as any
+    if (!ps) return sum
+    // New range format
+    if (ps.optimistic_ceiling !== undefined) {
+      if (typeof ps.optimistic_ceiling === 'number') return sum + ps.optimistic_ceiling
+      const match = String(ps.optimistic_ceiling).match(/[\d,]+/)
+      return sum + (match ? parseInt(match[0].replace(/,/g, ''), 10) : 0)
+    }
+    // Old array format
+    if (Array.isArray(ps)) {
+      return sum + ps.reduce((s: number, item: any) => {
+        const match = item.annual_impact?.match(/[\d,]+/)
+        return s + (match ? parseInt(match[0].replace(/,/g, ''), 10) : 0)
+      }, 0)
+    }
+    return sum
   }, 0)
 
   const formatCurrencyValue = (amount: number) => {
@@ -255,7 +266,7 @@ export default function AppHomePage() {
       <div className="max-w-3xl mx-auto space-y-6">
         <OnboardingBanner userEmail={profile?.email} hasDeals={false} />
 
-        {!isPro && !isAdmin && (
+        {!isPaid && !isAdmin && (
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200">
               <Zap className="w-3.5 h-3.5 text-emerald-600" />
@@ -365,7 +376,7 @@ export default function AppHomePage() {
       </div>
 
       {/* Usage banner */}
-      {!isPro && !isAdmin && (
+      {!isPaid && !isAdmin && (
         <div className={`rounded-xl p-4 flex items-center justify-between ${
           isAtLimit
             ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200'
@@ -453,7 +464,7 @@ export default function AppHomePage() {
       </div>
 
       {/* Pro teaser for free users */}
-      {!isPro && !isAdmin && (
+      {!isPaid && !isAdmin && (
         <div className="relative rounded-2xl border border-slate-200 overflow-hidden">
           <div className="filter blur-[5px] pointer-events-none select-none p-5 bg-white">
             <div className="grid grid-cols-3 gap-3">

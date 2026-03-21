@@ -102,14 +102,17 @@ function parseSavingsNumber(str: string): number {
 
 function getPotentialSavings(deal: any): number {
   const latestRound = getLatestRound(deal)
-  const savings = latestRound?.output_json?.potential_savings || []
-  // Only count high-confidence savings for the headline number
-  const highConf = savings.filter((item: any) => item.confidence === 'high')
-  // Fallback: if no items have confidence (old data), count all
-  const items = highConf.length > 0 ? highConf : savings
-  return items.reduce((sum: number, item: any) => {
-    return sum + parseMoney(item.annual_impact || '').amount
-  }, 0)
+  const ps = latestRound?.output_json?.potential_savings
+  if (!ps) return 0
+  // New range format
+  if (ps.optimistic_ceiling !== undefined) return typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseMoney(String(ps.optimistic_ceiling || '0')).amount
+  // Old array format
+  if (Array.isArray(ps)) {
+    const hasConf = ps.some((item: any) => item.confidence)
+    const items = hasConf ? ps.filter((item: any) => item.confidence !== 'low') : ps
+    return items.reduce((sum: number, item: any) => sum + parseMoney(item.annual_impact || '').amount, 0)
+  }
+  return 0
 }
 
 function DealMenu({ dealId, isClosed, totalCommitment, roundCount, hasSavings, onClose, onDelete, t }: {

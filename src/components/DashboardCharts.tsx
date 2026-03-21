@@ -53,7 +53,7 @@ interface Props {
   deals: DealRow[]
   baseCurrency: string
   savingsAchieved: number
-  isPro: boolean
+  plan: string
   isAdmin: boolean
   winRate: number
   closedDealCount: number
@@ -270,8 +270,10 @@ function SavingsBarChart({ data, currency, t, locale }: { data: Category[]; curr
   )
 }
 
-export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency, savingsAchieved, isPro, isAdmin, winRate, closedDealCount, wonDealCount, averageQuoteScore }: Props) {
-  const showProLock = !isPro && !isAdmin
+export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency, savingsAchieved, plan, isAdmin, winRate, closedDealCount, wonDealCount, averageQuoteScore }: Props) {
+  const isProOrAbove = plan === 'pro' || plan === 'business' || isAdmin
+  const isEssentials = plan === 'essentials' && !isAdmin
+  const isFree = !isProOrAbove && !isEssentials
   const { t, locale } = useI18n()
   const router = useRouter()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -315,7 +317,35 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
         {/* Spend by Category */}
         <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
           <h3 className="text-sm font-bold text-slate-900 mb-4">{t('charts.spendByCategory')}</h3>
-          {filteredCategories.length > 0 ? (
+          {isEssentials ? (
+            <div className="relative">
+              <div className="blur-sm pointer-events-none">
+                {filteredCategories.length > 0 ? (
+                  <DonutChart
+                    data={filteredCategories}
+                    currency={baseCurrency}
+                    t={t}
+                    locale={locale}
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={setSelectedCategory}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-40 text-center">
+                    <p className="text-xs text-slate-400">{t('charts.noCategoryData')}</p>
+                  </div>
+                )}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-xl">
+                <div className="text-center">
+                  <Lock className="w-5 h-5 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm font-semibold text-slate-700">{t('charts.unlockWithPro')}</p>
+                  <Link href="/pricing" className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
+                    {locale === 'fr' ? 'Passer à Pro' : 'Upgrade'} &rarr;
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : filteredCategories.length > 0 ? (
             <DonutChart
               data={filteredCategories}
               currency={baseCurrency}
@@ -334,7 +364,7 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
         {/* Savings: Identified vs Achieved */}
         <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm relative">
           <h3 className="text-sm font-bold text-slate-900 mb-4">{locale === 'fr' ? 'Économies par catégorie' : 'Savings by category'}</h3>
-          {showProLock ? (
+          {isFree ? (
             <div className="relative">
               <div className="filter blur-[4px] pointer-events-none select-none">
                 <SavingsBarChart data={filteredCategories} currency={baseCurrency} t={t} locale={locale} />
@@ -345,6 +375,21 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
                   <p className="text-xs font-semibold text-slate-900 mb-1">{t('charts.proFeature')}</p>
                   <Link href="/pricing" className="text-[10px] text-emerald-600 hover:text-emerald-700 font-medium">
                     {t('charts.unlockWithPro')} &rarr;
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : isEssentials ? (
+            <div className="relative">
+              <div className="blur-sm pointer-events-none">
+                <SavingsBarChart data={filteredCategories} currency={baseCurrency} t={t} locale={locale} />
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-xl">
+                <div className="text-center">
+                  <Lock className="w-5 h-5 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm font-semibold text-slate-700">{t('charts.unlockWithPro')}</p>
+                  <Link href="/pricing" className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
+                    {locale === 'fr' ? 'Passer à Pro' : 'Upgrade'} &rarr;
                   </Link>
                 </div>
               </div>
@@ -463,7 +508,48 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
         {/* Win Rate — 2 cols */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
           <h3 className="text-sm font-bold text-slate-900 mb-4">{t('charts.winRate')}</h3>
-          {closedDealCount > 0 ? (() => {
+          {isEssentials ? (
+            <div className="relative">
+              <div className="blur-sm pointer-events-none">
+                {closedDealCount > 0 ? (() => {
+                  const rate = Math.round((wonDealCount / closedDealCount) * 100)
+                  const circ = 2 * Math.PI * 40
+                  const dash = (rate / 100) * circ
+                  return (
+                    <div className="flex items-center gap-6">
+                      <div className="relative flex-shrink-0">
+                        <svg width="100" height="100" viewBox="0 0 96 96" className="-rotate-90">
+                          <circle cx="48" cy="48" r="40" fill="none" stroke="#f1f5f9" strokeWidth="8" />
+                          <circle cx="48" cy="48" r="40" fill="none" stroke="#10b981" strokeWidth="8"
+                            strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round" className="transition-all duration-700" />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-2xl font-bold text-slate-900">{rate}%</span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900 mb-1">{wonDealCount} {locale === 'fr' ? 'sur' : 'of'} {closedDealCount}</p>
+                        <p className="text-xs text-slate-500">
+                          {locale === 'fr' ? 'contrats clôturés avec succès' : 'deals closed successfully'}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })() : (
+                  <div className="h-24" />
+                )}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-xl">
+                <div className="text-center">
+                  <Lock className="w-5 h-5 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm font-semibold text-slate-700">{t('charts.unlockWithPro')}</p>
+                  <Link href="/pricing" className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
+                    {locale === 'fr' ? 'Passer à Pro' : 'Upgrade'} &rarr;
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : closedDealCount > 0 ? (() => {
             const rate = Math.round((wonDealCount / closedDealCount) * 100)
             const circ = 2 * Math.PI * 40
             const dash = (rate / 100) * circ
@@ -512,7 +598,52 @@ export function DashboardCharts({ categories, topSuppliers, deals, baseCurrency,
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-slate-900">{t('charts.topSuppliers')}</h3>
           </div>
-          {topSuppliers.length > 0 ? (
+          {isEssentials ? (
+            <div className="relative">
+              <div className="blur-sm pointer-events-none">
+                {topSuppliers.length > 0 ? (
+                  <div className="space-y-2.5">
+                    {topSuppliers.map((supplier, i) => {
+                      const maxSpend = topSuppliers[0]?.spend || 1
+                      return (
+                        <div key={supplier.name}>
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-[10px] font-bold text-slate-300 w-4 flex-shrink-0">{i + 1}</span>
+                              <span className="text-xs text-slate-700 truncate" title={supplier.name}>{supplier.name}</span>
+                              <span className="text-[10px] text-slate-400 flex-shrink-0">{supplier.count} {supplier.count === 1 ? (locale === 'fr' ? 'contrat' : 'deal') : t('charts.dealsLabel')}</span>
+                            </div>
+                            <div className="flex items-center gap-3 flex-shrink-0 ml-2">
+                              <span className="text-xs font-semibold text-slate-900 tabular-nums">
+                                {formatMoney(supplier.spend, baseCurrency, locale)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-slate-300 transition-all duration-500"
+                              style={{ width: `${(supplier.spend / maxSpend) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="h-32" />
+                )}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-xl">
+                <div className="text-center">
+                  <Lock className="w-5 h-5 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm font-semibold text-slate-700">{t('charts.unlockWithPro')}</p>
+                  <Link href="/pricing" className="text-xs text-emerald-600 hover:text-emerald-700 font-medium">
+                    {locale === 'fr' ? 'Passer à Pro' : 'Upgrade'} &rarr;
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : topSuppliers.length > 0 ? (
             <div className="space-y-2.5">
               {topSuppliers.map((supplier, i) => {
                 const maxSpend = topSuppliers[0]?.spend || 1

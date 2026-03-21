@@ -214,44 +214,65 @@ export function parseMoney(str: string): { amount: number; currency: Currency } 
     return { amount: 0, currency: 'EUR' }
   }
 
-  // Detect currency first
+  // If it's a raw number, return directly
+  if (typeof (str as any) === 'number') {
+    return { amount: str as any, currency: 'EUR' }
+  }
+
   const currency = detectCurrency(str)
 
-  // Check for range first: "$3,000-6,000" — take midpoint
-  const rangeMatch = str.match(/([\d.,\s]+)[-–—]\s*([\d.,\s]+)/)
-  if (rangeMatch) {
-    const parseNum = (s: string) => parseFloat(s.replace(/[\s,]/g, ''))
-    const a = parseNum(rangeMatch[1]), b = parseNum(rangeMatch[2])
-    if (!isNaN(a) && !isNaN(b) && a > 0 && b > 0) {
-      return { amount: (a + b) / 2, currency }
+  // Handle K/M suffixes first
+  const kmMatch = str.match(/([\d.,\s]+)\s*([KkMm])/)
+  if (kmMatch) {
+    const num = parseFloat(kmMatch[1].replace(/[\s,]/g, ''))
+    if (!isNaN(num)) {
+      if (kmMatch[2].toUpperCase() === 'K') return { amount: num * 1000, currency }
+      if (kmMatch[2].toUpperCase() === 'M') return { amount: num * 1000000, currency }
     }
   }
 
-  // Remove currency symbols and extra text
+  // Strip currency symbols and text suffixes
   let cleaned = str
-    .toUpperCase()
-    .replace(/USD|EUR|GBP|CAD|AUD|CHF|JPY/g, '')
-    .replace(/\$|€|£|¥/g, '')
-    .replace(/\/MONTH|\/YEAR|MONTHLY|ANNUAL|CONTRACT|SAVED|OVER CONTRACT LIFE|PER YEAR/g, '')
+    .replace(/[€$£¥]/g, '')
+    .replace(/USD|EUR|GBP|CAD|AUD|CHF|JPY/gi, '')
+    .replace(/saved|économisés?|potentiel|per year|\/year|\/yr|\/an|\/month|\/mo|over contract life|monthly|annual|contract/gi, '')
     .trim()
 
-  // Extract number with K/M suffix
-  const match = cleaned.match(/([\d,]+\.?\d*)\s*([KM])?/)
-  if (!match) {
-    return { amount: 0, currency }
+  // Handle ranges: take midpoint
+  const rangeMatch = cleaned.match(/([\d.,\s]+)[-–—]\s*([\d.,\s]+)/)
+  if (rangeMatch) {
+    const a = parseCleanNumber(rangeMatch[1])
+    const b = parseCleanNumber(rangeMatch[2])
+    if (a > 0 && b > 0) return { amount: (a + b) / 2, currency }
   }
 
-  const numberStr = match[1].replace(/,/g, '')
-  const suffix = match[2]
-  const baseAmount = parseFloat(numberStr)
-
-  if (isNaN(baseAmount)) {
-    return { amount: 0, currency }
-  }
-
-  let amount = baseAmount
-  if (suffix === 'K') amount *= 1000
-  if (suffix === 'M') amount *= 1000000
-
+  const amount = parseCleanNumber(cleaned)
   return { amount, currency }
+}
+
+/** Parse a number string handling both US (1,000.50) and European (1.000,50 or 1 000) formats */
+function parseCleanNumber(str: string): number {
+  let cleaned = str.trim()
+
+  // Remove spaces (French thousands: "77 599")
+  cleaned = cleaned.replace(/\s/g, '')
+
+  // Detect European format: "4.200" (dot as thousands) vs "4.20" (dot as decimal)
+  // European: digits.3digits with no other decimal = dot is thousands separator
+  if (/^\d{1,3}(\.\d{3})+$/.test(cleaned)) {
+    cleaned = cleaned.replace(/\./g, '') // dots are thousands separators
+  }
+  // "77.599,50" = European with decimal comma
+  if (/,\d{1,2}$/.test(cleaned)) {
+    cleaned = cleaned.replace(/\./g, '').replace(',', '.')
+  }
+
+  // Standard: strip commas (thousands separators in US format)
+  cleaned = cleaned.replace(/,/g, '')
+
+  // Remove any remaining non-numeric chars
+  cleaned = cleaned.replace(/[^\d.]/g, '')
+
+  const num = parseFloat(cleaned)
+  return isNaN(num) ? 0 : num
 }

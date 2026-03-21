@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { CreateDealSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/claude'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { FREE_ANALYSIS_LIMIT, isPaidPlan as checkIsPaidPlan } from '@/lib/tiers'
 
 // Allow up to 120s for classification + analysis with retries (Vercel Pro plan)
 export const maxDuration = 120
@@ -35,8 +36,6 @@ async function withRetry<T>(
   throw lastError
 }
 
-const FREE_ANALYSIS_LIMIT = 4
-
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
@@ -60,8 +59,8 @@ export async function POST(request: Request) {
 
     // Rate limiting (admins bypass)
     if (!profile.is_admin) {
-      const isPro = profile.plan === 'pro'
-      const rateLimit = await checkRateLimit(user.id, isPro)
+      const isPaidUser = checkIsPaidPlan(profile.plan as any)
+      const rateLimit = await checkRateLimit(user.id, profile.plan)
 
       if (!rateLimit.allowed) {
         return NextResponse.json(
@@ -74,10 +73,10 @@ export async function POST(request: Request) {
         )
       }
 
-      // Free plan limits (admins bypass)
-      if (!isPro && profile.usage_count >= FREE_ANALYSIS_LIMIT) {
+      // Free plan total limit (paid plans use rate limiter only)
+      if (!isPaidUser && profile.usage_count >= FREE_ANALYSIS_LIMIT) {
         return NextResponse.json(
-          { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Pro (€39/mo) for unlimited analyses.` },
+          { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (€15/mo) or Pro (€39/mo) for more analyses.` },
           { status: 403 }
         )
       }

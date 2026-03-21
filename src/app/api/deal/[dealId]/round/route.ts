@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { AddRoundSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/claude'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { FREE_ANALYSIS_LIMIT, isPaidPlan as checkIsPaidPlan } from '@/lib/tiers'
 
 // Allow up to 120s for classification + analysis with retries (Vercel Pro plan)
 export const maxDuration = 120
@@ -36,8 +37,6 @@ async function withRetry<T>(
   throw lastError
 }
 
-const FREE_ANALYSIS_LIMIT = 5
-
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ dealId: string }> }
@@ -65,8 +64,8 @@ export async function POST(
 
     // Rate limiting (admins bypass)
     if (!profile.is_admin) {
-      const isPro = profile.plan === 'pro'
-      const rateLimit = await checkRateLimit(user.id, isPro)
+      const isPaidUser = checkIsPaidPlan(profile.plan as any)
+      const rateLimit = await checkRateLimit(user.id, profile.plan)
 
       if (!rateLimit.allowed) {
         return NextResponse.json(
@@ -79,10 +78,10 @@ export async function POST(
         )
       }
 
-      // Free plan limits
-      if (!isPro && profile.usage_count >= FREE_ANALYSIS_LIMIT) {
+      // Free plan total limit (paid plans use rate limiter only)
+      if (!isPaidUser && profile.usage_count >= FREE_ANALYSIS_LIMIT) {
         return NextResponse.json(
-          { error: `Free plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Pro for unlimited analyses.` },
+          { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (€15/mo) or Pro (€39/mo) for more analyses.` },
           { status: 403 }
         )
       }
@@ -224,12 +223,6 @@ ${(output.red_flags || []).map((flag: any) => `
 
 **Leverage You Have:**
 ${(output.negotiation_plan?.leverage_you_have || []).map((l: string) => `- ${l}`).join('\n')}
-
-**Must-Have Asks:**
-${(output.negotiation_plan?.must_have_asks || []).map((a: string) => `- ${a}`).join('\n')}
-
-**Nice-to-Have Asks:**
-${(output.negotiation_plan?.nice_to_have_asks || []).map((a: string) => `- ${a}`).join('\n')}
 
 **Trades You Can Offer:**
 ${(output.negotiation_plan?.trades_you_can_offer || []).map((t: string) => `- ${t}`).join('\n')}

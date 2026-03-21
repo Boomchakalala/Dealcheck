@@ -23,7 +23,7 @@ export default async function AppLayout({
     .eq('id', user.id)
     .single()
 
-  const isPro = profile?.plan === 'pro'
+  const isPaid = profile?.plan === 'essentials' || profile?.plan === 'pro' || profile?.plan === 'business'
   const isAdmin = profile?.is_admin || false
   const usageCount = profile?.usage_count || 0
 
@@ -32,7 +32,7 @@ export default async function AppLayout({
       <UnifiedHeader
         variant="app"
         userEmail={user.email || 'user@example.com'}
-        isUpgraded={isPro}
+        isUpgraded={isPaid}
         usageCount={usageCount}
         isAdmin={isAdmin}
       />

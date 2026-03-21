@@ -85,7 +85,7 @@ export function SettingsClient({
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
-  const isPaid = plan === 'pro' || plan === 'business'
+  const isPaid = plan === 'essentials' || plan === 'pro' || plan === 'business'
   const remaining = Math.max(0, 4 - usageCount)
 
   // Avatar initial

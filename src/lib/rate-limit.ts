@@ -13,23 +13,27 @@ export interface RateLimitResult {
   message?: string
 }
 
-// Default limits for free users
-const DEFAULT_LIMITS: RateLimitConfig = {
+// Rate limits by tier
+const FREE_LIMITS: RateLimitConfig = {
   hourlyLimit: 5,
   dailyLimit: 5,
 }
 
-// Pro user limits
+const ESSENTIALS_LIMITS: RateLimitConfig = {
+  hourlyLimit: 5,
+  dailyLimit: 10,
+}
+
 const PRO_LIMITS: RateLimitConfig = {
   hourlyLimit: 10,
   dailyLimit: 30,
 }
 
-export async function checkRateLimit(userId: string, isPro: boolean = false): Promise<RateLimitResult> {
+export async function checkRateLimit(userId: string, plan: string = 'free'): Promise<RateLimitResult> {
   const supabase = await createClient()
   const now = new Date()
 
-  const limits = isPro ? PRO_LIMITS : DEFAULT_LIMITS
+  const limits = plan === 'pro' || plan === 'business' ? PRO_LIMITS : plan === 'essentials' ? ESSENTIALS_LIMITS : FREE_LIMITS
 
   // Count analyses in the last hour
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
@@ -100,8 +104,8 @@ export async function getUserUsage(userId: string): Promise<{
     .eq('id', userId)
     .single()
 
-  const isPro = profile?.plan === 'pro'
-  const limits = isPro ? PRO_LIMITS : DEFAULT_LIMITS
+  const plan = profile?.plan || 'free'
+  const limits = plan === 'pro' || plan === 'business' ? PRO_LIMITS : plan === 'essentials' ? ESSENTIALS_LIMITS : FREE_LIMITS
 
   // Count hourly usage
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)

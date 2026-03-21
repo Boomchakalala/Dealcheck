@@ -61,8 +61,7 @@ export const docusignExample: DealOutput = {
       "PandaDoc Business is ~€35/user/month for equivalent features — 30% cheaper",
       "You're renewing, not churning — maximum leverage point right now",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "2-year commitment in exchange for 10% discount and price lock",
       "G2 or Capterra review",
@@ -79,20 +78,29 @@ export const docusignExample: DealOutput = {
       "Price lock for 2 years — remove annual increase clause",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Right-size 40 to 30 seats",
-      annual_impact: "€6,000 saved",
-      confidence: 'high',
-      rationale: "15 seats are unused — cutting waste requires no concession",
-    },
-    {
-      ask: "10% loyalty discount on adjusted contract",
-      annual_impact: "€1,800 saved",
-      confidence: 'medium',
-      rationale: "Standard renewal discount — DocuSign AMs have authority for 10-15%",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "€6,000",
+    optimistic_ceiling: "€7,800",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Floor is driven by seat right-sizing alone; ceiling adds a loyalty discount that depends on negotiation.",
+    items: [
+      {
+        ask: "Right-size 40 to 30 seats",
+        tier: 1,
+        conservative_impact: "€6,000 saved",
+        optimistic_impact: "€6,000 saved",
+        rationale: "15 seats are unused — cutting waste requires no concession",
+      },
+      {
+        ask: "10% loyalty discount on adjusted contract",
+        tier: 2,
+        conservative_impact: "€0",
+        optimistic_impact: "€1,800 saved",
+        rationale: "Standard renewal discount — DocuSign AMs have authority for 10-15%",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re: DocuSign renewal",
@@ -234,8 +242,7 @@ export const salesforceExample: DealOutput = {
       "12 unused seats is documented proof you're over-licensed",
       "You have 3 months before renewal — enough time to run a competitive evaluation",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "Commit to 2-year renewal for discount and price lock",
       "Add 2 Service Cloud seats if per-seat rate comes down to €70",
@@ -252,20 +259,29 @@ export const salesforceExample: DealOutput = {
       "Reduce auto-renew notice from 90 to 30 days",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Right-size 40 to 32 seats",
-      annual_impact: "€7,200 saved",
-      confidence: 'high',
-      rationale: "12 seats are unused — cutting waste requires no concession",
-    },
-    {
-      ask: "8% loyalty discount on adjusted contract",
-      annual_impact: "€2,304 saved",
-      confidence: 'medium',
-      rationale: "Standard multi-year discount — Salesforce AMs routinely offer 8-12%",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "€7,200",
+    optimistic_ceiling: "€9,504",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Floor is driven by seat right-sizing alone; ceiling adds a multi-year loyalty discount that depends on negotiation.",
+    items: [
+      {
+        ask: "Right-size 40 to 32 seats",
+        tier: 1,
+        conservative_impact: "€7,200 saved",
+        optimistic_impact: "€7,200 saved",
+        rationale: "12 seats are unused — cutting waste requires no concession",
+      },
+      {
+        ask: "8% loyalty discount on adjusted contract",
+        tier: 2,
+        conservative_impact: "€0",
+        optimistic_impact: "€2,304 saved",
+        rationale: "Standard multi-year discount — Salesforce AMs routinely offer 8-12%",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re: Salesforce renewal",
@@ -407,8 +423,7 @@ export const microsoft365Example: DealOutput = {
       "Google Workspace Business Plus is €13.20/user/month — 67% cheaper for non-power users",
       "Annual prepay is standard — you're already on annual commitment, just not getting the discount",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "Prepay full year upfront for better rate",
       "Consolidate all Microsoft licensing through one reseller",
@@ -425,20 +440,29 @@ export const microsoft365Example: DealOutput = {
       "Extend auto-renew notice from 30 to 60 days",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Right-size 60 to 48 seats",
-      annual_impact: "€5,760 saved",
-      confidence: 'high',
-      rationale: "18 seats are unused — documented waste",
-    },
-    {
-      ask: "Annual prepay rate €40 to €37/user",
-      annual_impact: "€1,728 saved",
-      confidence: 'high',
-      rationale: "Reseller margin is negotiable — prepay rate is standard",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "€7,488",
+    optimistic_ceiling: "€7,488",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Both asks are high-confidence — seat right-sizing and prepay rate are standard, so floor and ceiling align.",
+    items: [
+      {
+        ask: "Right-size 60 to 48 seats",
+        tier: 1,
+        conservative_impact: "€5,760 saved",
+        optimistic_impact: "€5,760 saved",
+        rationale: "18 seats are unused — documented waste",
+      },
+      {
+        ask: "Annual prepay rate €40 to €37/user",
+        tier: 1,
+        conservative_impact: "€1,728 saved",
+        optimistic_impact: "€1,728 saved",
+        rationale: "Reseller margin is negotiable — prepay rate is standard",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re: Microsoft 365 renewal",
@@ -587,8 +611,7 @@ export const fedexExample: DealOutput = {
       "Uncapped fuel surcharge is indefensible — they know it",
       "Annual commitment gives them revenue certainty — use it hard",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "Increase minimum volume commitment to 1,100 parcels/month for better base rate",
       "2-year term for GRI cap and rate lock",
@@ -606,20 +629,29 @@ export const fedexExample: DealOutput = {
       "Volume rebate trigger at 1,200 parcels/month",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Base rate $4.20 to $3.50 (1,000 avg/mo)",
-      annual_impact: "$8,400 saved",
-      confidence: 'high',
-      rationale: "Negotiated market rate is $3.20-3.60 at this volume — well documented",
-    },
-    {
-      ask: "Fuel surcharge 20% to 12%",
-      annual_impact: "$4,152 saved",
-      confidence: 'high',
-      rationale: "Market surcharges run 10-14% — 20% is above market",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "$12,552",
+    optimistic_ceiling: "$12,552",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Both asks are high-confidence — base rate and fuel surcharge are well above documented market rates, so floor and ceiling align.",
+    items: [
+      {
+        ask: "Base rate $4.20 to $3.50 (1,000 avg/mo)",
+        tier: 1,
+        conservative_impact: "$8,400 saved",
+        optimistic_impact: "$8,400 saved",
+        rationale: "Negotiated market rate is $3.20-3.60 at this volume — well documented",
+      },
+      {
+        ask: "Fuel surcharge 20% to 12%",
+        tier: 1,
+        conservative_impact: "$4,152 saved",
+        optimistic_impact: "$4,152 saved",
+        rationale: "Market surcharges run 10-14% — 20% is above market",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re: FedEx agreement",
@@ -775,8 +807,7 @@ export const konicaExample: DealOutput = {
       "No exit clause is one-sided and easy to challenge",
       "Exclusive consumables clause is unusual — any competitor will offer open supply",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "Commit to full 3-year term upfront if lease drops to €700",
       "Purchase extended warranty add-on if toner exclusivity is removed",
@@ -794,20 +825,29 @@ export const konicaExample: DealOutput = {
       "Include annual service fee in monthly rate — simplify billing",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Lease rate €870 to €700/month",
-      annual_impact: "€2,040 saved",
-      confidence: 'high',
-      rationale: "Ricoh, Canon, Xerox all quoting €620-720 for equivalent devices",
-    },
-    {
-      ask: "Toner open market saving (est.)",
-      annual_impact: "€360 saved",
-      confidence: 'medium',
-      rationale: "Third-party toners run 25-35% cheaper — depends on clause removal",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "€2,040",
+    optimistic_ceiling: "€2,400",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Floor is driven by the lease rate reduction alone; ceiling adds toner savings that depend on removing the exclusivity clause.",
+    items: [
+      {
+        ask: "Lease rate €870 to €700/month",
+        tier: 1,
+        conservative_impact: "€2,040 saved",
+        optimistic_impact: "€2,040 saved",
+        rationale: "Ricoh, Canon, Xerox all quoting €620-720 for equivalent devices",
+      },
+      {
+        ask: "Toner open market saving (est.)",
+        tier: 2,
+        conservative_impact: "€0",
+        optimistic_impact: "€360 saved",
+        rationale: "Third-party toners run 25-35% cheaper — depends on clause removal",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re: Konica Minolta lease",
@@ -961,8 +1001,7 @@ export const bdoExample: DealOutput = {
       "12% increase clause is aggressive and straightforward to push back on",
       "You're a growing business — they want the long-term relationship",
     ],
-    must_have_asks: [],
-    nice_to_have_asks: [],
+
     trades_you_can_offer: [
       "2-year commitment for rate lock and reduced hourly rate",
       "Refer one business contact in your network",
@@ -980,26 +1019,36 @@ export const bdoExample: DealOutput = {
       "Reduce cancellation notice from 60 to 30 days",
     ],
   },
-  potential_savings: [
-    {
-      ask: "Hourly rate €210 to €150 (35hrs/yr)",
-      annual_impact: "€2,100 saved",
-      confidence: 'high',
-      rationale: "Market rate is €130-160/hour — €210 is well above standard",
-    },
-    {
-      ask: "Annual increase 12% to 3% (year 2 saving)",
-      annual_impact: "€1,512 saved",
-      confidence: 'high',
-      rationale: "3-5% tied to CPI is industry standard — 12% is indefensible",
-    },
-    {
-      ask: "Hours cap risk mitigation (est.)",
-      annual_impact: "€1,500 saved",
-      confidence: 'medium',
-      rationale: "Prevents uncapped billing in complex years — depends on cap negotiation",
-    },
-  ],
+  potential_savings: {
+    conservative_floor: "€3,612",
+    optimistic_ceiling: "€5,112",
+    floor_label: "If your strongest asks land",
+    ceiling_label: "If vendor meets you halfway",
+    summary: "Floor covers the hourly rate and annual increase reductions; ceiling adds hours-cap risk mitigation that depends on negotiation.",
+    items: [
+      {
+        ask: "Hourly rate €210 to €150 (35hrs/yr)",
+        tier: 1,
+        conservative_impact: "€2,100 saved",
+        optimistic_impact: "€2,100 saved",
+        rationale: "Market rate is €130-160/hour — €210 is well above standard",
+      },
+      {
+        ask: "Annual increase 12% to 3% (year 2 saving)",
+        tier: 1,
+        conservative_impact: "€1,512 saved",
+        optimistic_impact: "€1,512 saved",
+        rationale: "3-5% tied to CPI is industry standard — 12% is indefensible",
+      },
+      {
+        ask: "Hours cap risk mitigation (est.)",
+        tier: 2,
+        conservative_impact: "€0",
+        optimistic_impact: "€1,500 saved",
+        rationale: "Prevents uncapped billing in complex years — depends on cap negotiation",
+      },
+    ],
+  },
   email_drafts: {
     neutral: {
       subject: "Re: BDO proposal",

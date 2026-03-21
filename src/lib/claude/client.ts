@@ -51,7 +51,7 @@ export function parseJsonFromContent(content: string): unknown {
 
 export function getLanguageInstruction(locale: string): string {
   if (locale === 'fr') {
-    return '\n\nIMPORTANT: The user\'s language preference is French. Generate ALL output text in French. This includes: verdict, red flag descriptions, negotiation advice, strategy text, savings descriptions, and all other user-facing text. Use professional French business/procurement terminology. Keep proper nouns, product names, and currency amounts as-is.'
+    return '\n\nIMPORTANT: The user\'s language preference is French. Generate ALL output text in French. This includes: verdict, red flag descriptions, negotiation advice, strategy text, savings descriptions, email drafts, and all other user-facing text. Use professional French business/procurement terminology. Keep proper nouns, product names, and currency amounts as-is. For email greetings, use "Bonjour [Name]," (not "Hi" or "Hey"). For email sign-offs, use "Cordialement," followed by "[Votre nom]".'
   }
   return '\n\nIMPORTANT: Generate ALL output text in English.'
 }

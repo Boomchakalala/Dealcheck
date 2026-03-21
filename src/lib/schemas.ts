@@ -2,7 +2,9 @@ import { z } from 'zod'
 
 // Zod schema for strict validation of OpenAI output
 export const RedFlagSchema = z.object({
-  type: z.string(), // Flexible to allow any category
+  type: z.string(),
+  severity: z.enum(['high', 'medium', 'low']).default('medium'),
+  score_category: z.enum(['pricing', 'terms', 'leverage']).default('pricing'),
   issue: z.string(),
   why_it_matters: z.string(),
   what_to_ask_for: z.string(),
@@ -41,24 +43,16 @@ export const DealOutputSchema = z.object({
   red_flags: z.array(RedFlagSchema).default([]),
   negotiation_plan: z.object({
     leverage_you_have: z.array(z.string()).default([]),
-    must_have_asks: z.array(z.string()).default([]),
-    nice_to_have_asks: z.array(z.string()).default([]),
     trades_you_can_offer: z.array(z.string()).default([]),
   }).optional().default({}),
   what_to_ask_for: z.object({
     must_have: z.array(z.string()).default([]),
     nice_to_have: z.array(z.string()).default([]),
   }).optional().default({}),
-  potential_savings: z.array(z.object({
-    ask: z.string(),
-    annual_impact: z.string(),
-    confidence: z.enum(['high', 'medium', 'low']).default('medium'),
-    rationale: z.string().optional().default(''),
-  })).optional().default([]),
+  potential_savings: z.any().optional().default({}),
   cash_flow_improvements: z.array(z.object({
-    type: z.string(),
     recommendation: z.string(),
-    category: z.enum(['cash_flow', 'risk_protection', 'liability']),
+    category: z.enum(['cash_flow', 'risk']),
   })).optional().default([]),
   score: z.number().min(0).max(100).optional(),
   score_label: z.string().optional(),
@@ -193,7 +187,7 @@ export const DealOutputSchemaV2 = z.object({
 
 // Quote Classification Schema (Step 1 of two-step pipeline)
 export const QuoteClassificationSchema = z.object({
-  quote_type: z.enum(['saas', 'professional_services', 'product_hardware', 'household', 'event_project', 'construction']).catch('professional_services'),
+  quote_type: z.enum(['saas', 'professional_services', 'product_hardware', 'household', 'event_project', 'construction', 'staffing', 'travel', 'media', 'usage_based_infra', 'managed_services', 'insurance', 'logistics', 'leasing', 'garage']).catch('professional_services'),
   deal_size_bracket: z.enum(['micro', 'small', 'medium', 'large', 'enterprise']).catch('medium'),
   recurring: z.boolean().catch(false),
   leverage_level: z.enum(['high', 'medium', 'low', 'unclear']).catch('medium'),
