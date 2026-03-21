@@ -113,59 +113,60 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
     return isNaN(num) ? 0 : num
   }
 
-  // Parse savings from new range-based structure (with backward compat for old array format)
+  // Parse savings: new must-have/nice-to-have format with backward compat
   const savingsData = useMemo(() => {
     const ps = output.potential_savings as any
-    if (!ps || (typeof ps === 'object' && !Array.isArray(ps) && !ps.items && !ps.conservative_floor)) {
-      return { floor: 0, ceiling: 0, floorLabel: '', ceilingLabel: '', summary: '', items: [], bonus: [], isRange: false }
-    }
+    if (!ps) return { total: 0, currency: '', mustHave: [], niceToHave: [] }
 
-    // New range-based format
-    if (ps.conservative_floor !== undefined || ps.items) {
-      // Handle both raw numbers and formatted strings
-      const parseVal = (v: any) => typeof v === 'number' ? v : parseMoney(String(v || '0')).amount
-      const floor = parseVal(ps.conservative_floor)
-      const ceiling = parseVal(ps.optimistic_ceiling)
+    // New must-have/nice-to-have format
+    if (ps.must_have !== undefined) {
+      const total = typeof ps.total === 'number' ? ps.total : parseMoney(String(ps.total || '0')).amount
       return {
-        floor,
-        ceiling,
+        total,
         currency: ps.currency || '',
-        floorLabel: ps.floor_label || '',
-        ceilingLabel: ps.ceiling_label || '',
-        summary: ps.summary || '',
-        items: (ps.items || []).map((item: any) => ({
-          ...item,
-          conservative_impact: typeof item.conservative_impact === 'number' ? item.conservative_impact : parseVal(item.conservative_impact),
-          optimistic_impact: typeof item.optimistic_impact === 'number' ? item.optimistic_impact : parseVal(item.optimistic_impact),
+        mustHave: (ps.must_have || []).map((item: any) => ({
+          ask: item.ask,
+          amount: typeof item.amount === 'number' ? item.amount : parseMoney(String(item.amount || '0')).amount,
+          rationale: item.rationale || '',
         })),
-        bonus: ps.bonus_opportunities || [],
-        isRange: true,
+        niceToHave: (ps.nice_to_have || []).map((item: any) => ({
+          ask: item.ask,
+          amount: typeof item.amount === 'number' ? item.amount : parseMoney(String(item.amount || '0')).amount,
+          rationale: item.rationale || '',
+        })),
       }
     }
 
-    // Old array format (backward compat)
-    if (Array.isArray(ps)) {
-      const headline = ps.filter((s: any) => s.confidence !== 'low')
-      const bonus = ps.filter((s: any) => s.confidence === 'low')
-      const total = headline.reduce((sum: number, s: any) => sum + parseMoney(s.annual_impact || '').amount, 0)
+    // Old range format (backward compat)
+    if (ps.optimistic_ceiling !== undefined || ps.items) {
+      const parseVal = (v: any) => typeof v === 'number' ? v : parseMoney(String(v || '0')).amount
+      const ceiling = parseVal(ps.optimistic_ceiling)
+      const items = ps.items || []
       return {
-        floor: total,
-        ceiling: total,
-        floorLabel: '',
-        ceilingLabel: '',
-        summary: '',
-        items: headline.map((s: any) => ({ ask: s.ask, tier: s.confidence === 'high' ? 1 : 2, conservative_impact: s.annual_impact, optimistic_impact: s.annual_impact, rationale: s.rationale || '' })),
-        bonus: bonus.map((s: any) => ({ ask: s.ask, range: s.annual_impact, note: s.rationale || '' })),
-        isRange: false,
+        total: ceiling,
+        currency: ps.currency || '',
+        mustHave: items.filter((i: any) => i.tier === 1).map((i: any) => ({ ask: i.ask, amount: parseVal(i.optimistic_impact), rationale: i.rationale || '' })),
+        niceToHave: items.filter((i: any) => i.tier === 2).map((i: any) => ({ ask: i.ask, amount: parseVal(i.optimistic_impact), rationale: i.rationale || '' })),
       }
     }
 
-    return { floor: 0, ceiling: 0, floorLabel: '', ceilingLabel: '', summary: '', items: [], bonus: [], isRange: false }
+    // Old flat array format (backward compat)
+    if (Array.isArray(ps)) {
+      const mustHave = ps.filter((s: any) => s.confidence !== 'low')
+      const niceToHave = ps.filter((s: any) => s.confidence === 'low')
+      const total = mustHave.reduce((sum: number, s: any) => sum + parseMoney(s.annual_impact || '').amount, 0)
+      return {
+        total,
+        currency: '',
+        mustHave: mustHave.map((s: any) => ({ ask: s.ask, amount: parseMoney(s.annual_impact || '').amount, rationale: s.rationale || '' })),
+        niceToHave: niceToHave.map((s: any) => ({ ask: s.ask, amount: parseMoney(s.annual_impact || '').amount, rationale: s.rationale || '' })),
+      }
+    }
+
+    return { total: 0, currency: '', mustHave: [], niceToHave: [] }
   }, [output.potential_savings])
 
-  // For backward compat in metric cards
-  const headlineTotal = savingsData.ceiling > 0 ? savingsData.ceiling : savingsData.floor
-  const hasOnlyBonus = savingsData.floor === 0 && savingsData.ceiling === 0 && savingsData.bonus.length > 0
+  const headlineTotal = savingsData.total
 
   const formatSavings = (amount: number) => {
     const dealTotal = output.snapshot?.total_commitment || ''
@@ -346,11 +347,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                     <div>
                       <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('output.potentialSavings')}</p>
                       <p className="text-lg font-bold text-emerald-700">
-                        {savingsData.ceiling > 0
-                          ? savingsData.floor > 0 && savingsData.floor !== savingsData.ceiling
-                            ? `${formatSavings(savingsData.floor)} - ${formatSavings(savingsData.ceiling)}`
-                            : formatSavings(savingsData.ceiling)
-                          : t('output.na')}
+                        {headlineTotal > 0 ? formatSavings(headlineTotal) : t('output.na')}
                       </p>
                       <p className="text-[11px] text-slate-500">
                         {savingsPct > 0 ? t('output.percentPotentialSavings', { pct: String(savingsPct) }) : t('output.noSavingsCalculated')}
@@ -923,7 +920,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
       {/* ══════════════════════════════════════════════════════════════ */}
       {/* SECTION 2: SAVINGS IMPACT - Simplified */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      {(savingsData.items.length > 0 || savingsData.bonus.length > 0) && (() => {
+      {(savingsData.mustHave.length > 0 || savingsData.niceToHave.length > 0) && (() => {
         const dealTotal = output.snapshot?.total_commitment || ''
         const currencySymbol = dealTotal.includes('€') ? '€' : dealTotal.includes('£') ? '£' : dealTotal.includes('C$') ? 'C$' : dealTotal.includes('A$') ? 'A$' : '$'
         const fmtCurrency = (amount: number) => {
@@ -932,10 +929,8 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           return `${currencySymbol}${Math.round(amount)}`
         }
         const dealTotalNum = parseMoney(dealTotal).amount
-        const ceilingPct = dealTotalNum > 0 ? Math.min((savingsData.ceiling / dealTotalNum) * 100, 50) : 0
-        const floorPct = dealTotalNum > 0 ? Math.min((savingsData.floor / dealTotalNum) * 100, 50) : 0
-        const tier1Items = savingsData.items.filter((i: any) => i.tier === 1)
-        const tier2Items = savingsData.items.filter((i: any) => i.tier === 2)
+        const savingsPctLocal = dealTotalNum > 0 ? Math.min((headlineTotal / dealTotalNum) * 100, 50) : 0
+        const niceToHaveTotal = savingsData.niceToHave.reduce((sum: number, i: any) => sum + (i.amount || 0), 0)
 
         return (
         <div className="mb-8">
@@ -948,7 +943,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           </div>
 
           <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm">
-            {/* Range header */}
+            {/* Header with total */}
             <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-6 pb-6 border-b-2 border-slate-200">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
@@ -956,58 +951,47 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-900">{t('output.potentialSavingsTitle')}</h3>
-                  {savingsData.summary && <p className="text-xs text-slate-600 mt-0.5">{savingsData.summary}</p>}
+                  <p className="text-xs text-slate-600">{t('output.estimatedImpactIfNegotiate')}</p>
                 </div>
               </div>
-              <div className="flex gap-3">
-                {savingsData.floor > 0 && (
-                  <div className="text-center bg-emerald-50 rounded-xl px-4 py-3 border-2 border-emerald-200">
-                    <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-wide mb-0.5">{t('output.conservativeFloor')}</p>
-                    <p className="text-xl font-bold text-emerald-700">{fmtCurrency(savingsData.floor)}</p>
-                    {savingsData.floorLabel && <p className="text-[9px] text-emerald-600 mt-0.5">{savingsData.floorLabel}</p>}
-                  </div>
+              <div className="text-right bg-emerald-50 rounded-xl px-5 py-3 border-2 border-emerald-200">
+                <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide mb-0.5">{t('output.potentialSavings')}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-emerald-700">{fmtCurrency(headlineTotal)}</p>
+                {niceToHaveTotal > 0 && (
+                  <p className="text-[10px] text-emerald-600 mt-0.5">+ {fmtCurrency(niceToHaveTotal)} {t('output.bonusIfNegotiated')}</p>
                 )}
-                <div className="text-center bg-emerald-50 rounded-xl px-4 py-3 border-2 border-emerald-200">
-                  <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-wide mb-0.5">{savingsData.floor > 0 ? t('output.optimisticCeiling') : t('output.potentialSavings')}</p>
-                  <p className="text-xl font-bold text-emerald-700">{fmtCurrency(savingsData.ceiling)}</p>
-                  {savingsData.ceilingLabel && <p className="text-[9px] text-emerald-600 mt-0.5">{savingsData.ceilingLabel}</p>}
-                </div>
               </div>
             </div>
 
             {/* Visual comparison bar */}
-            {dealTotalNum > 0 && ceilingPct > 0 && (
+            {dealTotalNum > 0 && savingsPctLocal > 0 && (
               <div className="mb-6">
                 <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1.5">
                   <span>{t('output.originalQuote')} <span className="font-semibold text-slate-700">{dealTotal}</span></span>
-                  <span>{t('output.potentialSavings')} <span className="font-semibold text-emerald-700">{fmtCurrency(savingsData.ceiling)}</span></span>
+                  <span>{t('output.potentialSavings')} <span className="font-semibold text-emerald-700">{fmtCurrency(headlineTotal)}</span></span>
                 </div>
-                <div className="h-4 bg-slate-100 rounded-full overflow-hidden relative">
-                  <div className="h-full bg-slate-300 rounded-l-full" style={{ width: `${100 - ceilingPct}%` }} />
-                  <div className="h-full bg-emerald-400 absolute top-0 right-0 rounded-r-full" style={{ width: `${ceilingPct}%` }} />
-                  {floorPct > 0 && floorPct < ceilingPct && (
-                    <div className="h-full bg-emerald-600 absolute top-0 rounded-r-full" style={{ right: `${ceilingPct - floorPct}%`, width: `${floorPct}%` }} />
-                  )}
+                <div className="h-4 bg-slate-100 rounded-full overflow-hidden flex">
+                  <div className="h-full bg-slate-300 rounded-l-full transition-all duration-500" style={{ width: `${100 - savingsPctLocal}%` }} />
+                  <div className="h-full bg-emerald-500 rounded-r-full transition-all duration-500" style={{ width: `${savingsPctLocal}%` }} />
                 </div>
                 <div className="flex items-center justify-between text-[10px] mt-1">
-                  <span className="text-slate-400">{t('output.afterSavings', { amount: fmtCurrency(Math.max(0, dealTotalNum - savingsData.ceiling)) })}</span>
-                  <span className="font-semibold text-emerald-600">{t('output.percentSavings', { pct: ceilingPct.toFixed(0) })}</span>
+                  <span className="text-slate-400">{t('output.afterSavings', { amount: fmtCurrency(Math.max(0, dealTotalNum - headlineTotal)) })}</span>
+                  <span className="font-semibold text-emerald-600">{t('output.percentSavings', { pct: savingsPctLocal.toFixed(0) })}</span>
                 </div>
               </div>
             )}
 
             <div className="space-y-6">
-              {/* Tier 1: Solid savings */}
-              {tier1Items.length > 0 && (
+              {/* Must-have savings */}
+              {savingsData.mustHave.length > 0 && (
               <div>
-                <h4 className="text-sm font-bold text-slate-900 mb-1">{t('output.solidSavings')}</h4>
-                <p className="text-xs text-slate-500 mb-4">{t('output.solidSavingsDesc')}</p>
+                <h4 className="text-sm font-bold text-slate-900 mb-1">{t('output.mustHaveSavings')}</h4>
+                <p className="text-xs text-slate-500 mb-4">{t('output.mustHaveSavingsDesc')}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {tier1Items.map((item: any, idx: number) => (
+                  {savingsData.mustHave.map((item: any, idx: number) => (
                     <div key={idx} className="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4">
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="text-lg font-bold text-emerald-700 break-words min-w-0">{typeof item.optimistic_impact === 'number' ? fmtCurrency(item.optimistic_impact) : item.optimistic_impact}</span>
-                        <span className="text-[9px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold flex-shrink-0">TIER 1</span>
+                        <span className="text-lg font-bold text-emerald-700 break-words min-w-0">{fmtCurrency(item.amount)}</span>
                       </div>
                       <p className="text-sm text-slate-800 font-medium leading-relaxed">{item.ask}</p>
                       {item.rationale && <p className="text-xs text-emerald-600 mt-1.5 italic">{item.rationale}</p>}
@@ -1017,40 +1001,20 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
               </div>
               )}
 
-              {/* Tier 2: Achievable savings */}
-              {tier2Items.length > 0 && (
-              <div>
-                <h4 className="text-sm font-bold text-slate-900 mb-1">{t('output.achievableSavings')}</h4>
-                <p className="text-xs text-slate-500 mb-4">{t('output.achievableSavingsDesc')}</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {tier2Items.map((item: any, idx: number) => (
-                    <div key={idx} className="bg-amber-50 border-2 border-amber-200 rounded-lg p-4">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="text-lg font-bold text-amber-700 break-words min-w-0">{typeof item.optimistic_impact === 'number' ? fmtCurrency(item.optimistic_impact) : item.optimistic_impact}</span>
-                        <span className="text-[9px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold flex-shrink-0">TIER 2</span>
-                      </div>
-                      <p className="text-sm text-slate-800 font-medium leading-relaxed">{item.ask}</p>
-                      {item.rationale && <p className="text-xs text-amber-600 mt-1.5 italic">{item.rationale}</p>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              )}
-
-              {/* Bonus opportunities (Tier 3) */}
-              {savingsData.bonus.length > 0 && (
+              {/* Nice-to-have savings */}
+              {savingsData.niceToHave.length > 0 && (
               <div>
                 <h4 className="text-sm font-bold text-slate-900 mb-1">{t('output.bonusOpportunities')}</h4>
                 <p className="text-xs text-slate-500 mb-4">{t('output.bonusOpportunitiesDesc')}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {savingsData.bonus.map((item: any, idx: number) => (
-                    <div key={idx} className="bg-slate-50 border-2 border-slate-200 rounded-lg p-4">
+                  {savingsData.niceToHave.map((item: any, idx: number) => (
+                    <div key={idx} className="bg-amber-50 border-2 border-amber-200 rounded-lg p-4">
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="text-lg font-bold text-slate-600 break-words min-w-0">{item.range}</span>
-                        <span className="text-[9px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold flex-shrink-0">{t('output.longShot')}</span>
+                        <span className="text-lg font-bold text-amber-700 break-words min-w-0">{fmtCurrency(item.amount)}</span>
+                        <span className="text-[9px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold flex-shrink-0">{t('output.worthAsking')}</span>
                       </div>
                       <p className="text-sm text-slate-800 font-medium leading-relaxed">{item.ask}</p>
-                      {item.note && <p className="text-xs text-slate-500 mt-1.5 italic">{item.note}</p>}
+                      {item.rationale && <p className="text-xs text-amber-600 mt-1.5 italic">{item.rationale}</p>}
                     </div>
                   ))}
                 </div>

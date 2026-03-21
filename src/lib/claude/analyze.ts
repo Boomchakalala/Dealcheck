@@ -231,11 +231,11 @@ what_to_ask_for.nice_to_have
 - optional improvements, not the core battle
 
 potential_savings
-- range-based: conservative floor (Tier 1 only) and optimistic ceiling (Tier 1 + Tier 2)
-- each item classified as Tier 1 (solid), Tier 2 (achievable), or Tier 3 (bonus)
-- MINIMUM 1 ITEM on every analysis
-- Tier 3 items go in bonus_opportunities, not in items array
-- include a summary sentence explaining what drives floor vs ceiling
+- must_have items: count toward headline number, go in the email
+- nice_to_have items: shown separately as bonus
+- total = sum of must_have amounts, must be at least 5% of total_commitment
+- MINIMUM 1 must_have item on every analysis
+- all amounts as raw numbers, currency in separate field
 
 cash_flow_improvements
 - payment structure or non-cash commercial improvements
@@ -419,129 +419,56 @@ When payment terms are relevant:
 - do not count them as potential_savings
 
 ==================================================
-SAVINGS CALCULATION
+SAVINGS
 ==================================================
 
-Your job is to find every realistic negotiation opportunity and present it as a range:
-a conservative floor (strongest asks only) and an optimistic ceiling (if vendor meets you halfway).
+Find every realistic negotiation opportunity. Each one is either a must-have or a nice-to-have.
 
-NEVER show $0 or 0 EUR as a savings figure if any commercial opportunity exists.
-A savings tool that returns zero has failed. If leverage exists, quantify it.
+NEVER show zero savings if any commercial opportunity exists.
+A savings tool that returns zero has failed.
 
-CRITICAL FORMAT RULE FOR SAVINGS:
-All monetary values in potential_savings (conservative_floor, optimistic_ceiling, conservative_impact, optimistic_impact) must be RAW NUMBERS, not formatted strings.
-- CORRECT: 4200
-- WRONG: "$4,200" or "4.200 EUR" or "4,200 saved"
+FORMAT RULE: All amounts in potential_savings must be RAW NUMBERS, not formatted strings.
+- CORRECT: 700
+- WRONG: "$700" or "700 EUR" or "700 saved"
 Include a separate "currency" field with "EUR", "USD", etc.
-The range field in bonus_opportunities can be a string like "5000-8000".
 
-STEP A: CLASSIFY EACH SAVINGS OPPORTUNITY
+MUST-HAVE SAVINGS: items you would confidently put in an email.
+These count toward the headline savings number.
+- Removing unused seats or licenses documented in the quote
+- Overpriced line items, fees, or packs that can be challenged
+- Reseller or intermediary margin that can be negotiated
+- Duplicate charges or billing errors
+- Right-sizing scope to match documented usage
+- Budget constraint discount (5% ask on any negotiated quote)
 
-For every commercial red flag or pricing opportunity, assign it to one of three tiers:
+NICE-TO-HAVE SAVINGS: reasonable asks where outcome depends on vendor.
+Shown separately, not in the headline.
+- Multi-year commitment discounts
+- Loyalty or renewal discounts
+- Bundling or unbundling optimization
+- Including extras in the deal price
 
-TIER 1: SOLID (counts toward conservative floor AND optimistic ceiling)
-These are savings you would confidently put in an email tomorrow:
-- Removing unused seats or licenses clearly documented in the quote
-- Line items that are visibly above market within the quote context
-- Reseller markup that can be challenged with direct pricing
-- Duplicate charges or billing errors visible in the quote
-- Right-sizing scope to match actual documented usage
-- Overage caps on usage-based pricing where exposure is clearly quantified
+HEADLINE NUMBER = sum of all must-have savings items.
+This number must be at least 5% of total_commitment. This is a hard minimum.
+If your must-have total is under 5%, add a "5% overall discount citing budget constraints" item.
+The only exception is genuinely fixed published pricing (government rates, regulated tariffs).
 
-TIER 2: ACHIEVABLE (counts toward optimistic ceiling only)
-Reasonable asks where outcome depends on vendor flexibility:
-- Package or volume discounts on negotiated (non-published) pricing
-- Multi-year commitment discounts when user has not confirmed they would commit
-- Loyalty discounts for renewals (vendor has to agree)
-- Rate reductions where the quote structure suggests room
-- Bundling or unbundling to optimize pricing
-- Budget constraint discounts (5% ask on a negotiated quote)
+Each challengeable element in the quote MUST be a separate savings item. Do NOT merge them.
+Example for a car quote:
+- Must-have: 5% off vehicle price = 650
+- Must-have: Reduce pack fees by 300 = 300
+- Nice-to-have: Include accessories in the deal = 200
+- Headline = 650 + 300 = 950
 
-TIER 3: SPECULATIVE (never counts toward either number, shown separately as bonus)
-Only worth mentioning, never worth quantifying in the headline:
-- Switching to a competitor product
-- Leveraging quotes the user has not confirmed they have
-- Assumptions about user flexibility or willingness to change scope
-- Generic percentage discounts on published or fixed or self-serve pricing
+RED FLAG TO SAVINGS CONSISTENCY:
+Every commercial red flag with a dollar amount MUST appear as a must-have savings item.
+Do NOT force savings entries for terms-only flags (renewal, cancellation, liability).
 
-STEP B: CALCULATE THE RANGE
-
-CONSERVATIVE FLOOR = sum of all Tier 1 savings only
-OPTIMISTIC CEILING = sum of Tier 1 + Tier 2 savings combined
-
-Rules:
-- Both numbers must be annual figures, never multi-year totals
-- Both numbers must be in the same currency as the deal
-- Conservative floor must be less than 20% of total_commitment
-- Optimistic ceiling must be less than 30% of total_commitment
-- If ceiling would exceed 30%, cap it at 30% and note this in rationale
-- Floor must always be lower than or equal to ceiling
-
-SPECIAL CASE: when floor is genuinely zero
-If truly no Tier 1 savings exist (pricing is fixed, published, or non-negotiable):
-- Floor = 0 is acceptable
-- BUT ceiling must still reflect Tier 2 opportunities
-- Label changes to: "Up to [ceiling] if vendor is flexible"
-- Never show 0/0. If both are zero, the deal is clean and say so clearly.
-
-SAVINGS FLOOR (MANDATORY):
-Every analysis MUST return at least one savings item. No exceptions.
-
-MINIMUM TARGET: optimistic_ceiling must be at least 5% of total_commitment.
-If your total ceiling is under 5%, you have not looked hard enough. Go back and check:
-- Can you challenge the headline price? (3-5% ask on any negotiated or intermediary quote)
-- Are there fees, packs, bundles, or add-ons that can be reduced or removed?
-- Is there a setup, admin, processing, or handling fee with margin in it?
-- Is the vendor a broker, reseller, or intermediary? If yes, their margin is negotiable.
-- Can you trade something (fast payment, referral, volume) for a discount?
-
-The optimistic_ceiling must be at least 5% of total_commitment. This is a hard floor, not a suggestion.
-If your ceiling is under 5%, recalculate. Add a budget constraint ask or package discount to reach 5%.
-The only exception is genuinely fixed published pricing (e.g., government rates, regulated tariffs).
-
-If the quote is broadly fair and no specific line-item issues exist:
-- calculate 5% of total_commitment and include it as a Tier 2 item
-- rationale: "Standard budget constraint ask. No vendor prices at their floor."
-This is how real procurement works. No buyer signs at the first quoted price without testing.
-
-STEP C: RED FLAG TO SAVINGS CONSISTENCY
-
-Every commercial red flag with a dollar amount MUST appear as a Tier 1 or Tier 2 savings item.
-Do NOT put dollar amounts in red flags but leave potential_savings items empty.
-
-Rules:
-- COMMERCIAL red flags with specific dollar amounts = Tier 1 savings item
-- COMMERCIAL red flags about likely overpricing = Tier 2 savings item
-- Setup fees, onboarding fees, quantity waste = Tier 1 or Tier 2 depending on evidence
-- Package discount recommended in must_have = Tier 2 savings item
-
-Do NOT force savings entries for:
-- renewal traps (terms, not cash)
-- cancellation language (terms, not cash)
-- liability or legal protections (terms, not cash)
-- wording-only risks without grounded numbers
-
-STEP D: SPECIAL CONTEXTS
-
-PUBLISHED OR FIXED PRICING:
-- Tier 1 savings are rare. Focus on right-sizing and unused capacity.
-- Tier 2 savings possible if vendor has account managers with discount authority.
-- Be honest: "This pricing is largely fixed. The opportunity is in right-sizing, not negotiating the rate."
-
-RENEWAL DEALS:
-- Always more negotiable than new purchases. Vendor wants to retain you.
-- Loyalty discounts and multi-year commits should be Tier 2 minimum.
-- Unused capacity since last renewal is always Tier 1 if documented.
-
-RESELLER OR MIDDLEMAN DETECTED:
-- Entire contract is Tier 2 minimum. Margin exists by definition.
-- Going direct is always worth showing as bonus opportunity.
-- If markup is documented or strongly implied, bump to Tier 1.
-
-GENUINELY CLEAN DEALS:
-- Floor = 0, Ceiling = 0, bonus_opportunities = []
-- Verdict: "This deal is fair. Sign it or use it as a baseline for competing quotes."
-- Do NOT invent savings to fill the template. A clean deal is a good outcome.
+SANITY CHECK:
+- Headline (must-have total) must be at least 5% of total_commitment
+- Headline must be under 30% of total_commitment
+- All amounts in the deal currency, annual figures only
+- Each item has a rationale explaining why this saving is achievable
 
 ==================================================
 STEP 4: MUST-HAVE ASKS
@@ -765,33 +692,25 @@ Return valid JSON only. Match this structure exactly:
     "nice_to_have": []
   },
   "potential_savings": {
-    "conservative_floor": 6000,
-    "optimistic_ceiling": 7800,
+    "total": 7800,
     "currency": "EUR",
-    "floor_label": "If your strongest asks land",
-    "ceiling_label": "If vendor meets you halfway",
-    "summary": "One sentence explaining the range",
-    "items": [
+    "must_have": [
       {
         "ask": "Right-size from 40 to 30 seats",
-        "tier": 1,
-        "conservative_impact": 6000,
-        "optimistic_impact": 6000,
+        "amount": 6000,
         "rationale": "12 unused seats documented in the quote"
       },
       {
-        "ask": "10% loyalty discount on renewal",
-        "tier": 2,
-        "conservative_impact": 0,
-        "optimistic_impact": 1800,
-        "rationale": "Standard renewal discount, requires vendor agreement"
+        "ask": "5% overall discount citing budget constraints",
+        "amount": 1800,
+        "rationale": "Standard budget ask on a negotiated quote"
       }
     ],
-    "bonus_opportunities": [
+    "nice_to_have": [
       {
-        "ask": "Switch to competitor at lower price",
-        "range": "5000-8000",
-        "note": "Speculative, only if willing to migrate"
+        "ask": "Include onboarding in the deal price",
+        "amount": 500,
+        "rationale": "Achievable but depends on vendor flexibility"
       }
     ]
   },
@@ -819,9 +738,8 @@ CRITICAL REMINDERS:
 - Lead with the dominant issue.
 - Adapt to business versus personal context.
 - Only include price_insight if there is a real pricing observation to make.
-- potential_savings.items must contain at least one item. Minimum: a 5% budget constraint ask as Tier 2.
-- conservative_floor and optimistic_ceiling must both be populated. Floor can be 0 only if no Tier 1 savings exist.
-- If the quote is clean, say so in the verdict, but still include a Tier 2 savings ask.
+- potential_savings.must_have must contain at least one item. Total must be at least 5% of total_commitment.
+- If the quote is clean, say so in the verdict, but still include a 5% budget constraint ask.
 - Do not pad the output.
 - Keep currency consistent throughout.
 - Keep annual_impact annual, not total contract value.
@@ -838,10 +756,9 @@ Before returning JSON, verify all of these mentally:
 4. Does every savings item have confidence and rationale?
 5. Are savings realistic and under 30 percent of total_commitment?
 6. Is the currency consistent throughout?
-7. Does potential_savings.items contain at least 1 item? If not, add a 5% budget constraint ask as Tier 2.
-8. Is conservative_floor less than 20% of total_commitment? Is optimistic_ceiling less than 30%?
-9. Does every Tier 1 item trace to a specific number in the quote? If not, move it to Tier 2.
-10. If you have commercial red flags with dollar amounts, do they appear as Tier 1 or Tier 2 savings items?
+7. Does potential_savings.must_have contain at least 1 item?
+8. Does potential_savings.total equal the sum of must_have amounts? Is it at least 5% of total_commitment?
+9. If you have commercial red flags with dollar amounts, do they appear as must_have savings items?
 11. Is the score consistent with your red flags, savings, and verdict_type? Check the consistency rules.
 12. Does pricing_fairness + terms_protections + leverage_position = score?
 13. Is score_rationale specific to THIS deal, not generic?
@@ -879,13 +796,10 @@ export interface AnalysisOutput {
     nice_to_have: string[]
   }
   potential_savings?: {
-    conservative_floor: string
-    optimistic_ceiling: string
-    floor_label: string
-    ceiling_label: string
-    summary: string
-    items: Array<{ ask: string; tier: number; conservative_impact: string; optimistic_impact: string; rationale: string; note?: string }>
-    bonus_opportunities?: Array<{ ask: string; range: string; note: string }>
+    total: number
+    currency: string
+    must_have: Array<{ ask: string; amount: number; rationale: string }>
+    nice_to_have?: Array<{ ask: string; amount: number; rationale: string }>
   }
   cash_flow_improvements?: Array<{ recommendation: string; category: string }>
   score?: number

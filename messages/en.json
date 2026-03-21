@@ -499,6 +499,8 @@
     "dependsOnVendor": "Depends on vendor flexibility",
     "conservativeFloor": "Conservative",
     "optimisticCeiling": "Optimistic",
+    "mustHaveSavings": "Must-have savings",
+    "mustHaveSavingsDesc": "Push for these. They go in your negotiation email.",
     "solidSavings": "Solid savings",
     "solidSavingsDesc": "Directly supported by the quote. High probability of landing these.",
     "achievableSavings": "Achievable savings",

@@ -104,7 +104,9 @@ function getPotentialSavings(deal: any): number {
   const latestRound = getLatestRound(deal)
   const ps = latestRound?.output_json?.potential_savings
   if (!ps) return 0
-  // New range format
+  // New must-have format
+  if (ps.total !== undefined) return typeof ps.total === 'number' ? ps.total : parseMoney(String(ps.total || '0')).amount
+  // Old range format
   if (ps.optimistic_ceiling !== undefined) return typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseMoney(String(ps.optimistic_ceiling || '0')).amount
   // Old array format
   if (Array.isArray(ps)) {

@@ -62,15 +62,17 @@ export function calculateQuoteScore(output: DealOutputType): {
   // Count red flags (excluding source insight)
   const redFlagCount = (output.red_flags || []).filter(f => f.type?.toLowerCase() !== 'source insight').length
 
-  // Get savings ceiling
+  // Get savings total
   const commitNum = parseMoneyAmount(output.snapshot?.total_commitment || '')
   const savings = output.potential_savings as any
-  const ceilingAmount = savings?.optimistic_ceiling !== undefined
-    ? (typeof savings.optimistic_ceiling === 'number' ? savings.optimistic_ceiling : parseMoneyAmount(String(savings.optimistic_ceiling)))
-    : Array.isArray(savings)
-      ? savings.filter((s: any) => s.confidence !== 'low').reduce((sum: number, s: any) => sum + parseMoneyAmount(s.annual_impact || ''), 0)
-      : 0
-  const savingsPct = commitNum > 0 ? (ceilingAmount / commitNum) * 100 : 0
+  const savingsTotal = savings?.total !== undefined
+    ? (typeof savings.total === 'number' ? savings.total : parseMoneyAmount(String(savings.total)))
+    : savings?.optimistic_ceiling !== undefined
+      ? (typeof savings.optimistic_ceiling === 'number' ? savings.optimistic_ceiling : parseMoneyAmount(String(savings.optimistic_ceiling)))
+      : Array.isArray(savings)
+        ? savings.filter((s: any) => s.confidence !== 'low').reduce((sum: number, s: any) => sum + parseMoneyAmount(s.annual_impact || ''), 0)
+        : 0
+  const savingsPct = commitNum > 0 ? (savingsTotal / commitNum) * 100 : 0
 
   // If AI provided a score, validate and use it
   if (aiScore !== undefined && aiScore >= 5 && aiScore <= 98) {

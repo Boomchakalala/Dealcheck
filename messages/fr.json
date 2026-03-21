@@ -499,6 +499,8 @@
     "dependsOnVendor": "Dépend de la flexibilité du fournisseur",
     "conservativeFloor": "Conservateur",
     "optimisticCeiling": "Optimiste",
+    "mustHaveSavings": "Économies prioritaires",
+    "mustHaveSavingsDesc": "Poussez pour celles-ci. Elles vont dans votre email de négociation.",
     "solidSavings": "Économies solides",
     "solidSavingsDesc": "Directement appuyées par le devis. Forte probabilité d'obtention.",
     "achievableSavings": "Économies atteignables",

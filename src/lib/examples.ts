@@ -79,24 +79,19 @@ export const docusignExample: DealOutput = {
     ],
   },
   potential_savings: {
-    conservative_floor: "€6,000",
-    optimistic_ceiling: "€7,800",
-    floor_label: "If your strongest asks land",
-    ceiling_label: "If vendor meets you halfway",
-    summary: "Floor is driven by seat right-sizing alone; ceiling adds a loyalty discount that depends on negotiation.",
-    items: [
+    total: 6000,
+    currency: "EUR",
+    must_have: [
       {
         ask: "Right-size 40 to 30 seats",
-        tier: 1,
-        conservative_impact: "€6,000 saved",
-        optimistic_impact: "€6,000 saved",
+        amount: 6000,
         rationale: "15 seats are unused — cutting waste requires no concession",
       },
+    ],
+    nice_to_have: [
       {
         ask: "10% loyalty discount on adjusted contract",
-        tier: 2,
-        conservative_impact: "€0",
-        optimistic_impact: "€1,800 saved",
+        amount: 1800,
         rationale: "Standard renewal discount — DocuSign AMs have authority for 10-15%",
       },
     ],
@@ -260,24 +255,19 @@ export const salesforceExample: DealOutput = {
     ],
   },
   potential_savings: {
-    conservative_floor: "€7,200",
-    optimistic_ceiling: "€9,504",
-    floor_label: "If your strongest asks land",
-    ceiling_label: "If vendor meets you halfway",
-    summary: "Floor is driven by seat right-sizing alone; ceiling adds a multi-year loyalty discount that depends on negotiation.",
-    items: [
+    total: 7200,
+    currency: "EUR",
+    must_have: [
       {
         ask: "Right-size 40 to 32 seats",
-        tier: 1,
-        conservative_impact: "€7,200 saved",
-        optimistic_impact: "€7,200 saved",
+        amount: 7200,
         rationale: "12 seats are unused — cutting waste requires no concession",
       },
+    ],
+    nice_to_have: [
       {
         ask: "8% loyalty discount on adjusted contract",
-        tier: 2,
-        conservative_impact: "€0",
-        optimistic_impact: "€2,304 saved",
+        amount: 2304,
         rationale: "Standard multi-year discount — Salesforce AMs routinely offer 8-12%",
       },
     ],
@@ -441,27 +431,21 @@ export const microsoft365Example: DealOutput = {
     ],
   },
   potential_savings: {
-    conservative_floor: "€7,488",
-    optimistic_ceiling: "€7,488",
-    floor_label: "If your strongest asks land",
-    ceiling_label: "If vendor meets you halfway",
-    summary: "Both asks are high-confidence — seat right-sizing and prepay rate are standard, so floor and ceiling align.",
-    items: [
+    total: 7488,
+    currency: "EUR",
+    must_have: [
       {
         ask: "Right-size 60 to 48 seats",
-        tier: 1,
-        conservative_impact: "€5,760 saved",
-        optimistic_impact: "€5,760 saved",
+        amount: 5760,
         rationale: "18 seats are unused — documented waste",
       },
       {
         ask: "Annual prepay rate €40 to €37/user",
-        tier: 1,
-        conservative_impact: "€1,728 saved",
-        optimistic_impact: "€1,728 saved",
+        amount: 1728,
         rationale: "Reseller margin is negotiable — prepay rate is standard",
       },
     ],
+    nice_to_have: [],
   },
   email_drafts: {
     neutral: {
@@ -630,27 +614,21 @@ export const fedexExample: DealOutput = {
     ],
   },
   potential_savings: {
-    conservative_floor: "$12,552",
-    optimistic_ceiling: "$12,552",
-    floor_label: "If your strongest asks land",
-    ceiling_label: "If vendor meets you halfway",
-    summary: "Both asks are high-confidence — base rate and fuel surcharge are well above documented market rates, so floor and ceiling align.",
-    items: [
+    total: 12552,
+    currency: "USD",
+    must_have: [
       {
         ask: "Base rate $4.20 to $3.50 (1,000 avg/mo)",
-        tier: 1,
-        conservative_impact: "$8,400 saved",
-        optimistic_impact: "$8,400 saved",
+        amount: 8400,
         rationale: "Negotiated market rate is $3.20-3.60 at this volume — well documented",
       },
       {
         ask: "Fuel surcharge 20% to 12%",
-        tier: 1,
-        conservative_impact: "$4,152 saved",
-        optimistic_impact: "$4,152 saved",
+        amount: 4152,
         rationale: "Market surcharges run 10-14% — 20% is above market",
       },
     ],
+    nice_to_have: [],
   },
   email_drafts: {
     neutral: {
@@ -826,24 +804,19 @@ export const konicaExample: DealOutput = {
     ],
   },
   potential_savings: {
-    conservative_floor: "€2,040",
-    optimistic_ceiling: "€2,400",
-    floor_label: "If your strongest asks land",
-    ceiling_label: "If vendor meets you halfway",
-    summary: "Floor is driven by the lease rate reduction alone; ceiling adds toner savings that depend on removing the exclusivity clause.",
-    items: [
+    total: 2040,
+    currency: "EUR",
+    must_have: [
       {
         ask: "Lease rate €870 to €700/month",
-        tier: 1,
-        conservative_impact: "€2,040 saved",
-        optimistic_impact: "€2,040 saved",
+        amount: 2040,
         rationale: "Ricoh, Canon, Xerox all quoting €620-720 for equivalent devices",
       },
+    ],
+    nice_to_have: [
       {
         ask: "Toner open market saving (est.)",
-        tier: 2,
-        conservative_impact: "€0",
-        optimistic_impact: "€360 saved",
+        amount: 360,
         rationale: "Third-party toners run 25-35% cheaper — depends on clause removal",
       },
     ],
@@ -1020,31 +993,24 @@ export const bdoExample: DealOutput = {
     ],
   },
   potential_savings: {
-    conservative_floor: "€3,612",
-    optimistic_ceiling: "€5,112",
-    floor_label: "If your strongest asks land",
-    ceiling_label: "If vendor meets you halfway",
-    summary: "Floor covers the hourly rate and annual increase reductions; ceiling adds hours-cap risk mitigation that depends on negotiation.",
-    items: [
+    total: 3612,
+    currency: "EUR",
+    must_have: [
       {
         ask: "Hourly rate €210 to €150 (35hrs/yr)",
-        tier: 1,
-        conservative_impact: "€2,100 saved",
-        optimistic_impact: "€2,100 saved",
+        amount: 2100,
         rationale: "Market rate is €130-160/hour — €210 is well above standard",
       },
       {
         ask: "Annual increase 12% to 3% (year 2 saving)",
-        tier: 1,
-        conservative_impact: "€1,512 saved",
-        optimistic_impact: "€1,512 saved",
+        amount: 1512,
         rationale: "3-5% tied to CPI is industry standard — 12% is indefensible",
       },
+    ],
+    nice_to_have: [
       {
         ask: "Hours cap risk mitigation (est.)",
-        tier: 2,
-        conservative_impact: "€0",
-        optimistic_impact: "€1,500 saved",
+        amount: 1500,
         rationale: "Prevents uncapped billing in complex years — depends on cap negotiation",
       },
     ],

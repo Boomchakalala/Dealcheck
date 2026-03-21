@@ -225,6 +225,9 @@ export default function AppHomePage() {
     const ps = latest?.output_json?.potential_savings as any
     if (!ps) return sum
     // New range format
+    if (ps.total !== undefined) {
+      return sum + (typeof ps.total === 'number' ? ps.total : parseInt(String(ps.total), 10) || 0)
+    }
     if (ps.optimistic_ceiling !== undefined) {
       if (typeof ps.optimistic_ceiling === 'number') return sum + ps.optimistic_ceiling
       const match = String(ps.optimistic_ceiling).match(/[\d,]+/)

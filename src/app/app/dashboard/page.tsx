@@ -107,7 +107,9 @@ export default async function DashboardPage() {
       // Parse potential savings from AI output
       const ps = output?.potential_savings as any
       let potentialSavings = 0
-      if (ps?.optimistic_ceiling !== undefined) {
+      if (ps?.total !== undefined) {
+        potentialSavings = typeof ps.total === 'number' ? ps.total : parseSavingsAmount(String(ps.total))
+      } else if (ps?.optimistic_ceiling !== undefined) {
         potentialSavings = typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseSavingsAmount(String(ps.optimistic_ceiling))
       } else if (Array.isArray(ps)) {
         const hasConf = ps.some((item: any) => item.confidence)

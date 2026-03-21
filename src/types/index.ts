@@ -188,23 +188,17 @@ export type DealOutput = {
     nice_to_have: string[]
   }
   potential_savings?: {
-    conservative_floor: string
-    optimistic_ceiling: string
-    floor_label: string
-    ceiling_label: string
-    summary: string
-    items: Array<{
+    total: number
+    currency: string
+    must_have: Array<{
       ask: string
-      tier: 1 | 2
-      conservative_impact: string
-      optimistic_impact: string
+      amount: number
       rationale: string
-      note?: string
     }>
-    bonus_opportunities?: Array<{
+    nice_to_have?: Array<{
       ask: string
-      range: string
-      note: string
+      amount: number
+      rationale: string
     }>
   }
   cash_flow_improvements?: Array<{
