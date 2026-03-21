@@ -12,45 +12,74 @@ import { Check, CheckCircle2 } from 'lucide-react'
 
 export default function ExamplePage() {
   const { locale, t } = useI18n()
-  const [selectedExample, setSelectedExample] = useState<ExampleType>('marketing')
+  const [selectedExample, setSelectedExample] = useState<ExampleType>('docusign')
 
   const currentExamples = locale === 'fr' ? examplesFr : examples
 
   const closedDeals: Record<ExampleType, { original: string; final: string; savings: string; savingsPct: string; date: string; tags: string[]; wins: { type: string; label: string; amount?: string }[] }> = {
-    marketing: {
-      original: '€111,600', final: '€98,400', savings: '€13,200', savingsPct: '11.8%', date: 'Mar 18, 2026',
-      tags: ['Price reduced', 'Ad fee cut', 'Cancellation updated', 'Deliverables added'],
+    docusign: {
+      original: '€24,000', final: '€16,200', savings: '€7,800', savingsPct: '32.5%', date: 'Apr 5, 2026',
+      tags: ['Seats right-sized', 'Loyalty discount', 'Notice extended'],
       wins: [
-        { type: 'Price', label: 'Monthly retainer reduced from €7,500 to €7,250', amount: '€3,000/yr' },
-        { type: 'Price', label: 'Ad management fee cut from 20% to 12%', amount: '€8,640/yr' },
-        { type: 'Terms', label: 'Cancellation notice cut from 60 to 30 days' },
-        { type: 'Scope', label: 'Minimum 6 blog posts/month guaranteed in writing' },
+        { type: 'Price', label: 'Right-sized from 40 to 30 seats', amount: '€6,000/yr' },
+        { type: 'Price', label: '10% loyalty discount on adjusted contract', amount: '€1,800/yr' },
+        { type: 'Terms', label: 'Auto-renew notice extended from 30 to 60 days' },
       ],
     },
-    saas: {
-      original: '€36,000', final: '€28,350', savings: '€7,650', savingsPct: '21.3%', date: 'Apr 2, 2026',
+    salesforce: {
+      original: '€36,000', final: '€26,496', savings: '€9,504', savingsPct: '26%', date: 'May 15, 2026',
       tags: ['Seats right-sized', 'Multi-year discount', 'Price locked'],
       wins: [
-        { type: 'Price', label: 'Right-sized from 40 to 34 seats', amount: '€5,400/yr' },
-        { type: 'Price', label: '2-year commitment at 6% discount', amount: '€1,890/yr' },
-        { type: 'Terms', label: 'Price capped at 3% annual increase' },
+        { type: 'Price', label: 'Right-sized from 40 to 32 seats', amount: '€7,200/yr' },
+        { type: 'Price', label: '2-year commitment at 8% discount', amount: '€2,304/yr' },
+        { type: 'Terms', label: 'Price locked for 2-year term' },
       ],
     },
-    supplies: {
-      original: '€42,750', final: '€38,250', savings: '€4,500', savingsPct: '10.5%', date: 'Apr 10, 2026',
-      tags: ['Volume discount', 'Delivery fees reduced', 'Pricing locked'],
+    microsoft365: {
+      original: '€28,800', final: '€21,312', savings: '€7,488', savingsPct: '26%', date: 'Apr 20, 2026',
+      tags: ['Seats right-sized', 'Prepay discount', 'Billing simplified'],
       wins: [
-        { type: 'Price', label: 'Discount increased from 5% to 12%', amount: '€3,150/yr' },
-        { type: 'Price', label: 'Delivery fee threshold lowered from €50 to €25', amount: '€720/yr' },
-        { type: 'Terms', label: 'Top 20 item prices locked for 12 months' },
+        { type: 'Price', label: 'Right-sized from 60 to 48 seats', amount: '€5,760/yr' },
+        { type: 'Price', label: 'Annual prepay rate €40 to €37/user', amount: '€1,728/yr' },
+        { type: 'Terms', label: 'Auto-renew notice extended to 60 days' },
+      ],
+    },
+    fedex: {
+      original: '$51,960', final: '$39,408', savings: '$12,552', savingsPct: '24%', date: 'Mar 25, 2026',
+      tags: ['Base rate reduced', 'Fuel capped', 'GRI capped'],
+      wins: [
+        { type: 'Price', label: 'Base rate reduced from $4.20 to $3.50/parcel', amount: '$8,400/yr' },
+        { type: 'Price', label: 'Fuel surcharge capped at 12%', amount: '$4,152/yr' },
+        { type: 'Terms', label: 'GRI capped at 3.5% annually' },
+      ],
+    },
+    konica: {
+      original: '€35,370', final: '€28,170', savings: '€7,200', savingsPct: '20%', date: 'Apr 12, 2026',
+      tags: ['Lease reduced', 'Toner clause removed', 'Exit clause added'],
+      wins: [
+        { type: 'Price', label: 'Lease reduced from €870 to €700/month', amount: '€6,120/3yr' },
+        { type: 'Terms', label: 'Exclusive toner clause removed' },
+        { type: 'Terms', label: '18-month exit clause with 3-month buyout added' },
+      ],
+    },
+    bdo: {
+      original: '€24,150', final: '€19,038', savings: '€5,112', savingsPct: '21%', date: 'Mar 30, 2026',
+      tags: ['Hourly rate reduced', 'Hours capped', 'Increase capped'],
+      wins: [
+        { type: 'Price', label: 'Hourly rate reduced from €210 to €150', amount: '€2,100/yr' },
+        { type: 'Price', label: 'Annual increase capped at 3%', amount: '€1,512/yr' },
+        { type: 'Terms', label: 'Hard annual cap of 35 hours with pre-approval' },
       ],
     },
   }
 
   const exampleTypes = [
-    { id: 'marketing' as ExampleType, label: locale === 'fr' ? 'Agence Marketing' : 'Marketing Agency', description: locale === 'fr' ? '112K € — économies 16,8K €/an' : '€112K retainer — saves €16.8K/yr' },
-    { id: 'saas' as ExampleType, label: locale === 'fr' ? 'CRM SaaS' : 'SaaS CRM', description: locale === 'fr' ? '36K € — économies 9,5K €/an' : '€36K renewal — saves €9.5K/yr' },
-    { id: 'supplies' as ExampleType, label: locale === 'fr' ? 'Fournitures Bureau' : 'Office Supplies', description: locale === 'fr' ? '43K € — économies 5,5K €/an' : '€43K contract — saves €5.6K/yr' },
+    { id: 'docusign' as ExampleType, label: 'DocuSign', description: locale === 'fr' ? '24K € — économies 7,8K €/an' : '€24K renewal — saves €7.8K/yr' },
+    { id: 'salesforce' as ExampleType, label: 'Salesforce', description: locale === 'fr' ? '36K € — économies 9,5K €/an' : '€36K renewal — saves €9.5K/yr' },
+    { id: 'microsoft365' as ExampleType, label: 'Microsoft 365', description: locale === 'fr' ? '29K € — économies 7,5K €/an' : '€29K renewal — saves €7.5K/yr' },
+    { id: 'fedex' as ExampleType, label: 'FedEx', description: locale === 'fr' ? '52K $ — économies 12,5K $/an' : '$52K contract — saves $12.5K/yr' },
+    { id: 'konica' as ExampleType, label: 'Konica Minolta', description: locale === 'fr' ? '35K € — économies 7,2K €/3 ans' : '€35K lease — saves €7.2K/3yr' },
+    { id: 'bdo' as ExampleType, label: 'BDO', description: locale === 'fr' ? '24K € — économies 5,1K €/an' : '€24K retainer — saves €5.1K/yr' },
   ]
 
   return (
@@ -95,7 +124,7 @@ export default function ExamplePage() {
         {/* Example Type Selector */}
         <div className="mb-8">
           <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-4">Choose Quote Type</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {exampleTypes.map((type) => (
               <button
                 key={type.id}

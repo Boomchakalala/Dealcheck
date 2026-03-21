@@ -1,12 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.termlift.com</loc><priority>1.0</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://www.termlift.com/pricing</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://www.termlift.com/example</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://www.termlift.com/about</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://www.termlift.com/security</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://www.termlift.com/contact</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://www.termlift.com/help</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://www.termlift.com/privacy</loc><priority>0.3</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://www.termlift.com/terms</loc><priority>0.3</priority><changefreq>monthly</changefreq></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://www.termlift.com</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr"/>
+    <priority>1.0</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/pricing</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/pricing"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/pricing"/>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/example</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/example"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/example"/>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/help</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/help"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/help"/>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/about</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/about"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/about"/>
+    <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/security</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/security"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/security"/>
+    <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/contact"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/contact"/>
+    <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/privacy</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/terms</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
 </urlset>

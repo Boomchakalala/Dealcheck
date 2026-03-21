@@ -19,10 +19,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "TermLift — Better Vendor Terms in Minutes",
+    default: "TermLift — AI Vendor Quote Analysis & Contract Negotiation Tool",
     template: "%s | TermLift",
   },
-  description: "Drop in a vendor quote and get back exactly where you're overpaying, a full negotiation playbook, and a ready-to-send email — in under 60 seconds. Free to try.",
+  description: "Analyze any vendor quote in 60 seconds. TermLift spots hidden fees, inflated pricing, and unfavorable contract terms — then builds a negotiation playbook with savings targets and ready-to-send emails. Free to try.",
   metadataBase: new URL("https://www.termlift.com"),
   icons: {
     icon: "/favicon.png",
@@ -31,15 +31,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "TermLift",
-    title: "TermLift — Better Vendor Terms in Minutes",
-    description: "Stop overpaying vendors. Drop in any quote and get red flags, a negotiation playbook, and a ready-to-send email in 60 seconds.",
+    title: "TermLift — AI Vendor Quote Analysis & Contract Negotiation Tool",
+    description: "Analyze any vendor quote in 60 seconds. Spot hidden fees, inflated pricing, and unfavorable terms. Get a negotiation playbook and ready-to-send emails.",
     url: "https://www.termlift.com",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TermLift — Stop Overpaying Vendors",
-    description: "Drop in any vendor quote. Get back exactly where you're overpaying, what to push for, and a ready-to-send email — in 60 seconds.",
+    title: "TermLift — AI Quote Analysis & Negotiation Tool",
+    description: "Analyze vendor quotes in 60 seconds. Spot overpricing, unfavorable terms, and missed savings — then negotiate with confidence.",
   },
   alternates: {
     canonical: "https://www.termlift.com",

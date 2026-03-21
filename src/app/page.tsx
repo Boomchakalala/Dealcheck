@@ -110,7 +110,7 @@ export default function LandingPage() {
                     <div className="w-2 h-2 rounded-full bg-yellow-400" />
                     <div className="w-2 h-2 rounded-full bg-green-400" />
                   </div>
-                  <p className="text-[9px] font-semibold text-slate-500">{t('example.quoteVendor')} — €111,600</p>
+                  <p className="text-[9px] font-semibold text-slate-500">DocuSign · Business Pro — €24,000</p>
                 </div>
 
                 <div className="p-3 space-y-2">
@@ -118,7 +118,7 @@ export default function LandingPage() {
                   <div className="bg-orange-50 border border-orange-200 rounded p-2">
                     <div className="flex items-center gap-2 mb-1.5">
                       <ScoreCircle
-                        score={52} size={34} strokeWidth={3}
+                        score={51} size={34} strokeWidth={3}
                         trackClass="stroke-orange-200" ringClass="stroke-orange-500" textClass="text-orange-700"
                         showOutOf={false}
                       />
@@ -131,7 +131,7 @@ export default function LandingPage() {
                     <div className="flex items-center gap-1.5 text-[8px]">
                       <div className="flex-1 text-center">
                         <p className="font-semibold text-slate-400 uppercase tracking-wider">{t('output.totalCommitment')}</p>
-                        <p className="text-[9px] font-bold text-slate-900">€111,600</p>
+                        <p className="text-[9px] font-bold text-slate-900">€24,000</p>
                       </div>
                       <div className="w-px h-4 bg-orange-200" />
                       <div className="flex-1 text-center">
@@ -150,9 +150,9 @@ export default function LandingPage() {
                   <div className="border border-slate-200 rounded p-2">
                     <div className="space-y-1.5">
                       {[
-                        { label: t('example.scorePricing'), pct: 38 },
-                        { label: t('example.scoreTerms'), pct: 67 },
-                        { label: t('example.scoreLeverage'), pct: 65 },
+                        { label: t('example.scorePricing'), pct: 40 },
+                        { label: t('example.scoreTerms'), pct: 53 },
+                        { label: t('example.scoreLeverage'), pct: 75 },
                       ].map((bar) => (
                         <div key={bar.label}>
                           <div className="flex items-center justify-between mb-0.5">
@@ -367,7 +367,7 @@ export default function LandingPage() {
                 <div className="bg-white rounded-xl border-2 border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col relative">
                   <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-slate-300" />
-                    <span className="text-[10px] sm:text-xs font-medium text-slate-400">vendor-quote.pdf</span>
+                    <span className="text-[10px] sm:text-xs font-medium text-slate-400">docusign-renewal.pdf</span>
                   </div>
                   <div className="p-4 sm:p-5 text-xs sm:text-sm text-slate-600 leading-relaxed space-y-3.5 flex-1">
                     <div className="flex items-center justify-between mb-1">
@@ -377,13 +377,13 @@ export default function LandingPage() {
                     <p className="text-slate-400 text-[10px] mb-2">{t('example.quotePreparedFor')}</p>
                     <p className="text-slate-500 text-xs uppercase tracking-wide font-medium">{t('example.quoteTitle')}</p>
                     <div className="space-y-1.5 pt-1">
-                      <div className="flex justify-between"><span>{t('example.quoteRetainer')}</span><span className="font-semibold text-slate-800">€7,500/mo</span></div>
-                      <div className="flex justify-between"><span>{t('example.quoteAdFee')}</span><span className="font-semibold text-slate-800">20%</span></div>
-                      <div className="flex justify-between"><span>{t('example.quoteAdBudget')}</span><span className="font-semibold text-slate-800">€9,000/mo</span></div>
+                      <div className="flex justify-between"><span>{t('example.quoteRetainer')}</span><span className="font-semibold text-slate-800">€50/user/mo</span></div>
+                      <div className="flex justify-between"><span>{t('example.quoteAdFee')}</span><span className="font-semibold text-slate-800">40 users</span></div>
+                      <div className="flex justify-between"><span>{t('example.quoteAdBudget')}</span><span className="font-semibold text-slate-800">€2,000/mo</span></div>
                       <div className="flex justify-between"><span>{t('example.quoteTerm')}</span><span className="font-semibold text-slate-800">12 months</span></div>
                       <div className="flex justify-between"><span>{t('example.quoteStartDate')}</span><span className="font-semibold text-slate-800">{t('example.quoteStartDateValue')}</span></div>
                       <div className="flex justify-between"><span>{t('example.quotePayment')}</span><span className="font-semibold text-slate-800">{t('example.quotePaymentValue')}</span></div>
-                      <div className="flex justify-between border-t border-slate-100 pt-1.5 mt-1.5"><span className="font-medium text-slate-700">{t('example.quoteTotal')}</span><span className="font-bold text-slate-900">€111,600</span></div>
+                      <div className="flex justify-between border-t border-slate-100 pt-1.5 mt-1.5"><span className="font-medium text-slate-700">{t('example.quoteTotal')}</span><span className="font-bold text-slate-900">€24,000</span></div>
                     </div>
                     <p className="pt-1">{t('example.quoteDeliverables')}</p>
 
@@ -419,14 +419,14 @@ export default function LandingPage() {
                   <div className="bg-orange-50 rounded-xl border border-orange-200 p-3.5 sm:p-4 shadow-sm">
                     <div className="flex items-center gap-3 mb-3">
                       <ScoreCircle
-                        score={52} size={44} strokeWidth={3.5}
+                        score={51} size={44} strokeWidth={3.5}
                         trackClass="stroke-orange-200" ringClass="stroke-orange-500" textClass="text-orange-700"
                         showOutOf={false}
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-orange-600 mb-1">{t('example.quoteScoreLabel')}</p>
                         <div className="flex items-center gap-1.5 flex-wrap text-[9px] text-slate-500">
-                          <span className="font-semibold">{t('example.savingsAmount').replace(/[^\d.,€$£]/g, '') || '€111,600'} total</span>
+                          <span className="font-semibold">€24,000 total</span>
                           <span className="text-slate-300">|</span>
                           <span className="font-semibold">2 red flags</span>
                           <span className="text-slate-300">|</span>
@@ -436,9 +436,9 @@ export default function LandingPage() {
                     </div>
                     <div className="grid grid-cols-3 gap-3">
                       {[
-                        { label: t('example.scorePricing'), pct: 38 },
-                        { label: t('example.scoreTerms'), pct: 67 },
-                        { label: t('example.scoreLeverage'), pct: 65 },
+                        { label: t('example.scorePricing'), pct: 40 },
+                        { label: t('example.scoreTerms'), pct: 53 },
+                        { label: t('example.scoreLeverage'), pct: 75 },
                       ].map((bar) => (
                         <div key={bar.label}>
                           <div className="flex items-center justify-between mb-1">
@@ -524,33 +524,32 @@ export default function LandingPage() {
                     <Check className="w-4 h-4 text-white/90" />
                     <span className="text-sm font-bold text-white">{locale === 'fr' ? 'Contrat clôturé' : 'Deal closed'}</span>
                   </div>
-                  <span className="text-[11px] text-white/70 font-medium">Mar 18, 2026</span>
+                  <span className="text-[11px] text-white/70 font-medium">Apr 5, 2026</span>
                 </div>
                 <div className="p-4 sm:p-5 space-y-4">
                   {/* Stats: Original → Final → Savings */}
                   <div className="grid grid-cols-3 gap-2.5">
                     <div className="bg-slate-50 rounded-lg border border-slate-200 p-3 text-center">
                       <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">{locale === 'fr' ? 'Devis initial' : 'Original quote'}</p>
-                      <p className="text-sm sm:text-base font-bold text-slate-900">€111,600</p>
+                      <p className="text-sm sm:text-base font-bold text-slate-900">€24,000</p>
                     </div>
                     <div className="bg-slate-50 rounded-lg border border-slate-200 p-3 text-center">
                       <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">{locale === 'fr' ? 'Montant final' : 'Final agreed'}</p>
-                      <p className="text-sm sm:text-base font-bold text-slate-900">€98,400</p>
+                      <p className="text-sm sm:text-base font-bold text-slate-900">€16,200</p>
                     </div>
                     <div className="bg-emerald-50 rounded-lg border border-emerald-200 p-3 text-center">
                       <p className="text-[9px] font-semibold text-emerald-600 uppercase tracking-wide mb-0.5">{locale === 'fr' ? 'Économies' : 'Savings captured'}</p>
-                      <p className="text-sm sm:text-base font-bold text-emerald-800">€13,200</p>
-                      <p className="text-[10px] font-semibold text-emerald-600">11.8%</p>
+                      <p className="text-sm sm:text-base font-bold text-emerald-800">€7,800</p>
+                      <p className="text-[10px] font-semibold text-emerald-600">32.5%</p>
                     </div>
                   </div>
 
                   {/* What changed pills */}
                   <div className="flex flex-wrap gap-1.5">
                     {[
-                      locale === 'fr' ? 'Prix réduit' : 'Price reduced',
-                      locale === 'fr' ? 'Frais publicitaires réduits' : 'Ad fee cut',
-                      locale === 'fr' ? 'Résiliation mise à jour' : 'Cancellation updated',
-                      locale === 'fr' ? 'Livrables ajoutés' : 'Deliverables added',
+                      locale === 'fr' ? 'Licences optimisées' : 'Seats right-sized',
+                      locale === 'fr' ? 'Remise fidélité' : 'Loyalty discount',
+                      locale === 'fr' ? 'Préavis étendu' : 'Notice extended',
                     ].map((tag) => (
                       <span key={tag} className="px-2 py-0.5 text-[9px] font-semibold text-slate-500 bg-slate-100 rounded-full">{tag}</span>
                     ))}
@@ -563,20 +562,20 @@ export default function LandingPage() {
                       <div className="flex items-start gap-2.5 pb-2 border-b border-slate-100">
                         <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex-shrink-0 mt-0.5">Price</span>
                         <div>
-                          <p className="text-xs text-slate-800">{locale === 'fr' ? 'Honoraires mensuels réduits de €7 500 à €7 250' : 'Monthly retainer reduced from €7,500 to €7,250'}</p>
-                          <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">€3,000/yr</p>
+                          <p className="text-xs text-slate-800">{locale === 'fr' ? 'Licences réduites de 40 à 30' : 'Right-sized from 40 to 30 seats'}</p>
+                          <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">€6,000/yr</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-2.5 pb-2 border-b border-slate-100">
                         <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex-shrink-0 mt-0.5">Price</span>
                         <div>
-                          <p className="text-xs text-slate-800">{locale === 'fr' ? 'Frais de gestion publicitaire réduits de 20% à 12%' : 'Ad management fee cut from 20% to 12%'}</p>
-                          <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">€8,640/yr</p>
+                          <p className="text-xs text-slate-800">{locale === 'fr' ? 'Remise fidélité de 10% sur le contrat ajusté' : '10% loyalty discount on adjusted contract'}</p>
+                          <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">€1,800/yr</p>
                         </div>
                       </div>
                       <div className="flex items-start gap-2.5">
                         <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-slate-100 text-slate-600 border border-slate-200 flex-shrink-0 mt-0.5">Terms</span>
-                        <p className="text-xs text-slate-800">{locale === 'fr' ? 'Délai de résiliation réduit de 60 à 30 jours' : 'Cancellation notice cut from 60 to 30 days'}</p>
+                        <p className="text-xs text-slate-800">{locale === 'fr' ? 'Préavis de renouvellement étendu de 30 à 60 jours' : 'Auto-renew notice extended from 30 to 60 days'}</p>
                       </div>
                     </div>
                   </div>

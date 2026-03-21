@@ -7,8 +7,8 @@ import { getTranslations } from 'next-intl/server'
 import { UpgradeButton } from '@/components/UpgradeButton'
 
 export const metadata: Metadata = {
-  title: 'Pricing — TermLift | Start Free, Upgrade When Ready',
-  description: 'TermLift is free to try — no credit card needed. Upgrade to Pro for unlimited vendor quote analyses, spend tracking, and deal history from €39/month.',
+  title: 'Pricing — TermLift | Free Vendor Quote Analysis Tool',
+  description: 'Start analyzing vendor quotes for free — no credit card needed. Upgrade to Pro (€39/mo) for unlimited AI analyses, deal tracking, and negotiation history. Save thousands on vendor contracts.',
   alternates: { canonical: 'https://www.termlift.com/pricing' },
 }
 
