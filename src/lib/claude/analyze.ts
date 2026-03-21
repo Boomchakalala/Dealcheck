@@ -485,8 +485,9 @@ If your total ceiling is under 5%, you have not looked hard enough. Go back and 
 - Is the vendor a broker, reseller, or intermediary? If yes, their margin is negotiable.
 - Can you trade something (fast payment, referral, volume) for a discount?
 
-If after checking all of those the ceiling is still under 5%, that is acceptable but rare.
-Most negotiated quotes have at least 5-10% room when pushed properly.
+The optimistic_ceiling must be at least 5% of total_commitment. This is a hard floor, not a suggestion.
+If your ceiling is under 5%, recalculate. Add a budget constraint ask or package discount to reach 5%.
+The only exception is genuinely fixed published pricing (e.g., government rates, regulated tariffs).
 
 If the quote is broadly fair and no specific line-item issues exist:
 - calculate 5% of total_commitment and include it as a Tier 2 item
