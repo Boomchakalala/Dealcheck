@@ -7,119 +7,30 @@ import type { DealOutput, DealOutputV2 } from '@/types'
 // ---------------------------------------------------------------------------
 
 const EMAIL_PROMPT = `
-==================================================
-VOICE & TONE,SOUND LIKE A REAL PERSON
-==================================================
+Write negotiation emails that sound like a real person wrote them in 5 minutes.
 
-Write like a sharp, confident buyer,not a template engine.
+The tone is warm, collaborative, and confident. You're genuinely interested in the deal. You're asking, not demanding. But you're clear about what you want and you make the vendor feel that saying yes means closing the deal today.
 
-These emails should read like they were written by someone who actually reviewed the quote, knows what they want, and is comfortable negotiating. Think: a senior ops lead or founder who writes clear, no-fluff emails.
+Think of someone who writes: "Could we look at this together?", "Can we imagine a scenario where...", "If there's flexibility here, I'm ready to move forward." Friendly, but with substance behind every ask.
 
-GOLDEN RULE: Read the email out loud. If it sounds like a procurement bot wrote it, rewrite it.
+Three versions:
+- neutral: warm and collaborative. You like the offer, you want to work it out. Conversational.
+- firm: direct and professional. You've been clear about what you need. No fluff, still respectful.
+- final_push: deadline-driven. You're signaling you'll go elsewhere if this doesn't land. Urgent but never aggressive.
 
-DO NOT USE THESE PHRASES (they scream "AI-generated"):
-- "I hope this email finds you well"
-- "Thanks for sharing the quote/proposal"
-- "We reviewed the proposal and would like to discuss"
-- "Would it be possible to explore..."
-- "We believe there may be an opportunity to..."
-- "I wanted to reach out regarding..."
-- "We appreciate the detailed proposal"
-- "We look forward to your response"
-- "Please don't hesitate to reach out"
-
-USE NATURAL LANGUAGE LIKE:
-- "Hey [name], had a look at the quote. We're interested and want to move quickly, just need to sort a couple of things first."
-- "Appreciate the quick turnaround. If we can align on a few points I can get this signed off this week."
-- "Overall this looks solid. A small gesture on [specific thing] would help me get budget approval today."
-- "We're keen to get this done. If there's flexibility on [specific point], I can commit immediately."
-- "I'd rather not shop around on this. If you can help on [specific ask], we have a deal."
-- "A discount here would speed things up on our end. Happy to sign as soon as we're aligned."
-
-VARY YOUR SENTENCE STRUCTURE:
-- Mix short and long sentences
-- Don't start every sentence with "We" or "I"
-- Use contractions naturally (we'd, it's, that's, won't, can't)
-- Throw in a casual connector: "That said,", "On that note,", "Quick one:"
-
-BANNED CHARACTERS:
-Never use en dash or em dash characters in emails. Use commas, colons, or normal hyphens instead.
-
-==================================================
-EMAIL RULES
-==================================================
-
-Emails should feel like the OPPOSITE of the analysis section:
-- Analysis section: ASSERTIVE, data-driven ("Negotiate 10% off", "Push for cap")
-- Emails: CONVERSATIONAL, relationship-aware,you're writing to a real person
-
-Three variations, each with a different posture:
-- neutral: friendly, collaborative opener. You're interested and engaged, just want to sort a few things. Warm but clear.
-- firm: you've already asked nicely or the quote needs real pushback. Direct, professional, no fluff. Still respectful but the tone says "we need this resolved."
-- final_push: deadline-driven close. Signals you're ready to move on or go elsewhere. Urgent but never rude.
-
-CORE RULES:
+Each email must:
+- Start with a greeting ("Hi [Name]," or "Hey [Name]," if you have the name, "Hi," if not)
+- End with "Best regards," then "[Your Name]" on a new line
+- Reference real details from the quote (amounts, terms, product names)
 - Only include asks from the analysis, never invent new ones
-- If 0 real asks, write a light confirmation email, not a negotiation
-- If 1 ask, focus the whole email on it, don't pad
-- If 2-3 asks, structure cleanly but keep it tight
-- Reference REAL details from the quote (amounts, terms, dates)
-- Every email must end with a clear next step
-- Make the vendor WANT to say yes. Give them a reason to act now:
-  * "If we can align on this, I'm ready to sign this week"
-  * "A gesture here would help me get this approved internally today"
-  * "This would let us move forward immediately rather than shopping around"
-- Never just list asks like a shopping list. Tie each ask to a reason and a benefit for both sides.
-- Create urgency without being pushy. The vendor should feel that a quick yes = a guaranteed sale.
+- End with a clear next step that makes it easy for the vendor to say yes
+- Make the vendor feel that a quick agreement = a guaranteed sale
 
-Subject lines,KEEP THEM SIMPLE AND GENERIC:
-- Use the vendor name + a plain reference. That's it.
-- Good: "Re: Datadog proposal"
-- Good: "Brightwave,follow-up"
-- Good: "Re: Adobe quote"
-- Good: "[Vendor] contract,quick follow-up"
-- Bad: "Re: Datadog Renewal,a couple of points before we sign" (too long, too specific)
-- Bad: "Points to discuss on your proposal" (screams AI)
-- Bad: "Following up on your quote,key considerations" (AI garbage)
-- Bad: "Quick question about your proposal" (vague clickbait)
-- Bad: Anything with "key considerations", "points to discuss", "a few thoughts", "important items"
-- The subject line should look like what a busy person would type in 2 seconds
+Subject lines: keep them dead simple. Vendor name + plain reference. "Re: Ewigo proposal", "Salesforce renewal, follow-up". Nothing clever.
 
-ADAPT TO CONTEXT:
-- Business: commercially literate, structured, confident
-- Personal/Household: simpler, practical, friendly,sound like a smart homeowner, not a procurement team
-- SaaS: reference seats, billing, renewal terms
-- Services: reference scope, deliverables, rates
-- Household: reference labor/materials split, timeline, warranty
+Never use en dash or em dash characters. Use commas, colons, or normal hyphens.
 
-LENGTH:
-- Keep it tight. 4-8 sentences for simple quotes, 7-12 for complex ones.
-- If you can say it in fewer sentences, do.
-
-==================================================
-GREETING & SIGN-OFF,MANDATORY
-==================================================
-
-GREETING (first line of every email body):
-- If a contact name is available from the quote (e.g., sales rep, account manager, any person's name): use "Hi [First Name]," or "Hey [First Name],"
-- If no contact name is available: use "Hi," or "Hi there,"
-- NEVER skip the greeting. NEVER jump straight into the body.
-- For firm/final_push: "Hi [Name]," (not "Hey"),slightly more formal
-
-SIGN-OFF (last lines of every email body):
-- ALWAYS end with "Best regards," followed by a new line with "[Your Name]"
-- Use exactly "[Your Name]" as a placeholder,the user will replace it
-- NEVER skip the sign-off. NEVER end with just the last sentence of the body.
-- Format:
-  Best regards,
-  [Your Name]
-
-QUALITY SELF-CHECK:
-- Does it sound like a human wrote it in 3 minutes, not a bot in 3 seconds?
-- Would you actually send this email? Or would you rewrite it first?
-- Is every sentence earning its place?
-- Does it start with a greeting?
-- Does it end with "Best regards," + "[Your Name]"?
+Write like a human. If it sounds like AI wrote it, rewrite it.
 `
 
 // ---------------------------------------------------------------------------
