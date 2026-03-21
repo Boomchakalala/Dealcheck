@@ -27,6 +27,8 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
   const appNavItems = [
     { href: '/app', label: t('nav.deals') },
     { href: '/app/dashboard', label: t('nav.dashboard') },
+    { href: '/pricing', label: t('nav.pricing') },
+    { href: '/example', label: t('nav.examples') },
   ]
 
   const isActive = (href: string) => {
