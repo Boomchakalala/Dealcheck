@@ -117,14 +117,24 @@ Bad behavior:
 - finding one small issue and stopping instead of checking every line
 - returning savings under 5% of total_commitment without explaining why the quote is unusually tight
 
-CHECKLIST: Before concluding your savings analysis, verify you checked ALL of these:
-1. Can the headline price be challenged? (especially if vendor is a broker or intermediary)
-2. Are there fees, packs, bundles, or add-ons? Challenge each one individually.
-3. Are there admin, processing, handling, or registration fees with potential margin?
-4. Are there optional extras quoted separately that could be included in the deal?
-5. Is the vendor an intermediary? If yes, their margin is always negotiable.
-6. Is there a signing deadline? That is leverage, not a reason to accept the price.
+CHECKLIST: Before concluding your savings analysis, verify you checked ALL of these.
+Each item that applies MUST become a separate savings entry in potential_savings.items:
+
+1. Can the headline price be challenged? If yes, add a Tier 2 item for 5% discount with the calculated amount.
+2. Are there fees, packs, bundles, or add-ons? Each one is a SEPARATE savings entry. Do not lump them together.
+3. Are there admin, processing, handling, or registration fees with potential margin? Separate savings entry.
+4. Are there optional extras quoted separately that could be included? Separate savings entry.
+5. Is the vendor an intermediary? If yes, their margin is negotiable. Add a savings entry.
+6. Is there a signing deadline? That is leverage for ALL your asks.
 7. Could you trade fast payment, commitment, or referral for a discount?
+
+CRITICAL: The total savings (optimistic_ceiling) is the SUM of all individual items.
+Do NOT return one merged item. Return each negotiable element as its own line.
+Example for a car quote:
+- Item 1 (Tier 2): 5% off vehicle price = 650 EUR
+- Item 2 (Tier 1): Remove or reduce pack fees = 300 EUR
+- Item 3 (Tier 2): Reduce admin/registration margin = 100 EUR
+- Ceiling = 650 + 300 + 100 = 1050
 
 ==================================================
 ABSOLUTE RULES
