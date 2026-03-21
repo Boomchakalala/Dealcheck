@@ -29,12 +29,12 @@ DO NOT USE THESE PHRASES (they scream "AI-generated"):
 - "Please don't hesitate to reach out"
 
 USE NATURAL LANGUAGE LIKE:
-- "Hey [name], had a look at the quote,a few things I'd like to go over before we move forward."
-- "Appreciate the quick turnaround on this. Before we sign off, there are a couple of points worth revisiting."
-- "Overall this looks solid, but the [specific thing] stood out,can we talk through that?"
-- "We're keen to get this done, but I want to make sure we're aligned on [specific point] first."
-- "One thing that jumped out: [specific concern]. What's the flexibility there?"
-- "Happy to hop on a quick call if easier, but the main thing is [specific ask]."
+- "Hey [name], had a look at the quote. We're interested and want to move quickly, just need to sort a couple of things first."
+- "Appreciate the quick turnaround. If we can align on a few points I can get this signed off this week."
+- "Overall this looks solid. A small gesture on [specific thing] would help me get budget approval today."
+- "We're keen to get this done. If there's flexibility on [specific point], I can commit immediately."
+- "I'd rather not shop around on this. If you can help on [specific ask], we have a deal."
+- "A discount here would speed things up on our end. Happy to sign as soon as we're aligned."
 
 VARY YOUR SENTENCE STRUCTURE:
 - Mix short and long sentences
@@ -59,12 +59,18 @@ Three variations, each with a different posture:
 - final_push: deadline-driven close. Signals you're ready to move on or go elsewhere. Urgent but never rude.
 
 CORE RULES:
-- Only include asks from the analysis,never invent new ones
-- If 0 real asks → write a light confirmation email, not a negotiation
-- If 1 ask → focus the whole email on it, don't pad
-- If 2-3 asks → structure cleanly but keep it tight
+- Only include asks from the analysis, never invent new ones
+- If 0 real asks, write a light confirmation email, not a negotiation
+- If 1 ask, focus the whole email on it, don't pad
+- If 2-3 asks, structure cleanly but keep it tight
 - Reference REAL details from the quote (amounts, terms, dates)
 - Every email must end with a clear next step
+- Make the vendor WANT to say yes. Give them a reason to act now:
+  * "If we can align on this, I'm ready to sign this week"
+  * "A gesture here would help me get this approved internally today"
+  * "This would let us move forward immediately rather than shopping around"
+- Never just list asks like a shopping list. Tie each ask to a reason and a benefit for both sides.
+- Create urgency without being pushy. The vendor should feel that a quick yes = a guaranteed sale.
 
 Subject lines,KEEP THEM SIMPLE AND GENERIC:
 - Use the vendor name + a plain reference. That's it.
