@@ -9,6 +9,7 @@ import { examplesFr } from '@/lib/examples-fr'
 import { useI18n } from '@/i18n/context'
 import Link from 'next/link'
 import { Check, CheckCircle2 } from 'lucide-react'
+import { ScoreCircle } from '@/components/ScoreCircle'
 
 export default function ExamplePage() {
   const { locale, t } = useI18n()
@@ -129,9 +130,16 @@ export default function ExamplePage() {
               >
                 <div className="flex items-start justify-between mb-1.5">
                   <h4 className="text-sm font-bold text-slate-900">{type.label}</h4>
-                  <div className="text-right flex-shrink-0 ml-2">
-                    <p className={`text-lg font-bold leading-none ${scoreColor}`}>{exScore}</p>
-                    <p className="text-[8px] text-slate-400 uppercase tracking-wide">Score</p>
+                  <div className="flex-shrink-0 ml-2">
+                    <ScoreCircle
+                      score={exScore}
+                      size={36}
+                      strokeWidth={3}
+                      trackClass={exScore >= 80 ? 'stroke-emerald-100' : exScore >= 60 ? 'stroke-amber-100' : 'stroke-orange-100'}
+                      ringClass={exScore >= 80 ? 'stroke-emerald-500' : exScore >= 60 ? 'stroke-amber-500' : 'stroke-orange-500'}
+                      textClass={scoreColor}
+                      showOutOf={false}
+                    />
                   </div>
                 </div>
                 <p className="text-xs text-slate-500">{type.description}</p>
