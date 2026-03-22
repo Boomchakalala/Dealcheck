@@ -62,6 +62,7 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <head>
+        <meta name="google-site-verification" content="VFAqvJkNGlWXSZLe4dtSN8benH7O0vTRBDzrrOyCX5E" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
