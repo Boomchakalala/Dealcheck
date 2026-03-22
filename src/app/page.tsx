@@ -719,24 +719,23 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
             {/* Starter */}
-            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-7">
-              <div className="mb-5">
+            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6">
+              <div className="mb-4">
                 <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.starter')}</h3>
                 <p className="text-sm text-slate-500">{t('pricing.starterDesc')}</p>
               </div>
-              <div className="mb-5">
-                <span className="text-3xl sm:text-4xl font-bold text-slate-900">€0</span>
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-slate-900">€0</span>
               </div>
-              <ul className="space-y-2.5 mb-7">
+              <ul className="space-y-2 mb-6">
                 {[
                   t('pricing.starterFeature1'),
                   t('pricing.starterFeature2'),
                   t('pricing.starterFeature3'),
-                  t('pricing.starterFeature4'),
                 ].map((feature) => (
-                  <li key={feature} className="flex items-start gap-2.5 text-sm text-slate-700">
+                  <li key={feature} className="flex items-start gap-2 text-sm text-slate-700">
                     <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={3} />
                     {feature}
                   </li>
@@ -744,34 +743,34 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/try"
-                className="block w-full text-center px-6 py-3 text-sm font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
+                className="block w-full text-center px-5 py-3 text-sm font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
               >
                 {t('pricing.starterCta')}
               </Link>
             </div>
 
-            {/* Pro — Highlighted */}
-            <div className="bg-white border-2 border-emerald-500 rounded-2xl p-6 sm:p-7 relative shadow-lg">
+            {/* Essentials — Highlighted */}
+            <div className="bg-white border-2 border-emerald-500 rounded-2xl p-6 relative shadow-lg">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white">{t('pricing.mostPopular')}</span>
               </div>
-              <div className="mb-5">
-                <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.pro')}</h3>
-                <p className="text-sm text-slate-500">{t('pricing.proDesc')}</p>
+              <div className="mb-4">
+                <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.essentials')}</h3>
+                <p className="text-sm text-slate-500">{t('pricing.essentialsDesc')}</p>
               </div>
-              <div className="mb-5">
-                <span className="text-3xl sm:text-4xl font-bold text-slate-900">€39</span>
-                <span className="text-sm text-slate-500">/month</span>
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-slate-900">€15</span>
+                <span className="text-sm text-slate-500">/mo</span>
               </div>
-              <ul className="space-y-2.5 mb-7">
+              <ul className="space-y-2 mb-6">
                 {[
-                  t('pricing.proFeature1'),
-                  t('pricing.proFeature2'),
-                  t('pricing.proFeature3'),
-                  t('pricing.proFeature4'),
-                  t('pricing.proFeature5'),
+                  t('pricing.essentialsFeature1'),
+                  t('pricing.essentialsFeature2'),
+                  t('pricing.essentialsFeature3'),
+                  t('pricing.essentialsFeature4'),
+                  t('pricing.essentialsFeature5'),
                 ].map((feature) => (
-                  <li key={feature} className="flex items-start gap-2.5 text-sm text-slate-700">
+                  <li key={feature} className="flex items-start gap-2 text-sm text-slate-700">
                     <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={3} />
                     {feature}
                   </li>
@@ -779,7 +778,39 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/pricing"
-                className="block w-full text-center px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md"
+                className="block w-full text-center px-5 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md"
+              >
+                {t('pricing.getEssentials')}
+              </Link>
+            </div>
+
+            {/* Pro */}
+            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6">
+              <div className="mb-4">
+                <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.pro')}</h3>
+                <p className="text-sm text-slate-500">{t('pricing.proDesc')}</p>
+              </div>
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-slate-900">€39</span>
+                <span className="text-sm text-slate-500">/mo</span>
+              </div>
+              <ul className="space-y-2 mb-6">
+                {[
+                  t('pricing.proFeature1'),
+                  t('pricing.proFeature2'),
+                  t('pricing.proFeature3'),
+                  t('pricing.proFeature4'),
+                  t('pricing.proFeature5'),
+                ].map((feature) => (
+                  <li key={feature} className="flex items-start gap-2 text-sm text-slate-700">
+                    <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={3} />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/pricing"
+                className="block w-full text-center px-5 py-3 text-sm font-semibold rounded-xl border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 transition-all"
               >
                 {t('pricing.getPro')}
               </Link>
