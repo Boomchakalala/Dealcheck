@@ -94,7 +94,7 @@ export function QuoteUploaderCard({
           isDragging
             ? 'border-emerald-500 bg-emerald-50'
             : 'border-slate-300 hover:border-emerald-400 hover:bg-slate-50'
-        } ${isCompact ? 'p-6 sm:p-8' : 'p-8 sm:p-12 min-h-[200px] flex items-center justify-center'}`}
+        } ${isCompact ? 'p-6 sm:p-8' : 'p-6 sm:p-12 min-h-[180px] sm:min-h-[200px] flex items-center justify-center'}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -199,22 +199,14 @@ export function QuoteUploaderCard({
       {/* Trust badges */}
       {showTrustBadges && (
         <div className="mt-5 sm:mt-6 pt-5 border-t border-slate-100">
-          <div className="grid grid-cols-4 gap-3 sm:gap-4">
-            {[
-              { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', label: t('upload.trustEncrypted') },
-              { icon: 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', label: t('upload.trustDeleted') },
-              { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label: t('upload.trustNoTraining') },
-              { icon: 'M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21', label: t('upload.trustNoShare') },
-            ].map((badge) => (
-              <div key={badge.label} className="flex flex-col items-center text-center gap-1.5">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={badge.icon} />
-                  </svg>
-                </div>
-                <span className="text-[10px] sm:text-xs text-slate-500 leading-tight">{badge.label}</span>
-              </div>
-            ))}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-0 text-xs text-slate-400">
+            <span>{t('upload.trustEncrypted')}</span>
+            <span className="hidden sm:inline mx-2">·</span>
+            <span>{t('upload.trustDeleted')}</span>
+            <span className="hidden sm:inline mx-2">·</span>
+            <span>{t('upload.trustNoTraining')}</span>
+            <span className="hidden sm:inline mx-2">·</span>
+            <span>{t('upload.trustNoShare')}</span>
           </div>
         </div>
       )}

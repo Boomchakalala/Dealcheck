@@ -15,16 +15,16 @@
     "newAnalysis": "New analysis"
   },
   "hero": {
-    "badge": "Your procurement copilot",
-    "title1": "Stop overpaying.",
-    "title2": "Start negotiating.",
-    "subtitle": "Drop in a vendor quote. Get back exactly where you're overpaying, what to push for, and a ready-to-send email — in under 60 seconds.",
+    "badge": "Instant procurement expertise",
+    "title1": "The procurement expert",
+    "title2": "your team never had.",
+    "subtitle": "Paste a vendor quote. Get back every red flag, what to push for, and a ready-to-send negotiation email, in 60 seconds.",
     "cta": "Analyze a quote free",
     "ctaSecondary": "See a real example",
     "noSignup": "No signup needed. Free to try.",
-    "check1": "Spot hidden fees, inflated rates, and unfavorable clauses",
-    "check2": "Get a negotiation playbook with asks that move the needle",
-    "check3": "Send a polished reply in your tone, ready to copy and go",
+    "check1": "Catch auto-renewals, price escalation clauses, and unused seat traps before you sign",
+    "check2": "Get a negotiation playbook built from 8 years of real procurement experience",
+    "check3": "Send a polished reply in your tone, copy, paste, done",
     "verdict": "Negotiate before signing",
     "verdictDesc": "Paying for 15 unused seats with no loyalty discount after 2 years. Two asks could save you €7,800/year.",
     "redFlagLabel": "Commercial Red Flag",
@@ -45,14 +45,14 @@
     "noCard": "No credit card needed"
   },
   "builtFor": {
-    "title": "No procurement team? No problem.",
-    "subtitle": "Whether it's a SaaS renewal, agency retainer, office supplies, or any vendor contract — just drop in your quote and let TermLift do the heavy lifting.",
-    "founders": "Startup founders",
-    "foundersDesc": "Negotiating vendor contracts, agency fees, and SaaS agreements for the first time without a legal or procurement team.",
-    "ops": "Ops & office managers",
-    "opsDesc": "Managing supplier renewals, service agreements, and multi-vendor contracts across the business.",
-    "buyers": "Small business buyers",
-    "buyersDesc": "Buying services, equipment, or supplies and wanting to stop leaving money on the table at every renewal."
+    "title": "Built for teams without procurement backup",
+    "subtitle": "",
+    "founders": "Founders",
+    "foundersDesc": "Signing vendor contracts without procurement support? TermLift shows where to push back before you sign.",
+    "ops": "Ops & BU managers",
+    "opsDesc": "When quotes land on your desk, TermLift highlights what to flag, what to ask for, and where to negotiate.",
+    "buyers": "Small business owners",
+    "buyersDesc": "Every renewal is a chance to improve terms. TermLift helps you spot leverage and push back faster."
   },
   "howItWorks": {
     "title": "From quote to savings in 3 steps",
@@ -173,8 +173,8 @@
     "title3": "Real expertise, not generic AI"
   },
   "cta": {
-    "title": "That quote in your inbox? You're probably overpaying.",
-    "subtitle": "Find out in 60 seconds. No signup, no commitment — just clarity on what you should be paying.",
+    "title": "That quote in your inbox? You're probably leaving money on the table.",
+    "subtitle": "Find out in 60 seconds. No signup, no commitment, just clear negotiation leverage and what to push back on.",
     "button": "Analyze your first quote"
   },
   "footer": {
@@ -186,7 +186,7 @@
     "about": "About",
     "contact": "Contact",
     "rights": "© 2026 TermLift. All rights reserved.",
-    "description": "AI-powered vendor quote analyzer. Get better deals in 60 seconds.",
+    "description": "Better vendor terms. In 60 seconds.",
     "product": "Product",
     "company": "Company",
     "trust": "Trust & Security"
@@ -195,7 +195,7 @@
     "heroTitle": "Built by someone who's been on your side of the table",
     "heroSubtitle": "TermLift was built by a procurement professional — not a tech team that's never negotiated a contract.",
     "whyTitle": "Why TermLift exists",
-    "whyContent": "After 8 years working in procurement, I kept seeing the same problem. Founders signing SaaS contracts they didn't understand. Operations managers renewing supplier agreements without pushing back. Small business owners accepting vendor terms because they didn't know what to ask for.\n\nThe knowledge to negotiate better deals exists — it lives in procurement departments at large companies. TermLift makes that knowledge available to everyone, in 60 seconds, for any quote or contract.",
+    "whyContent": "I spent 8 years in procurement watching the same thing happen: a vendor quote would land with a founder or a BU manager, they'd read it, nothing would jump out, and they'd sign. Meanwhile the auto-renewal clause, the 8% annual price escalation, the 15 unused seats, all just sat there costing money. TermLift is the procurement expert that should have been in the room.",
     "differenceTitle": "What makes us different",
     "card1Title": "Real procurement expertise",
     "card1Desc": "Every red flag, negotiation ask, and email draft is built on real procurement experience. Not generic AI output.",
@@ -253,8 +253,8 @@
     "errorGeneric": "Failed to send feedback. Please try again."
   },
   "try": {
-    "headline": "Drop in any vendor quote. Get back red flags, savings, and a ready-to-send email in 60 seconds.",
-    "noSignup": "No signup needed for your first analysis.",
+    "headline": "Your vendor prepared for this negotiation. Now you can too.",
+    "noSignup": "Drop in your quote, get back red flags, savings, and a ready-to-send negotiation email in 60 seconds. No signup needed.",
     "demoText": "Try with demo text",
     "seeExample": "See a full example first",
     "analysisReady": "Your analysis is ready",

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, Upload, Search, Send, Lock, ShieldCheck, Globe, Check, Users, Building2, ShoppingCart, Zap, FileText, Mail, CreditCard } from 'lucide-react'
+import { ArrowRight, Upload, Search, Send, Lock, ShieldCheck, Globe, Check, Users, Building2, ShoppingCart, Zap, FileText, Mail, CreditCard, Rocket, Briefcase, Store } from 'lucide-react'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { useScrollReveal, useCountUp } from '@/hooks/useScrollReveal'
@@ -53,8 +53,8 @@ export default function LandingPage() {
               </div>
 
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-4 sm:mb-6 leading-[1.15]">
-                {t('hero.title1')}<br className="hidden sm:block" />
-                <span className="text-emerald-600">{t('hero.title2')}</span>
+                Better vendor terms.<br className="hidden sm:block" />
+                <span className="text-emerald-600">In 60 seconds.</span>
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-lg">
                 {t('hero.subtitle')}
@@ -212,7 +212,7 @@ export default function LandingPage() {
       {/* Social Proof Bar */}
       <section
         ref={statsReveal.ref}
-        className={`py-12 sm:py-16 bg-gradient-to-b from-slate-50 to-white border-y border-slate-200/60 transition-all duration-700 ${
+        className={`py-10 sm:py-14 bg-gradient-to-b from-slate-50 to-white transition-all duration-700 ${
           statsReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
         }`}
       >
@@ -239,46 +239,46 @@ export default function LandingPage() {
       {/* Who it's for */}
       <section
         ref={whoReveal.ref}
-        className={`py-20 sm:py-28 bg-white relative transition-all duration-700 ${
+        className={`py-16 sm:py-24 bg-white relative transition-all duration-700 ${
           whoReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <div className="text-center mb-14 sm:mb-16">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
+          <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-4">
               {t('builtFor.title')}
             </h2>
-            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
-              {t('builtFor.subtitle')}
+            <p className="text-base sm:text-lg text-slate-500 max-w-2xl mx-auto">
+              Just drop in your quote and let TermLift do the heavy lifting.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
             {[
-              {
-                icon: Building2,
-                title: t('builtFor.founders'),
-                desc: t('builtFor.foundersDesc'),
-              },
-              {
-                icon: Users,
-                title: t('builtFor.ops'),
-                desc: t('builtFor.opsDesc'),
-              },
-              {
-                icon: ShoppingCart,
-                title: t('builtFor.buyers'),
-                desc: t('builtFor.buyersDesc'),
-              },
+              { icon: Rocket, title: t('builtFor.founders'), desc: t('builtFor.foundersDesc') },
+              { icon: Briefcase, title: t('builtFor.ops'), desc: t('builtFor.opsDesc') },
+              { icon: Store, title: t('builtFor.buyers'), desc: t('builtFor.buyersDesc') },
             ].map((persona) => (
-              <div key={persona.title} className="bg-white border-2 border-slate-100 rounded-xl p-6 sm:p-8 hover:border-emerald-200 hover:shadow-lg transition-all duration-300 group">
-                <div className="w-12 h-12 mb-5 bg-emerald-50 rounded-xl flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
-                  <persona.icon className="w-6 h-6 text-emerald-600" />
+              <div key={persona.title} className="bg-white border border-slate-200 rounded-lg p-5 sm:p-6 hover:border-emerald-300 hover:shadow-sm transition-all duration-200 flex flex-col">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 bg-emerald-50 rounded-md flex items-center justify-center flex-shrink-0">
+                    <persona.icon className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900">{persona.title}</h3>
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2">{persona.title}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{persona.desc}</p>
+                <p className="text-sm text-slate-500 leading-relaxed">{persona.desc}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-slate-400 mb-3">Paste your next vendor quote and start negotiating faster.</p>
+            <Link
+              href="/try"
+              className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+            >
+              Analyze free — no signup needed
+            </Link>
           </div>
         </div>
       </section>
@@ -287,7 +287,7 @@ export default function LandingPage() {
       <section
         ref={howReveal.ref}
         id="how-it-works"
-        className={`py-24 sm:py-36 bg-[#0f172a] relative overflow-hidden transition-all duration-700 ${
+        className={`py-20 sm:py-28 bg-[#0f172a] relative overflow-hidden transition-all duration-700 ${
           howReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
@@ -359,8 +359,8 @@ export default function LandingPage() {
               {/* LEFT: Before — Vendor Quote */}
               <div className="lg:w-1/2 flex flex-col">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
-                    <span className="text-xs font-bold text-slate-500">1</span>
+                  <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center">
+                    <span className="text-xs font-bold text-white">1</span>
                   </div>
                   <p className="text-sm font-semibold text-slate-300">{t('example.youPaste')}</p>
                 </div>
@@ -601,56 +601,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section
-        ref={socialReveal.ref}
-        className={`py-20 sm:py-28 bg-gradient-to-b from-slate-50/80 to-white relative transition-all duration-700 ${
-          socialReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}
-      >
-        <div className="max-w-5xl mx-auto px-5 sm:px-8">
-          {/* Stat bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-0 sm:divide-x sm:divide-slate-200 mb-16 sm:mb-20">
-            {[
-              { value: t('social.stat1'), label: t('social.stat1Label') },
-              { value: t('social.stat2'), label: t('social.stat2Label') },
-              { value: t('social.stat3'), label: t('social.stat3Label') },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center px-8 sm:px-12">
-                <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">{stat.value}</p>
-                <p className="text-sm text-slate-500 mt-1 font-medium">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Testimonials */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { quote: t('social.quote1'), name: t('social.name1'), title: t('social.title1'), initials: 'TL' },
-              { quote: t('social.quote2'), name: t('social.name2'), title: t('social.title2'), initials: 'TL' },
-              { quote: t('social.quote3'), name: t('social.name3'), title: t('social.title3'), initials: 'AI' },
-            ].map((testimonial) => (
-              <div key={testimonial.name} className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
-                <div className="mb-4">
-                  <svg className="w-6 h-6 text-emerald-300" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                  </svg>
-                </div>
-                <p className="text-sm text-slate-700 leading-relaxed mb-5">{testimonial.quote}</p>
-                <div className="flex items-center gap-3 mt-auto">
-                  <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-bold text-emerald-700">{testimonial.initials}</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">{testimonial.name}</p>
-                    <p className="text-xs text-slate-400">{testimonial.title}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Data Privacy */}
       <section
@@ -837,7 +787,7 @@ export default function LandingPage() {
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
             {t('cta.title')}
           </h2>
-          <p className="text-emerald-100 text-base sm:text-lg md:text-xl mb-10 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-emerald-100 text-base sm:text-lg mb-8 leading-relaxed max-w-2xl mx-auto">
             {t('cta.subtitle')}
           </p>
           <Link

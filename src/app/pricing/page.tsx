@@ -37,8 +37,8 @@ export default async function PricingPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/40 via-white to-white pointer-events-none" />
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.08)_0%,transparent_65%)] pointer-events-none" />
 
-          <div className="relative max-w-6xl mx-auto px-5 sm:px-8 pt-24 sm:pt-32 pb-20">
-            <div className="text-center mb-16">
+          <div className="relative max-w-6xl mx-auto px-5 sm:px-8 pt-28 sm:pt-36 pb-20">
+            <div className="text-center mb-14">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-emerald-200/60 shadow-sm mb-6">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                 <span className="text-xs font-semibold text-emerald-700 tracking-wide">{t('pricingPage.transparentPricing')}</span>
@@ -50,11 +50,6 @@ export default async function PricingPage() {
                 {t('pricing.subtitle')}
               </p>
             </div>
-
-            {/* Social proof */}
-            <p className="text-center text-sm text-slate-500 mb-8">
-              {t('pricingPage.socialProof')}
-            </p>
 
             {/* 3-Tier Grid */}
             <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto">
