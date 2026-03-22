@@ -118,7 +118,7 @@ export default function LandingPage() {
                   <div className="bg-orange-50 border border-orange-200 rounded p-2">
                     <div className="flex items-center gap-2 mb-1.5">
                       <ScoreCircle
-                        score={51} size={34} strokeWidth={3}
+                        score={62} size={34} strokeWidth={3}
                         trackClass="stroke-orange-200" ringClass="stroke-orange-500" textClass="text-orange-700"
                         showOutOf={false}
                       />
@@ -150,9 +150,9 @@ export default function LandingPage() {
                   <div className="border border-slate-200 rounded p-2">
                     <div className="space-y-1.5">
                       {[
-                        { label: t('example.scorePricing'), pct: 40 },
-                        { label: t('example.scoreTerms'), pct: 53 },
-                        { label: t('example.scoreLeverage'), pct: 75 },
+                        { label: t('example.scorePricing'), pct: 56 },
+                        { label: t('example.scoreTerms'), pct: 67 },
+                        { label: t('example.scoreLeverage'), pct: 70 },
                       ].map((bar) => (
                         <div key={bar.label}>
                           <div className="flex items-center justify-between mb-0.5">
@@ -419,7 +419,7 @@ export default function LandingPage() {
                   <div className="bg-orange-50 rounded-xl border border-orange-200 p-3.5 sm:p-4 shadow-sm">
                     <div className="flex items-center gap-3 mb-3">
                       <ScoreCircle
-                        score={51} size={44} strokeWidth={3.5}
+                        score={62} size={44} strokeWidth={3.5}
                         trackClass="stroke-orange-200" ringClass="stroke-orange-500" textClass="text-orange-700"
                         showOutOf={false}
                       />
@@ -436,9 +436,9 @@ export default function LandingPage() {
                     </div>
                     <div className="grid grid-cols-3 gap-3">
                       {[
-                        { label: t('example.scorePricing'), pct: 40 },
-                        { label: t('example.scoreTerms'), pct: 53 },
-                        { label: t('example.scoreLeverage'), pct: 75 },
+                        { label: t('example.scorePricing'), pct: 56 },
+                        { label: t('example.scoreTerms'), pct: 67 },
+                        { label: t('example.scoreLeverage'), pct: 70 },
                       ].map((bar) => (
                         <div key={bar.label}>
                           <div className="flex items-center justify-between mb-1">
