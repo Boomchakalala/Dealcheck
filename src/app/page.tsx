@@ -287,7 +287,7 @@ export default function LandingPage() {
       <section
         ref={howReveal.ref}
         id="how-it-works"
-        className={`py-20 sm:py-28 bg-[#0f172a] relative overflow-hidden transition-all duration-700 ${
+        className={`py-16 sm:py-20 bg-[#0f172a] relative overflow-hidden transition-all duration-700 ${
           howReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
@@ -297,7 +297,7 @@ export default function LandingPage() {
 
         <div className="max-w-6xl mx-auto px-5 sm:px-8 relative">
           <div className="text-center mb-16 sm:mb-20">
-            <h2 className="text-2xl sm:text-3xl md:text-[2.75rem] font-bold text-white mb-4 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
               {t('howItWorks.title')}
             </h2>
             <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
@@ -325,14 +325,14 @@ export default function LandingPage() {
                   </div>
                 )}
 
-                <div className="bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8 hover:-translate-y-1 hover:bg-white/[0.09] hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 w-full max-w-[300px] flex-1">
+                <div className="bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:-translate-y-1 hover:bg-white/[0.09] hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 w-full max-w-[300px] flex-1">
                   <div className="w-20 h-20 mb-5 bg-emerald-600 rounded-2xl flex items-center justify-center relative mx-auto shadow-lg shadow-emerald-500/20">
                     <item.icon className="w-9 h-9 text-white" />
                     <div className="absolute -top-2.5 -right-2.5 w-8 h-8 rounded-full bg-white text-[#0f172a] text-sm font-extrabold flex items-center justify-center shadow-md">
                       {item.step}
                     </div>
                   </div>
-                  <p className="text-lg sm:text-xl font-bold text-white mb-2">
+                  <p className="text-lg font-bold text-white mb-2">
                     {item.title}
                   </p>
                   <p className="text-sm text-slate-400 leading-relaxed">
