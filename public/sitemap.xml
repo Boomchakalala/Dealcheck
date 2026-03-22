@@ -66,6 +66,21 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://www.termlift.com/blog/how-to-negotiate-car-purchase</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/blog/what-to-check-before-signing-equipment-lease</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/blog/how-to-review-vendor-contract-without-lawyer</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://www.termlift.com/privacy</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
