@@ -95,49 +95,41 @@ export const docusignExampleFr: DealOutput = {
       subject: "Re : Renouvellement DocuSign",
       body: `Bonjour [Nom],
 
-Merci pour l'avis de renouvellement — nous prévoyons de rester chez DocuSign et souhaitons confirmer rapidement.
+On adore DocuSign et on veut boucler ce renouvellement rapidement. J'ai juste besoin de clarifier deux points de notre c\u00f4t\u00e9.
 
-Deux points à régler avant de signer :
+Nous avons actuellement 40 licences, mais en regardant nos donn\u00e9es d'utilisation, seules 25 personnes se connectent r\u00e9guli\u00e8rement. Serait-il possible de passer \u00e0 30 ? Cela nous laisse une marge confortable sans payer des licences que personne n'utilise, et nous ram\u00e8ne \u00e0 \u20ac1 500/mois.
 
-1. Nombre de licences : nous avons 40 licences mais seulement 25 sont utilisées activement. Je souhaiterais ajuster à 30 — cela nous laisse une marge confortable sans payer 10 licences inutiles. Cela nous ramène à €1 500/mois.
+Par ailleurs, cela fait 2 ans que nous sommes clients fid\u00e8les. Y a-t-il une marge de man\u0153uvre pour une remise de fid\u00e9lit\u00e9 ? M\u00eame 10 % sur le contrat ajust\u00e9 ferait vraiment la diff\u00e9rence. PandaDoc nous sollicite avec des tarifs agressifs, mais honn\u00eatement, on pr\u00e9f\u00e8re rester si les chiffres tiennent la route.
 
-2. Remise de fidélité : nous sommes clients DocuSign depuis 2 ans. PandaDoc et Adobe Sign nous proposent tous deux 10-15 % en dessous de ce tarif. Serait-il possible d'appliquer une remise de fidélité de 10 % au renouvellement ?
-
-Ensemble, cela nous amène à environ €16 200/an — nous sommes prêts à nous engager sur 2 ans et à laisser un avis si cela vous aide.
-
-Dites-moi si nous pouvons boucler cela cette semaine.
+Si on peut atterrir autour de \u20ac16 200/an, je suis pr\u00eat \u00e0 signer un engagement de 2 ans cette semaine. Je peux aussi laisser un avis sur G2 si cela vous aide.
 
 Cordialement,
 [Votre nom]`,
     },
     firm: {
-      subject: "Renouvellement DocuSign — suivi",
+      subject: "Renouvellement DocuSign",
       body: `Bonjour [Nom],
 
-Nous souhaitons renouveler mais avons besoin de deux ajustements avant de signer :
+Je reviens vers vous au sujet du renouvellement. Nous devons r\u00e9gler deux points avant de pouvoir signer.
 
-1. Réduction de 40 à 30 licences — seulement 25 sont actives. Nouveau mensuel : €1 500.
-2. Remise de fidélité de 10 % — nous sommes clients depuis 2 ans et PandaDoc propose 30 % en dessous de votre tarif actuel.
+D'abord, le nombre de licences. Nous en avons 40 mais seulement 25 sont actives. Payer 15 licences vides \u00e0 \u20ac50/mois n'est pas justifiable en interne. Nous devons passer \u00e0 30.
 
-Total ajusté : €16 200/an. Nous sommes prêts à nous engager sur 2 ans pour que cela fonctionne de votre côté.
+Ensuite, apr\u00e8s 2 ans en tant que client, nous avons besoin d'une remise de fid\u00e9lit\u00e9 sur ce renouvellement. PandaDoc nous propose 30 % en dessous de votre tarif actuel, et m\u00eame si on pr\u00e9f\u00e8re rester chez DocuSign, on ne peut pas ignorer cet \u00e9cart. Une remise de 10 % sur le contrat ajust\u00e9 nous am\u00e8nerait \u00e0 \u20ac16 200/an.
 
-Pouvez-vous confirmer d'ici vendredi ?
+On s'engage volontiers sur 2 ans \u00e0 ce montant. Pouvez-vous confirmer d'ici vendredi pour qu'on boucle le dossier ?
 
 Cordialement,
 [Votre nom]`,
     },
     final_push: {
-      subject: "DocuSign — conditions de renouvellement",
+      subject: "Renouvellement DocuSign",
       body: `Bonjour [Nom],
 
-Nous avons examiné le renouvellement et deux points doivent être résolus avant de pouvoir signer :
+Je pr\u00e9f\u00e8re \u00eatre franc avec vous. On \u00e9change sur ce renouvellement depuis un moment, et nous devons prendre une d\u00e9cision avant le 1er avril.
 
-1. Nous payons 40 licences avec 25 actives. Nous ne renouvellerons pas à 40 licences.
-2. Après 2 ans en tant que client, nous attendons un tarif de fidélité. PandaDoc nous a proposé 30 % en dessous de votre prix actuel.
+Nous ne renouvellerons pas \u00e0 40 licences alors que 25 seulement sont actives. Cela repr\u00e9sente \u20ac9 000/an de gaspillage, et notre direction financi\u00e8re l'a signal\u00e9. Nous avons aussi besoin d'un tarif de fid\u00e9lit\u00e9 apr\u00e8s 2 ans. PandaDoc a une proposition sign\u00e9e sur mon bureau, 30 % en dessous de votre tarif actuel.
 
-Nous sommes prêts à nous engager sur 2 ans à 30 licences avec une remise de 10 % — €16 200/an. Si nous ne pouvons pas nous aligner, nous devrons finaliser notre évaluation des alternatives avant le 1er avril.
-
-Merci de répondre avant le [DATE].
+Voici ce qui fonctionne pour nous : 30 licences, remise de fid\u00e9lit\u00e9 de 10 %, \u20ac16 200/an. On signe un engagement de 2 ans aujourd'hui si vous confirmez. Sinon, nous devrons avancer sur notre \u00e9valuation des alternatives cette semaine.
 
 Cordialement,
 [Votre nom]`,
@@ -265,49 +257,43 @@ export const salesforceExampleFr: DealOutput = {
       subject: "Re : Renouvellement Salesforce",
       body: `Bonjour [Nom],
 
-Merci pour le renouvellement — nous prévoyons de rester sur Sales Cloud et souhaitons régler cela avant le 1er juin.
+Cela fait 3 ans que nous sommes sur Sales Cloud et l'\u00e9quipe l'utilise au quotidien, donc le renouvellement est clairement pr\u00e9vu. Je veux simplement m'assurer que le contrat refl\u00e8te notre utilisation r\u00e9elle de la plateforme.
 
-Deux points avant de confirmer :
+Nous payons actuellement 40 licences, mais j'ai lanc\u00e9 un audit des connexions et seules 28 personnes sont actives. Serait-il possible d'ajuster \u00e0 32 ? Cela nous garde une petite marge sans les \u20ac900/mois qu'on d\u00e9pense aujourd'hui en licences vides.
 
-1. Nombre de licences : nous avons 40 licences mais seulement 28 sont utilisées activement. Je souhaiterais ajuster à 32 — cela nous laisse de la marge sans payer 8 licences inutiles. Cela nous ramène à €2 400/mois.
+Autre point, cela fait 3 ans que nous sommes clients et nous n'avons jamais demand\u00e9 de remise. Y a-t-il de la flexibilit\u00e9 sur un tarif pluriannuel ? Si on s'engage sur 2 ans, 8 % serait-il envisageable ? HubSpot nous d\u00e9marche fortement \u00e0 \u20ac40-50/licence, mais migrer un CRM est douloureux et on pr\u00e9f\u00e9rerait \u00e9viter.
 
-2. Remise pluriannuelle : nous sommes sur Salesforce depuis 3 ans. HubSpot et Pipedrive proposent tous deux des tarifs nettement inférieurs. Une remise de 8 % serait-elle envisageable si nous nous engageons sur 2 ans ?
-
-Cela nous amène à environ €26 496/an — nous sommes prêts à signer un engagement de 2 ans et à envisager l'ajout de Service Cloud si le tarif unitaire descend à €70.
-
-Dites-moi ce que vous pouvez faire.
+Cela nous am\u00e8nerait autour de \u20ac26 500/an. Si le tarif unitaire descend \u00e0 \u20ac70, on envisagerait aussi d'ajouter des licences Service Cloud.
 
 Cordialement,
 [Votre nom]`,
     },
     firm: {
-      subject: "Renouvellement Salesforce — suivi",
+      subject: "Renouvellement Salesforce",
       body: `Bonjour [Nom],
 
-Nous souhaitons renouveler mais avons besoin de deux ajustements :
+Je dois vous signaler deux probl\u00e8mes sur le renouvellement qui bloquent les choses de notre c\u00f4t\u00e9.
 
-1. Réduction de 40 à 32 licences — seulement 28 actives. Nouveau mensuel : €2 400.
-2. Remise pluriannuelle de 8 % pour un engagement de 2 ans — nous sommes clients depuis 3 ans et HubSpot propose des tarifs bien inférieurs au vôtre.
+Notre nombre de licences est incorrect. Nous payons pour 40 mais seulement 28 sont actives. Cela fait 12 licences \u00e0 \u20ac75/mois inutilis\u00e9es, et le sujet a \u00e9t\u00e9 remont\u00e9 en interne. Nous devons passer \u00e0 32.
 
-Total ajusté : €26 496/an. Nous sommes prêts à nous engager sur 2 ans pour que cela fonctionne.
+Sur le tarif, apr\u00e8s 3 ans en tant que client, nous nous attendions \u00e0 ce qu'une remise pluriannuelle fasse partie de ce renouvellement. HubSpot nous propose un tarif bien en dessous du v\u00f4tre, et notre \u00e9quipe demande pourquoi on n'explore pas cette option. Une remise de 8 % sur un engagement de 2 ans r\u00e9glerait la question. Cela donne \u20ac26 496/an.
 
-Pouvez-vous confirmer d'ici la fin de semaine ?
+J'aimerais r\u00e9soudre cela cette semaine pour pouvoir arr\u00eater l'\u00e9valuation concurrentielle. Pouvez-vous revenir avec des conditions mises \u00e0 jour ?
 
 Cordialement,
 [Votre nom]`,
     },
     final_push: {
-      subject: "Salesforce — conditions de renouvellement",
+      subject: "Renouvellement Salesforce",
       body: `Bonjour [Nom],
 
-Nous avons examiné le renouvellement et deux points doivent être résolus avant de signer :
+Je vais droit au but. Notre renouvellement arrive le 1er juin et nous devons trancher.
 
-1. Nous payons 40 licences avec 28 actives. Nous ne renouvellerons pas au nombre actuel de licences.
-2. Après 3 ans, nous attendons un tarif de fidélité. HubSpot et Pipedrive proposent 40 % en dessous de votre prix actuel.
+Nous avons men\u00e9 une \u00e9valuation compl\u00e8te de HubSpot le mois dernier. Leur tarif est 40 % en dessous du v\u00f4tre, et l'\u00e9cart fonctionnel s'est consid\u00e9rablement r\u00e9duit. La seule raison pour laquelle nous n'avons pas migr\u00e9, c'est le co\u00fbt de migration et le fait que notre \u00e9quipe conna\u00eet Salesforce.
 
-Nous sommes prêts à nous engager sur 2 ans à 32 licences avec une remise de 8 % — €26 496/an. Si nous ne pouvons pas nous aligner, nous finaliserons notre évaluation HubSpot avant le 1er juin.
+Mais nous ne pouvons pas renouveler \u00e0 40 licences quand 12 sont inutilis\u00e9es, et nous avons besoin d'une remise pluriannuelle apr\u00e8s 3 ans. Voici ce qui fonctionne : 32 licences, remise de 8 %, engagement de 2 ans, \u20ac26 496/an. Je peux faire signer cette semaine si vous confirmez.
 
-Merci de répondre avant le [DATE].
+Si on n'y arrive pas, nous lancerons la migration HubSpot. Je pr\u00e9f\u00e9rerais \u00e9viter, mais les chiffres doivent tenir.
 
 Cordialement,
 [Votre nom]`,
@@ -416,38 +402,37 @@ export const microsoft365ExampleFr: DealOutput = {
       subject: "Re : Renouvellement Microsoft 365",
       body: `Bonjour [Nom],
 
-Merci pour l'avis de renouvellement. Nous sommes satisfaits de Business Premium et souhaitons continuer.
+Bonne nouvelle de notre c\u00f4t\u00e9. Business Premium fonctionne tr\u00e8s bien, le nombre de licences est bon, et l'\u00e9quipe est satisfaite. Nous sommes pr\u00eats \u00e0 renouveler.
 
-Le tarif et le nombre de licences sont corrects, donc cela devrait \u00eatre simple. Deux petites demandes avant de confirmer :
+J'ai juste deux petites demandes avant de finaliser. Premi\u00e8rement, serait-il possible de verrouiller le tarif de \u20ac38/utilisateur pour 2 ans ? Nous nous engagerions volontiers sur un contrat de 2 ans en \u00e9change. Cela nous \u00e9vite les allers-retours l'ann\u00e9e prochaine, et vous avez un revenu garanti sur 50 licences.
 
-1. Pourrions-nous verrouiller le tarif actuel pour 2 ans ? Nous nous engagerions sur un contrat de 2 ans en \u00e9change. Cela nous \u00e9vite la conversation de renouvellement l'an prochain.
+Deuxi\u00e8mement, le pr\u00e9avis de renouvellement automatique de 30 jours est serr\u00e9 pour un engagement de \u20ac22 800. Serait-il possible de l'allonger \u00e0 60 jours ? Juste pour nous laisser le temps de planifier en interne.
 
-2. Le pr\u00e9avis de renouvellement est actuellement de 30 jours, ce qui est serr\u00e9 pour un engagement de cette taille. Serait-il possible de l'allonger \u00e0 60 jours ?
-
-Si cela fonctionne, nous sommes pr\u00eats \u00e0 signer cette semaine.
+Si ces deux points fonctionnent, je peux faire signer avant la fin de semaine. Un renouvellement simple pour tout le monde.
 
 Cordialement,
 [Votre nom]`,
     },
     firm: {
-      subject: "Renouvellement Microsoft 365 \u2014 suivi",
+      subject: "Renouvellement Microsoft 365",
       body: `Bonjour [Nom],
 
-Nous souhaitons renouveler mais avons besoin de deux confirmations :
+Nous sommes pr\u00eats \u00e0 renouveler le contrat Business Premium de 50 licences, mais j'ai besoin de deux confirmations avant de signer.
 
-1. Verrouillage tarifaire sur 2 ans au tarif actuel de \u20ac38/utilisateur.
-2. Pr\u00e9avis de renouvellement automatique \u00e9tendu \u00e0 60 jours.
+Nous avons besoin que le tarif actuel de \u20ac38/utilisateur soit verrouill\u00e9 pour 2 ans. Nous nous engageons sur un contrat de 2 ans, donc un gel tarifaire est un \u00e9change \u00e9quitable. Nous avons aussi besoin que le pr\u00e9avis de renouvellement passe de 30 \u00e0 60 jours. Sur un contrat de cette taille, 30 jours ne suffisent pas.
 
-Nous sommes pr\u00eats \u00e0 signer un engagement de 2 ans imm\u00e9diatement si ces points sont confirm\u00e9s.
+Ce sont des demandes simples. Pouvez-vous confirmer pour qu'on boucle le dossier ?
 
 Cordialement,
 [Votre nom]`,
     },
     final_push: {
-      subject: "Microsoft 365 \u2014 conditions de renouvellement",
+      subject: "Renouvellement Microsoft 365",
       body: `Bonjour [Nom],
 
-Nous devons finaliser le renouvellement avant le 1er mai. Le contrat nous convient, mais nous avons besoin du verrouillage tarifaire sur 2 ans et du pr\u00e9avis de 60 jours confirm\u00e9s avant de signer.
+Notre renouvellement du 1er mai approche et j'aimerais r\u00e9gler cela. Le contrat est bon et nous voulons rester, mais j'attends toujours la confirmation sur le gel tarifaire de 2 ans \u00e0 \u20ac38/utilisateur et le pr\u00e9avis de renouvellement de 60 jours.
+
+Ce sont des demandes mineures sur un renouvellement par ailleurs impeccable. 50 licences, engagement de 2 ans, z\u00e9ro complication. J'ai juste besoin d'un oui sur ces deux points et on signe imm\u00e9diatement.
 
 Pouvez-vous confirmer d'ici la fin de semaine ?
 
@@ -581,53 +566,41 @@ export const fedexExampleFr: DealOutput = {
       subject: "Re : Accord FedEx",
       body: `Bonjour [Nom],
 
-Merci pour la proposition — la couverture et les niveaux de service correspondent à nos volumes. Avant de signer, trois points à régler :
+La couverture et les niveaux de service nous conviennent parfaitement, et nous aimerions avancer avec FedEx. Je voudrais juste revoir quelques chiffres avant de finaliser.
 
-1. Tarif de base : $4,20/colis est au-dessus de ce que des comptes comparables à notre volume obtiennent (fourchette $3,20-3,60). Pourrions-nous nous accorder sur $3,50 ?
+Le tarif de base de $4,20/colis est plus \u00e9lev\u00e9 que ce qu'on nous propose ailleurs pour notre volume. \u00c0 1 000 colis/mois, les tarifs n\u00e9goci\u00e9s comparables se situent entre $3,20 et $3,60. Serait-il possible de viser $3,50 ?
 
-2. Surcharge carburant : 20 % sans plafond avec révision hebdomadaire est difficile à budgéter. Nous avons besoin d'un plafond à 12 % avec révision mensuelle.
+C\u00f4t\u00e9 surcharge carburant, 20 % sans plafond avec r\u00e9vision hebdomadaire rend la pr\u00e9vision des co\u00fbts tr\u00e8s difficile. Y a-t-il de la flexibilit\u00e9 pour plafonner \u00e0 12 % avec une r\u00e9vision mensuelle ? C'est davantage en ligne avec ce que nous observons sur le march\u00e9.
 
-3. Clause GRI : 7,9 % d'augmentation annuelle est élevé. Pourrions-nous convenir d'un plafond à 3,5 % pour la durée du contrat ?
+Dernier point, la clause GRI de 7,9 %. Sur un horizon de 3 ans, cela s'accumule vite. Pourrait-on s'accorder sur un plafond de 3,5 % pour la dur\u00e9e du contrat ?
 
-Nous sommes prêts à nous engager sur 1 100 colis/mois et un contrat de 2 ans si nous nous alignons sur ces points.
-
-Au plaisir de régler cela.
+Nous nous engagerions sur 1 100 colis/mois et un contrat de 2 ans si on r\u00e8gle ces points. C'est un volume garanti significatif pour votre \u00e9quipe.
 
 Cordialement,
 [Votre nom]`,
     },
     firm: {
-      subject: "Accord FedEx — suivi",
+      subject: "Accord FedEx",
       body: `Bonjour [Nom],
 
-Nous souhaitons avancer mais avons besoin de trois modifications :
+Je pr\u00e9f\u00e8re \u00eatre transparent sur notre position. Le r\u00e9seau FedEx nous pla\u00eet, mais les conditions commerciales doivent bouger avant qu'on puisse signer.
 
-1. Tarif de base à $3,50/colis — $4,20 est au-dessus du marché négocié pour notre volume.
-2. Surcharge carburant plafonnée à 12 % avec révision mensuelle — 20 % non plafonné n'est pas acceptable.
-3. GRI plafonné à 3,5 % — 7,9 % d'augmentation annuelle est trop agressif.
+Le tarif de base de $4,20/colis est au-dessus du march\u00e9. UPS nous a propos\u00e9 $3,30 pour la m\u00eame tranche de volume. Nous avons besoin de $3,50. La surcharge carburant de 20 % sans plafond est r\u00e9dhibitoire pour notre direction financi\u00e8re. Le march\u00e9 est \u00e0 10-14 %, et nous avons besoin d'un plafond \u00e0 12 % avec r\u00e9vision mensuelle. Le GRI de 7,9 % ajoutera plus de $4 000 \u00e0 nos co\u00fbts rien que l'ann\u00e9e prochaine. Nous avons besoin d'un plafond \u00e0 3,5 %.
 
-UPS nous a proposé $3,30/colis avec un plafond carburant de 12 %. Nous préférons FedEx mais avons besoin de conditions compétitives.
-
-Pouvez-vous envoyer des conditions révisées cette semaine ?
+Nous exp\u00e9dions plus de 1 000 colis par mois et sommes pr\u00eats \u00e0 nous engager, mais pas \u00e0 ces tarifs. Pouvez-vous revenir avec des conditions r\u00e9vis\u00e9es cette semaine ?
 
 Cordialement,
 [Votre nom]`,
     },
     final_push: {
-      subject: "FedEx — conditions de l'accord de livraison",
+      subject: "Accord FedEx",
       body: `Bonjour [Nom],
 
-Nous devons finaliser notre accord de livraison cette semaine. Nous choisissons entre FedEx et UPS.
+Nous devons finaliser notre contrat de livraison cette semaine. J'ai une proposition sign\u00e9e d'UPS sur mon bureau \u00e0 $3,30/colis avec un plafond carburant de 12 % et un plafond GRI de 3 %.
 
-Trois points à résoudre :
+Voici ce qui nous garde chez FedEx : tarif de base \u00e0 $3,50, plafond de surcharge carburant \u00e0 12 % avec r\u00e9vision mensuelle, et plafond GRI \u00e0 3,5 %. Nous nous engageons sur 1 100 colis/mois et un contrat de 2 ans. Cela repr\u00e9sente plus de $80 000 de chiffre d'affaires annuel garanti que vous pouvez inscrire d\u00e8s aujourd'hui.
 
-1. Tarif de base : $3,50/colis (pas $4,20)
-2. Plafond carburant : 12 % (pas 20 % non plafonné)
-3. GRI : plafond annuel de 3,5 % (pas 7,9 %)
-
-Nous nous engagerons sur 1 100 colis/mois et un contrat de 2 ans si vous confirmez ces conditions. Cela représente plus de $80 000 de chiffre d'affaires annuel garanti.
-
-Sinon, nous signerons avec UPS d'ici vendredi.
+Je dois donner une r\u00e9ponse \u00e0 UPS d'ici vendredi. Si vous confirmez ces conditions, on signe avec FedEx le jour m\u00eame.
 
 Cordialement,
 [Votre nom]`,
@@ -764,51 +737,43 @@ export const konicaExampleFr: DealOutput = {
       subject: "Re : Location Konica Minolta",
       body: `Bonjour [Nom],
 
-Merci pour la proposition — les spécifications correspondent à nos volumes d'impression. Avant de nous engager sur 36 mois, trois points à aborder :
+Les sp\u00e9cifications du bizhub C360i correspondent bien \u00e0 nos besoins. Deux unit\u00e9s avec ce forfait d'impression couvrent nos volumes, et on aimerait mettre cela en place. Avant de s'engager sur 36 mois, je voudrais discuter de quelques points.
 
-1. Tarif de location mensuel : à €870/mois, nous sommes au-dessus des devis comparables de Ricoh et Canon (fourchette €650-720 pour des appareils équivalents). Serait-il possible de descendre à €700 ?
+Sur le tarif de location, \u20ac870/mois est un peu \u00e9lev\u00e9 par rapport \u00e0 ce qu'on a vu ailleurs. Ricoh et Canon nous ont tous deux propos\u00e9 dans la fourchette \u20ac650-720 pour des appareils couleur A3/A4 \u00e9quivalents. Serait-il possible de viser \u20ac700 ?
 
-2. Exclusivité toner : nous aurions besoin que la clause d'approvisionnement exclusif soit supprimée, ou que les prix du toner soient fixés aux tarifs actuels pour les 36 mois.
+La clause d'exclusivit\u00e9 toner nous pose aussi probl\u00e8me. Nous aurions besoin soit de la supprimer pour pouvoir nous approvisionner librement, soit de verrouiller les prix du toner aux tarifs actuels pour les 36 mois. On ne peut pas signer un contrat de 3 ans o\u00f9 les co\u00fbts de consommables ne sont pas ma\u00eetris\u00e9s.
 
-3. Sortie anticipée : un engagement de 36 mois sans option de sortie est difficile à accepter. Une clause de sortie à 18 mois avec des frais de rachat de 3 mois rendrait cela acceptable.
+Enfin, 36 mois sans option de sortie, c'est difficile \u00e0 faire passer en interne. Serait-il possible d'inclure une clause de sortie \u00e0 18 mois avec des frais de rachat de 3 mois ? Vous gardez un revenu garanti, et nous avons de la flexibilit\u00e9 si nos besoins \u00e9voluent.
 
-Nous sommes prêts à confirmer le contrat complet de 3 ans et à ajouter l'extension de garantie si nous nous alignons sur ces points.
-
-Au plaisir de régler cela.
+Si on r\u00e8gle ces points, je suis pr\u00eat \u00e0 confirmer le contrat complet de 3 ans et \u00e0 ajouter l'extension de garantie.
 
 Cordialement,
 [Votre nom]`,
     },
     firm: {
-      subject: "Location Konica Minolta — suivi",
+      subject: "Location Konica Minolta",
       body: `Bonjour [Nom],
 
-Nous souhaitons avancer mais avons besoin de trois modifications avant de signer :
+Nous avons examin\u00e9 la proposition de location en d\u00e9tail et trois points doivent \u00eatre r\u00e9solus.
 
-1. Tarif de location à €700/mois — €870 est au-dessus du marché. Ricoh et Canon proposent €650-720.
-2. Exclusivité toner supprimée ou tarif verrouillé pour 36 mois.
-3. Clause de sortie à 18 mois avec rachat de 3 mois — 36 mois sans sortie n'est pas acceptable.
+Le tarif de \u20ac870/mois est au-dessus du march\u00e9. Nous avons des devis \u00e9crits de Ricoh et Canon \u00e0 \u20ac650-720 pour des appareils \u00e9quivalents. Nous avons besoin de \u20ac700/mois. La clause d'exclusivit\u00e9 toner doit \u00eatre supprim\u00e9e, ou les prix du toner doivent \u00eatre verrouill\u00e9s pour les 36 mois. Nous ne pouvons pas accepter des co\u00fbts de consommables ouverts sur une location fixe. Et un contrat de 36 mois sans aucune option de sortie, notre service juridique ne validera pas. Nous avons besoin d'une clause de sortie \u00e0 18 mois avec des frais de 3 mois.
 
-Nous nous engagerons sur le contrat complet de 3 ans à €700/mois. Pouvez-vous confirmer ?
+Nous voulons aller avec Konica Minolta, mais ces conditions doivent bouger. \u00c0 \u20ac700/mois avec ces ajustements, nous nous engageons imm\u00e9diatement sur les 3 ans. Pouvez-vous revenir avec des conditions r\u00e9vis\u00e9es ?
 
 Cordialement,
 [Votre nom]`,
     },
     final_push: {
-      subject: "Konica Minolta — conditions de location",
+      subject: "Location Konica Minolta",
       body: `Bonjour [Nom],
 
-Nous devons finaliser notre location d'imprimantes cette semaine. Nous choisissons entre Konica Minolta et Ricoh.
+Nous prenons notre d\u00e9cision de location d'imprimantes cette semaine et je veux donner sa chance \u00e0 Konica Minolta avant d'aller voir ailleurs.
 
-Trois points à résoudre :
+La r\u00e9alit\u00e9, c'est que Ricoh nous a propos\u00e9 \u20ac680/mois pour des appareils comparables, avec approvisionnement toner libre et une clause de sortie \u00e0 18 mois. Votre proposition est \u00e0 \u20ac870/mois avec exclusivit\u00e9 toner et aucune sortie possible. L'\u00e9cart est significatif.
 
-1. Location : €700/mois (pas €870)
-2. Toner : approvisionnement ouvert ou tarif verrouillé
-3. Clause de sortie : option de sortie à 18 mois
+Voici ce qui bouclerait le dossier : \u20ac700/mois de location, exclusivit\u00e9 toner supprim\u00e9e ou tarifs verrouill\u00e9s pour 36 mois, et une clause de sortie \u00e0 18 mois avec rachat de 3 mois. Cela repr\u00e9sente quand m\u00eame plus de \u20ac25 200 de revenus de location garantis pour vous.
 
-Nous signerons immédiatement le contrat complet de 3 ans si ces points sont confirmés. Cela représente plus de €25 200 de revenus de location garantis.
-
-Sinon, nous irons chez Ricoh d'ici vendredi.
+Je dois donner une r\u00e9ponse \u00e0 Ricoh d'ici vendredi. Si vous pouvez vous aligner sur ces conditions, on signe avec Konica Minolta le jour m\u00eame.
 
 Cordialement,
 [Votre nom]`,
@@ -950,53 +915,43 @@ export const bdoExampleFr: DealOutput = {
       subject: "Re : Proposition BDO",
       body: `Bonjour [Nom],
 
-Merci pour cette proposition — le périmètre couvre nos besoins et nous souhaitons avancer. Avant de signer, trois points à aborder :
+Le p\u00e9rim\u00e8tre du forfait correspond exactement \u00e0 ce dont nous avons besoin. Comptes de gestion, TVA, paie, fiscalit\u00e9, tout couvert avec un responsable senior d\u00e9di\u00e9. Nous sommes sinc\u00e8rement int\u00e9ress\u00e9s par une collaboration avec BDO.
 
-1. Taux horaire : €210/heure est au-dessus de la fourchette de €140-160 que nous avons observée chez des cabinets comparables pour le travail hors-périmètre. Serait-il possible de descendre à €150 ?
+Avant de signer, je voudrais discuter des conditions hors-p\u00e9rim\u00e8tre. Le taux de \u20ac210/heure est sensiblement au-dessus de ce qu'on nous propose ailleurs. Les cabinets comparables se situent \u00e0 \u20ac130-160 pour un travail similaire. Serait-il possible de viser \u20ac150 ?
 
-2. Plafond d'heures : nous aurions besoin d'un plafond annuel ferme de 35 heures sur le hors-périmètre, avec approbation préalable requise au-delà de 10 heures dans un mois donné. La facturation sans limite n'est pas quelque chose que nous pouvons accepter.
+Nous aurions aussi besoin de garde-fous sur les heures. Aujourd'hui il n'y a aucun plafond, ce qui veut dire qu'une situation fiscale complexe pourrait faire exploser la facture sans limite. Un plafond ferme de 35 heures annuelles, avec approbation pr\u00e9alable au-del\u00e0 de 10 heures dans un mois donn\u00e9, nous donnerait de la visibilit\u00e9 \u00e0 tous les deux.
 
-3. Augmentation annuelle : 12 % est élevé — nous aimerions nous accorder sur 3 % ou l'IPC, le plus bas des deux.
+Sur l'augmentation annuelle, 12 % est bien au-dessus de l'IPC et difficile \u00e0 budg\u00e9ter. Pourrait-on s'accorder sur 3 % ou l'IPC, le plus bas des deux ?
 
-Nous sommes prêts à nous engager sur 2 ans si nous trouvons un accord sur ces points — cela facilite la planification des deux côtés.
-
-Au plaisir de travailler ensemble.
+Si on r\u00e8gle ces points, j'aimerais m'engager sur 2 ans. Cela facilite la planification des deux c\u00f4t\u00e9s.
 
 Cordialement,
 [Votre nom]`,
     },
     firm: {
-      subject: "Proposition BDO — suivi",
+      subject: "Proposition BDO",
       body: `Bonjour [Nom],
 
-Nous souhaitons avancer mais avons besoin de trois modifications :
+Nous avons \u00e9tudi\u00e9 la proposition en d\u00e9tail et souhaitons avancer avec BDO, mais trois points doivent changer.
 
-1. Taux horaire à €150 — €210 est au-dessus du marché (les cabinets comparables proposent €130-160).
-2. Plafond annuel ferme de 35 heures avec approbation mensuelle au-delà de 10 heures.
-3. Augmentation annuelle plafonnée à 3 % ou IPC — 12 % n'est pas acceptable.
+Le taux hors-p\u00e9rim\u00e8tre de \u20ac210/heure est significativement au-dessus du march\u00e9. Grant Thornton et Mazars proposent tous deux \u20ac130-160 pour un travail \u00e9quivalent. Nous avons besoin de \u20ac150. L'absence de plafond d'heures est un probl\u00e8me. Une exposition de facturation illimit\u00e9e, ce n'est pas quelque chose que nous pouvons valider. Nous avons besoin d'un plafond ferme de 35 heures annuelles avec approbation pr\u00e9alable au-del\u00e0 de 10 heures dans un mois donn\u00e9. Et la clause d'augmentation de 12 % doit baisser. Sur un forfait de \u20ac16 800, cela repr\u00e9sente plus de \u20ac2 000 de plus l'ann\u00e9e prochaine. Nous avons besoin de 3 % ou l'IPC.
 
-Grant Thornton et Mazars ont tous deux proposé des forfaits inférieurs au vôtre avec des taux horaires plus bas. Nous préférons BDO mais avons besoin de conditions compétitives.
-
-Pouvez-vous envoyer des conditions révisées cette semaine ?
+Le forfait lui-m\u00eame est correct, et l'\u00e9quipe nous pla\u00eet. \u00c0 \u20ac150/heure avec un contr\u00f4le des co\u00fbts ad\u00e9quat, nous nous engageons sur 2 ans d\u00e8s aujourd'hui. Pouvez-vous envoyer des conditions r\u00e9vis\u00e9es cette semaine ?
 
 Cordialement,
 [Votre nom]`,
     },
     final_push: {
-      subject: "BDO — conditions de la proposition",
+      subject: "Proposition BDO",
       body: `Bonjour [Nom],
 
-Nous devons finaliser notre arrangement comptable cette semaine. Nous choisissons entre BDO et deux autres cabinets.
+Je vais \u00eatre direct. Nous devons d\u00e9signer notre cabinet comptable ce mois-ci, et nous h\u00e9sitons entre BDO et Mazars.
 
-Trois points à résoudre :
+Mazars est arriv\u00e9 avec un forfait inf\u00e9rieur, un taux hors-p\u00e9rim\u00e8tre de \u20ac150/heure, un plafond d'heures ferme, et une augmentation annuelle de 3 %. Votre proposition pr\u00e9voit un taux horaire de \u20ac210, aucun plafond d'heures et un escalateur de 12 %. Sur le papier, l'\u00e9cart est difficile \u00e0 justifier aupr\u00e8s de notre conseil.
 
-1. Taux horaire : €150 (pas €210)
-2. Plafond d'heures : 35 annuel avec approbation mensuelle
-3. Augmentation annuelle : 3 % (pas 12 %)
+Voici ce qui nous garde chez BDO : \u20ac150/heure, plafond annuel de 35 heures avec approbation mensuelle, et augmentation annuelle de 3 % index\u00e9e sur l'IPC. Nous signons un engagement de 2 ans cette semaine si vous confirmez.
 
-Nous nous engagerons immédiatement sur une mission de 2 ans si ces points sont confirmés.
-
-Sinon, nous irons chez Mazars d'ici la fin du mois.
+Je dois donner une r\u00e9ponse \u00e0 Mazars d'ici la fin du mois. Je pr\u00e9f\u00e9rerais sinc\u00e8rement BDO, mais les chiffres doivent fonctionner.
 
 Cordialement,
 [Votre nom]`,

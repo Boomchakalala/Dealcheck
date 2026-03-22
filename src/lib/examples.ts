@@ -101,49 +101,41 @@ export const docusignExample: DealOutput = {
       subject: "Re: DocuSign renewal",
       body: `Hi [Name],
 
-Thanks for the renewal notice — we're planning to stay with DocuSign and want to get this confirmed quickly.
+We love DocuSign and want to get this renewal wrapped up quickly. I just need to sort out a couple of things on our end first.
 
-Two things I'd like to sort out before we sign:
+We're currently on 40 seats, but when I pulled our usage data, only 25 are actively logging in. Could we right-size to 30? That gives us a comfortable buffer without paying for seats nobody's using, and brings us to €1,500/month.
 
-1. Seat count: We're on 40 seats but only 25 are actively used. I'd like to right-size to 30 — gives us comfortable headroom without paying for 10 seats we don't need. That brings us to €1,500/month.
+Also, we've been loyal customers for 2 years now. Is there flexibility on a loyalty discount? Even 10% on the adjusted contract would go a long way. I know PandaDoc has been reaching out with aggressive pricing, but honestly, we'd rather stay put if the numbers work.
 
-2. Loyalty discount: We've been with DocuSign for 2 years. PandaDoc and Adobe Sign have both come in 10-15% below this rate. Would you be able to apply a 10% loyalty discount on the renewal?
-
-Together that brings us to around €16,200/year — happy to commit to 2 years and leave a review if that helps on your end.
-
-Let me know if we can get this wrapped up this week.
+If we can land around €16,200/year, I'm ready to sign a 2-year commitment this week. Happy to leave a G2 review too if that helps.
 
 Best regards,
 [Your Name]`,
     },
     firm: {
-      subject: "DocuSign renewal — follow-up",
+      subject: "DocuSign renewal",
       body: `Hi [Name],
 
-We want to renew but need two changes before we sign:
+Following up on the renewal. We need to address two things before we can sign.
 
-1. Seat reduction from 40 to 30 — only 25 are active. New monthly: €1,500.
-2. 10% loyalty discount — we've been customers 2 years and PandaDoc is quoting 30% below your current rate.
+First, the seat count. We have 40 seats but only 25 are active. Paying for 15 empty seats at €50/month isn't something we can justify internally. We need to drop to 30.
 
-Adjusted total: €16,200/year. Happy to commit to 2 years to make it work on your end.
+Second, after 2 years as a customer, we need a loyalty discount on this renewal. PandaDoc is quoting us 30% below your current rate, and while we'd prefer to stay with DocuSign, we can't ignore that gap. A 10% discount on the adjusted contract would bring us to €16,200/year.
 
-Can you confirm by Friday?
+We're happy to commit to 2 years at that number. Can you confirm by Friday so we can close this out?
 
 Best regards,
 [Your Name]`,
     },
     final_push: {
-      subject: "DocuSign — renewal terms",
+      subject: "DocuSign renewal",
       body: `Hi [Name],
 
-We've reviewed the renewal and have two issues that need resolving before we can sign:
+I want to be straightforward with you. We've been going back and forth on this renewal, and we need to make a decision before April 1.
 
-1. We are paying for 40 seats with 25 active. We will not renew at 40 seats.
-2. After 2 years as a customer we expect a loyalty rate. PandaDoc has quoted us 30% below your current price.
+We will not renew at 40 seats when only 25 are active. That's €9,000/year in waste, and our finance team has flagged it. We also need a loyalty rate after 2 years. PandaDoc has a signed proposal on my desk at 30% below your current pricing.
 
-We're prepared to commit to 2 years at 30 seats with a 10% discount — €16,200/year. If we can't align on this we'll need to complete our evaluation of alternatives before April 1.
-
-Please respond by [DATE].
+Here's what works for us: 30 seats, 10% loyalty discount, €16,200/year. We'll sign a 2-year term today if you can confirm. If not, we'll need to move forward with our evaluation of alternatives this week.
 
 Best regards,
 [Your Name]`,
@@ -277,49 +269,43 @@ export const salesforceExample: DealOutput = {
       subject: "Re: Salesforce renewal",
       body: `Hi [Name],
 
-Thanks for the renewal — we're planning to stay on Sales Cloud and want to get this sorted ahead of June 1.
+We've been on Sales Cloud for 3 years now and the team relies on it daily, so renewing is definitely the plan. I just want to make sure the contract reflects how we're actually using the platform.
 
-Two things before we confirm:
+Right now we're paying for 40 seats, but I ran a login audit and only 28 people are active. Could we adjust to 32? That keeps a small buffer without the €900/month we're currently spending on empty licenses.
 
-1. Seat count: We're on 40 seats but only 28 are actively used. I'd like to right-size to 32 — gives us headroom without paying for 8 seats we don't need. That brings us to €2,400/month.
+The other thing, we've been a customer for 3 years and haven't asked for a discount once. Is there flexibility on a multi-year rate? If we commit to 2 years, would 8% work? HubSpot has been pitching us hard at €40-50/seat, but migrating a CRM is painful and we'd rather not.
 
-2. Multi-year discount: We've been on Salesforce for 3 years. HubSpot and Pipedrive have both come in significantly below this rate. Would an 8% discount work if we commit to 2 years?
-
-That brings us to around €26,496/year — happy to do a 2-year term and explore adding Service Cloud if the per-seat rate comes down to €70.
-
-Let me know what you can do.
+That would land us around €26,500/year. If the per-seat rate comes down to €70, we'd also look at adding Service Cloud seats.
 
 Best regards,
 [Your Name]`,
     },
     firm: {
-      subject: "Salesforce renewal — follow-up",
+      subject: "Salesforce renewal",
       body: `Hi [Name],
 
-We want to renew but need two adjustments:
+I need to flag two issues with the renewal that are holding things up on our side.
 
-1. Seat reduction from 40 to 32 — only 28 active. New monthly: €2,400.
-2. 8% multi-year discount for 2-year commitment — we've been customers 3 years and HubSpot is quoting well below your current rate.
+Our seat count is wrong. We're paying for 40 but only 28 are active. That's 12 seats at €75/month going unused, and it's been raised internally. We need to drop to 32.
 
-Adjusted total: €26,496/year. Happy to commit to 2 years to make it work.
+On pricing, after 3 years as a customer, we expected a multi-year discount to be part of this renewal. HubSpot is quoting us well below your current rate, and our team is asking why we're not exploring it. An 8% discount on a 2-year commitment would put this to rest. That's €26,496/year.
 
-Can you confirm by end of week?
+I'd like to get this resolved this week so we can stop the competitive evaluation. Can you come back with updated terms?
 
 Best regards,
 [Your Name]`,
     },
     final_push: {
-      subject: "Salesforce — renewal terms",
+      subject: "Salesforce renewal",
       body: `Hi [Name],
 
-We've reviewed the renewal and have two issues to resolve before we sign:
+I'll get right to it. Our renewal is coming up June 1 and we need to make a call.
 
-1. We are paying for 40 seats with 28 active. We will not renew at current seat count.
-2. After 3 years we expect a loyalty rate. HubSpot and Pipedrive are quoting 40% below your current price.
+We ran a full HubSpot evaluation last month. Their pricing is 40% below yours, and the feature gap has closed significantly. The only reason we haven't switched is the migration cost and the fact that our team knows Salesforce.
 
-We're prepared to commit to 2 years at 32 seats with an 8% discount — €26,496/year. If we can't align we will complete our HubSpot evaluation before June 1.
+But we cannot renew at 40 seats when 12 are sitting empty, and we need a multi-year discount after 3 years. Here's what works: 32 seats, 8% discount, 2-year term, €26,496/year. I can get this signed this week if you can confirm.
 
-Please respond by [DATE].
+If we can't get there, we'll proceed with the HubSpot migration. I'd rather not, but the numbers have to make sense.
 
 Best regards,
 [Your Name]`,
@@ -434,38 +420,37 @@ export const microsoft365Example: DealOutput = {
       subject: "Re: Microsoft 365 renewal",
       body: `Hi [Name],
 
-Thanks for the renewal notice. We're happy with Business Premium and want to continue.
+Good news on our end. The Business Premium setup is working well, seat count is spot on, and the team is happy. We're ready to renew.
 
-The pricing and seat count look right, so this should be straightforward. Two small asks before we confirm:
+I just have two small asks before we finalize. First, could we lock the €38/user rate for 2 years? We'd happily commit to a 2-year term in exchange. Saves us both the back-and-forth next year, and you get guaranteed revenue on 50 seats.
 
-1. Could we lock the current rate for 2 years? We'd commit to a 2-year term in exchange. Saves us both the renewal conversation next year.
+Second, the 30-day auto-renew notice is tight for a €22,800 commitment. Could we stretch that to 60 days? Just gives us proper time to plan internally.
 
-2. The auto-renew notice is currently 30 days, which is tight for a commitment this size. Could we extend that to 60 days?
-
-If those work, we're ready to sign this week.
+If those work, I can get this signed by end of week. Genuinely easy renewal for both of us.
 
 Best regards,
 [Your Name]`,
     },
     firm: {
-      subject: "Microsoft 365 renewal — follow-up",
+      subject: "Microsoft 365 renewal",
       body: `Hi [Name],
 
-We want to renew but need two things confirmed:
+We're ready to renew the 50-seat Business Premium contract, but I need two things confirmed before we sign.
 
-1. 2-year price lock at the current €38/user rate.
-2. Auto-renew notice extended to 60 days.
+We need the current €38/user rate locked for 2 years. We're committing to a 2-year term, so a price lock is a fair trade. We also need the auto-renew notice extended from 30 to 60 days. On a contract this size, 30 days isn't enough lead time.
 
-We're ready to sign a 2-year commitment immediately if those are confirmed.
+Both are straightforward asks. Can you confirm so we can get this closed?
 
 Best regards,
 [Your Name]`,
     },
     final_push: {
-      subject: "Microsoft 365 — renewal terms",
+      subject: "Microsoft 365 renewal",
       body: `Hi [Name],
 
-We need to finalize the renewal before May 1. The deal works for us, but we need the 2-year price lock and 60-day auto-renew notice confirmed before we sign.
+Our May 1 renewal is coming up and I'd like to get this done. The deal is solid and we want to stay, but I still need confirmation on the 2-year price lock at €38/user and the 60-day auto-renew notice.
+
+These are minor asks on an otherwise clean renewal. 50 seats, 2-year commitment, no hassle. I just need a yes on those two points and we'll sign immediately.
 
 Can you confirm by end of week?
 
@@ -606,53 +591,41 @@ export const fedexExample: DealOutput = {
       subject: "Re: FedEx agreement",
       body: `Hi [Name],
 
-Thanks for the proposal — the coverage and service levels look right for our volumes. Before we sign, three things I'd like to resolve:
+The coverage and service levels look great for what we need, and we'd like to move forward with FedEx. I just want to work through a few numbers before we finalize.
 
-1. Base rate: $4.20/parcel is above what comparable accounts at our volume are seeing ($3.20-3.60 range). Could we land at $3.50?
+The $4.20/parcel base rate is higher than what we've been quoted elsewhere for our volume. At 1,000 parcels/month, comparable negotiated rates are running $3.20-3.60. Could we look at $3.50?
 
-2. Fuel surcharge: 20% with no cap and weekly review is difficult to budget around. We need a cap at 12% with monthly review.
+On the fuel surcharge, 20% with no cap and weekly review makes it really hard to forecast costs. Is there flexibility to cap that at 12% with monthly review instead? That's more in line with what we're seeing in the market.
 
-3. GRI clause: 7.9% annual increase is steep. Could we agree a 3.5% cap for the contract term?
+Last one, the 7.9% GRI clause. Over a 3-year horizon that compounds quickly. Could we agree on a 3.5% cap for the contract term?
 
-We're happy to commit to 1,100 parcels/month and a 2-year term if we can align on the above.
-
-Looking forward to getting this sorted.
+We'd commit to 1,100 parcels/month and a 2-year term if we can sort these out. That's meaningful guaranteed volume for your team.
 
 Best regards,
 [Your Name]`,
     },
     firm: {
-      subject: "FedEx agreement — follow-up",
+      subject: "FedEx agreement",
       body: `Hi [Name],
 
-We want to move forward but need three changes:
+I want to be upfront about where we are. We like FedEx's network, but the commercial terms need to move before we can sign.
 
-1. Base rate to $3.50/parcel — $4.20 is above negotiated market for our volume.
-2. Fuel surcharge capped at 12% with monthly review — 20% uncapped is not workable.
-3. GRI capped at 3.5% — 7.9% annual increase is too aggressive.
+The base rate of $4.20/parcel is above market. UPS has quoted us $3.30 for the same volume tier. We need $3.50. The 20% fuel surcharge with no cap is a non-starter for our finance team. Market is 10-14%, and we need a 12% cap with monthly review. The 7.9% GRI will add over $4,000 to our costs next year alone. We need that capped at 3.5%.
 
-UPS has quoted us $3.30/parcel with a 12% fuel cap. We'd prefer FedEx but need competitive terms.
-
-Can you send revised terms this week?
+We're shipping 1,000+ parcels a month and ready to commit, but not at these rates. Can you come back with revised terms this week?
 
 Best regards,
 [Your Name]`,
     },
     final_push: {
-      subject: "FedEx — shipping agreement terms",
+      subject: "FedEx agreement",
       body: `Hi [Name],
 
-We need to finalize our shipping agreement this week. We're choosing between FedEx and UPS.
+We need to finalize our shipping contract this week. I have a signed UPS proposal on my desk at $3.30/parcel with a 12% fuel cap and 3% GRI ceiling.
 
-Three items need resolving:
+Here's what keeps us with FedEx: $3.50 base rate, 12% fuel surcharge cap with monthly review, and a 3.5% GRI ceiling. We'll commit to 1,100 parcels/month on a 2-year term. That's over $80,000 in guaranteed annual revenue you can book today.
 
-1. Base rate: $3.50/parcel (not $4.20)
-2. Fuel cap: 12% (not 20% uncapped)
-3. GRI: 3.5% annual cap (not 7.9%)
-
-We'll commit to 1,100 parcels/month on a 2-year term if you can confirm these terms. That's $80,000+ in guaranteed annual revenue.
-
-Otherwise we'll sign with UPS by Friday.
+I need to give UPS an answer by Friday. If you can confirm these terms, we'll sign with FedEx the same day.
 
 Best regards,
 [Your Name]`,
@@ -797,51 +770,43 @@ export const konicaExample: DealOutput = {
       subject: "Re: Konica Minolta lease",
       body: `Hi [Name],
 
-Thanks for the proposal — the spec looks right for our printing volumes. Before we commit to 36 months, three things I'd like to address:
+The bizhub C360i spec is a good fit for our office. Two units with that print allowance covers our volumes nicely, and we'd like to get this set up. Before we commit to 36 months, I want to talk through a few things.
 
-1. Monthly lease rate: At €870/month we're above comparable quotes from Ricoh and Canon (€650-720 range for equivalent devices). Could we come down to €700?
+On the lease rate, €870/month is a bit steep compared to what we've seen. Ricoh and Canon have both quoted us in the €650-720 range for equivalent A3/A4 colour devices. Could we look at €700?
 
-2. Toner exclusivity: We'd need the exclusive supply clause removed, or toner pricing fixed at current rates for the full 36 months.
+The toner exclusivity clause is also tricky for us. We'd either need that removed so we can source openly, or the toner pricing locked at current rates for the full 36 months. We just can't sign a 3-year deal where consumables costs are uncapped.
 
-3. Early exit: A 36-month term with no exit option is difficult to commit to. An 18-month break clause with a 3-month fee buyout would make this workable.
+Lastly, 36 months with no exit option is a hard sell internally. Could we include an 18-month break clause with a 3-month buyout fee? That way you still get guaranteed revenue, and we get some flexibility if our needs change.
 
-Happy to confirm the full 3-year term and add the extended warranty if we can align on the above.
-
-Looking forward to sorting this out.
+If we can sort this out, I'm ready to confirm the full 3-year term and add the extended warranty.
 
 Best regards,
 [Your Name]`,
     },
     firm: {
-      subject: "Konica Minolta lease — follow-up",
+      subject: "Konica Minolta lease",
       body: `Hi [Name],
 
-We want to move forward but need three changes before we sign:
+We've reviewed the lease proposal in detail and there are three issues we need resolved.
 
-1. Lease rate to €700/month — €870 is above market. Ricoh and Canon are quoting €650-720.
-2. Toner exclusivity removed or pricing locked for 36 months.
-3. 18-month exit clause with 3-month buyout — 36 months with no exit is not workable.
+The €870/month lease rate is above market. We have written quotes from Ricoh and Canon at €650-720 for equivalent devices. We need €700/month. The mandatory toner exclusivity clause needs to go, or toner pricing needs to be locked for all 36 months. We can't accept open-ended consumables costs on a fixed lease. And a 36-month term with zero exit option isn't something our legal team will approve. We need an 18-month break clause with a 3-month fee.
 
-We'll commit to the full 3-year term at €700/month. Can you confirm?
+We want to go with Konica Minolta, but these terms need to move. At €700/month with those adjustments, we'll commit to the full 3 years immediately. Can you come back with revised terms?
 
 Best regards,
 [Your Name]`,
     },
     final_push: {
-      subject: "Konica Minolta — lease terms",
+      subject: "Konica Minolta lease",
       body: `Hi [Name],
 
-We need to finalize our printer lease this week. We're choosing between Konica Minolta and Ricoh.
+We're making our printer lease decision this week and I want to give Konica Minolta a fair shot before we go elsewhere.
 
-Three items need resolving:
+The reality is that Ricoh has quoted us €680/month for comparable devices, with open toner sourcing and an 18-month exit clause. Your proposal is €870/month with mandatory toner lock-in and no exit. The gap is significant.
 
-1. Lease: €700/month (not €870)
-2. Toner: open supply or locked pricing
-3. Exit clause: 18-month break option
+Here's what would close this: €700/month lease, toner exclusivity removed or pricing locked for 36 months, and an 18-month break clause with 3-month buyout. That's still over €25,200 in guaranteed lease revenue for you.
 
-We'll sign the full 3-year term immediately if these are confirmed. That's €25,200+ in guaranteed lease revenue.
-
-Otherwise we'll go with Ricoh by Friday.
+I need to give Ricoh an answer by Friday. If you can match these terms, we'll sign with Konica Minolta the same day.
 
 Best regards,
 [Your Name]`,
@@ -991,53 +956,43 @@ export const bdoExample: DealOutput = {
       subject: "Re: BDO proposal",
       body: `Hi [Name],
 
-Thanks for putting this together — the scope covers what we need and we're keen to move forward. Before we sign, three things I'd like to address:
+The scope of the package is exactly what we need. Management accounts, VAT, payroll, tax, all covered with a dedicated senior manager. We're genuinely keen to work with BDO on this.
 
-1. Hourly rate: €210/hour is above the €140-160 range we've seen from comparable firms for out-of-scope work. Could we come down to €150?
+Before we sign, I want to talk through the out-of-scope terms. The €210/hour rate is quite a bit above what we've been quoted elsewhere. Comparable firms are coming in at €130-160 for similar work. Could we look at €150?
 
-2. Hours cap: We'd need a hard annual cap of 35 hours on out-of-scope, with pre-approval required above 10 hours in any month. Open-ended billing isn't something we can sign off on.
+We'd also need some guardrails on hours. Right now there's no cap, which means one complex tax situation could spike our bill with no ceiling. A hard cap of 35 hours annually, with pre-approval above 10 in any given month, would give us both clarity.
 
-3. Annual increase: 12% is steep — we'd like to align on 3% or CPI, whichever is lower.
+On the annual increase, 12% is well above CPI and hard to budget around. Could we agree on 3% or CPI, whichever is lower?
 
-Happy to commit to 2 years if we can get these sorted — makes planning easier on both sides.
-
-Looking forward to working together.
+If we can sort these out, I'd love to commit to a 2-year engagement. Makes planning easier for both sides.
 
 Best regards,
 [Your Name]`,
     },
     firm: {
-      subject: "BDO proposal — follow-up",
+      subject: "BDO proposal",
       body: `Hi [Name],
 
-We want to move forward but need three changes:
+We've reviewed the proposal carefully and want to move forward with BDO, but three things need to change.
 
-1. Hourly rate to €150 — €210 is above market (comparable firms quote €130-160).
-2. Hard annual cap of 35 hours with monthly pre-approval above 10 hours.
-3. Annual increase capped at 3% or CPI — 12% is not something we can accept.
+The €210/hour out-of-scope rate is significantly above market. Grant Thornton and Mazars are both quoting €130-160 for equivalent work. We need €150. The lack of any hours cap is a problem. Open-ended billing exposure isn't something we can sign off on. We need a hard cap of 35 hours annually with pre-approval above 10 hours in any month. And the 12% annual increase clause needs to come down. On a €16,800 retainer, that's over €2,000 more next year. We need 3% or CPI.
 
-Grant Thornton and Mazars have both quoted below your retainer with lower hourly rates. We'd prefer BDO but need competitive terms.
-
-Can you send revised terms this week?
+The retainer itself is fair, and we like the team. At €150/hour with proper cost controls, we'll commit to 2 years today. Can you send revised terms this week?
 
 Best regards,
 [Your Name]`,
     },
     final_push: {
-      subject: "BDO — proposal terms",
+      subject: "BDO proposal",
       body: `Hi [Name],
 
-We need to finalize our accountancy arrangement this week. We're choosing between BDO and two other firms.
+I'll be direct. We need to appoint our accountancy firm this month, and we're choosing between BDO and Mazars.
 
-Three items need resolving:
+Mazars has come in with a lower retainer, €150/hour out-of-scope rate, a hard hours cap, and a 3% annual increase. Your proposal has a €210 hourly rate, no hours cap, and a 12% escalator. On paper, the gap is hard to justify to our board.
 
-1. Hourly rate: €150 (not €210)
-2. Hours cap: 35 annual with monthly approval
-3. Annual increase: 3% (not 12%)
+Here's what keeps us with BDO: €150/hour, 35-hour annual cap with monthly pre-approval, and 3% annual increase tied to CPI. We'll sign a 2-year engagement this week if you confirm.
 
-We'll commit to a 2-year engagement immediately if these are confirmed.
-
-Otherwise we'll go with Mazars by end of month.
+I need to give Mazars an answer by end of month. I'd genuinely prefer BDO, but the numbers have to work.
 
 Best regards,
 [Your Name]`,
