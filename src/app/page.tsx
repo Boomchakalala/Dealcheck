@@ -287,7 +287,7 @@ export default function LandingPage() {
       <section
         ref={howReveal.ref}
         id="how-it-works"
-        className={`py-16 sm:py-20 bg-[#0f172a] relative overflow-hidden transition-all duration-700 ${
+        className={`pt-16 sm:pt-20 pb-12 sm:pb-16 bg-[#0f172a] relative overflow-hidden transition-all duration-700 ${
           howReveal.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
@@ -508,7 +508,7 @@ export default function LandingPage() {
             </div>
 
             {/* STEP 3: Deal Closed — Outcome */}
-            <div className="mt-8">
+            <div className="mt-8 max-w-2xl mx-auto">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center">
                   <span className="text-xs font-bold text-white">3</span>
