@@ -141,6 +141,11 @@ export default function AboutPage() {
               {t('about.ctaButton')}
               <ArrowRight className="w-5 h-5" />
             </Link>
+            <div className="mt-6 flex items-center justify-center gap-4">
+              <Link href="/example" className="text-sm font-medium text-emerald-200 hover:text-white">See examples</Link>
+              <span className="text-emerald-400">|</span>
+              <Link href="/pricing" className="text-sm font-medium text-emerald-200 hover:text-white">View pricing</Link>
+            </div>
           </div>
         </div>
       </main>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'About — TermLift',
-  description: 'Built by a procurement professional with 8 years of experience. TermLift makes negotiation expertise available to everyone.',
+  description: 'Built by a procurement professional who spent 8 years watching people overpay vendors. TermLift puts that expertise in your hands.',
   alternates: { canonical: 'https://www.termlift.com/about' },
 }
 

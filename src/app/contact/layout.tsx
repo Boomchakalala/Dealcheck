@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Contact — TermLift',
-  description: 'Get in touch with the TermLift team. Questions, feedback, or partnership enquiries.',
+  description: 'Questions about TermLift? Feedback on an analysis? Want to partner? We would love to hear from you.',
   openGraph: {
     title: 'Contact — TermLift',
-    description: 'Get in touch with the TermLift team. Questions, feedback, or partnership enquiries.',
+    description: 'Questions about TermLift? Feedback on an analysis? Want to partner? We would love to hear from you.',
   },
   alternates: { canonical: 'https://www.termlift.com/contact' },
 }

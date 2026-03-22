@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { HelpCircle, Mail, ArrowRight } from 'lucide-react'
@@ -120,6 +121,14 @@ export default function HelpPage() {
               hello@termlift.com
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
+          </div>
+
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/try" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">Try your first analysis free</Link>
+            <span className="hidden sm:inline text-slate-300">|</span>
+            <Link href="/example" className="text-sm font-medium text-slate-600 hover:text-slate-900">See example analyses</Link>
+            <span className="hidden sm:inline text-slate-300">|</span>
+            <Link href="/pricing" className="text-sm font-medium text-slate-600 hover:text-slate-900">View pricing</Link>
           </div>
         </div>
       </main>
