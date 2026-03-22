@@ -253,18 +253,18 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
             {[
               { icon: Rocket, title: t('builtFor.founders'), desc: t('builtFor.foundersDesc') },
               { icon: Briefcase, title: t('builtFor.ops'), desc: t('builtFor.opsDesc') },
               { icon: Store, title: t('builtFor.buyers'), desc: t('builtFor.buyersDesc') },
             ].map((persona) => (
-              <div key={persona.title} className="bg-white border border-slate-200 rounded-lg p-5 sm:p-6 hover:border-emerald-300 hover:shadow-sm transition-all duration-200 flex flex-col">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 bg-emerald-50 rounded-md flex items-center justify-center flex-shrink-0">
-                    <persona.icon className="w-4 h-4 text-emerald-600" />
+              <div key={persona.title} className="bg-white border border-slate-200 rounded-xl p-7 sm:p-8 hover:border-emerald-300 hover:shadow-md transition-all duration-200 flex flex-col">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <persona.icon className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <h3 className="text-base font-bold text-slate-900">{persona.title}</h3>
+                  <h3 className="text-lg font-bold text-slate-900">{persona.title}</h3>
                 </div>
                 <p className="text-sm text-slate-500 leading-relaxed">{persona.desc}</p>
               </div>
