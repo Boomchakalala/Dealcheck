@@ -671,7 +671,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
             {/* Starter */}
-            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6">
+            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 flex flex-col">
               <div className="mb-4">
                 <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.starter')}</h3>
                 <p className="text-sm text-slate-500">{t('pricing.starterDesc')}</p>
@@ -679,7 +679,7 @@ export default function LandingPage() {
               <div className="mb-4">
                 <span className="text-3xl font-bold text-slate-900">€0</span>
               </div>
-              <ul className="space-y-2 mb-6">
+              <ul className="space-y-2 mb-6 flex-1">
                 {[
                   t('pricing.starterFeature1'),
                   t('pricing.starterFeature2'),
@@ -700,7 +700,7 @@ export default function LandingPage() {
             </div>
 
             {/* Essentials — Highlighted */}
-            <div className="bg-white border-2 border-emerald-500 rounded-2xl p-6 relative shadow-lg">
+            <div className="bg-white border-2 border-emerald-500 rounded-2xl p-6 relative shadow-lg flex flex-col">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white">{t('pricing.mostPopular')}</span>
               </div>
@@ -712,7 +712,7 @@ export default function LandingPage() {
                 <span className="text-3xl font-bold text-slate-900">€15</span>
                 <span className="text-sm text-slate-500">/mo</span>
               </div>
-              <ul className="space-y-2 mb-6">
+              <ul className="space-y-2 mb-6 flex-1">
                 {[
                   t('pricing.essentialsFeature1'),
                   t('pricing.essentialsFeature2'),
@@ -735,7 +735,7 @@ export default function LandingPage() {
             </div>
 
             {/* Pro */}
-            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6">
+            <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 flex flex-col">
               <div className="mb-4">
                 <h3 className="text-lg font-bold text-slate-900 mb-1">{t('pricing.pro')}</h3>
                 <p className="text-sm text-slate-500">{t('pricing.proDesc')}</p>
@@ -744,7 +744,7 @@ export default function LandingPage() {
                 <span className="text-3xl font-bold text-slate-900">€39</span>
                 <span className="text-sm text-slate-500">/mo</span>
               </div>
-              <ul className="space-y-2 mb-6">
+              <ul className="space-y-2 mb-6 flex-1">
                 {[
                   t('pricing.proFeature1'),
                   t('pricing.proFeature2'),

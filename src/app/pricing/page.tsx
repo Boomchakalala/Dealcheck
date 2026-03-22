@@ -55,7 +55,7 @@ export default async function PricingPage() {
             <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto">
 
               {/* Starter (Free) */}
-              <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300">
+              <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 flex flex-col">
                 <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">{t('pricing.starter')}</p>
                 <div className="mb-4">
                   <span className="text-4xl font-bold text-slate-900 tracking-tight">{t('pricingPage.freePrice')}</span>
@@ -63,7 +63,7 @@ export default async function PricingPage() {
                 <p className="text-sm text-slate-500 mb-6 leading-relaxed">
                   {t('pricingPage.starterDesc')}
                 </p>
-                <ul className="space-y-2.5 mb-7">
+                <ul className="space-y-2.5 mb-7 flex-1">
                   {starterFeatures.map((item, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -80,7 +80,7 @@ export default async function PricingPage() {
               </div>
 
               {/* Essentials (EUR15/mo) — NEW */}
-              <div className="rounded-2xl border-2 border-emerald-500/60 p-6 relative bg-gradient-to-b from-emerald-50/50 to-white shadow-lg shadow-emerald-100/50 hover:shadow-2xl hover:shadow-emerald-100/60 transition-all duration-300">
+              <div className="rounded-2xl border-2 border-emerald-500/60 p-6 relative bg-gradient-to-b from-emerald-50/50 to-white shadow-lg shadow-emerald-100/50 hover:shadow-2xl hover:shadow-emerald-100/60 transition-all duration-300 flex flex-col">
                 <div className="absolute -top-3.5 left-6">
                   <span className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold rounded-full tracking-wide shadow-lg">
                     {t('pricing.mostPopular').toUpperCase()}
@@ -94,7 +94,7 @@ export default async function PricingPage() {
                 <p className="text-sm text-slate-500 mb-6 leading-relaxed">
                   {t('pricingPage.essentialsDesc')}
                 </p>
-                <ul className="space-y-2.5 mb-7">
+                <ul className="space-y-2.5 mb-7 flex-1">
                   {essentialsFeatures.map((item, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -110,7 +110,7 @@ export default async function PricingPage() {
               </div>
 
               {/* Pro (EUR39/mo) */}
-              <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300">
+              <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300 flex flex-col">
                 <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">{t('pricing.pro')}</p>
                 <div className="mb-4">
                   <span className="text-4xl font-bold text-slate-900 tracking-tight">{t('pricingPage.proPrice')}</span>
@@ -119,7 +119,7 @@ export default async function PricingPage() {
                 <p className="text-sm text-slate-500 mb-6 leading-relaxed">
                   {t('pricingPage.proDesc')}
                 </p>
-                <ul className="space-y-2.5 mb-7">
+                <ul className="space-y-2.5 mb-7 flex-1">
                   {proFeatures.map((item, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
