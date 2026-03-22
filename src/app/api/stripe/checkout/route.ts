@@ -19,6 +19,11 @@ export async function POST(request: Request) {
 
     const selectedPlan = PLANS[plan as PlanKey]
 
+    // Guard against placeholder price IDs
+    if (selectedPlan.priceId.includes('placeholder')) {
+      return NextResponse.json({ error: 'This plan is not yet available. Please contact support.' }, { status: 400 })
+    }
+
     // Get or create Stripe customer
     const { data: profile } = await supabase
       .from('profiles')

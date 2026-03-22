@@ -5,6 +5,7 @@ import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { I18nProvider } from "@/i18n/context";
+import { CookieConsent } from "@/components/CookieConsent";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -85,6 +86,7 @@ export default async function RootLayout({
             <AnalyticsProvider>
               <Toaster position="top-right" richColors />
               {children}
+              <CookieConsent />
             </AnalyticsProvider>
           </I18nProvider>
         </NextIntlClientProvider>
