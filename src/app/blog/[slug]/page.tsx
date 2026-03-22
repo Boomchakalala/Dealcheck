@@ -6,6 +6,7 @@ import { MarketingFooter } from '@/components/MarketingFooter'
 import { getPostBySlug, getAllPosts } from '@/lib/blog'
 import { ArrowLeft, Clock } from 'lucide-react'
 import { renderMarkdownToHtml } from '@/lib/render-markdown'
+import { cookies } from 'next/headers'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -38,6 +39,8 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound()
 
   const htmlContent = renderMarkdownToHtml(post.content)
+  const locale = (await cookies()).get('termlift_lang')?.value || 'en'
+  const fr = locale === 'fr'
 
   return (
     <div className="min-h-screen bg-white">
@@ -47,7 +50,7 @@ export default async function BlogPostPage({ params }: Props) {
       <div className="bg-gradient-to-b from-slate-50 to-white">
         <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-16 sm:pt-24 pb-10">
           <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-emerald-600 transition-colors mb-6">
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to blog
+            <ArrowLeft className="w-3.5 h-3.5" /> {fr ? 'Retour au blog' : 'Back to blog'}
           </Link>
 
           <div className="flex items-center gap-3 mb-5">
@@ -86,28 +89,28 @@ export default async function BlogPostPage({ params }: Props) {
               <span className="text-sm font-bold text-emerald-700">KQ</span>
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-900">Written by the TermLift team</p>
-              <p className="text-xs text-slate-500">8 years of procurement expertise, distilled into actionable advice.</p>
+              <p className="text-sm font-semibold text-slate-900">{fr ? '\u00c9crit par l\'\u00e9quipe TermLift' : 'Written by the TermLift team'}</p>
+              <p className="text-xs text-slate-500">{fr ? '8 ans d\'expertise achats, transform\u00e9s en conseils actionnables.' : '8 years of procurement expertise, distilled into actionable advice.'}</p>
             </div>
           </div>
         </div>
 
         {/* CTA */}
         <div className="mt-12 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-8 sm:p-10 text-center">
-          <h3 className="text-xl font-bold text-white mb-3">Stop reading about negotiation. Start doing it.</h3>
-          <p className="text-sm text-emerald-100 mb-5 max-w-md mx-auto">Paste your vendor quote and get back red flags, savings, and a ready-to-send email in 60 seconds.</p>
+          <h3 className="text-xl font-bold text-white mb-3">{fr ? 'Arr\u00eatez de lire sur la n\u00e9gociation. Passez \u00e0 l\'action.' : 'Stop reading about negotiation. Start doing it.'}</h3>
+          <p className="text-sm text-emerald-100 mb-5 max-w-md mx-auto">{fr ? 'Collez votre devis fournisseur et obtenez alertes, \u00e9conomies et un email pr\u00eat \u00e0 envoyer en 60 secondes.' : 'Paste your vendor quote and get back red flags, savings, and a ready-to-send email in 60 seconds.'}</p>
           <Link
             href="/try"
             className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-xl bg-white text-emerald-700 hover:bg-emerald-50 transition-all shadow-lg"
           >
-            Analyze your first quote free
+            {fr ? 'Analysez votre premier devis gratuitement' : 'Analyze your first quote free'}
           </Link>
         </div>
 
         {/* Back to blog */}
         <div className="mt-8 text-center">
           <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-400 hover:text-emerald-600 transition-colors">
-            <ArrowLeft className="w-3.5 h-3.5" /> All posts
+            <ArrowLeft className="w-3.5 h-3.5" /> {fr ? 'Tous les articles' : 'All posts'}
           </Link>
         </div>
       </main>

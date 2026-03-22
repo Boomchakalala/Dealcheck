@@ -3,9 +3,13 @@ import { UnifiedHeader } from '@/components/UnifiedHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { getAllPosts } from '@/lib/blog'
 import { ArrowRight, Clock } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
+import { cookies } from 'next/headers'
 
-export default function BlogPage() {
+export default async function BlogPage() {
   const posts = getAllPosts()
+  const locale = (await cookies()).get('termlift_lang')?.value || 'en'
+  const fr = locale === 'fr'
 
   return (
     <div className="min-h-screen bg-white">
@@ -15,9 +19,9 @@ export default function BlogPage() {
       <div className="bg-gradient-to-b from-slate-50 to-white">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 pt-20 sm:pt-28 pb-12">
           <div className="text-center">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 mb-5">Procurement insights</span>
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 mb-5">{fr ? 'Conseils achats' : 'Procurement insights'}</span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">Blog</h1>
-            <p className="text-base sm:text-lg text-slate-500 max-w-xl mx-auto">Negotiation strategies, vendor management tips, and how to stop leaving money on the table.</p>
+            <p className="text-base sm:text-lg text-slate-500 max-w-xl mx-auto">{fr ? 'Strat\u00e9gies de n\u00e9gociation, conseils fournisseurs, et comment arr\u00eater de laisser de l\'argent sur la table.' : 'Negotiation strategies, vendor management tips, and how to stop leaving money on the table.'}</p>
           </div>
         </div>
       </div>
@@ -48,7 +52,7 @@ export default function BlogPage() {
                 }`}>{post.title}</h2>
                 <p className="text-sm text-slate-500 leading-relaxed mb-4">{post.description}</p>
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 group-hover:text-emerald-700">
-                  Read article <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  {fr ? 'Lire l\'article' : 'Read article'} <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </article>
             </Link>
@@ -57,13 +61,13 @@ export default function BlogPage() {
 
         {/* CTA */}
         <div className="mt-16 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-8 sm:p-10 text-center">
-          <h3 className="text-xl font-bold text-white mb-3">Ready to analyze your own quote?</h3>
-          <p className="text-sm text-emerald-100 mb-5 max-w-md mx-auto">Paste a vendor quote and get back red flags, savings, and a negotiation email in 60 seconds.</p>
+          <h3 className="text-xl font-bold text-white mb-3">{fr ? 'Pr\u00eat \u00e0 analyser votre prochain devis ?' : 'Ready to analyze your own quote?'}</h3>
+          <p className="text-sm text-emerald-100 mb-5 max-w-md mx-auto">{fr ? 'Collez un devis fournisseur et obtenez alertes, \u00e9conomies et un email de n\u00e9gociation en 60 secondes.' : 'Paste a vendor quote and get back red flags, savings, and a negotiation email in 60 seconds.'}</p>
           <Link
             href="/try"
             className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-xl bg-white text-emerald-700 hover:bg-emerald-50 transition-all shadow-lg"
           >
-            Try free, no signup needed
+            {fr ? 'Essai gratuit, sans inscription' : 'Try free, no signup needed'}
           </Link>
         </div>
       </main>
