@@ -352,97 +352,79 @@ Best regards,
   disclaimer: "This analysis is for informational purposes only and does not constitute legal, financial, or professional advice.",
 }
 
-// Example 3: Microsoft 365 — Business Premium Renewal
+// Example 3: Microsoft 365 — Business Premium Renewal (CLEAN DEAL)
 // Math:
-//   60 seats x €40/user/month = €2,400/month = €28,800/year
-//   Right-size to 48: 48 x €40 = €1,920/month → saves €480/month = €5,760/year
-//   Prepay rate €40 → €37 on 48 seats: €3 x 48 x 12 = €1,728/year
-//   Total savings: €5,760 + €1,728 = €7,488/year (26%)
-//   After: €28,800 - €7,488 = €21,312
+//   50 seats x €38/user/month = €1,900/month = €22,800/year
+//   Already prepay rate, seat count matches usage
+//   Minor optimization: extend auto-renew notice, lock pricing for 2 years
+//   Small savings: 3% loyalty ask = €684
 export const microsoft365Example: DealOutput = {
   title: "Microsoft 365 · Business Premium · Annual Renewal",
   vendor: "Microsoft 365",
   category: "SaaS - Productivity",
   description: "Productivity suite — Office apps, Teams, Exchange, Intune, Defender",
-  verdict: "18 inactive seats at full rate, no annual prepay discount applied.",
-  verdict_type: "negotiate",
-  price_insight: "At €40/user/month for 60 seats, you're spending €2,400/month. Only 42 are active. Right-sizing and switching to prepay rate saves €7,488/year.",
+  verdict: "This deal is well-structured. Pricing is competitive, seat count matches usage, and terms are standard. Minor optimization only.",
+  verdict_type: "competitive",
+  price_insight: "At €38/user/month on 50 seats with annual prepay, this is in line with standard M365 Business Premium pricing through resellers.",
   snapshot: {
     vendor_product: "Microsoft 365 / Business Premium",
     term: "12 months",
-    total_commitment: "€28,800",
-    billing_payment: "Annual commitment, monthly billing",
-    pricing_model: "Per-seat, monthly billing",
+    total_commitment: "€22,800",
+    billing_payment: "Annual prepay",
+    pricing_model: "Per-seat, billed annually",
     deal_type: "Renewal",
     renewal_date: "May 1, 2026",
     currency: "EUR",
   },
   quick_read: {
     whats_solid: [
-      "Full Office suite with desktop and web apps",
-      "Intune device management and Defender security included",
-      "Azure AD Premium P1 — strong identity management",
+      "Seat count matches active users, no waste",
+      "Annual prepay rate already applied",
+      "Full security suite included (Intune, Defender, Azure AD P1)",
     ],
     whats_concerning: [
-      "18 of 60 seats are inactive — 30% waste at €40/seat/month",
-      "Paying monthly rate despite annual commitment — prepay discount not applied",
-      "Seat reductions only possible at renewal",
+      "30-day auto-renew notice is tight for a €22K commitment",
     ],
-    conclusion: "Right product, too many seats, wrong billing rate. Cut to 48 seats and switch to prepay to save €7,488/year.",
+    conclusion: "Clean deal. Sign it, but lock pricing for 2 years and extend the auto-renew notice window.",
   },
   red_flags: [
     {
-      type: "Commercial",
-      issue: "Paying for 60 seats but only 42 are active — 18 unused seats",
-      why_it_matters: "18 unused seats x €40/month = €720/month = €8,640/year going to waste. Right-sizing to 48 seats (42 active + 6 buffer) = €1,920/month instead of €2,400/month. Saving: €480/month = €5,760/year.",
-      what_to_ask_for: "Reduce from 60 to 48 seats — saves €5,760/year",
-      if_they_push_back: "Reduce to 54 seats — saves €2,880/year",
-    },
-    {
-      type: "Commercial",
-      issue: "Annual prepay discount not applied — paying monthly rate on annual commitment",
-      why_it_matters: "Microsoft 365 Business Premium billed annually upfront typically runs €36-38/user/month through resellers vs €40 on monthly billing. On 48 seats, switching to annual prepay saves €1,728/year.",
-      what_to_ask_for: "Annual prepay pricing — €37/user/month on 48 seats (saves €1,728/year)",
-      if_they_push_back: "€38/user/month — saves €1,152/year",
+      type: "Renewal",
+      issue: "30-day auto-renew notice on a €22,800 annual commitment",
+      why_it_matters: "A short notice window limits your ability to renegotiate or compare alternatives before the contract auto-renews at whatever rate the reseller sets.",
+      what_to_ask_for: "Extend auto-renew notice from 30 to 60 days",
+      if_they_push_back: "Request email reminder 90 days before renewal date",
     },
   ],
   negotiation_plan: {
     leverage_you_have: [
-      "Resellers have margin they can give — this isn't a direct Microsoft price",
-      "18 unused seats is strong evidence of over-licensing",
-      "Google Workspace Business Plus is €13.20/user/month — 67% cheaper for non-power users",
-      "Annual prepay is standard — you're already on annual commitment, just not getting the discount",
+      "Loyal customer renewing without issues",
+      "50-seat account is meaningful volume for the reseller",
+      "Annual prepay reduces their collection risk",
     ],
 
     trades_you_can_offer: [
-      "Prepay full year upfront for better rate",
-      "Consolidate all Microsoft licensing through one reseller",
-      "Commit to 2-year term for guaranteed pricing",
+      "Commit to 2-year renewal for price lock",
+      "Consolidate additional licensing through them",
     ],
   },
   what_to_ask_for: {
     must_have: [
-      "Reduce from 60 to 48 seats — saves €5,760/year",
-      "Switch to annual prepay rate at €37/user — saves €1,728/year on adjusted count",
+      "Lock pricing for 2 years at current rate",
+      "Extend auto-renew notice to 60 days",
     ],
     nice_to_have: [
-      "Bundle in Microsoft Copilot pilot for 10 users at discounted rate",
-      "Extend auto-renew notice from 30 to 60 days",
+      "Include 5 Copilot licenses at discounted rate as a trial",
     ],
   },
   potential_savings: {
-    total: 7488,
+    total: 684,
     currency: "EUR",
     must_have: [
       {
-        ask: "Right-size 60 to 48 seats",
-        amount: 5760,
-        rationale: "18 seats are unused — documented waste",
-      },
-      {
-        ask: "Annual prepay rate €40 to €37/user",
-        amount: 1728,
-        rationale: "Reseller margin is negotiable — prepay rate is standard",
+        ask: "3% loyalty discount for 2-year commitment",
+        amount: 684,
+        rationale: "Modest ask in exchange for guaranteed 2-year revenue",
       },
     ],
     nice_to_have: [],
@@ -452,17 +434,15 @@ export const microsoft365Example: DealOutput = {
       subject: "Re: Microsoft 365 renewal",
       body: `Hi [Name],
 
-Thanks for the renewal notice — we're staying on Business Premium and want to get this sorted before May 1.
+Thanks for the renewal notice. We're happy with Business Premium and want to continue.
 
-Two things before we confirm:
+The pricing and seat count look right, so this should be straightforward. Two small asks before we confirm:
 
-1. Seat count: We're on 60 seats with 42 active. I'd like to right-size to 48 — keeps us with comfortable headroom without paying for 12 seats we don't use. New monthly: €1,920.
+1. Could we lock the current rate for 2 years? We'd commit to a 2-year term in exchange. Saves us both the renewal conversation next year.
 
-2. Prepay rate: We're on annual commitment but paying the monthly rate. Can we move to annual prepay pricing — we've seen €37/user as the standard rate for this. On 48 seats that's €1,776/month.
+2. The auto-renew notice is currently 30 days, which is tight for a commitment this size. Could we extend that to 60 days?
 
-Combined that brings us to €21,312/year. Happy to prepay the full year upfront to make it simple.
-
-Let me know what you can do.
+If those work, we're ready to sign this week.
 
 Best regards,
 [Your Name]`,
@@ -471,14 +451,12 @@ Best regards,
       subject: "Microsoft 365 renewal — follow-up",
       body: `Hi [Name],
 
-We want to renew but need two adjustments:
+We want to renew but need two things confirmed:
 
-1. Seat reduction from 60 to 48 — only 42 active. New monthly: €1,920.
-2. Annual prepay rate at €37/user — we're on annual commitment but paying the monthly rate. That's not competitive.
+1. 2-year price lock at the current €38/user rate.
+2. Auto-renew notice extended to 60 days.
 
-Adjusted total: €21,312/year. We're happy to prepay the full year upfront.
-
-Can you confirm by end of week?
+We're ready to sign a 2-year commitment immediately if those are confirmed.
 
 Best regards,
 [Your Name]`,
@@ -487,36 +465,29 @@ Best regards,
       subject: "Microsoft 365 — renewal terms",
       body: `Hi [Name],
 
-We've reviewed the renewal and need to resolve two things before we sign:
+We need to finalize the renewal before May 1. The deal works for us, but we need the 2-year price lock and 60-day auto-renew notice confirmed before we sign.
 
-1. We are paying for 60 seats with 42 active. We will not renew at 60.
-2. We expect annual prepay pricing at €37/user — Google Workspace is quoting us 67% below your current rate for non-power users.
-
-We're prepared to prepay a full year at 48 seats and €37/user — €21,312. If we can't align we'll split our licensing between Microsoft and Google Workspace.
-
-Please respond by [DATE].
+Can you confirm by end of week?
 
 Best regards,
 [Your Name]`,
     },
   },
-  score: 53,
-  score_label: "Needs negotiation",
+  score: 84,
+  score_label: "Ready to sign",
   score_breakdown: {
-    pricing_fairness: 22,
-    terms_protections: 17,
-    leverage_position: 14,
+    pricing_fairness: 46,
+    terms_protections: 22,
+    leverage_position: 16,
     pricing_deductions: [
-      { points: 15, reason: "18 unused seats at full rate — 30% waste" },
-      { points: 8, reason: "Prepay discount not applied on annual commitment" },
-      { points: 5, reason: "Savings exceed 25% of contract value" },
+      { points: 4, reason: "Minor room for loyalty discount" },
     ],
     terms_deductions: [
-      { points: 8, reason: "Seat reductions only at renewal — no mid-term flex" },
-      { points: 5, reason: "30-day auto-renew notice window" },
+      { points: 5, reason: "30-day auto-renew notice is tight" },
+      { points: 3, reason: "No price lock guarantee at renewal" },
     ],
     leverage_deductions: [
-      { points: 6, reason: "Annual commitment already in place" },
+      { points: 4, reason: "Annual commitment already in place" },
     ],
   },
   score_rationale: "18 inactive seats at full rate with no prepay discount applied",
@@ -687,7 +658,7 @@ Best regards,
 [Your Name]`,
     },
   },
-  score: 41,
+  score: 43,
   score_label: "Push back hard",
   score_breakdown: {
     pricing_fairness: 15,
@@ -876,8 +847,8 @@ Best regards,
 [Your Name]`,
     },
   },
-  score: 42,
-  score_label: "Push back hard",
+  score: 62,
+  score_label: "Solid, negotiate the details",
   score_breakdown: {
     pricing_fairness: 18,
     terms_protections: 10,
@@ -1072,7 +1043,7 @@ Best regards,
 [Your Name]`,
     },
   },
-  score: 46,
+  score: 55,
   score_label: "Needs negotiation",
   score_breakdown: {
     pricing_fairness: 20,

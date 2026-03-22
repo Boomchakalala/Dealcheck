@@ -36,12 +36,12 @@ export default function ExamplePage() {
       ],
     },
     microsoft365: {
-      original: '€28,800', final: '€21,312', savings: '€7,488', savingsPct: '26%', date: 'Apr 20, 2026',
-      tags: ['Seats right-sized', 'Prepay discount', 'Billing simplified'],
+      original: '€22,800', final: '€22,116', savings: '€684', savingsPct: '3%', date: 'Apr 20, 2026',
+      tags: ['Price locked', 'Notice extended'],
       wins: [
-        { type: 'Price', label: 'Right-sized from 60 to 48 seats', amount: '€5,760/yr' },
-        { type: 'Price', label: 'Annual prepay rate €40 to €37/user', amount: '€1,728/yr' },
+        { type: 'Price', label: '3% loyalty discount on 2-year commit', amount: '€684/yr' },
         { type: 'Terms', label: 'Auto-renew notice extended to 60 days' },
+        { type: 'Terms', label: 'Pricing locked for 2 years' },
       ],
     },
     fedex: {
@@ -76,7 +76,7 @@ export default function ExamplePage() {
   const exampleTypes = [
     { id: 'docusign' as ExampleType, label: 'DocuSign', description: locale === 'fr' ? '24K € — économies 7,8K €/an' : '€24K renewal — saves €7.8K/yr' },
     { id: 'salesforce' as ExampleType, label: 'Salesforce', description: locale === 'fr' ? '36K € — économies 9,5K €/an' : '€36K renewal — saves €9.5K/yr' },
-    { id: 'microsoft365' as ExampleType, label: 'Microsoft 365', description: locale === 'fr' ? '29K € — économies 7,5K €/an' : '€29K renewal — saves €7.5K/yr' },
+    { id: 'microsoft365' as ExampleType, label: 'Microsoft 365', description: locale === 'fr' ? '23K € — contrat propre' : '€23K renewal — clean deal' },
     { id: 'fedex' as ExampleType, label: 'FedEx', description: locale === 'fr' ? '52K $ — économies 12,5K $/an' : '$52K contract — saves $12.5K/yr' },
     { id: 'konica' as ExampleType, label: 'Konica Minolta', description: locale === 'fr' ? '35K € — économies 7,2K €/3 ans' : '€35K lease — saves €7.2K/3yr' },
     { id: 'bdo' as ExampleType, label: 'BDO', description: locale === 'fr' ? '24K € — économies 5,1K €/an' : '€24K retainer — saves €5.1K/yr' },
@@ -111,58 +111,37 @@ export default function ExamplePage() {
           </div>
         </div>
 
-        {/* Example Type Selector — visual tabs with savings */}
+        {/* Example Type Selector — visual tabs with scores and savings */}
         <div className="mb-8">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {exampleTypes.map((type) => (
+            {exampleTypes.map((type) => {
+              const exScore = currentExamples[type.id]?.score ?? 0
+              const scoreColor = exScore >= 80 ? 'text-emerald-600' : exScore >= 60 ? 'text-amber-600' : 'text-orange-600'
+              return (
               <button
                 key={type.id}
                 onClick={() => setSelectedExample(type.id)}
-                className={`p-4 rounded-xl border-2 text-left transition-all ${
+                className={`p-4 rounded-xl border-2 text-left transition-all relative ${
                   selectedExample === type.id
                     ? 'border-emerald-500 bg-emerald-50 shadow-md'
                     : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-start justify-between mb-1.5">
                   <h4 className="text-sm font-bold text-slate-900">{type.label}</h4>
-                  {selectedExample === type.id && (
-                    <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center">
-                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                  )}
+                  <div className="text-right flex-shrink-0 ml-2">
+                    <p className={`text-lg font-bold leading-none ${scoreColor}`}>{exScore}</p>
+                    <p className="text-[8px] text-slate-400 uppercase tracking-wide">Score</p>
+                  </div>
                 </div>
                 <p className="text-xs text-slate-500">{type.description}</p>
                 <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">
                   {closedDeals[type.id].savings} saved
                 </div>
               </button>
-            ))}
+              )
+            })}
           </div>
-        </div>
-
-        {/* Before/After summary card */}
-        <div className="mb-8 bg-slate-50 border border-slate-200 rounded-xl p-5 sm:p-6">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Original quote</p>
-              <p className="text-lg sm:text-xl font-bold text-slate-900">{closedDeals[selectedExample].original}</p>
-            </div>
-            <div>
-              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Red flags found</p>
-              <p className="text-lg sm:text-xl font-bold text-red-600">{currentExamples[selectedExample].red_flags?.length || 0}</p>
-            </div>
-            <div>
-              <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wide mb-1">Savings identified</p>
-              <p className="text-lg sm:text-xl font-bold text-emerald-700">{closedDeals[selectedExample].savings}</p>
-              <p className="text-[10px] font-semibold text-emerald-600">{closedDeals[selectedExample].savingsPct}</p>
-            </div>
-          </div>
-          <p className="text-center text-xs text-slate-500 mt-4">
-            This quote looked clean. TermLift found {closedDeals[selectedExample].savings} in savings and {currentExamples[selectedExample].red_flags?.length || 0} red flags.
-          </p>
         </div>
 
         {/* Closed Deal Banner — compact, eye-catching */}
