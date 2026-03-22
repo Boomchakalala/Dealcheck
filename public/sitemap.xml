@@ -51,6 +51,21 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://www.termlift.com/blog</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/blog/how-to-negotiate-saas-renewal</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/blog/5-things-vendor-hopes-you-wont-notice</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://www.termlift.com/privacy</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>

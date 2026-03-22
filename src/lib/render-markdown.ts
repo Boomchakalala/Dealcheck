@@ -1,3 +1,32 @@
+/** Simple markdown to HTML for blog posts */
+export function renderMarkdownToHtml(md: string): string {
+  return md
+    // Horizontal rules
+    .replace(/^---$/gm, '<hr />')
+    // Headers
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+    // Blockquotes (multi-line)
+    .replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>')
+    // Unordered lists
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, (match) => `<ul>${match}</ul>`)
+    // Paragraphs (double newlines)
+    .replace(/\n\n(?!<)/g, '</p><p>')
+    // Wrap in initial p if needed
+    .replace(/^(?!<)/, '<p>')
+    .replace(/(?!>)$/, '</p>')
+    // Clean up empty paragraphs
+    .replace(/<p>\s*<\/p>/g, '')
+    // Clean up blockquote nesting
+    .replace(/<\/blockquote>\s*<blockquote>/g, '')
+}
+
 // Shared helper to render markdown from deal output JSON
 export function renderMarkdown(output: any): string {
   const verdictLabel = output.verdict_type === 'competitive'

@@ -11,6 +11,7 @@ export function MarketingFooter() {
     { href: '/#how-it-works', label: t('nav.howItWorks') },
     { href: '/example', label: t('nav.examples') },
     { href: '/pricing', label: t('footer.pricing') },
+    { href: '/blog', label: 'Blog' },
     { href: '/about', label: t('footer.about') },
     { href: '/contact', label: t('footer.contact') },
     { href: '/security', label: t('footer.security') },
