@@ -29,6 +29,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
     { href: '/app/dashboard', label: t('nav.dashboard') },
     { href: '/pricing', label: t('nav.pricing') },
     { href: '/example', label: t('nav.examples') },
+    { href: '/blog', label: 'Blog' },
   ]
 
   const isActive = (href: string) => {
@@ -55,6 +56,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
       <Link href="/pricing" className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-medium">{t('nav.pricing')}</Link>
       <Link href="/#how-it-works" className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-medium">{t('nav.howItWorks')}</Link>
       <Link href="/example" className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-medium">{t('nav.examples')}</Link>
+      <Link href="/blog" className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-medium">Blog</Link>
     </>
   )
 
