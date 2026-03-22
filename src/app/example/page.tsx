@@ -168,7 +168,7 @@ export default function ExamplePage() {
           </button>
         </div>
 
-        <OutputDisplay output={currentExamples[selectedExample]} />
+        <OutputDisplay key={selectedExample} output={currentExamples[selectedExample]} />
 
         {/* Deal Closed — Win Summary (full outcome card) */}
         {(() => {

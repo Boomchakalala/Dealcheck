@@ -95,13 +95,13 @@ export const docusignExampleFr: DealOutput = {
       subject: "Re : Renouvellement DocuSign",
       body: `Bonjour [Nom],
 
-On adore DocuSign et on veut boucler ce renouvellement rapidement. J'ai juste besoin de clarifier deux points de notre c\u00f4t\u00e9.
+Merci pour l'avis de renouvellement. Nous sommes satisfaits de DocuSign et souhaitons boucler cela rapidement.
 
-Nous avons actuellement 40 licences, mais en regardant nos donn\u00e9es d'utilisation, seules 25 personnes se connectent r\u00e9guli\u00e8rement. Serait-il possible de passer \u00e0 30 ? Cela nous laisse une marge confortable sans payer des licences que personne n'utilise, et nous ram\u00e8ne \u00e0 \u20ac1 500/mois.
+J'ai regard\u00e9 nos donn\u00e9es d'utilisation et seules 25 des 40 licences sont actives. Serait-il possible de passer \u00e0 30 ? Cela nous laisse une marge confortable et nous ram\u00e8ne \u00e0 \u20ac1 500/mois au lieu de \u20ac2 000.
 
-Par ailleurs, cela fait 2 ans que nous sommes clients fid\u00e8les. Y a-t-il une marge de man\u0153uvre pour une remise de fid\u00e9lit\u00e9 ? M\u00eame 10 % sur le contrat ajust\u00e9 ferait vraiment la diff\u00e9rence. PandaDoc nous sollicite avec des tarifs agressifs, mais honn\u00eatement, on pr\u00e9f\u00e8re rester si les chiffres tiennent la route.
+Nous sommes clients depuis 2 ans maintenant, et je voulais voir s'il y avait une possibilit\u00e9 de remise fid\u00e9lit\u00e9. M\u00eame 10 % sur le contrat ajust\u00e9 m'aiderait \u00e0 faire valider cela en interne. PandaDoc nous propose des tarifs assez inf\u00e9rieurs, mais nous pr\u00e9f\u00e9rons rester si les chiffres fonctionnent.
 
-Si on peut atterrir autour de \u20ac16 200/an, je suis pr\u00eat \u00e0 signer un engagement de 2 ans cette semaine. Je peux aussi laisser un avis sur G2 si cela vous aide.
+Si on peut atterrir autour de \u20ac16 200/an, je peux faire signer cette semaine. Est-ce faisable de votre c\u00f4t\u00e9 ?
 
 Cordialement,
 [Votre nom]`,

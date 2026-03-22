@@ -101,13 +101,13 @@ export const docusignExample: DealOutput = {
       subject: "Re: DocuSign renewal",
       body: `Hi [Name],
 
-We love DocuSign and want to get this renewal wrapped up quickly. I just need to sort out a couple of things on our end first.
+Thanks for the renewal notice. We're happy with DocuSign and want to get this sorted quickly.
 
-We're currently on 40 seats, but when I pulled our usage data, only 25 are actively logging in. Could we right-size to 30? That gives us a comfortable buffer without paying for seats nobody's using, and brings us to €1,500/month.
+I pulled our usage data and only 25 of the 40 seats are actively being used. Could we right-size to 30? That still gives us a buffer but brings us down to €1,500/month instead of €2,000.
 
-Also, we've been loyal customers for 2 years now. Is there flexibility on a loyalty discount? Even 10% on the adjusted contract would go a long way. I know PandaDoc has been reaching out with aggressive pricing, but honestly, we'd rather stay put if the numbers work.
+We've also been customers for 2 years now, so I wanted to ask about a loyalty discount. Even 10% on the adjusted contract would help me get this approved internally. PandaDoc has been quoting us quite a bit lower, but we'd rather stay if the numbers work.
 
-If we can land around €16,200/year, I'm ready to sign a 2-year commitment this week. Happy to leave a G2 review too if that helps.
+If we can land around €16,200/year, I can get this signed this week. Would that work on your end?
 
 Best regards,
 [Your Name]`,
