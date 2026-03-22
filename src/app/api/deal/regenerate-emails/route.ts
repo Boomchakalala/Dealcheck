@@ -3,7 +3,8 @@ import { getClaudeResponse, getLanguageInstruction } from '@/lib/claude'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
-const MAX_REGENERATIONS = 3
+import { getMaxEmailRegens } from '@/lib/tiers'
+import type { Plan } from '@/lib/tiers'
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +13,20 @@ export async function POST(request: Request) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Get user plan for regen limit
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('plan, is_admin')
+      .eq('id', user.id)
+      .single()
+
+    const plan = (profile?.plan || 'free') as Plan
+    const maxRegens = profile?.is_admin ? 99 : getMaxEmailRegens(plan)
+
+    if (maxRegens === 0) {
+      return NextResponse.json({ error: 'Email regeneration requires Essentials or Pro plan.' }, { status: 403 })
     }
 
     const body = await request.json()
@@ -46,10 +61,10 @@ export async function POST(request: Request) {
       }, { status: 400 })
     }
 
-    // Check regeneration limit
-    if (round.email_regeneration_count >= MAX_REGENERATIONS) {
+    // Check regeneration limit based on plan
+    if (round.email_regeneration_count >= maxRegens) {
       return NextResponse.json({
-        error: `You've reached the limit of ${MAX_REGENERATIONS} email regenerations for this round.`
+        error: `You've reached the limit of ${maxRegens} email regeneration${maxRegens > 1 ? 's' : ''} for this round.${plan === 'essentials' ? ' Upgrade to Pro for 3 per round.' : ''}`
       }, { status: 429 })
     }
 
@@ -126,7 +141,7 @@ Return ONLY valid JSON (no markdown, no code fences):
 
     return NextResponse.json({
       emails: result.emails.slice(0, 3),
-      remainingRegenerations: MAX_REGENERATIONS - round.email_regeneration_count - 1
+      remainingRegenerations: maxRegens - round.email_regeneration_count - 1
     })
   } catch (error) {
     console.error('Regenerate emails error:', error)
