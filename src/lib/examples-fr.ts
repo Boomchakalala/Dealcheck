@@ -340,91 +340,73 @@ Cordialement,
   disclaimer: "Cette analyse est fournie à titre informatif uniquement et ne constitue pas un conseil juridique, financier ou professionnel.",
 }
 
-// Exemple 3 : Microsoft 365 — Renouvellement Business Premium
+// Exemple 3 : Microsoft 365 — Renouvellement Business Premium (CONTRAT PROPRE)
 export const microsoft365ExampleFr: DealOutput = {
-  title: "Microsoft 365 · Business Premium · Renouvellement annuel",
+  title: "Microsoft 365 \u00b7 Business Premium \u00b7 Renouvellement annuel",
   vendor: "Microsoft 365",
-  category: "SaaS - Productivité",
-  description: "Suite de productivité — applications Office, Teams, Exchange, Intune, Defender",
-  verdict: "18 licences inactives au plein tarif, aucune remise de prépaiement annuel appliquée.",
-  verdict_type: "negotiate",
-  price_insight: "À €40/utilisateur/mois pour 60 licences, vous dépensez €2 400/mois. Seules 42 sont actives. En ajustant le nombre et en passant au tarif prépayé, vous économisez €7 488/an.",
+  category: "SaaS - Productivit\u00e9",
+  description: "Suite de productivit\u00e9 \u2014 applications Office, Teams, Exchange, Intune, Defender",
+  verdict: "Ce contrat est bien structur\u00e9. Le tarif est comp\u00e9titif, le nombre de licences correspond \u00e0 l'utilisation, et les conditions sont standard. Optimisation mineure uniquement.",
+  verdict_type: "competitive",
+  price_insight: "\u00c0 \u20ac38/utilisateur/mois sur 50 licences en pr\u00e9paiement annuel, c'est en ligne avec les tarifs standard M365 Business Premium via revendeurs.",
   snapshot: {
     vendor_product: "Microsoft 365 / Business Premium",
     term: "12 mois",
-    total_commitment: "€28,800",
-    billing_payment: "Engagement annuel, facturation mensuelle",
-    pricing_model: "Par licence, facturation mensuelle",
+    total_commitment: "\u20ac22,800",
+    billing_payment: "Pr\u00e9paiement annuel",
+    pricing_model: "Par licence, facturation annuelle",
     deal_type: "Renewal",
     renewal_date: "May 1, 2026",
     currency: "EUR",
   },
   quick_read: {
     whats_solid: [
-      "Suite Office complète avec applications de bureau et web",
-      "Gestion des appareils Intune et sécurité Defender incluses",
-      "Azure AD Premium P1 — gestion des identités robuste",
+      "Nombre de licences correspond aux utilisateurs actifs, pas de gaspillage",
+      "Tarif pr\u00e9pay\u00e9 annuel d\u00e9j\u00e0 appliqu\u00e9",
+      "Suite s\u00e9curit\u00e9 compl\u00e8te incluse (Intune, Defender, Azure AD P1)",
     ],
     whats_concerning: [
-      "18 des 60 licences sont inactives — 30 % de gaspillage à €40/licence/mois",
-      "Tarif mensuel malgré un engagement annuel — remise de prépaiement non appliquée",
-      "Les réductions de licences ne sont possibles qu'au renouvellement",
+      "Pr\u00e9avis de renouvellement automatique de 30 jours serr\u00e9 pour un engagement de \u20ac22 800",
     ],
-    conclusion: "Bon produit, trop de licences, mauvais tarif de facturation. Réduisez à 48 licences et passez au prépaiement pour économiser €7 488/an.",
+    conclusion: "Contrat propre. Signez-le, mais verrouillez le tarif pour 2 ans et allongez le pr\u00e9avis de renouvellement.",
   },
   red_flags: [
     {
-      type: "Commercial",
-      issue: "Vous payez 60 licences mais seulement 42 sont actives — 18 licences inutilisées",
-      why_it_matters: "18 licences inutilisées x €40/mois = €720/mois = €8 640/an de gaspillage. En ajustant à 48 licences (42 actives + 6 de marge) = €1 920/mois au lieu de €2 400/mois. Économie : €480/mois = €5 760/an.",
-      what_to_ask_for: "Réduire de 60 à 48 licences — économie de €5 760/an",
-      if_they_push_back: "Réduire à 54 licences — économie de €2 880/an",
-    },
-    {
-      type: "Commercial",
-      issue: "Remise de prépaiement annuel non appliquée — vous payez le tarif mensuel sur un engagement annuel",
-      why_it_matters: "Microsoft 365 Business Premium facturé annuellement d'avance se négocie généralement à €36-38/utilisateur/mois via les revendeurs, contre €40 en facturation mensuelle. Sur 48 licences, passer au prépaiement annuel économise €1 728/an.",
-      what_to_ask_for: "Tarif prépayé annuel — €37/utilisateur/mois sur 48 licences (économie de €1 728/an)",
-      if_they_push_back: "€38/utilisateur/mois — économie de €1 152/an",
+      type: "Renewal",
+      issue: "Pr\u00e9avis de renouvellement automatique de 30 jours sur un engagement de \u20ac22 800",
+      why_it_matters: "Un pr\u00e9avis court limite votre capacit\u00e9 \u00e0 ren\u00e9gocier ou comparer les alternatives avant que le contrat ne se renouvelle automatiquement au tarif fix\u00e9 par le revendeur.",
+      what_to_ask_for: "Allonger le pr\u00e9avis de renouvellement de 30 \u00e0 60 jours",
+      if_they_push_back: "Demander un rappel par email 90 jours avant la date de renouvellement",
     },
   ],
   negotiation_plan: {
     leverage_you_have: [
-      "Les revendeurs ont de la marge à céder — ce n'est pas un prix direct Microsoft",
-      "18 licences inutilisées constituent une preuve solide de sur-licenciement",
-      "Google Workspace Business Plus est à €13,20/utilisateur/mois — 67 % moins cher pour les utilisateurs non-avancés",
-      "Le prépaiement annuel est la norme — vous êtes déjà en engagement annuel, sans bénéficier de la remise",
+      "Client fid\u00e8le qui renouvelle sans probl\u00e8me",
+      "Un compte de 50 licences repr\u00e9sente un volume significatif pour le revendeur",
+      "Le pr\u00e9paiement annuel r\u00e9duit leur risque de recouvrement",
     ],
-
     trades_you_can_offer: [
-      "Prépayer l'année complète d'avance pour un meilleur tarif",
-      "Consolider toutes les licences Microsoft chez un seul revendeur",
-      "S'engager sur 2 ans pour un tarif garanti",
+      "S'engager sur 2 ans pour un verrouillage tarifaire",
+      "Consolider les licences suppl\u00e9mentaires chez eux",
     ],
   },
   what_to_ask_for: {
     must_have: [
-      "Réduire de 60 à 48 licences — économie de €5 760/an",
-      "Passer au tarif prépayé annuel à €37/utilisateur — économie de €1 728/an sur le nombre ajusté",
+      "Verrouiller le tarif pour 2 ans au tarif actuel",
+      "Allonger le pr\u00e9avis de renouvellement \u00e0 60 jours",
     ],
     nice_to_have: [
-      "Intégrer un pilote Microsoft Copilot pour 10 utilisateurs à tarif réduit",
-      "Allonger le préavis de renouvellement automatique de 30 à 60 jours",
+      "Inclure 5 licences Copilot \u00e0 tarif r\u00e9duit en essai",
     ],
   },
   potential_savings: {
-    total: 7488,
+    total: 684,
     currency: "EUR",
     must_have: [
       {
-        ask: "Ajustement de 60 à 48 licences",
-        amount: 5760,
-        rationale: "18 licences inutilisées — gaspillage documenté",
-      },
-      {
-        ask: "Tarif prépayé annuel de €40 à €37/utilisateur",
-        amount: 1728,
-        rationale: "La marge du revendeur est négociable — le tarif prépayé est standard",
+        ask: "Remise fid\u00e9lit\u00e9 de 3 % pour engagement sur 2 ans",
+        amount: 684,
+        rationale: "Demande modeste en \u00e9change d'un revenu garanti sur 2 ans",
       },
     ],
     nice_to_have: [],
@@ -434,79 +416,68 @@ export const microsoft365ExampleFr: DealOutput = {
       subject: "Re : Renouvellement Microsoft 365",
       body: `Bonjour [Nom],
 
-Merci pour l'avis de renouvellement — nous restons sur Business Premium et souhaitons régler cela avant le 1er mai.
+Merci pour l'avis de renouvellement. Nous sommes satisfaits de Business Premium et souhaitons continuer.
 
-Deux points avant de confirmer :
+Le tarif et le nombre de licences sont corrects, donc cela devrait \u00eatre simple. Deux petites demandes avant de confirmer :
 
-1. Nombre de licences : nous avons 60 licences avec 42 actives. Je souhaiterais ajuster à 48 — cela nous laisse une marge confortable sans payer 12 licences inutiles. Nouveau mensuel : €1 920.
+1. Pourrions-nous verrouiller le tarif actuel pour 2 ans ? Nous nous engagerions sur un contrat de 2 ans en \u00e9change. Cela nous \u00e9vite la conversation de renouvellement l'an prochain.
 
-2. Tarif prépayé : nous sommes en engagement annuel mais payons le tarif mensuel. Pouvons-nous passer au tarif prépayé annuel — nous avons vu €37/utilisateur comme tarif standard. Sur 48 licences, cela fait €1 776/mois.
+2. Le pr\u00e9avis de renouvellement est actuellement de 30 jours, ce qui est serr\u00e9 pour un engagement de cette taille. Serait-il possible de l'allonger \u00e0 60 jours ?
 
-Ensemble, cela nous amène à €21 312/an. Nous sommes prêts à prépayer l'année complète d'avance pour simplifier.
-
-Dites-moi ce que vous pouvez faire.
+Si cela fonctionne, nous sommes pr\u00eats \u00e0 signer cette semaine.
 
 Cordialement,
 [Votre nom]`,
     },
     firm: {
-      subject: "Renouvellement Microsoft 365 — suivi",
+      subject: "Renouvellement Microsoft 365 \u2014 suivi",
       body: `Bonjour [Nom],
 
-Nous souhaitons renouveler mais avons besoin de deux ajustements :
+Nous souhaitons renouveler mais avons besoin de deux confirmations :
 
-1. Réduction de 60 à 48 licences — seulement 42 actives. Nouveau mensuel : €1 920.
-2. Tarif prépayé annuel à €37/utilisateur — nous sommes en engagement annuel mais payons le tarif mensuel. Ce n'est pas compétitif.
+1. Verrouillage tarifaire sur 2 ans au tarif actuel de \u20ac38/utilisateur.
+2. Pr\u00e9avis de renouvellement automatique \u00e9tendu \u00e0 60 jours.
 
-Total ajusté : €21 312/an. Nous sommes prêts à prépayer l'année complète d'avance.
+Nous sommes pr\u00eats \u00e0 signer un engagement de 2 ans imm\u00e9diatement si ces points sont confirm\u00e9s.
+
+Cordialement,
+[Votre nom]`,
+    },
+    final_push: {
+      subject: "Microsoft 365 \u2014 conditions de renouvellement",
+      body: `Bonjour [Nom],
+
+Nous devons finaliser le renouvellement avant le 1er mai. Le contrat nous convient, mais nous avons besoin du verrouillage tarifaire sur 2 ans et du pr\u00e9avis de 60 jours confirm\u00e9s avant de signer.
 
 Pouvez-vous confirmer d'ici la fin de semaine ?
 
 Cordialement,
 [Votre nom]`,
     },
-    final_push: {
-      subject: "Microsoft 365 — conditions de renouvellement",
-      body: `Bonjour [Nom],
-
-Nous avons examiné le renouvellement et deux points doivent être résolus avant de signer :
-
-1. Nous payons 60 licences avec 42 actives. Nous ne renouvellerons pas à 60.
-2. Nous attendons un tarif prépayé annuel à €37/utilisateur — Google Workspace nous propose 67 % en dessous de votre tarif actuel pour les utilisateurs non-avancés.
-
-Nous sommes prêts à prépayer une année complète à 48 licences et €37/utilisateur — €21 312. Si nous ne pouvons pas nous aligner, nous répartirons nos licences entre Microsoft et Google Workspace.
-
-Merci de répondre avant le [DATE].
-
-Cordialement,
-[Votre nom]`,
-    },
   },
-  score: 58,
-  score_label: "À négocier",
+  score: 84,
+  score_label: "Pr\u00eat \u00e0 signer",
   score_breakdown: {
-    pricing_fairness: 22,
-    terms_protections: 17,
-    leverage_position: 14,
+    pricing_fairness: 46,
+    terms_protections: 22,
+    leverage_position: 16,
     pricing_deductions: [
-      { points: 15, reason: "18 licences inutilisées au plein tarif — 30 % de gaspillage" },
-      { points: 8, reason: "Remise de prépaiement non appliquée sur l'engagement annuel" },
-      { points: 5, reason: "Les économies dépassent 25 % de la valeur du contrat" },
+      { points: 4, reason: "Marge mineure pour une remise fid\u00e9lit\u00e9" },
     ],
     terms_deductions: [
-      { points: 8, reason: "Réduction de licences uniquement au renouvellement — aucune flexibilité en cours de contrat" },
-      { points: 5, reason: "Préavis de renouvellement automatique de 30 jours" },
+      { points: 5, reason: "Pr\u00e9avis de renouvellement automatique de 30 jours serr\u00e9" },
+      { points: 3, reason: "Pas de garantie de verrouillage tarifaire au renouvellement" },
     ],
     leverage_deductions: [
-      { points: 6, reason: "Engagement annuel déjà en place" },
+      { points: 4, reason: "Engagement annuel d\u00e9j\u00e0 en place" },
     ],
   },
-  score_rationale: "18 licences inactives au plein tarif sans remise de prépaiement appliquée",
+  score_rationale: "Contrat bien structur\u00e9 avec des conditions standard. Optimisation mineure possible sur le pr\u00e9avis et le verrouillage tarifaire.",
   assumptions: [
-    "42 des 60 licences sont activement utilisées",
-    "Tarif prépayé revendeur de €37/utilisateur basé sur des contrats M365 Business Premium comparables",
+    "50 licences correspondent aux utilisateurs actifs",
+    "Le tarif de \u20ac38/utilisateur est comp\u00e9titif pour M365 Business Premium via revendeur",
   ],
-  disclaimer: "Cette analyse est fournie à titre informatif uniquement et ne constitue pas un conseil juridique, financier ou professionnel.",
+  disclaimer: "Cette analyse est un conseil commercial, pas un avis juridique. V\u00e9rifiez les conditions finales avant signature.",
 }
 
 // Exemple 4 : FedEx — Contrat annuel de livraison
