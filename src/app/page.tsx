@@ -53,8 +53,8 @@ export default function LandingPage() {
               </div>
 
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-4 sm:mb-6 leading-[1.15]">
-                Better vendor terms.<br className="hidden sm:block" />
-                <span className="text-emerald-600">In 60 seconds.</span>
+                {t('hero.title1')}<br className="hidden sm:block" />
+                <span className="text-emerald-600">{t('hero.title2')}</span>
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-lg">
                 {t('hero.subtitle')}
