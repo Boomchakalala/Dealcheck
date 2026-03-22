@@ -51,6 +51,11 @@ export default async function PricingPage() {
               </p>
             </div>
 
+            {/* Social proof */}
+            <p className="text-center text-sm text-slate-500 mb-8">
+              {t('pricingPage.socialProof')}
+            </p>
+
             {/* 3-Tier Grid */}
             <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto">
 
