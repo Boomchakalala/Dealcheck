@@ -42,6 +42,7 @@ export default async function SettingsPage() {
     const latest = rounds.sort((a: any, b: any) => (b.round_number || 0) - (a.round_number || 0))[0]
     const ps = latest?.output_json?.potential_savings as any
     if (!ps) return sum
+    if (ps.must_have) return sum + (ps.must_have as any[]).reduce((s: number, item: any) => s + (typeof item.amount === 'number' ? item.amount : parseMoney(String(item.amount || '0')).amount), 0)
     if (ps.total !== undefined) return sum + (typeof ps.total === 'number' ? ps.total : parseMoney(String(ps.total || '0')).amount)
     if (ps.optimistic_ceiling !== undefined) return sum + (typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseMoney(String(ps.optimistic_ceiling || '0')).amount)
     if (Array.isArray(ps)) return sum + ps.reduce((s: number, item: any) => s + parseMoney(item.annual_impact || '').amount, 0)

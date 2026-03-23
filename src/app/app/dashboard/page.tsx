@@ -107,7 +107,9 @@ export default async function DashboardPage() {
       // Parse potential savings from AI output
       const ps = output?.potential_savings as any
       let potentialSavings = 0
-      if (ps?.total !== undefined) {
+      if (ps?.must_have) {
+        potentialSavings = (ps.must_have as any[]).reduce((s: number, item: any) => s + (typeof item.amount === 'number' ? item.amount : parseSavingsAmount(String(item.amount || '0'))), 0)
+      } else if (ps?.total !== undefined) {
         potentialSavings = typeof ps.total === 'number' ? ps.total : parseSavingsAmount(String(ps.total))
       } else if (ps?.optimistic_ceiling !== undefined) {
         potentialSavings = typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseSavingsAmount(String(ps.optimistic_ceiling))

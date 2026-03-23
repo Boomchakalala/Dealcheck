@@ -225,6 +225,9 @@ export default function AppHomePage() {
     const ps = latest?.output_json?.potential_savings as any
     if (!ps) return sum
     // New range format
+    if (ps.must_have) {
+      return sum + (ps.must_have as any[]).reduce((s: number, item: any) => s + (typeof item.amount === 'number' ? item.amount : parseInt(String(item.amount), 10) || 0), 0)
+    }
     if (ps.total !== undefined) {
       return sum + (typeof ps.total === 'number' ? ps.total : parseInt(String(ps.total), 10) || 0)
     }

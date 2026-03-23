@@ -81,7 +81,9 @@ export default async function DealPage({
     : (latestOutput as DealOutput)?.red_flags?.length || 0
 
   const ps = (latestOutput as DealOutput)?.potential_savings as any
-  const potentialSavings = ps?.total !== undefined
+  const potentialSavings = ps?.must_have
+    ? (ps.must_have as any[]).reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : parseMoneyLib(String(item.amount || '0')).amount), 0)
+    : ps?.total !== undefined
     ? (typeof ps.total === 'number' ? ps.total : parseMoneyLib(String(ps.total || '0')).amount)
     : ps?.optimistic_ceiling !== undefined
       ? (typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseMoneyLib(String(ps.optimistic_ceiling || '0')).amount)

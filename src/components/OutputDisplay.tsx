@@ -120,20 +120,23 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
 
     // New must-have/nice-to-have format
     if (ps.must_have !== undefined) {
-      const total = typeof ps.total === 'number' ? ps.total : parseMoney(String(ps.total || '0')).amount
+      const mustHaveItems = (ps.must_have || []).map((item: any) => ({
+        ask: item.ask,
+        amount: typeof item.amount === 'number' ? item.amount : parseMoney(String(item.amount || '0')).amount,
+        rationale: item.rationale || '',
+      }))
+      const niceToHaveItems = (ps.nice_to_have || []).map((item: any) => ({
+        ask: item.ask,
+        amount: typeof item.amount === 'number' ? item.amount : parseMoney(String(item.amount || '0')).amount,
+        rationale: item.rationale || '',
+      }))
+      // Always compute total from items, never trust AI's total field
+      const total = mustHaveItems.reduce((sum: number, i: any) => sum + (i.amount || 0), 0)
       return {
         total,
         currency: ps.currency || '',
-        mustHave: (ps.must_have || []).map((item: any) => ({
-          ask: item.ask,
-          amount: typeof item.amount === 'number' ? item.amount : parseMoney(String(item.amount || '0')).amount,
-          rationale: item.rationale || '',
-        })),
-        niceToHave: (ps.nice_to_have || []).map((item: any) => ({
-          ask: item.ask,
-          amount: typeof item.amount === 'number' ? item.amount : parseMoney(String(item.amount || '0')).amount,
-          rationale: item.rationale || '',
-        })),
+        mustHave: mustHaveItems,
+        niceToHave: niceToHaveItems,
       }
     }
 

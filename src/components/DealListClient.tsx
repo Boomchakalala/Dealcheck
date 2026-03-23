@@ -104,7 +104,13 @@ function getPotentialSavings(deal: any): number {
   const latestRound = getLatestRound(deal)
   const ps = latestRound?.output_json?.potential_savings
   if (!ps) return 0
-  // New must-have format
+  // New must-have format — compute from items, not total field
+  if (ps.must_have) {
+    return (ps.must_have as any[]).reduce((sum: number, item: any) => {
+      const amt = typeof item.amount === 'number' ? item.amount : parseMoney(String(item.amount || '0')).amount
+      return sum + amt
+    }, 0)
+  }
   if (ps.total !== undefined) return typeof ps.total === 'number' ? ps.total : parseMoney(String(ps.total || '0')).amount
   // Old range format
   if (ps.optimistic_ceiling !== undefined) return typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseMoney(String(ps.optimistic_ceiling || '0')).amount
