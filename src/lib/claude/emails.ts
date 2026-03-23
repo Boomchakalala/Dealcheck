@@ -30,6 +30,8 @@ Subject lines: keep them dead simple. Vendor name + plain reference. "Re: Ewigo 
 
 Never use en dash or em dash characters. Use commas, colons, or normal hyphens.
 
+Never open by complimenting the price then immediately asking for a discount. That is contradictory and vendors see through it. Instead, lead with context: budget constraints, internal approval requirements, competing priorities. The discount should feel like a consequence of your situation, not a tactic.
+
 Write like a human. If it sounds like AI wrote it, rewrite it.
 `
 
