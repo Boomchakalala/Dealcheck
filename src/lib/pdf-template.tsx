@@ -302,7 +302,7 @@ export function AnalysisPDF({ output, locale = 'en' }: { output: DealOutput; loc
 
         {/* Savings */}
         {(mustHave.length > 0 || niceToHave.length > 0) && (
-          <View style={s.section} wrap={false}>
+          <View style={s.section}>
             <View style={s.savingsHeader}>
               <Text style={s.sectionTitle}>{fr ? 'Economies potentielles' : 'Potential Savings'}</Text>
               <View style={s.savingsTotal}>

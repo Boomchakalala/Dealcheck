@@ -826,7 +826,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   {copiedCol === 'push' ? t('output.copied') : t('output.copyAll')}
                 </button>
               </div>
-              <p className="text-[10px] text-slate-500 mb-3 ml-[42px]">{t('output.whatYouShouldAskVendorToChange')}</p>
+              <p className="text-[10px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whatYouShouldAskVendorToChange')}</p>
               <div className="space-y-2.5 flex-1">
                 {output.what_to_ask_for?.must_have?.map((item, idx) => (
                   <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3">
@@ -872,7 +872,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   {copiedCol === 'leverage' ? t('output.copied') : t('output.copyAll')}
                 </button>
               </div>
-              <p className="text-[10px] text-slate-500 mb-3 ml-[42px]">{t('output.whyTheyShouldSayYes')}</p>
+              <p className="text-[10px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whyTheyShouldSayYes')}</p>
               <ul className="space-y-2.5 flex-1">
                 {output.negotiation_plan?.leverage_you_have?.map((item, idx) => (
                   <li key={idx} className="bg-white border-l-[3px] border-l-emerald-400 border border-emerald-200 rounded-lg p-3 flex items-start gap-2.5">
@@ -904,7 +904,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   {copiedCol === 'offer' ? t('output.copied') : t('output.copyAll')}
                 </button>
               </div>
-              <p className="text-[10px] text-slate-500 mb-3 ml-[42px]">{t('output.whatYouCanGiveToGetWhatYouWant')}</p>
+              <p className="text-[10px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whatYouCanGiveToGetWhatYouWant')}</p>
               <ul className="space-y-2.5 flex-1">
                 {output.negotiation_plan?.trades_you_can_offer?.map((item, idx) => (
                   <li key={idx} className="bg-white border border-slate-200 rounded-lg p-3 flex items-start gap-2.5">
@@ -1131,8 +1131,8 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                     }`}
                   >
                     <div className="text-center">
-                      <div className="text-sm font-bold text-slate-900 mb-0.5">{tab.label}</div>
-                      <div className="text-xs text-slate-600">{tab.desc}</div>
+                      <div className="text-xs sm:text-sm font-bold text-slate-900 mb-0.5">{tab.label}</div>
+                      <div className="text-[10px] sm:text-xs text-slate-600 hidden sm:block">{tab.desc}</div>
                     </div>
                     {activeEmailTab === idx && (
                       <div className="absolute top-2 right-2">
