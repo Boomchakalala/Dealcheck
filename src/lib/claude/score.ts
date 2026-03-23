@@ -78,14 +78,11 @@ export function calculateQuoteScore(output: DealOutputType): {
   if (aiScore !== undefined && aiScore >= 5 && aiScore <= 98) {
     let validatedScore = aiScore
 
-    // Guardrails: cap score if it's inconsistent with the analysis
-    if (redFlagCount >= 4 && validatedScore > 55) validatedScore = 55
-    else if (redFlagCount >= 3 && validatedScore > 70) validatedScore = 70
-    else if (redFlagCount >= 2 && validatedScore > 82) validatedScore = 82
-
-    if (savingsPct > 15 && validatedScore > 60) validatedScore = 60
-    else if (savingsPct > 10 && validatedScore > 72) validatedScore = 72
-    else if (savingsPct > 5 && validatedScore > 85) validatedScore = 85
+    // Guardrails: cap score only for extreme flag counts
+    if (redFlagCount >= 5 && validatedScore > 45) validatedScore = 45
+    else if (redFlagCount >= 4 && validatedScore > 55) validatedScore = 55
+    else if (redFlagCount >= 3 && validatedScore > 75) validatedScore = 75
+    // No savings-based capping — score and savings are independent
 
     // Use AI breakdown if valid, otherwise derive from score
     const pf = aiBreakdown?.pricing_fairness ?? Math.round(validatedScore * 0.5)

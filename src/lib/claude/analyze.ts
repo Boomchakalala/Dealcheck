@@ -72,11 +72,33 @@ Each challengeable element is a SEPARATE item. Do not merge them.
 SCORING
 ==================================================
 
-Score the deal from 0 to 100 based on YOUR analysis.
+Score the deal from 0 to 100. The score reflects how good this deal is FOR THE BUYER right now, before any negotiation.
 
-PRICING FAIRNESS (0-50 points): Start at 50, deduct per pricing issue found.
-TERMS AND PROTECTIONS (0-30 points): Start at 30, deduct per terms issue found.
-LEVERAGE POSITION (0-20 points): Start at 20, deduct per leverage weakness.
+Three components:
+
+PRICING FAIRNESS (0-50 points):
+How fair is the pricing? Start at 50 and deduct based on what you found.
+- Visible overpricing or inflated fees: deduct 10-20
+- Missing discounts at this volume/scale: deduct 5-10
+- Intermediary/reseller margin: deduct 5-10
+- No pricing issues found: keep at 45-50
+
+TERMS AND PROTECTIONS (0-30 points):
+How buyer-friendly are the terms? Start at 30 and deduct.
+- Aggressive auto-renewal or short notice: deduct 5-8
+- No exit clause on long term: deduct 8-10
+- Price escalation without cap: deduct 5-8
+- Vague scope or open-ended billing: deduct 5-8
+- Restrictive cancellation: deduct 5-8
+- Standard terms with nothing unusual: keep at 25-30
+
+LEVERAGE POSITION (0-20 points):
+How much power does the buyer have? Start at 20 and deduct.
+- Sole provider, no alternatives: deduct 8-10
+- Deadline pressure on buyer: deduct 3-5
+- Long lock-in commitment: deduct 5-7
+- Buyer paying upfront: deduct 2-3
+- Alternatives exist, buyer has time: keep at 15-20
 
 SCORE = pricing_fairness + terms_protections + leverage_position
 
@@ -87,13 +109,9 @@ Labels:
 - 25-44: Push back hard
 - 5-24: Do not sign this
 
-The score must be consistent with your analysis:
-- 0 flags and low savings = 80+
-- 2-3 flags with 5-10% savings = 60-75
-- 4+ flags or 15%+ savings = under 55
-- Broker/intermediary detected = never above 80
+IMPORTANT: Score and savings are INDEPENDENT. Do not limit savings to match the score. A deal can score 65 and still have 15% savings potential. The score reflects the current state. The savings reflect what the buyer can improve through negotiation.
 
-score_rationale must be specific to THIS deal.
+score_rationale must be specific to THIS deal, referencing the actual issues found.
 
 ==================================================
 WRITING STYLE
