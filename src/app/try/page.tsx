@@ -273,7 +273,7 @@ This quote expires in 14 days.`
       <main className="max-w-3xl mx-auto px-4 sm:px-5 md:px-8 py-8 sm:py-12">
         {/* Headline */}
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 mb-2 leading-snug">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-2 leading-snug">
             {t('try.headline')}
           </h1>
           <p className="text-sm text-slate-500">

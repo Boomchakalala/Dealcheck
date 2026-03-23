@@ -122,14 +122,14 @@ export default function ExamplePage() {
               <button
                 key={type.id}
                 onClick={() => setSelectedExample(type.id)}
-                className={`p-4 rounded-xl border-2 text-left transition-all relative ${
+                className={`p-3 sm:p-4 rounded-xl border-2 text-left transition-all relative ${
                   selectedExample === type.id
                     ? 'border-emerald-500 bg-emerald-50 shadow-md'
                     : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
                 }`}
               >
                 <div className="flex items-start justify-between mb-1.5">
-                  <h4 className="text-sm font-bold text-slate-900">{type.label}</h4>
+                  <h4 className="text-xs sm:text-sm font-bold text-slate-900">{type.label}</h4>
                   <div className="flex-shrink-0 ml-2">
                     <ScoreCircle
                       score={exScore}

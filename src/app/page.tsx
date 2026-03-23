@@ -52,11 +52,11 @@ export default function LandingPage() {
                 <span className="text-xs font-semibold text-emerald-700">{t('hero.badge')}</span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-4 sm:mb-6 leading-[1.15]">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-4 sm:mb-6 leading-[1.15]">
                 {t('hero.title1')}<br className="hidden sm:block" />
                 <span className="text-emerald-600">{t('hero.title2')}</span>
               </h1>
-              <p className="text-sm sm:text-base md:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-lg">
+              <p className="text-base sm:text-lg md:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-lg">
                 {t('hero.subtitle')}
               </p>
 
