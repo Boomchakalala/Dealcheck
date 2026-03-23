@@ -52,7 +52,7 @@ export default function LandingPage() {
                 <span className="text-xs font-semibold text-emerald-700">{t('hero.badge')}</span>
               </div>
 
-              <h1 className="text-[2rem] sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-5 sm:mb-6 leading-[1.2] sm:leading-[1.15]">
+              <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-5 sm:mb-6 leading-[1.15]">
                 {t('hero.title1')}<br />
                 <span className="text-emerald-600">{t('hero.title2')}</span>
               </h1>
@@ -249,7 +249,7 @@ export default function LandingPage() {
               {t('builtFor.title')}
             </h2>
             <p className="text-base sm:text-lg text-slate-500 max-w-2xl mx-auto">
-              Just drop in your quote and let TermLift do the heavy lifting.
+              8 years of procurement expertise, built into every analysis. Drop in your quote and let TermLift do the heavy lifting.
             </p>
           </div>
 
