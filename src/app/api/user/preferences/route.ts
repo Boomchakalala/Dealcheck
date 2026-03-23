@@ -29,6 +29,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Check plan — preferences require Essentials+
+    const { data: profile } = await supabase.from('profiles').select('plan, is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin && (!profile?.plan || profile.plan === 'free')) {
+      return NextResponse.json({ error: 'Negotiation preferences require Essentials or Pro plan.' }, { status: 403 })
+    }
+
     const preferences = await request.json()
 
     const { error } = await supabase

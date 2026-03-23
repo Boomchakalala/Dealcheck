@@ -18,6 +18,12 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Check plan — PDF export requires Essentials+
+    const { data: profile } = await supabase.from('profiles').select('plan, is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin && (!profile?.plan || profile.plan === 'free')) {
+      return NextResponse.json({ error: 'PDF export requires Essentials or Pro plan.' }, { status: 403 })
+    }
+
     // Get the deal and latest round
     const { data: deal } = await supabase
       .from('deals')

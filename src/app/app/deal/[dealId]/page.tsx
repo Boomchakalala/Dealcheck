@@ -182,6 +182,8 @@ export default async function DealPage({
               currentTotal={totalCommitment}
               roundCount={sortedRounds.length}
               whatChanged={deal.what_changed}
+              userPlan={userPlan}
+              isAdmin={isAdmin}
             />
           </div>
         </div>

@@ -22,6 +22,8 @@ interface DealHeaderClientProps {
   currentTotal?: string
   roundCount?: number
   whatChanged?: string[] | null
+  userPlan?: string
+  isAdmin?: boolean
 }
 
 // Format savings with proper currency detection
@@ -40,6 +42,8 @@ export function DealHeaderClient({
   currentTotal,
   roundCount,
   whatChanged,
+  userPlan = 'free',
+  isAdmin = false,
 }: DealHeaderClientProps) {
   const router = useRouter()
   const t = useT()
@@ -112,14 +116,16 @@ export function DealHeaderClient({
     <>
       {/* Close Deal Button / Status - stays in header */}
       <div className="flex items-center gap-2 sm:gap-3 flex-wrap flex-shrink-0">
-        <button
-          onClick={handleExport}
-          disabled={exporting}
-          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors disabled:opacity-50 rounded-lg hover:bg-slate-100 border border-slate-200"
-        >
-          {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-          PDF
-        </button>
+        {(isAdmin || userPlan !== 'free') && (
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors disabled:opacity-50 rounded-lg hover:bg-slate-100 border border-slate-200"
+          >
+            {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            PDF
+          </button>
+        )}
         {isClosed ? (
           <>
             <span className={`text-xs font-semibold px-3 py-1.5 rounded-md border ${getOutcomeBadge().color}`}>

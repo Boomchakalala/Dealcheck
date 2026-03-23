@@ -237,21 +237,20 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Upgrade banner for Starter/Essentials */}
+      {/* Upgrade banner for Starter */}
       {!isPro && !isEssentials && !isAdmin && (
-        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl px-5 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Lock className="w-4 h-4 text-emerald-600" />
-            <p className="text-sm text-slate-700"><span className="font-semibold">{t('dashboard.unlockDashboard')}</span> — {t('dashboard.unlockDesc')}</p>
-          </div>
-          <Link href="/pricing" className="flex-shrink-0 px-4 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all">
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl px-5 py-4 text-center">
+          <Lock className="w-5 h-5 text-emerald-600 mx-auto mb-2" />
+          <p className="text-sm font-semibold text-slate-900 mb-1">{t('dashboard.unlockDashboard')}</p>
+          <p className="text-xs text-slate-500 mb-3">{locale === 'fr' ? 'Passez \u00e0 Essentials pour voir vos KPIs, ou \u00e0 Pro pour le tableau de bord complet.' : 'Upgrade to Essentials for your KPIs, or Pro for the full dashboard.'}</p>
+          <Link href="/pricing" className="inline-flex px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all">
             {t('dashboard.upgrade')}
           </Link>
         </div>
       )}
 
-      {/* Savings Hero + KPI Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Savings Hero + KPI Cards — Essentials+ only */}
+      {(isPro || isEssentials || isAdmin) && (<><div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Savings Hero — takes 1 col, stronger visual weight */}
         <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl p-5 text-white shadow-sm">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-200 mb-3">
@@ -350,9 +349,21 @@ export default async function DashboardPage() {
       {/* Currency note */}
       <p className="text-[10px] text-slate-400 text-right -mt-3">
         {locale === 'fr' ? `Converti en ${baseCurrency} aux taux du jour` : `Converted to ${baseCurrency} at today's rates`}
-      </p>
+      </p></>)}
 
-      {/* Charts — Client Component */}
+      {/* Essentials upgrade to Pro for charts */}
+      {isEssentials && !isAdmin && (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-center">
+          <p className="text-sm font-semibold text-slate-900 mb-1">{locale === 'fr' ? 'Passez \u00e0 Pro pour le tableau de bord complet' : 'Upgrade to Pro for the full dashboard'}</p>
+          <p className="text-xs text-slate-500 mb-3">{locale === 'fr' ? 'Graphiques, tendances, cat\u00e9gories et suivi des \u00e9conomies.' : 'Charts, trends, category breakdown, and savings tracking.'}</p>
+          <Link href="/pricing" className="inline-flex px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all">
+            {locale === 'fr' ? 'Passer \u00e0 Pro' : 'Upgrade to Pro'}
+          </Link>
+        </div>
+      )}
+
+      {/* Charts — Pro+ only */}
+      {(isPro || isAdmin) &&
       <DashboardCharts
         categories={categories}
         topSuppliers={topSuppliers}
@@ -376,7 +387,7 @@ export default async function DashboardPage() {
         closedDealCount={closedDeals.length}
         wonDealCount={wonDeals.length}
         averageQuoteScore={averageQuoteScore}
-      />
+      />}
     </div>
   )
 }

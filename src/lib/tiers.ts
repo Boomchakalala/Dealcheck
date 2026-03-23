@@ -9,10 +9,9 @@ export type FeatureId =
   | 'multi_round'
   | 'multi_round_unlimited'
   | 'negotiation_preferences'
-  | 'deal_history_30d'
-  | 'deal_history_full'
-  | 'spend_dashboard'
-  | 'spend_dashboard_teaser'
+  | 'deal_history'
+  | 'spend_dashboard_kpi'
+  | 'spend_dashboard_full'
   | 'savings_tracking'
   | 'email_regen'
   | 'email_regen_unlimited'
@@ -40,53 +39,59 @@ export const TIERS: Record<Plan, TierConfig> = {
     label: 'Starter',
     price: 'Free',
     features: [],
+    // Free gets: 4 analyses, 3 email tones, basic analysis output
+    // Free does NOT get: save deals, multi-round, regen, PDF, preferences, dashboard
   },
   essentials: {
     plan: 'essentials',
     label: 'Essentials',
-    price: '€15/mo',
+    price: '\u20AC15/mo',
     features: [
       'save_deals',
+      'deal_history',
       'multi_round',
       'negotiation_preferences',
-      'deal_history_30d',
-      'spend_dashboard_teaser',
       'email_regen',
+      'export_pdf',
+      'spend_dashboard_kpi',
     ],
   },
   pro: {
     plan: 'pro',
     label: 'Pro',
-    price: '€39/mo',
+    price: '\u20AC39/mo',
     features: [
       'unlimited_analyses',
       'save_deals',
+      'deal_history',
       'multi_round',
       'multi_round_unlimited',
       'negotiation_preferences',
-      'deal_history_full',
-      'spend_dashboard',
-      'savings_tracking',
       'email_regen',
       'email_regen_unlimited',
+      'export_pdf',
+      'spend_dashboard_kpi',
+      'spend_dashboard_full',
+      'savings_tracking',
     ],
   },
   business: {
     plan: 'business',
     label: 'Business',
-    price: '€149/mo',
+    price: '\u20AC149/mo',
     features: [
       'unlimited_analyses',
       'save_deals',
+      'deal_history',
       'multi_round',
       'multi_round_unlimited',
       'negotiation_preferences',
-      'deal_history_full',
-      'spend_dashboard',
-      'savings_tracking',
       'email_regen',
       'email_regen_unlimited',
       'export_pdf',
+      'spend_dashboard_kpi',
+      'spend_dashboard_full',
+      'savings_tracking',
       'team_workspace',
       'priority_ai',
     ],
@@ -95,17 +100,16 @@ export const TIERS: Record<Plan, TierConfig> = {
 
 export const FEATURE_LABELS: Record<FeatureId, { name: string; description: string; requiredPlan: Plan }> = {
   save_deals: { name: 'Save deals', description: 'Save and revisit your deal analyses', requiredPlan: 'essentials' },
+  deal_history: { name: 'Deal history', description: 'Access your full deal history', requiredPlan: 'essentials' },
   multi_round: { name: 'Multi-round tracking', description: 'Track negotiations across counter-offers', requiredPlan: 'essentials' },
   multi_round_unlimited: { name: 'Unlimited rounds', description: 'No limit on negotiation rounds per deal', requiredPlan: 'pro' },
   negotiation_preferences: { name: 'Negotiation preferences', description: 'Tailor analyses to your payment terms and priorities', requiredPlan: 'essentials' },
-  deal_history_30d: { name: '30-day deal history', description: 'Access your deal history for the past 30 days', requiredPlan: 'essentials' },
-  deal_history_full: { name: 'Full deal history', description: 'Access your complete deal history', requiredPlan: 'pro' },
-  spend_dashboard_teaser: { name: 'Dashboard preview', description: 'See your totals with charts locked', requiredPlan: 'essentials' },
-  spend_dashboard: { name: 'Full spend dashboard', description: 'Track total spend, savings, and vendor analytics', requiredPlan: 'pro' },
+  spend_dashboard_kpi: { name: 'Dashboard KPIs', description: 'See your savings totals and deal count', requiredPlan: 'essentials' },
+  spend_dashboard_full: { name: 'Full spend dashboard', description: 'Charts, trends, category breakdown, and savings tracking', requiredPlan: 'pro' },
   savings_tracking: { name: 'Savings tracking', description: 'Track savings identified vs savings achieved', requiredPlan: 'pro' },
   email_regen: { name: 'Email regeneration', description: 'Regenerate email drafts with custom instructions', requiredPlan: 'essentials' },
   email_regen_unlimited: { name: 'Unlimited email regeneration', description: '3 regenerations per round', requiredPlan: 'pro' },
-  export_pdf: { name: 'Export to PDF', description: 'Export full analysis reports as PDF documents', requiredPlan: 'business' },
+  export_pdf: { name: 'Export to PDF', description: 'Export full analysis reports as PDF documents', requiredPlan: 'essentials' },
   team_workspace: { name: 'Team workspace', description: 'Shared workspace with up to 3 team members', requiredPlan: 'business' },
   priority_ai: { name: 'Priority AI processing', description: 'Faster analysis with priority queue', requiredPlan: 'business' },
   unlimited_analyses: { name: 'Unlimited analyses', description: 'Analyze as many vendor quotes as you need', requiredPlan: 'pro' },
@@ -124,6 +128,11 @@ export function isPaidPlan(plan: Plan): boolean {
 /** Check if a plan has unlimited analyses */
 export function hasUnlimitedAnalyses(plan: Plan): boolean {
   return plan === 'pro' || plan === 'business'
+}
+
+/** Check if user can save deals */
+export function canSaveDeals(plan: Plan): boolean {
+  return plan !== 'free'
 }
 
 /** Check if user is at analysis limit */
@@ -150,9 +159,9 @@ export function getMaxEmailRegens(plan: Plan): number {
 
 /** Get max rounds per deal */
 export function getMaxRoundsPerDeal(plan: Plan): number | null {
-  if (plan === 'pro' || plan === 'business') return null // unlimited
+  if (plan === 'pro' || plan === 'business') return null
   if (plan === 'essentials') return ESSENTIALS_MAX_ROUNDS
-  return 1 // free = single analysis only
+  return 1
 }
 
 /** Get the required plan label for a feature */
