@@ -111,6 +111,19 @@ export async function analyzeDeal(
         final_push: { subject: `${rawFacts.vendor} — Final Decision`, body: 'Email generation failed. Please use the "Regenerate" button to try again.' },
       }
     }
+    // Ensure all emails have sign-off
+    const ensureSignOff = (body: string): string => {
+      const signOff = userLocale === 'fr' ? '\n\nCordialement,\n[Votre nom]' : '\n\nBest regards,\n[Your Name]'
+      if (!body.includes('[Your Name]') && !body.includes('[Votre nom]')) {
+        return body.trimEnd() + signOff
+      }
+      return body
+    }
+    if (emails) {
+      for (const key of ['neutral', 'firm', 'final_push'] as const) {
+        if (emails[key]?.body) emails[key].body = ensureSignOff(emails[key].body)
+      }
+    }
     console.log('[TermLift] Step 3 done')
 
     // ─── Step 4: Assemble the full DealOutput ───

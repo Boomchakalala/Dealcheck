@@ -636,8 +636,11 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                 const activeTab = selectedFlagTab[idx] || 'ask'
                 const isAddressed = addressedFlags.includes(idx)
 
-                const impactMatch = flag.why_it_matters?.match(/[\$€£][\d,]+(?:\.\d+)?(?:\/(?:year|yr|month|mo))?(?:\s*(?:per|a)\s*year)?/i)
-                const financialImpact = impactMatch ? impactMatch[0] : null
+                const impactMatch = flag.why_it_matters?.match(/[\$€£][\d,]+(?:\.\d+)?[KkMm]?(?:\+)?(?:\s*(?:\/|per\s*|a\s*)(?:year|yr|month|mo|an))?/i)
+                const rawImpact = impactMatch ? impactMatch[0] : null
+                // Filter out tiny amounts that are likely parsing fragments (e.g., "$16" from "$16K+")
+                const impactNum = rawImpact ? parseFloat(rawImpact.replace(/[^\d.]/g, '')) : 0
+                const financialImpact = rawImpact && impactNum >= 100 ? rawImpact : null
 
                 const isSourceInsight = flag.type?.toLowerCase() === 'source insight'
                 const severityColor = isSourceInsight
