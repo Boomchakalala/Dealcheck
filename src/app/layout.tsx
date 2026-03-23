@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "TermLift — Better Vendor Terms in 60 Seconds",
+    default: "TermLift — Turn Vendor Quotes Into Better Deals in 60s",
     template: "%s | TermLift",
   },
   description: "Paste a vendor quote, get back red flags, savings, and a negotiation email in 60 seconds. TermLift is the procurement expert your team never had. Free to try.",
@@ -32,14 +32,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "TermLift",
-    title: "TermLift — Better Vendor Terms in 60 Seconds",
+    title: "TermLift — Turn Vendor Quotes Into Better Deals in 60s",
     description: "Paste a vendor quote, get back red flags, savings, and a negotiation email in 60 seconds. Free to try.",
     url: "https://www.termlift.com",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TermLift — Better Vendor Terms in 60 Seconds",
+    title: "TermLift — Turn Vendor Quotes Into Better Deals in 60s",
     description: "Better vendor terms in 60 seconds. Paste a quote, get red flags, savings, and a ready-to-send email. Free to try.",
   },
   alternates: {
