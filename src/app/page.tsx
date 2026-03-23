@@ -38,36 +38,36 @@ export default function LandingPage() {
       <UnifiedHeader variant="landing" />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-16 md:pt-32 md:pb-24">
+      <section className="relative overflow-hidden pt-24 pb-12 sm:pt-28 sm:pb-16 md:pt-36 md:pb-24">
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/40 via-white to-white pointer-events-none" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.08)_0%,transparent_70%)] pointer-events-none" />
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-5 md:px-8 relative">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
+        <div className="max-w-6xl mx-auto px-5 sm:px-5 md:px-8 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-center">
             {/* Left: Content */}
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 mb-5 sm:mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 mb-6 sm:mb-7">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-xs font-semibold text-emerald-700">{t('hero.badge')}</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-4 sm:mb-6 leading-[1.15]">
-                {t('hero.title1')}<br className="hidden sm:block" />
+              <h1 className="text-[2rem] sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-5 sm:mb-6 leading-[1.2] sm:leading-[1.15]">
+                {t('hero.title1')}<br />
                 <span className="text-emerald-600">{t('hero.title2')}</span>
               </h1>
-              <p className="text-base sm:text-lg md:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-lg">
+              <p className="text-base sm:text-lg text-slate-500 mb-7 sm:mb-8 leading-relaxed max-w-lg">
                 {t('hero.subtitle')}
               </p>
 
               {/* Benefits */}
-              <div className="space-y-2.5 sm:space-y-3 mb-8 sm:mb-10">
+              <div className="space-y-3 mb-8 sm:mb-10">
                 {[
                   t('hero.check1'),
                   t('hero.check2'),
                   t('hero.check3'),
                 ].map((text) => (
-                  <div key={text} className="flex items-start gap-2.5 sm:gap-3">
+                  <div key={text} className="flex items-start gap-3">
                     <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Check className="w-3 h-3 text-emerald-600" strokeWidth={3} />
                     </div>
@@ -80,20 +80,20 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Link
                   href="/try"
-                  className="group inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                  className="group inline-flex items-center justify-center w-full sm:w-auto px-7 sm:px-8 py-4 text-base font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.97]"
                 >
                   {t('hero.cta')}
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/example"
-                  className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium rounded-xl text-slate-500 hover:text-emerald-600 transition-all"
+                  className="inline-flex items-center justify-center w-full sm:w-auto px-7 sm:px-8 py-3.5 text-sm sm:text-base font-medium rounded-xl border border-slate-200 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-all"
                 >
                   {t('hero.ctaSecondary')}
                 </Link>
               </div>
 
-              <p className="text-xs text-slate-500 mt-3 sm:mt-4">{t('hero.noSignup')}</p>
+              <p className="text-xs text-slate-400 mt-4 sm:mt-5 text-center sm:text-left">{t('hero.noSignup')}</p>
             </div>
 
             {/* Right: Product Preview — compact mini-preview */}
