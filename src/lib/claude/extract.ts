@@ -16,10 +16,12 @@ EXTRACT THESE FIELDS:
 7. contact_name: The name of the sales rep, account manager, or person who sent/signed the quote. Look for: signatures, "Prepared by", "Your contact", "Account Manager", "Sales Rep", email sign-offs, or any person's name associated with the vendor. Extract FIRST NAME ONLY (e.g., "Sarah" not "Sarah Johnson"). If no person name found, omit this field.
 
    CRITICAL RULES FOR total_commitment:
-   - SEARCH for a stated total FIRST: "Net Amount Due", "Total", "Grand Total", "Total Contract Value", "Annual Total"
-   - If you find a stated total → USE IT AS-IS. DONE. Do NOT multiply by anything.
-   - VERIFY: If line items show "Total Amount" per line, and a "Net Amount Due" sums them → that IS the full contract value
-   - ONLY multiply by term if amounts are explicitly labeled "/month" or "per month" AND no total exists
+   - SEARCH for a stated total FIRST: "Net Amount Due", "Total", "Grand Total", "Total Contract Value", "Annual Total", "Montant Total", "Total HT", "Total TTC"
+   - If you find a stated total, USE IT AS-IS. Do NOT multiply by anything.
+   - If NO single total exists but there are multiple line items, SUM ALL LINE ITEMS to calculate the total. Include all fees, extras, and add-ons in the sum.
+   - If amounts are hourly rates with quantities (e.g., 8 hours x 150/hr), calculate: rate x quantity for each line, then sum all lines.
+   - ONLY multiply by term if amounts are explicitly labeled "/month" or "per month" AND no total exists.
+   - SANITY CHECK: The total should make sense relative to the line items. If line items add up to thousands but your total is under 100, you have made an error. Recalculate.
    - Output ONLY a clean currency amount: "$16,328" or "€40,000". No formulas, no notes.
 
 7. billing_payment: How they pay (e.g., "Monthly", "Annual upfront", "Quarterly")

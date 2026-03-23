@@ -24,6 +24,7 @@ import { generateEmailDrafts } from './emails'
 import { calculateQuoteScore } from './score'
 import { validateTotalCommitment } from './validate-total'
 import { DealOutputSchema, type DealOutputType } from '../schemas'
+import { parseMoney } from '../currency'
 import type { DealOutput } from '@/types'
 
 /**
@@ -74,6 +75,16 @@ export async function analyzeDeal(
       userPreferences,
     })
     console.log('[TermLift] Step 2 done:', analysis.verdict_type, analysis.red_flags?.length, 'flags')
+
+    // ─── Step 2b: Sanity check — savings vs total commitment ───
+    const ps = analysis.potential_savings as any
+    if (ps?.must_have && rawFacts.total_commitment) {
+      const commitAmount = parseMoney(rawFacts.total_commitment).amount
+      const savingsFromItems = (ps.must_have as any[]).reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : 0), 0)
+      if (commitAmount > 0 && savingsFromItems > commitAmount) {
+        console.warn(`[TermLift] SANITY CHECK FAILED: savings (${savingsFromItems}) > total_commitment (${commitAmount}). Extraction likely misread the total.`)
+      }
+    }
 
     // ─── Step 3: Generate emails (~10s) ───
     console.log('[TermLift] Step 3: Generating emails...')
