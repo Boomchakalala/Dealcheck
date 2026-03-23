@@ -249,7 +249,7 @@ export default function LandingPage() {
               {t('builtFor.title')}
             </h2>
             <p className="text-base sm:text-lg text-slate-500 max-w-2xl mx-auto">
-              8 years of procurement expertise, built into every analysis. Drop in your quote and let TermLift do the heavy lifting.
+              8 years of procurement expertise, distilled into every analysis. Drop in your quote. Get instant negotiation leverage.
             </p>
           </div>
 
