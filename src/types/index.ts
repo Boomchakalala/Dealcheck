@@ -155,6 +155,15 @@ export type EmailDraft = {
 }
 
 export type DealOutput = {
+  leverage_assessment?: {
+    price_leverage: 'low' | 'moderate' | 'high'
+    terms_leverage: 'low' | 'moderate' | 'high'
+    structural_leverage: 'low' | 'moderate' | 'high'
+    risk_leverage: 'low' | 'moderate' | 'high'
+    ambiguity_leverage: 'low' | 'moderate' | 'high'
+    savings_confidence: 'low' | 'medium' | 'high'
+    best_negotiation_angle: string[]
+  }
   title: string
   vendor: string
   category?: string

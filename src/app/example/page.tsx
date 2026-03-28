@@ -19,20 +19,20 @@ export default function ExamplePage() {
 
   const closedDeals: Record<ExampleType, { original: string; final: string; savings: string; savingsPct: string; date: string; tags: string[]; wins: { type: string; label: string; amount?: string }[] }> = {
     docusign: {
-      original: '€24,000', final: '€16,200', savings: '€7,800', savingsPct: '32.5%', date: 'Apr 5, 2026',
+      original: '€24,000', final: '€17,100', savings: '€6,900', savingsPct: '29%', date: 'Apr 5, 2026',
       tags: ['Seats right-sized', 'Loyalty discount', 'Notice extended'],
       wins: [
         { type: 'Price', label: 'Right-sized from 40 to 30 seats', amount: '€6,000/yr' },
-        { type: 'Price', label: '10% loyalty discount on adjusted contract', amount: '€1,800/yr' },
+        { type: 'Price', label: '5% loyalty discount on adjusted contract', amount: '€900/yr' },
         { type: 'Terms', label: 'Auto-renew notice extended from 30 to 60 days' },
       ],
     },
     salesforce: {
-      original: '€36,000', final: '€26,496', savings: '€9,504', savingsPct: '26%', date: 'May 15, 2026',
+      original: '€36,000', final: '€27,360', savings: '€8,640', savingsPct: '24%', date: 'May 15, 2026',
       tags: ['Seats right-sized', 'Multi-year discount', 'Price locked'],
       wins: [
         { type: 'Price', label: 'Right-sized from 40 to 32 seats', amount: '€7,200/yr' },
-        { type: 'Price', label: '2-year commitment at 8% discount', amount: '€2,304/yr' },
+        { type: 'Price', label: '2-year commitment at 5% discount', amount: '€1,440/yr' },
         { type: 'Terms', label: 'Price locked for 2-year term' },
       ],
     },
@@ -46,41 +46,41 @@ export default function ExamplePage() {
       ],
     },
     fedex: {
-      original: '$51,960', final: '$39,408', savings: '$12,552', savingsPct: '24%', date: 'Mar 25, 2026',
+      original: '$51,960', final: '$41,160', savings: '$10,800', savingsPct: '21%', date: 'Mar 25, 2026',
       tags: ['Base rate reduced', 'Fuel capped', 'GRI capped'],
       wins: [
-        { type: 'Price', label: 'Base rate reduced from $4.20 to $3.50/parcel', amount: '$8,400/yr' },
-        { type: 'Price', label: 'Fuel surcharge capped at 12%', amount: '$4,152/yr' },
-        { type: 'Terms', label: 'GRI capped at 3.5% annually' },
+        { type: 'Price', label: 'Base rate reduced from $4.20 to $3.60/parcel', amount: '$7,200/yr' },
+        { type: 'Price', label: 'Fuel surcharge capped at 14%', amount: '$3,600/yr' },
+        { type: 'Terms', label: 'GRI capped at 4% annually' },
       ],
     },
     konica: {
-      original: '€35,370', final: '€28,170', savings: '€7,200', savingsPct: '20%', date: 'Apr 12, 2026',
+      original: '€35,370', final: '€29,610', savings: '€5,760', savingsPct: '16%', date: 'Apr 12, 2026',
       tags: ['Lease reduced', 'Toner clause removed', 'Exit clause added'],
       wins: [
-        { type: 'Price', label: 'Lease reduced from €870 to €700/month', amount: '€6,120/3yr' },
-        { type: 'Terms', label: 'Exclusive toner clause removed' },
-        { type: 'Terms', label: '18-month exit clause with 3-month buyout added' },
+        { type: 'Price', label: 'Lease reduced from €870 to €750/month', amount: '€4,320/3yr' },
+        { type: 'Terms', label: 'Exclusive toner clause removed — open sourcing allowed' },
+        { type: 'Terms', label: '24-month exit clause with 3-month buyout added' },
       ],
     },
     bdo: {
-      original: '€24,150', final: '€19,038', savings: '€5,112', savingsPct: '21%', date: 'Mar 30, 2026',
+      original: '€24,150', final: '€20,650', savings: '€3,500', savingsPct: '14.5%', date: 'Mar 30, 2026',
       tags: ['Hourly rate reduced', 'Hours capped', 'Increase capped'],
       wins: [
-        { type: 'Price', label: 'Hourly rate reduced from €210 to €150', amount: '€2,100/yr' },
-        { type: 'Price', label: 'Annual increase capped at 3%', amount: '€1,512/yr' },
-        { type: 'Terms', label: 'Hard annual cap of 35 hours with pre-approval' },
+        { type: 'Price', label: 'Hourly rate reduced from €210 to €170', amount: '€1,400/yr' },
+        { type: 'Price', label: 'Annual increase capped at 4%', amount: '€1,344/yr' },
+        { type: 'Terms', label: 'Hard annual cap of 40 hours with pre-approval' },
       ],
     },
   }
 
   const exampleTypes = [
-    { id: 'docusign' as ExampleType, label: 'DocuSign', description: locale === 'fr' ? '24K € — économies 7,8K €/an' : '€24K renewal — saves €7.8K/yr' },
-    { id: 'salesforce' as ExampleType, label: 'Salesforce', description: locale === 'fr' ? '36K € — économies 9,5K €/an' : '€36K renewal — saves €9.5K/yr' },
+    { id: 'docusign' as ExampleType, label: 'DocuSign', description: locale === 'fr' ? '24K € — économies ~6-8K €/an' : '€24K renewal — saved €6.9K/yr' },
+    { id: 'salesforce' as ExampleType, label: 'Salesforce', description: locale === 'fr' ? '36K € — économies ~7-9K €/an' : '€36K renewal — saved €8.6K/yr' },
     { id: 'microsoft365' as ExampleType, label: 'Microsoft 365', description: locale === 'fr' ? '23K € — contrat propre' : '€23K renewal — clean deal' },
-    { id: 'fedex' as ExampleType, label: 'FedEx', description: locale === 'fr' ? '52K $ — économies 12,5K $/an' : '$52K contract — saves $12.5K/yr' },
-    { id: 'konica' as ExampleType, label: 'Konica Minolta', description: locale === 'fr' ? '35K € — économies 7,2K €/3 ans' : '€35K lease — saves €7.2K/3yr' },
-    { id: 'bdo' as ExampleType, label: 'BDO', description: locale === 'fr' ? '24K € — économies 5,1K €/an' : '€24K retainer — saves €5.1K/yr' },
+    { id: 'fedex' as ExampleType, label: 'FedEx', description: locale === 'fr' ? '52K $ — économies ~10-12K $/an' : '$52K contract — saved $10.8K/yr' },
+    { id: 'konica' as ExampleType, label: 'Konica Minolta', description: locale === 'fr' ? '35K € — économies ~5-7K €/3 ans' : '€35K lease — saved €5.8K/3yr' },
+    { id: 'bdo' as ExampleType, label: 'BDO', description: locale === 'fr' ? '24K € — économies ~3-5K €/an' : '€24K retainer — saved €3.5K/yr' },
   ]
 
   return (
@@ -91,23 +91,23 @@ export default function ExamplePage() {
         {/* Hero headline */}
         <div className="text-center mb-10 sm:mb-12">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-3">
-            See what TermLift finds in a real vendor quote.
+            {t('examplePage.heroTitle')}
           </h1>
           <p className="text-sm sm:text-base text-slate-500 max-w-2xl mx-auto mb-6">
-            Pick a quote type below. Every analysis is based on realistic vendor scenarios.
+            {t('examplePage.heroSubtitle')}
           </p>
           <div className="flex items-center justify-center gap-3">
             <Link
               href="/try"
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 transition-colors shadow-sm"
             >
-              Analyze your own quote
+              {t('examplePage.analyzeOwn')}
             </Link>
             <Link
               href="/login"
               className="inline-flex items-center justify-center px-5 py-2.5 border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors"
             >
-              Create account
+              {t('examplePage.createAccount')}
             </Link>
           </div>
         </div>
@@ -157,14 +157,14 @@ export default function ExamplePage() {
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-5 h-5 text-white" />
             <span className="text-sm sm:text-base font-bold text-white">
-              {locale === 'fr' ? 'Contrat gagné' : 'Deal Won'} — {closedDeals[selectedExample].savings} {locale === 'fr' ? 'économisés' : 'saved'}
+              {t('examplePage.dealWon')} — {closedDeals[selectedExample].savings} {t('examplePage.saved')}
             </span>
           </div>
           <button
             onClick={() => document.getElementById('negotiation-outcome')?.scrollIntoView({ behavior: 'smooth' })}
             className="px-4 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap"
           >
-            {locale === 'fr' ? 'Voir le résultat →' : 'See outcome →'}
+            {t('examplePage.seeOutcome')} →
           </button>
         </div>
 
@@ -180,7 +180,7 @@ export default function ExamplePage() {
                   <Check className="w-4 h-4 text-white" strokeWidth={3} />
                 </div>
                 <h2 className="text-base font-bold text-slate-900 uppercase tracking-wide">
-                  {locale === 'fr' ? 'Résultat de la négociation' : 'Negotiation outcome'}
+                  {t('examplePage.negotiationOutcome')}
                 </h2>
               </div>
 
@@ -191,7 +191,7 @@ export default function ExamplePage() {
                     <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
                       <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
                     </div>
-                    <span className="text-base font-bold text-white">{locale === 'fr' ? 'Contrat clôturé' : 'Deal closed'}</span>
+                    <span className="text-base font-bold text-white">{t('examplePage.dealClosed')}</span>
                   </div>
                   <span className="text-xs text-white/70 font-medium">{deal.date}</span>
                 </div>
@@ -200,15 +200,15 @@ export default function ExamplePage() {
                   {/* Stats: Original → Final → Savings */}
                   <div className="grid grid-cols-3 gap-3">
                     <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 text-center">
-                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Devis initial' : 'Original quote'}</p>
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">{t('examplePage.originalQuote')}</p>
                       <p className="text-lg font-bold text-slate-900">{deal.original}</p>
                     </div>
                     <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 text-center">
-                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Montant final' : 'Final agreed'}</p>
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">{t('examplePage.finalAgreed')}</p>
                       <p className="text-lg font-bold text-slate-900">{deal.final}</p>
                     </div>
                     <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-4 text-center">
-                      <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wide mb-1">{locale === 'fr' ? 'Économies' : 'Savings captured'}</p>
+                      <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wide mb-1">{t('examplePage.savingsCapture')}</p>
                       <p className="text-lg font-bold text-emerald-800">{deal.savings}</p>
                       <p className="text-xs font-semibold text-emerald-600">{deal.savingsPct}</p>
                     </div>
@@ -223,7 +223,7 @@ export default function ExamplePage() {
 
                   {/* Wins secured */}
                   <div>
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-3">{locale === 'fr' ? 'Gains obtenus' : 'Wins secured'}</p>
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-3">{t('examplePage.winsSecured')}</p>
                     <div className="space-y-2.5">
                       {deal.wins.map((win, idx) => (
                         <div key={idx} className={`flex items-start gap-3 pb-2.5 ${idx < deal.wins.length - 1 ? 'border-b border-slate-100' : ''}`}>
@@ -247,20 +247,20 @@ export default function ExamplePage() {
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
           <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-8">
-            <h3 className="text-xl font-bold text-slate-900 mb-2">Ready to analyze your own quote?</h3>
-            <p className="text-sm text-slate-600 mb-5">Upload a PDF, image, or paste text. Get your analysis in under a minute.</p>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">{t('examplePage.readyToAnalyze')}</h3>
+            <p className="text-sm text-slate-600 mb-5">{t('examplePage.readySubtitle')}</p>
             <div className="flex items-center justify-center gap-4">
               <Link
                 href="/try"
                 className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
               >
-                Try with your own quote
+                {t('examplePage.tryOwn')}
               </Link>
               <Link
                 href="/login"
                 className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-all"
               >
-                Create account
+                {t('examplePage.createAccount')}
               </Link>
             </div>
           </div>

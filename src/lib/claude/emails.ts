@@ -51,6 +51,8 @@ export async function generateEmailDrafts(
     what_to_ask_for: { must_have: string[]; nice_to_have: string[] }
     negotiation_plan?: { leverage_you_have: string[] }
     quick_read?: { conclusion: string }
+    assertiveness_band?: 1 | 2 | 3 | 4
+    best_negotiation_angle?: string[]
   },
   userLocale?: string,
 ): Promise<{
@@ -87,7 +89,11 @@ Leverage:
 ${analysisOutput.negotiation_plan?.leverage_you_have?.join('\n') || 'None'}
 
 Conclusion: ${analysisOutput.quick_read?.conclusion || 'N/A'}
-
+${analysisOutput.assertiveness_band ? `
+ASSERTIVENESS CALIBRATION:
+Assertiveness Band: ${analysisOutput.assertiveness_band} (1 = strong push, 2 = moderate push, 3 = light push, 4 = cleanup asks only)
+${analysisOutput.assertiveness_band === 1 ? 'Push hard on the main leverage points. The data supports strong asks.' : ''}${analysisOutput.assertiveness_band === 2 ? 'Be direct and clear about asks, but keep the tone professional.' : ''}${analysisOutput.assertiveness_band === 3 ? 'Keep it light and collaborative. The main value is in tightening, not demanding.' : ''}${analysisOutput.assertiveness_band === 4 ? 'This is mostly a solid deal. Focus on 1-2 minor improvements, not a full negotiation.' : ''}
+${analysisOutput.best_negotiation_angle?.length ? `Primary negotiation angle: ${analysisOutput.best_negotiation_angle.join(', ')}. Focus the email on this lever rather than generic pushback.` : ''}` : ''}
 Return ONLY JSON with this structure:
 {
   "email_drafts": {

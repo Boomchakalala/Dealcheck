@@ -8,13 +8,22 @@ import { type DealOutput } from '@/types'
 //   Total savings: €6,000 + €1,800 = €7,800/year (32.5%)
 //   After negotiation: €24,000 - €7,800 = €16,200
 export const docusignExample: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'high',
+    terms_leverage: 'moderate',
+    structural_leverage: 'high',
+    risk_leverage: 'low',
+    ambiguity_leverage: 'low',
+    savings_confidence: 'high',
+    best_negotiation_angle: ['structure', 'price'],
+  },
   title: "DocuSign · Business Pro · Annual Renewal",
   vendor: "DocuSign",
   category: "SaaS - E-Signature",
   description: "E-signature platform — unlimited envelopes, advanced workflows, SSO & API access",
-  verdict: "Paying for 15 unused seats with no loyalty discount after 2 years as a customer.",
+  verdict: "You're paying for 15 unused seats. The main lever here is structural: right-size the seat count, then push for a loyalty discount.",
   verdict_type: "negotiate",
-  price_insight: "At €50/user/month for 40 seats, you're spending €2,000/month. Only 25 are active — 15 seats sit empty. Right-sizing and asking for a loyalty discount saves €7,800/year.",
+  price_insight: "At €50/user/month for 40 seats, you're spending €2,000/month. Only 25 are active — 15 seats sit empty. Right-sizing alone saves €6,000/year, and a loyalty ask could bring total savings to €6,000-8,000.",
   snapshot: {
     vendor_product: "DocuSign / Business Pro",
     term: "12 months",
@@ -36,7 +45,7 @@ export const docusignExample: DealOutput = {
       "Auto-renewal with only 30-day notice window",
       "Up to 8% annual price increase with no cap",
     ],
-    conclusion: "Good product, over-licensed. Cut to 30 seats, get a loyalty discount, and save €7,800/year.",
+    conclusion: "Good product, over-licensed. The real opportunity is structural: cut to 30 seats and push for a loyalty discount.",
   },
   red_flags: [
     {
@@ -83,16 +92,16 @@ export const docusignExample: DealOutput = {
     currency: "EUR",
     must_have: [
       {
-        ask: "Right-size 40 to 30 seats",
+        ask: "Right-size from 40 to 30 seats",
         amount: 6000,
-        rationale: "15 seats are unused — cutting waste requires no concession",
+        rationale: "15 seats are unused — cutting waste is the strongest lever here",
       },
     ],
     nice_to_have: [
       {
-        ask: "10% loyalty discount on adjusted contract",
-        amount: 1800,
-        rationale: "Standard renewal discount — DocuSign AMs have authority for 10-15%",
+        ask: "Loyalty discount on adjusted contract (5-10%)",
+        amount: 1350,
+        rationale: "DocuSign AMs have authority for 10-15% on renewals — expect 5-10% realistically",
       },
     ],
   },
@@ -176,13 +185,22 @@ Best regards,
 //   Total savings: €7,200 + €2,304 = €9,504/year (26%)
 //   After: €36,000 - €9,504 = €26,496
 export const salesforceExample: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'high',
+    terms_leverage: 'moderate',
+    structural_leverage: 'high',
+    risk_leverage: 'low',
+    ambiguity_leverage: 'low',
+    savings_confidence: 'high',
+    best_negotiation_angle: ['structure', 'price'],
+  },
   title: "Salesforce · Sales Cloud Professional · Annual Renewal",
   vendor: "Salesforce",
   category: "SaaS - CRM",
   description: "CRM platform — pipeline management, forecasting, and sales automation",
-  verdict: "Paying for 12 unused seats at full price with no multi-year discount on a renewal.",
+  verdict: "12 unused seats and no multi-year discount after 3 years. Main lever is structural: right-size, then negotiate commitment pricing.",
   verdict_type: "negotiate",
-  price_insight: "At €75/user/month for 40 seats, you're spending €3,000/month. With only 28 active users, 12 seats sit empty. Dropping to 32 and committing to 2 years gets you a meaningful discount.",
+  price_insight: "At €75/user/month for 40 seats, you're spending €3,000/month. Only 28 are active. Right-sizing to 32 saves €7,200/year — adding a multi-year discount could push total savings to €7,000-10,000.",
   snapshot: {
     vendor_product: "Salesforce / Sales Cloud Professional",
     term: "12 months",
@@ -204,7 +222,7 @@ export const salesforceExample: DealOutput = {
       "No multi-year discount despite being a customer for 3 years",
       "Auto-renewal locks you at the same seat count and price",
     ],
-    conclusion: "Right tool, too many seats. Cut from 40 to 32, commit to 2 years for a discount, and save €9,500/year.",
+    conclusion: "Right tool, too many seats. The main opportunity is structural: cut to 32 and negotiate a multi-year rate.",
   },
   red_flags: [
     {
@@ -251,16 +269,16 @@ export const salesforceExample: DealOutput = {
     currency: "EUR",
     must_have: [
       {
-        ask: "Right-size 40 to 32 seats",
+        ask: "Right-size from 40 to 32 seats",
         amount: 7200,
-        rationale: "12 seats are unused — cutting waste requires no concession",
+        rationale: "12 seats are unused — right-sizing is the strongest lever",
       },
     ],
     nice_to_have: [
       {
-        ask: "8% loyalty discount on adjusted contract",
-        amount: 2304,
-        rationale: "Standard multi-year discount — Salesforce AMs routinely offer 8-12%",
+        ask: "Multi-year discount on 2-year commitment (5-8%)",
+        amount: 1800,
+        rationale: "Salesforce AMs routinely offer 8-12% — expect 5-8% realistically",
       },
     ],
   },
@@ -345,11 +363,20 @@ Best regards,
 //   Minor optimization: extend auto-renew notice, lock pricing for 2 years
 //   Small savings: 3% loyalty ask = €684
 export const microsoft365Example: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'low',
+    terms_leverage: 'low',
+    structural_leverage: 'low',
+    risk_leverage: 'low',
+    ambiguity_leverage: 'low',
+    savings_confidence: 'low',
+    best_negotiation_angle: ['terms'],
+  },
   title: "Microsoft 365 · Business Premium · Annual Renewal",
   vendor: "Microsoft 365",
   category: "SaaS - Productivity",
   description: "Productivity suite — Office apps, Teams, Exchange, Intune, Defender",
-  verdict: "This deal is well-structured. Pricing is competitive, seat count matches usage, and terms are standard. Minor optimization only.",
+  verdict: "This deal is well-structured. Pricing is competitive, seat count matches usage. The only lever is terms: lock pricing for 2 years and extend the notice window.",
   verdict_type: "competitive",
   price_insight: "At €38/user/month on 50 seats with annual prepay, this is in line with standard M365 Business Premium pricing through resellers.",
   snapshot: {
@@ -492,11 +519,20 @@ Best regards,
 //   Total savings: $8,400 + $4,152 = $12,552/year (24%)
 //   After: ~$51,960 - $12,552 = ~$39,408
 export const fedexExample: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'high',
+    terms_leverage: 'high',
+    structural_leverage: 'moderate',
+    risk_leverage: 'moderate',
+    ambiguity_leverage: 'low',
+    savings_confidence: 'high',
+    best_negotiation_angle: ['price', 'terms'],
+  },
   title: "FedEx · Business Shipping Agreement · Annual Contract",
   vendor: "FedEx",
   category: "Logistics - Shipping",
   description: "Annual business shipping agreement — ground, express, and residential delivery",
-  verdict: "Uncapped fuel surcharge, above-market base rate, and GRI increase clause with no ceiling.",
+  verdict: "Three pricing issues: above-market base rate, uncapped fuel surcharge, and open GRI clause. All negotiable at your volume.",
   verdict_type: "overpay_risk",
   price_insight: "Base rate of $4.20/parcel is $0.60-1.00 above negotiated market for your volume. Combined with an uncapped 20% fuel surcharge, you're significantly overpaying.",
   snapshot: {
@@ -570,21 +606,27 @@ export const fedexExample: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 12552,
+    total: 12000,
     currency: "USD",
     must_have: [
       {
-        ask: "Base rate $4.20 to $3.50 (1,000 avg/mo)",
+        ask: "Base rate from $4.20 to $3.50 (1,000 avg parcels/mo)",
         amount: 8400,
-        rationale: "Negotiated market rate is $3.20-3.60 at this volume — well documented",
+        rationale: "Negotiated market rate is $3.20-3.60 at this volume",
       },
       {
-        ask: "Fuel surcharge 20% to 12%",
-        amount: 4152,
-        rationale: "Market surcharges run 10-14% — 20% is above market",
+        ask: "Fuel surcharge capped at 12% (down from 20%)",
+        amount: 3600,
+        rationale: "Market surcharges run 10-14% — 20% is well above standard",
       },
     ],
-    nice_to_have: [],
+    nice_to_have: [
+      {
+        ask: "GRI cap at 3.5% (saves in year 2+)",
+        amount: 1800,
+        rationale: "Prevents 7.9% compounding — significant over multi-year term",
+      },
+    ],
   },
   email_drafts: {
     neutral: {
@@ -670,11 +712,20 @@ Best regards,
 //   Total savings: €6,120 + €1,080 = €7,200 over 3 years (20%)
 //   After: €35,370 - €7,200 = €28,170
 export const konicaExample: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'high',
+    terms_leverage: 'high',
+    structural_leverage: 'moderate',
+    risk_leverage: 'high',
+    ambiguity_leverage: 'moderate',
+    savings_confidence: 'medium',
+    best_negotiation_angle: ['price', 'risk'],
+  },
   title: "Konica Minolta · Equipment Lease · 36-Month Contract",
   vendor: "Konica Minolta",
   category: "Equipment Lease - Office",
   description: "Multifunction printer lease — 2x bizhub C360i with service & consumables",
-  verdict: "Above-market lease rate, mandatory consumables lock-in, and zero exit flexibility over 3 years.",
+  verdict: "Above-market lease rate, mandatory consumables lock-in, and zero exit flexibility over 3 years. The main levers are price and risk.",
   verdict_type: "overpay_risk",
   price_insight: "€870/month for 2 A3/A4 colour MFPs is above comparable quotes from Ricoh, Canon, and Xerox (€620-720 range). Plus mandatory toner lock-in removes pricing leverage on consumables.",
   snapshot: {
@@ -748,20 +799,25 @@ export const konicaExample: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 2040,
+    total: 5500,
     currency: "EUR",
     must_have: [
       {
-        ask: "Lease rate €870 to €700/month",
-        amount: 2040,
-        rationale: "Ricoh, Canon, Xerox all quoting €620-720 for equivalent devices",
+        ask: "Reduce monthly lease from €870 to €700-750",
+        amount: 4320,
+        rationale: "Ricoh, Canon, Xerox quoting €620-720 for equivalent devices — expect €700-750 realistically",
+      },
+      {
+        ask: "Remove or cap toner exclusivity clause",
+        amount: 1080,
+        rationale: "Third-party toners run 25-35% cheaper — estimated saving over 3 years",
       },
     ],
     nice_to_have: [
       {
-        ask: "Toner open market saving (est.)",
-        amount: 360,
-        rationale: "Third-party toners run 25-35% cheaper — depends on clause removal",
+        ask: "Add 18-month exit clause with buyout",
+        amount: 0,
+        rationale: "Risk reduction, not a direct saving — but critical terms improvement",
       },
     ],
   },
@@ -851,11 +907,20 @@ Best regards,
 //   Hours cap risk mitigation: ~€1,500/year (estimated)
 //   Total savings: €2,100 + €1,512 + €1,500 = €5,112/year
 export const bdoExample: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'moderate',
+    terms_leverage: 'high',
+    structural_leverage: 'low',
+    risk_leverage: 'high',
+    ambiguity_leverage: 'moderate',
+    savings_confidence: 'medium',
+    best_negotiation_angle: ['price', 'risk'],
+  },
   title: "BDO · Annual Accountancy Services · Retainer",
   vendor: "BDO",
   category: "Professional Services - Accountancy",
   description: "SME accountancy & tax package — management accounts, VAT, payroll, tax returns",
-  verdict: "Above-market hourly rate, uncapped out-of-scope exposure, and aggressive 12% annual increase clause.",
+  verdict: "The retainer is fair but the out-of-scope terms are poorly controlled. Main levers: hourly rate, hours cap, and annual increase clause.",
   verdict_type: "negotiate",
   price_insight: "The retainer is fair but the €210/hour out-of-scope rate is well above market (€130-160 typical). Combined with no hours cap and a 12% increase clause, your cost exposure is poorly controlled.",
   snapshot: {
@@ -929,25 +994,25 @@ export const bdoExample: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 3612,
+    total: 3200,
     currency: "EUR",
     must_have: [
       {
-        ask: "Hourly rate €210 to €150 (35hrs/yr)",
-        amount: 2100,
-        rationale: "Market rate is €130-160/hour — €210 is well above standard",
+        ask: "Hourly rate from €210 to €150-175 (est. 35hrs/yr)",
+        amount: 1750,
+        rationale: "Market rate is €130-160/hour — expect €150-175 realistically",
       },
       {
-        ask: "Annual increase 12% to 3% (year 2 saving)",
-        amount: 1512,
+        ask: "Annual increase cap from 12% to 3-5%",
+        amount: 1450,
         rationale: "3-5% tied to CPI is industry standard — 12% is indefensible",
       },
     ],
     nice_to_have: [
       {
-        ask: "Hours cap risk mitigation (est.)",
-        amount: 1500,
-        rationale: "Prevents uncapped billing in complex years — depends on cap negotiation",
+        ask: "Hard hours cap at 35/yr with pre-approval",
+        amount: 0,
+        rationale: "Risk reduction, not a direct saving — prevents uncapped billing in complex years",
       },
     ],
   },

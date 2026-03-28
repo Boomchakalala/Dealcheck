@@ -20,10 +20,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "TermLift — Turn Vendor Quotes Into Better Deals in 60s",
+    default: "TermLift — Turn Vendor Quotes Into Better Deals",
     template: "%s | TermLift",
   },
-  description: "Paste a vendor quote, get back red flags, savings, and a negotiation email in 60 seconds. TermLift is the procurement expert your team never had. Free to try.",
+  description: "Paste a vendor quote, get back red flags, savings, and a ready-to-send negotiation email. TermLift is the procurement expert your team never had. Free to try.",
   metadataBase: new URL("https://www.termlift.com"),
   icons: {
     icon: "/favicon.png",
@@ -32,21 +32,21 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "TermLift",
-    title: "TermLift — Turn Vendor Quotes Into Better Deals in 60s",
-    description: "Paste a vendor quote, get back red flags, savings, and a negotiation email in 60 seconds. Free to try.",
+    title: "TermLift — Turn Vendor Quotes Into Better Deals",
+    description: "Paste a vendor quote, get back red flags, savings, and a ready-to-send negotiation email. Free to try.",
     url: "https://www.termlift.com",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TermLift — Turn Vendor Quotes Into Better Deals in 60s",
-    description: "Better vendor terms in 60 seconds. Paste a quote, get red flags, savings, and a ready-to-send email. Free to try.",
+    title: "TermLift — Turn Vendor Quotes Into Better Deals",
+    description: "Paste a vendor quote, get back red flags, savings, and a ready-to-send negotiation email. Free to try.",
   },
   alternates: {
     canonical: "https://www.termlift.com",
     languages: {
       en: "https://www.termlift.com",
-      fr: "https://www.termlift.com/fr",
+      fr: "https://www.termlift.com",
     },
   },
 };
@@ -66,16 +66,32 @@ export default async function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              name: "TermLift",
-              applicationCategory: "BusinessApplication",
-              description: "Stop overpaying vendors. Drop in any quote and get red flags, a negotiation playbook, and a ready-to-send email in 60 seconds.",
-              url: "https://www.termlift.com",
-              offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
-              operatingSystem: "Web",
-            }),
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                name: "TermLift",
+                applicationCategory: "BusinessApplication",
+                description: "Stop overpaying vendors. Drop in any quote and get red flags, a negotiation playbook, and a ready-to-send email.",
+                url: "https://www.termlift.com",
+                offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
+                operatingSystem: "Web",
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                name: "TermLift",
+                url: "https://www.termlift.com",
+                logo: "https://www.termlift.com/logo-icon.png",
+                description: "AI-powered vendor quote analysis. Get red flags, savings opportunities, and ready-to-send negotiation emails.",
+                sameAs: [],
+                contactPoint: {
+                  "@type": "ContactPoint",
+                  email: "hello@termlift.com",
+                  contactType: "customer support",
+                },
+              },
+            ]),
           }}
         />
       </head>

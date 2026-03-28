@@ -29,7 +29,7 @@ export function UnifiedHeader({ variant, userEmail, isUpgraded = false, usageCou
     { href: '/app/dashboard', label: t('nav.dashboard') },
     { href: '/pricing', label: t('nav.pricing') },
     { href: '/example', label: t('nav.examples') },
-    { href: '/blog', label: 'Blog' },
+    { href: '/blog', label: t('blog.title') },
   ]
 
   const isActive = (href: string) => {

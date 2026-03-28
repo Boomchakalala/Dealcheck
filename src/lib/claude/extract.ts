@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { anthropic, CLAUDE_MODEL, getResponseText, parseJsonFromContent, getLanguageInstruction, buildImageContent, SUPPORTED_IMAGE_MIME_TYPES, type ClaudeImageMediaType } from './client'
+import { anthropic, CLAUDE_MODEL, getResponseText, parseJsonFromContent, buildImageContent, SUPPORTED_IMAGE_MIME_TYPES, type ClaudeImageMediaType } from './client'
 
 const EXTRACTION_PROMPT = `You are a financial data extraction engine. Your ONLY job is to extract factual information from vendor quotes. Do NOT analyze, judge, or recommend — just extract.
 
@@ -77,7 +77,6 @@ export async function extractFinancialFacts(
   imageData?: { base64: string; mimeType: string },
   allPages?: Array<{ base64: string; mimeType: string }>,
   pdfData?: { base64: string; mimeType: string },
-  userLocale?: string,
 ): Promise<ExtractedFacts> {
   const visualContent = buildImageContent(imageData, allPages, pdfData)
   const hasVisualInput = !!visualContent
@@ -96,7 +95,11 @@ export async function extractFinancialFacts(
   const response = await anthropic.messages.create({
     model: CLAUDE_MODEL,
     max_tokens: 1024,
-    system: EXTRACTION_PROMPT + getLanguageInstruction(userLocale || 'en'),
+    // CRITICAL: Extraction is ALWAYS language-agnostic. Never inject language instructions here.
+    // The model must output structured facts in canonical English format (US number formatting,
+    // currency symbol before amount, field values in English). Localization happens downstream
+    // in the analysis and email steps only.
+    system: EXTRACTION_PROMPT,
     messages: [
       { role: 'user', content: userContent },
       { role: 'assistant', content: '{' },

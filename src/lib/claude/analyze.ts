@@ -17,8 +17,43 @@ You will receive:
 2. The raw quote for commercial analysis.
 
 ==================================================
-HOW TO ANALYZE
+STEP 1: LEVERAGE ASSESSMENT (required before analysis)
 ==================================================
+
+Before writing the analysis, assess the quote across five leverage dimensions.
+Output these as structured fields in the JSON. They must reflect what the quote actually contains, not what you wish it contained.
+
+1. price_leverage: "low" | "moderate" | "high"
+   How much room to push on headline pricing? High = visible overpricing, markup, or missing volume discount. Low = pricing appears competitive with no clear pressure point.
+
+2. terms_leverage: "low" | "moderate" | "high"
+   How much room to improve contractual or commercial terms? High = aggressive auto-renewal, no exit, escalation without cap. Low = standard balanced terms.
+
+3. structural_leverage: "low" | "moderate" | "high"
+   How much room to improve the deal structure itself? Scope, packaging, term length, billing, commitment size, license mix, bundled items. High = clearly oversized, poorly packaged, or restructurable. Low = straightforward single-item purchase.
+
+4. risk_leverage: "low" | "moderate" | "high"
+   How much leverage from buyer-unfriendly risk allocation, vague deliverables, weak SLA or protections, one-sided obligations? High = significant risk shifted to buyer. Low = balanced risk allocation.
+
+5. ambiguity_leverage: "low" | "moderate" | "high"
+   How much leverage from unclear fees, unclear scope, unclear assumptions, missing detail, or confusing quote logic? High = major gaps the buyer should challenge. Low = clear and complete quote.
+
+Also assess:
+6. savings_confidence: "low" | "medium" | "high"
+   How confident are you in the savings estimate? High = clear line items to challenge with arithmetic backing. Medium = reasonable estimates based on typical margins. Low = rough estimates, limited evidence.
+
+7. best_negotiation_angle: array of 1-2 primary angles from: "price", "terms", "structure", "scope_clarity", "billing_renewal", "risk"
+   What is the strongest lever the buyer has? This drives what the email should focus on.
+
+==================================================
+STEP 2: ANALYZE
+==================================================
+
+Now analyze the quote. Use the leverage assessment to calibrate your assertiveness:
+- If most dimensions are "high": push hard on price and structure
+- If most are "low": focus on cleanup asks and minor improvements
+- If price_leverage is low but terms/structural leverage is moderate/high: shift focus to terms and structure rather than forcing a price argument
+- If ambiguity_leverage is high: lead with clarification asks, not discounts
 
 Look at the quote and react like a procurement expert would. Find what matters:
 
@@ -54,7 +89,14 @@ Each savings opportunity is either:
 All amounts must be RAW NUMBERS (e.g., 700 not "700 EUR"). Include currency separately.
 total = sum of must_have amounts.
 
-Be aggressive. A good procurement lead would:
+CALIBRATION RULES:
+- Scale savings to your savings_confidence and leverage assessment. Do not inflate savings just because a quote is messy or unclear. Ambiguity is leverage for clarification, not for inventing discounts.
+- Large savings estimates (over 15%) must be justified by clear commercial or structural leverage (visible margin, excessive scope, intermediary markup). If you cannot point to the specific line item or structure that justifies it, reduce the estimate.
+- Small savings (2% to 5%) are still meaningful and must be surfaced. A solid quote with a 3% cleanup opportunity is more useful than pretending there is nothing to negotiate.
+- If pricing evidence is weak (savings_confidence is "low"), shift the analysis toward structure, terms, scope clarity, billing, renewal, or risk. Do not become useless just because you cannot justify a price cut.
+- If a quote appears genuinely competitive, say so, but still find the cleanup asks. Even the best quotes have at least one thing worth tightening.
+
+Be aggressive where justified. A good procurement lead would:
 - Always ask for a discount on the headline price (5% minimum on any negotiated quote)
 - Challenge every fee, pack, and add-on separately
 - Push for volume, loyalty, early-payment, or multi-year discounts where relevant
@@ -122,6 +164,8 @@ Never use en dash or em dash characters. Use commas, colons, or normal hyphens.
 Do not use hedging language ("it may be worth considering"). Be direct.
 Do not repeat the same point across sections.
 
+In the verdict and conclusion, explain where the real leverage sits and whether the main opportunity is price, structure, or terms. Make the output feel useful even when direct savings are limited.
+
 ==================================================
 OUTPUT SCHEMA
 ==================================================
@@ -129,6 +173,15 @@ OUTPUT SCHEMA
 Return valid JSON only:
 
 {
+  "leverage_assessment": {
+    "price_leverage": "low|moderate|high",
+    "terms_leverage": "low|moderate|high",
+    "structural_leverage": "low|moderate|high",
+    "risk_leverage": "low|moderate|high",
+    "ambiguity_leverage": "low|moderate|high",
+    "savings_confidence": "low|medium|high",
+    "best_negotiation_angle": ["price", "terms"]
+  },
   "title": "Vendor | New Purchase or Renewal | Month Year",
   "verdict": "One clear sentence telling the buyer what to do next",
   "verdict_type": "negotiate|competitive|overpay_risk",
@@ -197,8 +250,24 @@ GROUND RULES
 
 Return ONLY valid JSON.`
 
+// Leverage levels used in the pre-analysis assessment
+export type LeverageLevel = 'low' | 'moderate' | 'high'
+export type SavingsConfidence = 'low' | 'medium' | 'high'
+export type NegotiationAngle = 'price' | 'terms' | 'structure' | 'scope_clarity' | 'billing_renewal' | 'risk'
+
+export interface LeverageAssessment {
+  price_leverage: LeverageLevel
+  terms_leverage: LeverageLevel
+  structural_leverage: LeverageLevel
+  risk_leverage: LeverageLevel
+  ambiguity_leverage: LeverageLevel
+  savings_confidence: SavingsConfidence
+  best_negotiation_angle: NegotiationAngle[]
+}
+
 // Type for the analysis output
 export interface AnalysisOutput {
+  leverage_assessment?: LeverageAssessment
   title: string
   verdict: string
   verdict_type: 'negotiate' | 'competitive' | 'overpay_risk'

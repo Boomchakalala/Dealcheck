@@ -2,6 +2,15 @@ import { type DealOutput } from '@/types'
 
 // Exemple 1 (HERO): DocuSign — Renouvellement SaaS E-Signature
 export const docusignExampleFr: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'high',
+    terms_leverage: 'moderate',
+    structural_leverage: 'high',
+    risk_leverage: 'low',
+    ambiguity_leverage: 'low',
+    savings_confidence: 'high',
+    best_negotiation_angle: ['structure', 'price'],
+  },
   title: "DocuSign · Business Pro · Renouvellement annuel",
   vendor: "DocuSign",
   category: "SaaS - Signature électronique",
@@ -77,16 +86,16 @@ export const docusignExampleFr: DealOutput = {
     currency: "EUR",
     must_have: [
       {
-        ask: "Ajustement de 40 à 30 licences",
+        ask: "Optimiser de 40 à 30 licences",
         amount: 6000,
-        rationale: "15 licences inutilisées — supprimer le gaspillage ne nécessite aucune concession",
+        rationale: "15 licences inutilisées — supprimer le gaspillage est le levier principal",
       },
     ],
     nice_to_have: [
       {
-        ask: "Remise de fidélité de 10 % sur le contrat ajusté",
-        amount: 1800,
-        rationale: "Remise de renouvellement standard — les responsables de comptes DocuSign ont l'autorité pour 10-15 %",
+        ask: "Remise fidélité sur contrat ajusté (5-10 %)",
+        amount: 1350,
+        rationale: "Les responsables DocuSign ont autorité pour 10-15 % — attendez 5-10 % de manière réaliste",
       },
     ],
   },
@@ -164,6 +173,15 @@ Cordialement,
 
 // Exemple 2 : Salesforce — Renouvellement CRM annuel
 export const salesforceExampleFr: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'high',
+    terms_leverage: 'moderate',
+    structural_leverage: 'high',
+    risk_leverage: 'low',
+    ambiguity_leverage: 'low',
+    savings_confidence: 'high',
+    best_negotiation_angle: ['structure', 'price'],
+  },
   title: "Salesforce · Sales Cloud Professional · Renouvellement annuel",
   vendor: "Salesforce",
   category: "SaaS - CRM",
@@ -239,16 +257,16 @@ export const salesforceExampleFr: DealOutput = {
     currency: "EUR",
     must_have: [
       {
-        ask: "Ajustement de 40 à 32 licences",
+        ask: "Optimiser de 40 à 32 licences",
         amount: 7200,
-        rationale: "12 licences inutilisées — supprimer le gaspillage ne nécessite aucune concession",
+        rationale: "12 licences inutilisées — l'optimisation est le levier principal",
       },
     ],
     nice_to_have: [
       {
-        ask: "Remise de fidélité de 8 % sur le contrat ajusté",
-        amount: 2304,
-        rationale: "Remise pluriannuelle standard — les responsables Salesforce proposent régulièrement 8-12 %",
+        ask: "Remise pluriannuelle sur engagement 2 ans (5-8 %)",
+        amount: 1800,
+        rationale: "Les AE Salesforce offrent régulièrement 8-12 % — attendez 5-8 % de manière réaliste",
       },
     ],
   },
@@ -328,6 +346,15 @@ Cordialement,
 
 // Exemple 3 : Microsoft 365 — Renouvellement Business Premium (CONTRAT PROPRE)
 export const microsoft365ExampleFr: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'low',
+    terms_leverage: 'low',
+    structural_leverage: 'low',
+    risk_leverage: 'low',
+    ambiguity_leverage: 'low',
+    savings_confidence: 'low',
+    best_negotiation_angle: ['terms'],
+  },
   title: "Microsoft 365 \u00b7 Business Premium \u00b7 Renouvellement annuel",
   vendor: "Microsoft 365",
   category: "SaaS - Productivit\u00e9",
@@ -467,6 +494,15 @@ Cordialement,
 
 // Exemple 4 : FedEx — Contrat annuel de livraison
 export const fedexExampleFr: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'high',
+    terms_leverage: 'high',
+    structural_leverage: 'moderate',
+    risk_leverage: 'moderate',
+    ambiguity_leverage: 'low',
+    savings_confidence: 'high',
+    best_negotiation_angle: ['price', 'terms'],
+  },
   title: "FedEx · Accord de livraison professionnel · Contrat annuel",
   vendor: "FedEx",
   category: "Logistique - Livraison",
@@ -545,21 +581,27 @@ export const fedexExampleFr: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 12552,
+    total: 12000,
     currency: "USD",
     must_have: [
       {
-        ask: "Tarif de base de $4,20 à $3,50 (1 000 moy./mois)",
+        ask: "Tarif de base de 4,20 $ à 3,50 $ (1 000 colis/mois en moyenne)",
         amount: 8400,
-        rationale: "Le tarif négocié du marché est de $3,20-3,60 à ce volume — bien documenté",
+        rationale: "Le tarif négocié du marché est de 3,20-3,60 $ pour ce volume",
       },
       {
-        ask: "Surcharge carburant de 20 % à 12 %",
-        amount: 4152,
-        rationale: "Les surcharges du marché se situent entre 10-14 % — 20 % est au-dessus du marché",
+        ask: "Surcharge carburant plafonnée à 12 % (contre 20 %)",
+        amount: 3600,
+        rationale: "Les surcharges du marché sont de 10-14 % — 20 % est bien au-dessus",
       },
     ],
-    nice_to_have: [],
+    nice_to_have: [
+      {
+        ask: "Plafond GRI à 3,5 % (économies en année 2+)",
+        amount: 1800,
+        rationale: "Empêche la capitalisation de 7,9 % — significatif sur un contrat pluriannuel",
+      },
+    ],
   },
   email_drafts: {
     neutral: {
@@ -637,6 +679,15 @@ Cordialement,
 
 // Exemple 5 : Konica Minolta — Location d'équipement de bureau
 export const konicaExampleFr: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'high',
+    terms_leverage: 'high',
+    structural_leverage: 'moderate',
+    risk_leverage: 'high',
+    ambiguity_leverage: 'moderate',
+    savings_confidence: 'medium',
+    best_negotiation_angle: ['price', 'risk'],
+  },
   title: "Konica Minolta · Location d'équipement · Contrat de 36 mois",
   vendor: "Konica Minolta",
   category: "Location d'équipement - Bureau",
@@ -715,20 +766,25 @@ export const konicaExampleFr: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 2040,
+    total: 5500,
     currency: "EUR",
     must_have: [
       {
-        ask: "Tarif de location de €870 à €700/mois",
-        amount: 2040,
-        rationale: "Ricoh, Canon, Xerox proposent tous €620-720 pour des appareils équivalents",
+        ask: "Réduire le loyer mensuel de 870 € à 700-750 €",
+        amount: 4320,
+        rationale: "Ricoh, Canon, Xerox proposent 620-720 € pour des appareils équivalents — attendez 700-750 € de manière réaliste",
+      },
+      {
+        ask: "Supprimer ou plafonner la clause d'exclusivité toner",
+        amount: 1080,
+        rationale: "Les toners tiers sont 25-35 % moins chers — économie estimée sur 3 ans",
       },
     ],
     nice_to_have: [
       {
-        ask: "Économie toner marché ouvert (est.)",
-        amount: 360,
-        rationale: "Les toners tiers coûtent 25-35 % moins cher — dépend de la suppression de la clause",
+        ask: "Ajouter une clause de sortie à 18 mois avec rachat",
+        amount: 0,
+        rationale: "Réduction de risque, pas une économie directe — mais amélioration de conditions critique",
       },
     ],
   },
@@ -810,6 +866,15 @@ Cordialement,
 
 // Exemple 6 : BDO — Services comptables annuels
 export const bdoExampleFr: DealOutput = {
+  leverage_assessment: {
+    price_leverage: 'moderate',
+    terms_leverage: 'high',
+    structural_leverage: 'low',
+    risk_leverage: 'high',
+    ambiguity_leverage: 'moderate',
+    savings_confidence: 'medium',
+    best_negotiation_angle: ['price', 'risk'],
+  },
   title: "BDO · Services comptables annuels · Forfait",
   vendor: "BDO",
   category: "Services professionnels - Comptabilité",
@@ -888,25 +953,25 @@ export const bdoExampleFr: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 3612,
+    total: 3200,
     currency: "EUR",
     must_have: [
       {
-        ask: "Taux horaire de €210 à €150 (35h/an)",
-        amount: 2100,
-        rationale: "Le taux du marché est de €130-160/heure — €210 est bien au-dessus de la norme",
+        ask: "Taux horaire de 210 € à 150-175 € (est. 35h/an)",
+        amount: 1750,
+        rationale: "Le tarif du marché est de 130-160 €/heure — attendez 150-175 € de manière réaliste",
       },
       {
-        ask: "Augmentation annuelle de 12 % à 3 % (économie année 2)",
-        amount: 1512,
-        rationale: "3-5 % indexé sur l'IPC est la norme du secteur — 12 % est indéfendable",
+        ask: "Plafond d'augmentation annuelle de 12 % à 3-5 %",
+        amount: 1450,
+        rationale: "3-5 % indexé sur l'IPC est le standard — 12 % est indéfendable",
       },
     ],
     nice_to_have: [
       {
-        ask: "Plafonnement des heures — atténuation du risque (est.)",
-        amount: 1500,
-        rationale: "Empêche la facturation illimitée les années complexes — dépend de la négociation du plafond",
+        ask: "Plafond strict de 35h/an avec pré-approbation",
+        amount: 0,
+        rationale: "Réduction de risque, pas une économie directe — empêche la facturation illimitée",
       },
     ],
   },

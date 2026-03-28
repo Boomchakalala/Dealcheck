@@ -16,7 +16,20 @@ export const EmailDraftSchema = z.object({
   body: z.string(),
 })
 
+const LeverageLevelEnum = z.enum(['low', 'moderate', 'high']).catch('moderate')
+
+export const LeverageAssessmentSchema = z.object({
+  price_leverage: LeverageLevelEnum,
+  terms_leverage: LeverageLevelEnum,
+  structural_leverage: LeverageLevelEnum,
+  risk_leverage: LeverageLevelEnum,
+  ambiguity_leverage: LeverageLevelEnum,
+  savings_confidence: z.enum(['low', 'medium', 'high']).catch('medium'),
+  best_negotiation_angle: z.array(z.enum(['price', 'terms', 'structure', 'scope_clarity', 'billing_renewal', 'risk'])).catch(['price']),
+}).optional()
+
 export const DealOutputSchema = z.object({
+  leverage_assessment: LeverageAssessmentSchema,
   title: z.string(),
   vendor: z.string(),
   category: z.string().optional(), // e.g., "SaaS Infra", "Marketing Agency", "Consulting"

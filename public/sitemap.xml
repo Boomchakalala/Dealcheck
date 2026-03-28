@@ -4,79 +4,94 @@
   <url>
     <loc>https://www.termlift.com</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.termlift.com"/>
     <priority>1.0</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://www.termlift.com/pricing</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/pricing"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/pricing"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/pricing"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.termlift.com/pricing"/>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://www.termlift.com/example</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/example"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/example"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/example"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.termlift.com/example"/>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://www.termlift.com/help</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/help"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/help"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/help"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.termlift.com/help"/>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://www.termlift.com/about</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/about"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/about"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/about"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.termlift.com/about"/>
     <priority>0.5</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://www.termlift.com/security</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/security"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/security"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/security"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.termlift.com/security"/>
     <priority>0.5</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://www.termlift.com/contact</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/contact"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/fr/contact"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/contact"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.termlift.com/contact"/>
     <priority>0.5</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://www.termlift.com/blog</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/blog"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/blog"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.termlift.com/blog"/>
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://www.termlift.com/blog/how-to-negotiate-saas-renewal</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
     <loc>https://www.termlift.com/blog/5-things-vendor-hopes-you-wont-notice</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://www.termlift.com/blog/how-to-negotiate-car-purchase</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://www.termlift.com/blog/what-to-check-before-signing-equipment-lease</loc>
+    <lastmod>2026-03-05</lastmod>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://www.termlift.com/blog/how-to-review-vendor-contract-without-lawyer</loc>
+    <lastmod>2026-03-10</lastmod>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/blog/how-to-negotiate-saas-renewal</loc>
+    <lastmod>2026-03-15</lastmod>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/blog/what-to-check-before-signing-equipment-lease</loc>
+    <lastmod>2026-03-21</lastmod>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/blog/how-to-negotiate-car-purchase</loc>
+    <lastmod>2026-03-26</lastmod>
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>

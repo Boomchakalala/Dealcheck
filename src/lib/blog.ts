@@ -13,7 +13,7 @@ export const blogPosts: BlogPost[] = [
     slug: 'how-to-negotiate-saas-renewal',
     title: 'How to negotiate a SaaS renewal (and stop overpaying)',
     description: 'Most SaaS renewals go through without a single pushback. Here is what to check, what to ask for, and how to write the email that gets you better terms.',
-    date: '2026-03-22',
+    date: '2026-03-15',
     readTime: '7 min read',
     category: 'SaaS',
     content: `
@@ -138,7 +138,7 @@ The difference between a good deal and a bad one is knowing what to ask for. Tha
     slug: '5-things-vendor-hopes-you-wont-notice',
     title: '5 things your vendor hopes you will not notice in their quote',
     description: 'Vendors do not hide bad terms. They just make them easy to miss. Here are the five most common traps in vendor quotes and how to catch them before you sign.',
-    date: '2026-03-22',
+    date: '2026-03-05',
     readTime: '6 min read',
     category: 'Negotiation',
     content: `
@@ -237,7 +237,7 @@ That is why we built TermLift. Paste your quote, and it flags every one of these
     slug: 'how-to-negotiate-car-purchase',
     title: 'How to negotiate a car purchase: dealer markup, hidden fees, and what to push on',
     description: 'Car dealers negotiate for a living. You do it once every few years. Here is how to level the playing field and stop overpaying.',
-    date: '2026-03-22',
+    date: '2026-03-26',
     readTime: '8 min read',
     category: 'Vehicles',
     content: `
@@ -366,7 +366,7 @@ TermLift analyzes car quotes the same way it handles any vendor deal: paste the 
     slug: 'what-to-check-before-signing-equipment-lease',
     title: 'What to check before signing an equipment lease',
     description: 'Equipment leases lock you in for years. Here are the terms that cost you money and how to negotiate them before you sign.',
-    date: '2026-03-22',
+    date: '2026-03-21',
     readTime: '6 min read',
     category: 'Equipment',
     content: `
@@ -479,7 +479,7 @@ TermLift catches all of these issues automatically. Paste your lease quote and g
     slug: 'how-to-review-vendor-contract-without-lawyer',
     title: 'How to review a vendor contract without a lawyer',
     description: 'You do not need a law degree to spot bad terms. Here are the 7 clauses that matter most in any vendor contract and what to push back on.',
-    date: '2026-03-22',
+    date: '2026-03-10',
     readTime: '7 min read',
     category: 'Contracts',
     content: `

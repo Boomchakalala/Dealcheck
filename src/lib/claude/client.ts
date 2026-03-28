@@ -51,7 +51,19 @@ export function parseJsonFromContent(content: string): unknown {
 
 export function getLanguageInstruction(locale: string): string {
   if (locale === 'fr') {
-    return '\n\nIMPORTANT: The user\'s language preference is French. Generate ALL output text in French. This includes: verdict, red flag descriptions, negotiation advice, strategy text, savings descriptions, email drafts, and all other user-facing text. Use professional French business/procurement terminology. Keep proper nouns, product names, and currency amounts as-is. For email greetings, use "Bonjour [Name]," (not "Hi" or "Hey"). For email sign-offs, use "Cordialement," followed by "[Votre nom]".'
+    return `
+
+IMPORTANT: The user's language preference is French. Generate ALL descriptive text in French. This includes: verdict, red flag descriptions, negotiation advice, strategy text, savings rationale text, email drafts, and all other user-facing prose.
+
+Use professional French business/procurement terminology. Keep proper nouns, product names, and currency amounts as-is.
+
+CRITICAL — FACTS ARE IMMUTABLE:
+- All numeric values (amounts, percentages, scores) must remain EXACTLY as provided in the verified facts. Do NOT reformulate, round, convert, or re-localize them.
+- Currency amounts in JSON fields must use the EXACT same format as the input facts (e.g., if facts say "$16,328", output "$16,328" — never "16 328 $" or "16.328 $").
+- The "total" field in potential_savings must equal the arithmetic sum of must_have amounts. Do NOT change it.
+- savings amounts are raw numbers (e.g., 700 not "700 EUR"). This does not change with language.
+
+For email greetings, use "Bonjour [Name]," (not "Hi" or "Hey"). For email sign-offs, use "Cordialement," followed by "[Votre nom]".`
   }
   return '\n\nIMPORTANT: Generate ALL output text in English.'
 }

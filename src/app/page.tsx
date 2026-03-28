@@ -53,8 +53,8 @@ export default function LandingPage() {
               </div>
 
               <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-5 sm:mb-6 leading-[1.15]">
-                {t('hero.title1')}<br />
-                <span className="text-emerald-600">{t('hero.title2')}</span>
+                <span className="whitespace-nowrap">{t('hero.title1')}</span><br />
+                <span className="text-emerald-600 whitespace-nowrap">{t('hero.title2')}</span>
               </h1>
               <p className="text-base sm:text-lg text-slate-500 mb-7 sm:mb-8 leading-relaxed max-w-lg">
                 {t('hero.subtitle')}
@@ -249,7 +249,7 @@ export default function LandingPage() {
               {t('builtFor.title')}
             </h2>
             <p className="text-base sm:text-lg text-slate-500 max-w-2xl mx-auto">
-              8 years of procurement expertise, distilled into every analysis. Drop in your quote. Get instant negotiation leverage.
+              {t('builtFor.subtitle')}
             </p>
           </div>
 
@@ -377,13 +377,11 @@ export default function LandingPage() {
                     <p className="text-slate-400 text-[10px] mb-2">{t('example.quotePreparedFor')}</p>
                     <p className="text-slate-500 text-xs uppercase tracking-wide font-medium">{t('example.quoteTitle')}</p>
                     <div className="space-y-1.5 pt-1">
-                      <div className="flex justify-between"><span>{t('example.quoteRetainer')}</span><span className="font-semibold text-slate-800">€50/user/mo</span></div>
-                      <div className="flex justify-between"><span>{t('example.quoteAdFee')}</span><span className="font-semibold text-slate-800">40 users</span></div>
-                      <div className="flex justify-between"><span>{t('example.quoteAdBudget')}</span><span className="font-semibold text-slate-800">€2,000/mo</span></div>
+                      <div className="flex justify-between"><span>{t('example.quoteRetainer')}</span><span className="font-semibold text-slate-800">40 licensed</span></div>
+                      <div className="flex justify-between"><span>{t('example.quoteAdFee')}</span><span className="font-semibold text-slate-800">25 active</span></div>
+                      <div className="flex justify-between"><span>{t('example.quoteAdBudget')}</span><span className="font-semibold text-slate-800">{t('example.quotePaymentValue')}</span></div>
                       <div className="flex justify-between"><span>{t('example.quoteTerm')}</span><span className="font-semibold text-slate-800">12 months</span></div>
-                      <div className="flex justify-between"><span>{t('example.quoteStartDate')}</span><span className="font-semibold text-slate-800">{t('example.quoteStartDateValue')}</span></div>
-                      <div className="flex justify-between"><span>{t('example.quotePayment')}</span><span className="font-semibold text-slate-800">{t('example.quotePaymentValue')}</span></div>
-                      <div className="flex justify-between border-t border-slate-100 pt-1.5 mt-1.5"><span className="font-medium text-slate-700">{t('example.quoteTotal')}</span><span className="font-bold text-slate-900">€24,000</span></div>
+                      <div className="flex justify-between border-t border-slate-100 pt-1.5 mt-1.5"><span className="font-medium text-slate-700">{t('example.quoteTotal')}</span><span className="font-bold text-slate-900">€24,000/yr</span></div>
                     </div>
                     <p className="pt-1">{t('example.quoteDeliverables')}</p>
 
