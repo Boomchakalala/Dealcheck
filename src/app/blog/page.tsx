@@ -7,8 +7,8 @@ import { getTranslations } from 'next-intl/server'
 import { cookies } from 'next/headers'
 
 export default async function BlogPage() {
-  const posts = getAllPosts()
   const locale = (await cookies()).get('termlift_lang')?.value || 'en'
+  const posts = getAllPosts(locale)
   const t = await getTranslations({ locale })
 
   return (
@@ -45,7 +45,7 @@ export default async function BlogPage() {
                     <Clock className="w-3 h-3" />
                     {post.readTime}
                   </span>
-                  <span className="text-xs text-slate-400">{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                  <span className="text-xs text-slate-400">{new Date(post.date).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                 </div>
                 <h2 className={`font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors ${
                   i === 0 ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'

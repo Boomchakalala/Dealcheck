@@ -129,7 +129,7 @@ Sometimes the best deal is not the cheapest one. It is the one with the most fle
 
 SaaS renewals are not take-it-or-leave-it. Every vendor has margin, every contract has room, and every buyer who pushes back gets something better than the buyer who does not.
 
-The difference between a good deal and a bad one is knowing what to ask for. That is exactly what TermLift does: paste your renewal quote, get back every red flag, savings opportunity, and a ready-to-send email in 60 seconds.
+The difference between a good deal and a bad one is knowing what to ask for. That is exactly what TermLift does: paste your renewal quote, get back every red flag, savings opportunity, and a ready-to-send email in minutes.
 
 **[Try it free](/try)**
 `,
@@ -618,10 +618,14 @@ TermLift reads your vendor quote and flags all of these issues automatically, wi
   },
 ]
 
-export function getPostBySlug(slug: string): BlogPost | undefined {
-  return blogPosts.find(p => p.slug === slug)
+import { blogPostsFr } from './blog-fr'
+
+export function getPostBySlug(slug: string, locale?: string): BlogPost | undefined {
+  const posts = locale === 'fr' ? blogPostsFr : blogPosts
+  return posts.find(p => p.slug === slug)
 }
 
-export function getAllPosts(): BlogPost[] {
-  return blogPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+export function getAllPosts(locale?: string): BlogPost[] {
+  const posts = locale === 'fr' ? blogPostsFr : blogPosts
+  return [...posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }

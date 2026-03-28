@@ -38,11 +38,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
-  const post = getPostBySlug(slug)
+  const locale = (await cookies()).get('termlift_lang')?.value || 'en'
+  const post = getPostBySlug(slug, locale)
   if (!post) notFound()
 
   const htmlContent = renderMarkdownToHtml(post.content)
-  const locale = (await cookies()).get('termlift_lang')?.value || 'en'
   const t = await getTranslations({ locale })
 
   const jsonLd = {
@@ -96,7 +96,7 @@ export default async function BlogPostPage({ params }: Props) {
               <Clock className="w-3 h-3" />
               {post.readTime}
             </span>
-            <span className="text-xs text-slate-400">{new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+            <span className="text-xs text-slate-400">{new Date(post.date).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight">{post.title}</h1>
@@ -135,7 +135,7 @@ export default async function BlogPostPage({ params }: Props) {
         {/* CTA */}
         <div className="mt-12 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-8 sm:p-10 text-center">
           <h3 className="text-xl font-bold text-white mb-3">{t('blog.ctaTitle')}</h3>
-          <p className="text-sm text-emerald-100 mb-5 max-w-md mx-auto">{locale === 'fr' ? 'Collez votre devis fournisseur et obtenez alertes, économies et un email prêt à envoyer en 60 secondes.' : 'Paste your vendor quote and get back red flags, savings, and a ready-to-send email in 60 seconds.'}</p>
+          <p className="text-sm text-emerald-100 mb-5 max-w-md mx-auto">{locale === 'fr' ? 'Collez votre devis fournisseur et obtenez alertes, économies et un email prêt à envoyer en quelques minutes.' : 'Paste your vendor quote and get back red flags, savings, and a ready-to-send email in minutes.'}</p>
           <Link
             href="/try"
             className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-xl bg-white text-emerald-700 hover:bg-emerald-50 transition-all shadow-lg"
