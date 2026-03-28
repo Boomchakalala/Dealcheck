@@ -28,15 +28,15 @@ export function MarketingFooter() {
   ]
 
   return (
-    <footer className="bg-slate-900">
+    <footer className="border-t border-slate-200/80 bg-slate-50/40">
       {/* Trust strip */}
-      <div className="border-b border-slate-800">
+      <div className="border-b border-slate-200/60">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-4">
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
             {trustPoints.map((point) => (
               <div key={point.label} className="flex items-center gap-2">
-                <point.icon className="w-3.5 h-3.5 text-emerald-400" strokeWidth={2} />
-                <span className="text-xs font-medium text-slate-400">{point.label}</span>
+                <point.icon className="w-3.5 h-3.5 text-emerald-600" strokeWidth={2} />
+                <span className="text-xs font-medium text-slate-500">{point.label}</span>
               </div>
             ))}
           </div>
@@ -52,24 +52,24 @@ export function MarketingFooter() {
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Image src="/logo-icon.png" alt="TermLift" width={24} height={24} />
               <div className="flex items-baseline">
-                <span className="text-sm font-bold text-white">Term</span>
-                <span className="text-sm font-bold text-emerald-400">Lift</span>
+                <span className="text-sm font-bold text-slate-900">Term</span>
+                <span className="text-sm font-bold text-emerald-600">Lift</span>
               </div>
             </Link>
-            <p className="text-sm text-slate-400 leading-relaxed max-w-xs">
+            <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
               {t('footer.description')}
             </p>
           </div>
 
           {/* Product links */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">
+            <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-4">
               {t('footer.product')}
             </h4>
             <ul className="space-y-2.5">
               {productLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-slate-400 hover:text-emerald-400 transition-colors">
+                  <Link href={link.href} className="text-sm text-slate-500 hover:text-emerald-600 transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -79,13 +79,13 @@ export function MarketingFooter() {
 
           {/* Company links */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">
+            <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider mb-4">
               {t('footer.company')}
             </h4>
             <ul className="space-y-2.5">
               {companyLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-slate-400 hover:text-emerald-400 transition-colors">
+                  <Link href={link.href} className="text-sm text-slate-500 hover:text-emerald-600 transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -95,12 +95,12 @@ export function MarketingFooter() {
 
           {/* Footer CTA */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-3">
+            <h4 className="text-sm font-semibold text-slate-900 mb-3">
               {t('footer.ctaTitle')}
             </h4>
             <Link
               href="/try"
-              className="group inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-500 transition-all"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 transition-all shadow-sm"
             >
               {t('footer.ctaButton')}
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -110,23 +110,23 @@ export function MarketingFooter() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-slate-800">
+      <div className="border-t border-slate-200/60">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             {t('footer.rights')}
           </p>
           <div className="flex items-center gap-5">
-            <Link href="/privacy" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+            <Link href="/privacy" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
               {t('footer.privacy')}
             </Link>
-            <Link href="/terms" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+            <Link href="/terms" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
               {t('footer.terms')}
             </Link>
             <a
               href="https://twitter.com/TermLift"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-500 hover:text-slate-300 transition-colors"
+              className="text-slate-400 hover:text-slate-600 transition-colors"
               aria-label="X (Twitter)"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
