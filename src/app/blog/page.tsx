@@ -21,7 +21,7 @@ export default async function BlogPage() {
           <div className="text-center">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 mb-5">{t('blog.subtitle')}</span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-4">{t('blog.title')}</h1>
-            <p className="text-base sm:text-lg text-slate-500 max-w-xl mx-auto">{locale === 'fr' ? 'Stratégies de négociation, conseils fournisseurs, et comment arrêter de laisser de l\'argent sur la table.' : 'Negotiation strategies, vendor management tips, and how to stop leaving money on the table.'}</p>
+            <p className="text-base sm:text-lg text-slate-500 max-w-xl mx-auto">{locale === 'fr' ? 'Conseils de négociation concrets pour les équipes sans service achats.' : 'Practical negotiation advice for teams without a procurement department.'}</p>
           </div>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default async function BlogPage() {
         {/* CTA */}
         <div className="mt-16 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-8 sm:p-10 text-center">
           <h3 className="text-xl font-bold text-white mb-3">{t('examplePage.readyToAnalyze')}</h3>
-          <p className="text-sm text-emerald-100 mb-5 max-w-md mx-auto">{locale === 'fr' ? 'Collez un devis fournisseur et obtenez alertes, économies et un email de négociation en 60 secondes.' : 'Paste a vendor quote and get back red flags, savings, and a negotiation email in 60 seconds.'}</p>
+          <p className="text-sm text-emerald-100 mb-5 max-w-md mx-auto">{locale === 'fr' ? 'Collez un devis fournisseur et obtenez alertes, économies et un email de négociation en quelques minutes.' : 'Paste a vendor quote and get back red flags, savings, and a negotiation email in minutes.'}</p>
           <Link
             href="/try"
             className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-xl bg-white text-emerald-700 hover:bg-emerald-50 transition-all shadow-lg"
