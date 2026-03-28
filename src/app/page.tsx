@@ -52,7 +52,7 @@ export default function LandingPage() {
                 <span className="text-xs font-semibold text-emerald-700">{t('hero.badge')}</span>
               </div>
 
-              <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-5 sm:mb-6 leading-[1.15]">
+              <h1 className="text-[2.1rem] sm:text-4xl md:text-5xl lg:text-[3.25rem] font-bold text-slate-900 tracking-tight mb-5 sm:mb-6 leading-[1.15]">
                 <span className="whitespace-nowrap">{t('hero.title1')}</span><br />
                 <span className="text-emerald-600 whitespace-nowrap">{t('hero.title2')}</span>
               </h1>
