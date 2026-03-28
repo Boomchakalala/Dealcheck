@@ -16,7 +16,7 @@
   "hero.badge": "AI-powered quote analysis",
   "hero.title1": "Stop overpaying.",
   "hero.title2": "Start negotiating.",
-  "hero.subtitle": "Drop in a vendor quote. Get back exactly where you're overpaying, what to push for, and a ready-to-send email — in under 60 seconds.",
+  "hero.subtitle": "Drop in a vendor quote. Get back exactly where you're overpaying, what to push for, and a ready-to-send email.",
   "hero.cta": "Analyze a quote free",
   "hero.ctaSecondary": "See a real example",
   "hero.noSignup": "No signup needed. Free to try.",
@@ -52,7 +52,7 @@
 
   "example.headline": "This is what your vendor hoped you wouldn't notice.",
   "example.youPaste": "You paste in a vendor quote",
-  "example.termliftReturns": "TermLift returns this in 60 seconds",
+  "example.termliftReturns": "TermLift returns this in minutes",
   "example.cta": "Analyze your first quote free",
   "example.seeFullExample": "See a full example",
   "example.withAllDetails": "with all red flags, negotiation plan, and email drafts.",
@@ -111,7 +111,7 @@
   "pricing.getPro": "Get Pro",
 
   "cta.title": "That quote in your inbox? You're probably overpaying.",
-  "cta.subtitle": "Find out in 60 seconds. No signup, no commitment — just clarity on what you should be paying.",
+  "cta.subtitle": "Find out in minutes. No signup, no commitment — just clarity on what you should be paying.",
   "cta.button": "Analyze your first quote",
 
   "hero.verdict": "Negotiate before signing",
@@ -152,7 +152,7 @@
   "footer.privacy": "Privacy",
   "footer.rights": "© 2026 TermLift. All rights reserved.",
 
-  "try.headline": "Drop in any vendor quote. Get back red flags, savings, and a ready-to-send email in 60 seconds.",
+  "try.headline": "Drop in any vendor quote. Get back red flags, savings, and a ready-to-send email in minutes.",
   "try.noSignup": "No signup needed for your first analysis.",
   "try.demoText": "Try with demo text",
   "try.seeExample": "See a full example first",
@@ -199,7 +199,7 @@
   "login.and": "and",
 
   "app.dropFirst": "Drop in your first vendor quote",
-  "app.getRedFlags": "Get red flags, savings opportunities, and a ready-to-send email in 60 seconds.",
+  "app.getRedFlags": "Get red flags, savings opportunities, and a ready-to-send email in minutes.",
   "app.remaining": "{remaining} of 4 free analyses remaining",
   "app.yourDeals": "Your deals",
   "app.dealsAnalyzed": "{count} deals analyzed",
@@ -250,7 +250,7 @@
   "analysis.addRoundDesc": "Upload a counter-offer to continue negotiating",
 
   "onboarding.welcome": "Welcome to TermLift",
-  "onboarding.welcomeSub": "You're 60 seconds away from finding out if your vendor is overcharging you.",
+  "onboarding.welcomeSub": "Find out in minutes if your vendor is overcharging you.",
   "onboarding.cta": "Analyze my first quote",
   "onboarding.skip": "Skip setup",
   "onboarding.tip": "Tip",

@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 }
 
 const faqItems = [
-  { q: "What is TermLift?", a: "TermLift is an AI-powered tool that helps you negotiate better vendor deals. Upload a quote or contract, and it finds red flags, estimates potential savings, builds a negotiation plan with specific asks, and drafts ready-to-send reply emails — all in about 60 seconds." },
-  { q: "How does the AI analysis work?", a: "Text is extracted from your document (PDF, image, or pasted text) and sent to Anthropic's Claude AI, which is prompted specifically for procurement analysis. It reads the full content, identifies risks, builds a negotiation strategy, and generates structured output — typically in under 60 seconds." },
+  { q: "What is TermLift?", a: "TermLift is an AI-powered tool that helps you negotiate better vendor deals. Upload a quote or contract, and it finds red flags, estimates potential savings, builds a negotiation plan with specific asks, and drafts ready-to-send reply emails." },
+  { q: "How does the AI analysis work?", a: "Text is extracted from your document (PDF, image, or pasted text) and sent to Anthropic's Claude AI, which is prompted specifically for procurement analysis. It reads the full content, identifies risks, builds a negotiation strategy, and generates structured output." },
   { q: "What file formats are supported?", a: "PDF, PNG, JPG, WEBP, or plain text paste. Maximum file size is 10 MB. For best results with images, make sure the text in the image is clearly readable." },
   { q: "What do I get back from an analysis?", a: "You get a complete negotiation package: a verdict summary, red flags with suggested mitigations, a negotiation plan split into must-have and nice-to-have asks, estimated potential savings, and ready-to-send email drafts in three different tones." },
   { q: "Is my data private?", a: "Yes. Uploaded files are deleted immediately after text extraction. Your text is not stored unless you explicitly save the deal to your account. All data is encrypted in transit and at rest. Your documents are never used for AI training." },

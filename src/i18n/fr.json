@@ -16,7 +16,7 @@
   "hero.badge": "Analyse de devis par IA",
   "hero.title1": "Arrêtez de surpayer.",
   "hero.title2": "Négociez mieux.",
-  "hero.subtitle": "Déposez un devis fournisseur. Découvrez où vous surpayez, quoi demander, et recevez un email prêt à envoyer — en moins de 60 secondes.",
+  "hero.subtitle": "Déposez un devis fournisseur. Découvrez où vous surpayez, quoi demander, et recevez un email prêt à envoyer.",
   "hero.cta": "Analyser un devis gratuitement",
   "hero.ctaSecondary": "Voir un exemple réel",
   "hero.noSignup": "Sans inscription. Gratuit.",
@@ -44,7 +44,7 @@
   "howItWorks.title": "Du devis aux économies en 3 étapes",
   "howItWorks.subtitle": "Pas de tableurs, pas d'allers-retours avec le juridique. Juste la clarté sur quoi demander et les mots pour le dire.",
   "howItWorks.step1": "Déposez votre devis",
-  "howItWorks.step1Desc": "Uploadez un PDF, collez un email ou prenez une capture d'écran. Tout format fonctionne.",
+  "howItWorks.step1Desc": "Importez un PDF, collez un email ou prenez une capture d'écran. Tout format fonctionne.",
   "howItWorks.step2": "Voyez où vous pouvez économiser",
   "howItWorks.step2Desc": "Obtenez les alertes, les opportunités d'économies et un plan de négociation complet en quelques secondes.",
   "howItWorks.step3": "Envoyez une meilleure réponse",
@@ -52,7 +52,7 @@
 
   "example.headline": "Voilà ce que votre fournisseur espérait que vous ne remarqueriez pas.",
   "example.youPaste": "Vous collez un devis fournisseur",
-  "example.termliftReturns": "TermLift vous renvoie ceci en 60 secondes",
+  "example.termliftReturns": "TermLift vous renvoie ceci en quelques minutes",
   "example.cta": "Analysez votre premier devis gratuitement",
   "example.seeFullExample": "Voir un exemple complet",
   "example.withAllDetails": "avec toutes les alertes, le plan de négociation et les emails.",
@@ -111,7 +111,7 @@
   "pricing.getPro": "Passer à Pro",
 
   "cta.title": "Ce devis dans votre boîte mail ? Vous surpayez probablement.",
-  "cta.subtitle": "Découvrez-le en 60 secondes. Sans inscription, sans engagement — juste la clarté sur ce que vous devriez payer.",
+  "cta.subtitle": "Découvrez-le en quelques minutes. Sans inscription, sans engagement — juste la clarté sur ce que vous devriez payer.",
   "cta.button": "Analysez votre premier devis",
 
   "hero.verdict": "Négociez avant de signer",
@@ -152,7 +152,7 @@
   "footer.privacy": "Confidentialité",
   "footer.rights": "© 2026 TermLift. Tous droits réservés.",
 
-  "try.headline": "Déposez n'importe quel devis fournisseur. Obtenez les alertes, les économies et un email prêt à envoyer en 60 secondes.",
+  "try.headline": "Déposez n'importe quel devis fournisseur. Obtenez les alertes, les économies et un email prêt à envoyer en quelques minutes.",
   "try.noSignup": "Sans inscription pour votre première analyse.",
   "try.demoText": "Essayer avec un texte démo",
   "try.seeExample": "Voir un exemple complet d'abord",
@@ -199,7 +199,7 @@
   "login.and": "et",
 
   "app.dropFirst": "Déposez votre premier devis fournisseur",
-  "app.getRedFlags": "Obtenez les alertes, les opportunités d'économies et un email prêt à envoyer en 60 secondes.",
+  "app.getRedFlags": "Obtenez les alertes, les opportunités d'économies et un email prêt à envoyer en quelques minutes.",
   "app.remaining": "{remaining} analyses gratuites sur 4 restantes",
   "app.yourDeals": "Vos contrats",
   "app.dealsAnalyzed": "{count} contrats analysés",
@@ -247,14 +247,14 @@
   "analysis.roundHistory": "Historique des analyses",
   "analysis.roundsCompleted": "{count} rounds terminés",
   "analysis.addRound": "Ajouter un round",
-  "analysis.addRoundDesc": "Uploadez une contre-offre pour continuer la négociation",
+  "analysis.addRoundDesc": "Importez une contre-offre pour continuer la négociation",
 
   "onboarding.welcome": "Bienvenue sur TermLift",
-  "onboarding.welcomeSub": "Vous êtes à 60 secondes de savoir si votre fournisseur vous surfacture.",
+  "onboarding.welcomeSub": "Découvrez en quelques minutes si votre fournisseur vous surfacture.",
   "onboarding.cta": "Analyser mon premier devis",
   "onboarding.skip": "Passer l'introduction",
   "onboarding.tip": "Astuce",
-  "onboarding.tipText": "Uploadez un PDF, collez un email ou tapez votre devis. TermLift fonctionne avec tous les formats — déposez-le dans la zone ci-dessous.",
+  "onboarding.tipText": "Importez un PDF, collez un email ou tapez votre devis. TermLift fonctionne avec tous les formats — déposez-le dans la zone ci-dessous.",
 
   "settings.title": "Paramètres du compte",
   "settings.subtitle": "Gérez votre compte, abonnement et préférences.",
@@ -554,9 +554,9 @@
   "closeDeal.optSlaSupport": "SLA/Support",
 
   "addRound.title": "Ajouter un nouveau round",
-  "addRound.subtitle": "Uploadez une contre-offre pour continuer la négociation",
+  "addRound.subtitle": "Importez une contre-offre pour continuer la négociation",
   "addRound.round": "Round {number}",
-  "addRound.description": "Uploadez la contre-offre ou le devis révisé du fournisseur pour analyser les changements et obtenir des conseils de négociation mis à jour.",
+  "addRound.description": "Importez la contre-offre ou le devis révisé du fournisseur pour analyser les changements et obtenir des conseils de négociation mis à jour.",
   "addRound.uploadFile": "Uploader un fichier",
   "addRound.pasteText": "Coller du texte",
   "addRound.pastePlaceholder": "Collez le devis mis à jour ou la contre-offre ici...",
@@ -602,7 +602,7 @@
   "dealList.deleteConfirmClosed": "C'est un contrat clôturé avec des données d'économies. Êtes-vous sûr de vouloir le supprimer ?",
   "dealList.deleteFailed": "Échec de la suppression du contrat",
   "dealList.deleteError": "Erreur lors de la suppression du contrat",
-  "dealList.noDeals": "Aucun contrat. Uploadez votre premier devis pour commencer.",
+  "dealList.noDeals": "Aucun contrat. Importez votre premier devis pour commencer.",
 
   "charts.spendByCategory": "Dépenses par catégorie",
   "charts.savingsOverview": "Aperçu des économies",

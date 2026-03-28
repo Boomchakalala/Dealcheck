@@ -67,7 +67,7 @@
   "example": {
     "headline": "This is what your vendor hoped you wouldn't notice.",
     "youPaste": "You paste in a vendor quote",
-    "termliftReturns": "TermLift returns this in 60 seconds",
+    "termliftReturns": "TermLift returns this in minutes",
     "cta": "Analyze your first quote free",
     "seeFullExample": "See a full example",
     "withAllDetails": "with all red flags, negotiation plan, and email drafts.",
@@ -158,14 +158,14 @@
   "social": {
     "stat1": "8 years",
     "stat1Label": "Of procurement expertise built in",
-    "stat2": "60 seconds",
+    "stat2": "Minutes",
     "stat2Label": "From quote to negotiation plan",
     "stat3": "3 tones",
     "stat3Label": "Ready-to-send email drafts",
     "quote1": "After years of watching founders and ops managers sign contracts they shouldn't have, I built the tool I wished they'd had. TermLift is real procurement thinking — not generic AI.",
     "name1": "The founder",
     "title1": "8 years in procurement",
-    "quote2": "Most people don't overpay because they're bad at negotiation. They overpay because they don't know what to look for. TermLift closes that gap in 60 seconds.",
+    "quote2": "Most people don't overpay because they're bad at negotiation. They overpay because they don't know what to look for. TermLift closes that gap in minutes.",
     "name2": "Why this exists",
     "title2": "The problem we solve",
     "quote3": "Every red flag, every negotiation ask, every email draft comes from patterns seen across hundreds of real vendor contracts — not a prompt template.",
@@ -174,7 +174,7 @@
   },
   "cta": {
     "title": "That quote in your inbox? You're probably leaving money on the table.",
-    "subtitle": "Find out in 60 seconds. No signup, no commitment, just clear negotiation leverage and what to push back on.",
+    "subtitle": "Find out in minutes. No signup, no commitment, just clear negotiation leverage and what to push back on.",
     "button": "Analyze your first quote"
   },
   "footer": {
@@ -186,7 +186,7 @@
     "about": "About",
     "contact": "Contact",
     "rights": "© 2026 TermLift. All rights reserved.",
-    "description": "Turn vendor quotes into better deals in 60s.",
+    "description": "Turn vendor quotes into better deals.",
     "product": "Product",
     "company": "Company",
     "trust": "Trust & Security"
@@ -254,7 +254,7 @@
   },
   "try": {
     "headline": "Your vendor prepared for this negotiation. Now you can too.",
-    "noSignup": "Drop in your quote, get back red flags, savings, and a ready-to-send negotiation email in 60 seconds. No signup needed.",
+    "noSignup": "Drop in your quote, get back red flags, savings, and a ready-to-send negotiation email in minutes. No signup needed.",
     "demoText": "Try with demo text",
     "seeExample": "See a full example first",
     "analysisReady": "Your analysis is ready",
@@ -303,7 +303,7 @@
   },
   "app": {
     "dropFirst": "Drop in your first vendor quote",
-    "getRedFlags": "Get red flags, savings opportunities, and a ready-to-send email in 60 seconds.",
+    "getRedFlags": "Get red flags, savings opportunities, and a ready-to-send email in minutes.",
     "remaining": "{remaining} of 4 free analyses remaining",
     "yourDeals": "Your deals",
     "dealsAnalyzed": "{count} deals analyzed",
@@ -371,7 +371,7 @@
   },
   "onboarding": {
     "welcome": "Welcome to TermLift",
-    "welcomeSub": "You're 60 seconds away from finding out if your vendor is overcharging you.",
+    "welcomeSub": "Find out in minutes if your vendor is overcharging you.",
     "cta": "Analyze my first quote",
     "skip": "Skip setup",
     "tip": "Tip",
@@ -890,11 +890,11 @@
     "wereHereToHelp": "We're here to help.",
     "cat1": "What TermLift does",
     "cat1q1": "What is TermLift?",
-    "cat1a1": "TermLift is an AI-powered tool that helps you negotiate better vendor deals. Upload a quote or contract, and it finds red flags, estimates potential savings, builds a negotiation plan with specific asks, and drafts ready-to-send reply emails — all in about 60 seconds.",
+    "cat1a1": "TermLift is an AI-powered tool that helps you negotiate better vendor deals. Upload a quote or contract, and it finds red flags, estimates potential savings, builds a negotiation plan with specific asks, and drafts ready-to-send reply emails.",
     "cat1q2": "What TermLift is NOT",
     "cat1a2": "TermLift is not legal advice, not a guarantee of savings, and not a replacement for reading your contracts. It's a starting point that gives you leverage and structure — but you should always review the outputs yourself and consult a professional for legal or financial decisions.",
     "cat1q3": "How does the AI analysis work?",
-    "cat1a3": "Text is extracted from your document (PDF, image, or pasted text) and sent to Anthropic's Claude AI, which is prompted specifically for procurement analysis. It reads the full content, identifies risks, builds a negotiation strategy, and generates structured output — typically in under 60 seconds.",
+    "cat1a3": "Text is extracted from your document (PDF, image, or pasted text) and sent to Anthropic's Claude AI, which is prompted specifically for procurement analysis. It reads the full content, identifies risks, builds a negotiation strategy, and generates structured output.",
     "cat2": "Uploading quotes",
     "cat2q1": "How do I upload a quote?",
     "cat2a1": "You have four options: paste text directly into the text box, upload a PDF file, upload an image (PNG, JPG, or WEBP), or take a screenshot of a pricing page or email. Just drag and drop or click the upload area on the analysis page.",

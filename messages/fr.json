@@ -67,7 +67,7 @@
   "example": {
     "headline": "Voilà ce que votre fournisseur espérait que vous ne remarqueriez pas.",
     "youPaste": "Vous collez un devis fournisseur",
-    "termliftReturns": "TermLift vous renvoie ceci en 60 secondes",
+    "termliftReturns": "TermLift vous renvoie ceci en quelques minutes",
     "cta": "Analysez votre premier devis gratuitement",
     "seeFullExample": "Voir un exemple complet",
     "withAllDetails": "avec toutes les alertes, le plan de négociation et les emails.",
@@ -158,14 +158,14 @@
   "social": {
     "stat1": "8 ans",
     "stat1Label": "D'expertise achats intégrée",
-    "stat2": "60 secondes",
+    "stat2": "Minutes",
     "stat2Label": "Du devis au plan de négociation",
     "stat3": "3 tons",
     "stat3Label": "D'e-mails prêts à envoyer",
     "quote1": "Après des années à voir des fondateurs et des responsables ops signer des contrats qu'ils n'auraient pas dû, j'ai construit l'outil que j'aurais voulu qu'ils aient. TermLift, c'est une vraie logique achats — pas de l'IA générique.",
     "name1": "Le fondateur",
     "title1": "8 ans dans les achats",
-    "quote2": "La plupart des gens ne surpayent pas parce qu'ils négocient mal. Ils surpayent parce qu'ils ne savent pas quoi chercher. TermLift comble ce vide en 60 secondes.",
+    "quote2": "La plupart des gens ne surpayent pas parce qu'ils négocient mal. Ils surpayent parce qu'ils ne savent pas quoi chercher. TermLift comble ce vide en quelques minutes.",
     "name2": "Pourquoi ça existe",
     "title2": "Le problème qu'on résout",
     "quote3": "Chaque alerte, chaque demande de négociation, chaque brouillon d'e-mail vient de schémas observés sur des centaines de vrais contrats fournisseurs — pas d'un template de prompt.",
@@ -174,7 +174,7 @@
   },
   "cta": {
     "title": "Ce devis dans votre bo\u00eete mail ? Vous laissez probablement de l'argent sur la table.",
-    "subtitle": "D\u00e9couvrez-le en 60 secondes. Sans inscription, sans engagement, juste un levier de n\u00e9gociation clair et ce qu'il faut demander.",
+    "subtitle": "D\u00e9couvrez-le en quelques minutes. Sans inscription, sans engagement, juste un levier de n\u00e9gociation clair et ce qu'il faut demander.",
     "button": "Analysez votre premier devis"
   },
   "footer": {
@@ -186,7 +186,7 @@
     "about": "À propos",
     "contact": "Contact",
     "rights": "© 2026 TermLift. Tous droits réservés.",
-    "description": "Transformez vos devis fournisseurs en meilleurs contrats en 60s.",
+    "description": "Négociez mieux vos contrats fournisseurs.",
     "product": "Produit",
     "company": "Entreprise",
     "trust": "Confiance et sécurité"
@@ -303,7 +303,7 @@
   },
   "app": {
     "dropFirst": "Déposez votre premier devis fournisseur",
-    "getRedFlags": "Obtenez les alertes, les opportunités d'économies et un email prêt à envoyer en 60 secondes.",
+    "getRedFlags": "Obtenez les alertes, les opportunités d'économies et un email prêt à envoyer en quelques minutes.",
     "remaining": "{remaining} analyses gratuites sur 4 restantes",
     "yourDeals": "Vos contrats",
     "dealsAnalyzed": "{count} contrats analysés",
@@ -371,7 +371,7 @@
   },
   "onboarding": {
     "welcome": "Bienvenue sur TermLift",
-    "welcomeSub": "Vous êtes à 60 secondes de savoir si votre fournisseur vous surfacture.",
+    "welcomeSub": "Découvrez en quelques minutes si votre fournisseur vous surfacture.",
     "cta": "Analyser mon premier devis",
     "skip": "Passer l'introduction",
     "tip": "Astuce",
@@ -890,11 +890,11 @@
     "wereHereToHelp": "Nous sommes là pour vous aider.",
     "cat1": "Ce que fait TermLift",
     "cat1q1": "Qu'est-ce que TermLift ?",
-    "cat1a1": "TermLift est un outil alimenté par l'IA qui vous aide à mieux négocier vos contrats fournisseurs. Importez un devis ou un contrat, et il identifie les points d'alerte, estime les économies potentielles, élabore un plan de négociation avec des demandes précises et rédige des emails de réponse prêts à envoyer — le tout en environ 60 secondes.",
+    "cat1a1": "TermLift est un outil alimenté par l'IA qui vous aide à mieux négocier vos contrats fournisseurs. Importez un devis ou un contrat, et il identifie les points d'alerte, estime les économies potentielles, élabore un plan de négociation avec des demandes précises et rédige des emails de réponse prêts à envoyer.",
     "cat1q2": "Ce que TermLift N'est PAS",
     "cat1a2": "TermLift n'est pas un conseil juridique, ni une garantie d'économies, ni un substitut à la lecture de vos contrats. C'est un point de départ qui vous donne du levier et une structure — mais vous devez toujours vérifier les résultats par vous-même et consulter un professionnel pour les décisions juridiques ou financières.",
     "cat1q3": "Comment fonctionne l'analyse IA ?",
-    "cat1a3": "Le texte est extrait de votre document (PDF, image ou texte collé) et envoyé à l'IA Claude d'Anthropic, spécifiquement paramétrée pour l'analyse d'achats. Elle lit l'intégralité du contenu, identifie les risques, construit une stratégie de négociation et génère un résultat structuré — généralement en moins de 60 secondes.",
+    "cat1a3": "Le texte est extrait de votre document (PDF, image ou texte collé) et envoyé à l'IA Claude d'Anthropic, spécifiquement paramétrée pour l'analyse d'achats. Elle lit l'intégralité du contenu, identifie les risques, construit une stratégie de négociation et génère un résultat structuré.",
     "cat2": "Import de devis",
     "cat2q1": "Comment importer un devis ?",
     "cat2a1": "Vous avez quatre options : coller du texte directement dans la zone de texte, importer un fichier PDF, importer une image (PNG, JPG ou WEBP), ou faire une capture d'écran d'une page de tarifs ou d'un email. Glissez-déposez ou cliquez sur la zone d'import de la page d'analyse.",
