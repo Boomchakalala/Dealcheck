@@ -348,8 +348,8 @@ export default function LandingPage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-0">
             <div className="text-center mb-10">
               <h3 className="text-2xl sm:text-3xl md:text-[2rem] font-bold text-white">
-                {t('example.headline').split(/(wouldn't notice|n'auriez pas remarqué)/i).map((part, i) =>
-                  /wouldn't notice|n'auriez pas remarqué/i.test(part)
+                {t('example.headline').split(/(wouldn't notice|ne verrez pas)/i).map((part, i) =>
+                  /wouldn't notice|ne verrez pas/i.test(part)
                     ? <span key={i} className="text-red-400 italic">{part}</span>
                     : <span key={i}>{part}</span>
                 )}
