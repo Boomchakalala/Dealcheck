@@ -6,6 +6,7 @@ import { MarketingFooter } from '@/components/MarketingFooter'
 import { getPostBySlug, getAllPosts } from '@/lib/blog'
 import { ArrowLeft, Clock } from 'lucide-react'
 import { renderMarkdownToHtml } from '@/lib/render-markdown'
+import { EmailCapture } from '@/components/EmailCapture'
 import { cookies } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
 
@@ -132,8 +133,13 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </div>
 
+        {/* Email capture */}
+        <div className="mt-10">
+          <EmailCapture source="blog" />
+        </div>
+
         {/* CTA */}
-        <div className="mt-12 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-8 sm:p-10 text-center">
+        <div className="mt-8 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-8 sm:p-10 text-center">
           <h3 className="text-xl font-bold text-white mb-3">{t('blog.ctaTitle')}</h3>
           <p className="text-sm text-emerald-100 mb-5 max-w-md mx-auto">{locale === 'fr' ? 'Collez votre devis fournisseur et obtenez alertes, économies et un email prêt à envoyer en quelques minutes.' : 'Paste your vendor quote and get back red flags, savings, and a ready-to-send email in minutes.'}</p>
           <Link

@@ -608,4 +608,227 @@ TermLift analyse votre devis fournisseur et signale automatiquement tous ces pro
 **[Essayez gratuitement](/try)**
 `,
   },
+  {
+    slug: 'how-to-respond-to-vendor-price-increase',
+    title: 'Comment répondre à une hausse de prix fournisseur (sans casser la relation)',
+    description: 'Les hausses de prix fournisseur sont courantes, mais rarement définitives. Voici comment évaluer si la hausse est justifiée, quoi demander, et comment rédiger l\'e-mail de contestation.',
+    date: '2026-03-28',
+    readTime: '6 min de lecture',
+    category: 'Négociation',
+    content: `
+## Votre fournisseur vient d'annoncer une hausse. Ce n'est pas une fatalité.
+
+Chaque année, des milliers d'entreprises reçoivent un e-mail de leur fournisseur annonçant une « révision tarifaire ». La plupart acceptent sans broncher. Pourtant, selon les estimations du secteur, 60 à 70 % des hausses de prix fournisseurs sont négociables, en totalité ou en partie.
+
+La clé : savoir quel type de hausse vous avez en face, évaluer sa légitimité, et formuler la bonne réponse.
+
+---
+
+## Pourquoi les fournisseurs augmentent leurs prix
+
+Les raisons sont multiples, mais elles ne se valent pas toutes. Avant de répondre, identifiez la nature de la hausse.
+
+### Les 3 types de hausse
+
+**1. Hausse liée à l'inflation ou à l'IPC**
+
+Le fournisseur invoque la hausse des coûts généraux : matières premières, énergie, salaires. C'est le type le plus courant et souvent le plus légitime.
+
+**Comment la repérer :** Le fournisseur fait référence à l'indice des prix à la consommation, au coût des matières premières, ou à « l'évolution du marché ». La hausse se situe généralement entre 2 et 5 %.
+
+**2. Hausse furtive**
+
+Le prix unitaire reste identique, mais le périmètre diminue. Moins de licences incluses, support réduit, fonctionnalités déplacées vers un niveau supérieur. Vous payez le même montant pour moins de valeur.
+
+**Comment la repérer :** Comparez le détail du nouveau devis avec l'ancien. Si des éléments ont disparu ou changé de niveau, c'est une hausse déguisée.
+
+**3. Hausse opportuniste**
+
+Aucune justification objective. Le fournisseur augmente parce qu'il pense que vous ne contesterez pas. C'est fréquent chez les fournisseurs en position dominante ou lorsque le coût de changement est élevé.
+
+**Comment la repérer :** La hausse dépasse 5 %, sans référence à un indice, sans justification détaillée, et sans modification du périmètre.
+
+---
+
+## Comment évaluer si la hausse est justifiée
+
+Avant de contester, faites vos vérifications :
+
+**1. Comparez avec l'IPC réel.** Si l'inflation annuelle est à 2,5 % et que votre fournisseur demande 8 %, l'écart de 5,5 points nécessite une explication.
+
+**2. Vérifiez les prix du marché.** Demandez 2 à 3 devis concurrents pour des prestations équivalentes. Si le marché est à 10 % en dessous du nouveau tarif, vous avez un argument solide.
+
+**3. Analysez votre historique.** Avez-vous déjà subi des hausses les années précédentes ? Un fournisseur qui augmente de 5 % chaque année depuis 3 ans a cumulé 15,7 % de hausse. Sur un contrat à 60 000 par an, cela représente 9 420 de plus qu'au départ.
+
+**4. Évaluez votre dépendance.** Plus le coût de changement est élevé, plus le fournisseur se permet d'augmenter. Mais cela ne signifie pas que vous devez accepter sans négocier.
+
+---
+
+## Quoi demander : les 4 options de réponse
+
+Vous n'êtes pas limité à « oui » ou « non ». Voici vos options :
+
+### 1. Plafonner la hausse
+
+Acceptez le principe, mais limitez le montant. « Nous comprenons la nécessité d'un ajustement. Nous proposons un plafond à 3 %, en ligne avec l'IPC. »
+
+**Quand l'utiliser :** La hausse est partiellement justifiée, mais le pourcentage est excessif.
+
+### 2. Reporter la hausse
+
+Demandez un délai de 6 mois avant l'application. Cela vous donne le temps de budgétiser et de comparer les alternatives.
+
+**Quand l'utiliser :** La hausse arrive en milieu d'exercice ou sans préavis suffisant.
+
+### 3. Négocier en contrepartie
+
+Acceptez la hausse si le fournisseur améliore les conditions. Plus de licences, support étendu, gel tarifaire pour les 2 prochaines années, allongement du délai de préavis.
+
+**Quand l'utiliser :** Le fournisseur ne bougera pas sur le prix, mais vous pouvez obtenir de la valeur en échange.
+
+### 4. Refuser et engager un appel d'offres
+
+Si la hausse est injustifiée et que le fournisseur refuse de négocier, mettez le contrat en concurrence. Même si vous ne changez pas, l'exercice produit des données de marché qui renforcent votre position.
+
+**Quand l'utiliser :** La hausse dépasse 10 %, le fournisseur ne justifie rien, et des alternatives crédibles existent.
+
+---
+
+## Comment écrire l'e-mail de contestation
+
+> Bonjour [Nom],
+>
+> Merci pour l'avis de révision tarifaire concernant notre contrat [référence/service]. Nous avons bien noté la hausse proposée de [X] %.
+>
+> Avant d'accepter, nous souhaitons comprendre les facteurs qui justifient cet ajustement. L'IPC actuel est de [Y] %, et nous avons reçu des offres concurrentes en dessous de votre nouveau tarif pour des prestations équivalentes.
+>
+> Nous proposons les options suivantes :
+>
+> 1. Plafonner la hausse à [Z] %, en cohérence avec les indices de référence du marché.
+> 2. Reporter l'application de 6 mois pour nous permettre de l'intégrer à notre prévision budgétaire.
+> 3. Maintenir le tarif actuel en échange d'un engagement de [durée].
+>
+> Nous tenons à poursuivre notre collaboration. Pouvons-nous en discuter cette semaine ?
+>
+> Cordialement,
+> [Votre Nom]
+
+**Pourquoi cet e-mail fonctionne :** Il est factuel, propose des alternatives, et signale que vous avez fait vos recherches sans menacer la relation.
+
+---
+
+## L'essentiel
+
+Les hausses de prix ne sont pas des décisions unilatérales. Ce sont des propositions. Et toute proposition se négocie.
+
+Un fournisseur qui perd un client fidèle sur une hausse de 5 % fait une mauvaise affaire. Il le sait. Votre rôle est de lui rappeler, calmement et avec des données.
+
+TermLift analyse votre devis fournisseur et identifie automatiquement les hausses, les écarts avec le marché, et les points de négociation. Collez votre devis et récupérez un e-mail de contestation prêt à envoyer.
+
+**[Essayez gratuitement](/try)**
+`,
+  },
+  {
+    slug: 'saas-renewal-checklist',
+    title: 'Checklist de renouvellement SaaS : 10 points à vérifier avant de signer',
+    description: 'Avant de renouveler votre contrat SaaS, passez en revue ces 10 points. Chaque point oublié est une économie manquée ou un risque accepté sans le savoir.',
+    date: '2026-03-24',
+    readTime: '5 min de lecture',
+    category: 'SaaS',
+    content: `
+## 10 points. 15 minutes. Des milliers d'euros d'économies potentielles.
+
+Le renouvellement SaaS est le moment où vous avez le plus de levier. Votre fournisseur veut votre signature. Vous avez le droit de poser des conditions. Voici les 10 points à vérifier systématiquement avant de signer.
+
+---
+
+## 1. Nombre de licences
+
+Comparez le nombre de licences souscrites au nombre d'utilisateurs qui se connectent réellement. La plupart des entreprises paient 20 à 30 % de licences en trop. Sur un contrat à 50 licences à 80 par mois, 10 licences inutilisées représentent 9 600 par an de gaspillage. Demandez un réajustement au nombre d'utilisateurs actifs plus 10 % de marge.
+
+**Ce qu'il faut demander :** « Pouvez-vous nous fournir les données d'utilisation des 6 derniers mois ? Nous souhaitons ajuster le nombre de licences au renouvellement. »
+
+---
+
+## 2. Préavis de renouvellement
+
+Vérifiez le délai de notification pour refuser ou renégocier le renouvellement. Un préavis de 30 jours vous laisse très peu de temps pour évaluer les alternatives. Si vous manquez la fenêtre, vous êtes engagé automatiquement pour un cycle supplémentaire au tarif du fournisseur.
+
+**Ce qu'il faut demander :** « Pouvons-nous allonger le délai de préavis de renouvellement à 60 jours minimum ? »
+
+---
+
+## 3. Clause d'augmentation
+
+Vérifiez si le contrat autorise des hausses automatiques au renouvellement. Une clause de « jusqu'à 8 % par an » sur un contrat à 40 000 signifie un surcoût potentiel de 12 985 sur 3 ans par rapport à un tarif fixe. Si la clause existe, négociez un plafond à 3 % ou à l'IPC.
+
+**Ce qu'il faut demander :** « La clause d'augmentation prévoit [X] %. Pouvons-nous la plafonner à 3 % ou à l'indice des prix, le plus bas des deux ? »
+
+---
+
+## 4. Durée d'engagement
+
+Évaluez si un engagement annuel, pluriannuel ou mensuel correspond à vos besoins. Un engagement de 3 ans vous donne un levier sur le prix (les fournisseurs offrent 10 à 20 % de remise pour un engagement long), mais vous prive de flexibilité. Un engagement mensuel coûte plus cher mais vous permet de partir à tout moment.
+
+**Ce qu'il faut demander :** « Quelle remise proposez-vous pour un engagement de 2 ans par rapport à un renouvellement annuel ? »
+
+---
+
+## 5. Conditions de paiement
+
+Vérifiez si le paiement est annuel d'avance, trimestriel ou mensuel. Un paiement annuel d'avance de 48 000 immobilise votre trésorerie pendant 12 mois. Demandez un paiement trimestriel ou semestriel sans majoration. Si le fournisseur insiste sur le paiement annuel, négociez une remise de 3 à 5 % en contrepartie.
+
+**Ce qu'il faut demander :** « Proposez-vous un échéancier trimestriel sans surcoût ? Si le paiement annuel est requis, y a-t-il une remise associée ? »
+
+---
+
+## 6. Fonctionnalités groupées
+
+Identifiez les modules, options ou niveaux de service inclus dans votre forfait que vous n'utilisez pas. Les fournisseurs SaaS regroupent volontairement les fonctionnalités pour justifier un prix plus élevé. Un forfait « Entreprise » à 120 par utilisateur peut contenir des analyses avancées, un support premium et un accès API que votre équipe n'exploite pas. Le forfait « Professionnel » à 80 couvrirait vos besoins réels.
+
+**Ce qu'il faut demander :** « Pouvons-nous passer au forfait [inférieur] ? Nous n'utilisons que [liste des fonctionnalités]. »
+
+---
+
+## 7. Données d'utilisation
+
+Demandez au fournisseur un rapport d'utilisation détaillé. Ce rapport est votre meilleur outil de négociation. Il montre combien de licences sont actives, quelles fonctionnalités sont utilisées, et quel volume de stockage ou de transactions vous consommez réellement. Si les données montrent une sous-utilisation, vous avez un argument objectif pour réduire le périmètre.
+
+**Ce qu'il faut demander :** « Pouvez-vous nous transmettre un rapport d'utilisation couvrant les 12 derniers mois, incluant les connexions actives, les fonctionnalités utilisées et le volume consommé ? »
+
+---
+
+## 8. Alternatives concurrentes
+
+Avant de renouveler, obtenez 2 à 3 devis de solutions concurrentes. Vous n'avez pas besoin de changer de fournisseur. Le simple fait de disposer d'offres comparables renforce votre position de négociation. Un devis concurrent 15 % en dessous de votre tarif actuel est un argument que tout responsable de compte prendra au sérieux.
+
+**Ce qu'il faut demander :** « Nous avons reçu des offres concurrentes en dessous de votre tarif pour des fonctionnalités équivalentes. Y a-t-il une marge de manœuvre sur le prix de renouvellement ? »
+
+---
+
+## 9. Date de fin de contrat
+
+Identifiez la date exacte de fin de votre contrat actuel et programmez des rappels 90, 60 et 30 jours avant. La majorité des mauvaises affaires au renouvellement viennent d'un manque de préparation. Si vous commencez à négocier 10 jours avant l'échéance, le fournisseur sait que vous n'avez pas le temps de partir. Votre levier disparaît.
+
+**Ce qu'il faut faire :** Programmez trois rappels dans votre agenda dès maintenant. 90 jours avant : lancez l'évaluation. 60 jours avant : envoyez vos demandes. 30 jours avant : finalisez l'accord.
+
+---
+
+## 10. Clause de sortie
+
+Vérifiez les conditions de résiliation anticipée. Si le contrat ne prévoit aucune option de sortie pendant la période d'engagement, vous perdez tout levier une fois la signature apposée. Demandez une clause de résiliation pour convenance avec un préavis de 60 à 90 jours, ou une clause de sortie à mi-parcours moyennant une indemnité raisonnable.
+
+**Ce qu'il faut demander :** « Pouvons-nous ajouter une clause de résiliation anticipée avec un préavis de 90 jours et un remboursement au prorata des mois restants ? »
+
+---
+
+## L'essentiel
+
+Ces 10 points prennent 15 minutes à vérifier et peuvent vous faire économiser des milliers d'euros par renouvellement. Le meilleur moment pour négocier, c'est avant de signer. Après, il est trop tard.
+
+TermLift automatise cette vérification. Collez votre devis de renouvellement SaaS et récupérez chaque signal d'alerte, chaque opportunité d'économie et un e-mail de négociation prêt à envoyer.
+
+**[Essayez gratuitement](/try)**
+`,
+  },
 ]

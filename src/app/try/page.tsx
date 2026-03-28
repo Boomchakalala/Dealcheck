@@ -8,6 +8,7 @@ import { QuoteUploaderCard } from '@/components/QuoteUploaderCard'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { trackEvent } from '@/lib/analytics'
 import { ArrowRight, X } from 'lucide-react'
+import { EmailCapture } from '@/components/EmailCapture'
 import { useI18n } from '@/i18n/context'
 import type { DealOutput } from '@/types'
 
@@ -258,6 +259,11 @@ This quote expires in 14 days.`
               </Link>
             </div>
           )}
+
+          {/* Email capture */}
+          <div className="mt-6">
+            <EmailCapture source="try" />
+          </div>
         </main>
 
         <MarketingFooter />

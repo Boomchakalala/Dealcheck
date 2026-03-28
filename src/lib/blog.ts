@@ -616,6 +616,245 @@ TermLift reads your vendor quote and flags all of these issues automatically, wi
 **[Try it free](/try)**
 `,
   },
+  {
+    slug: 'how-to-respond-to-vendor-price-increase',
+    title: 'How to respond to a vendor price increase (without burning the relationship)',
+    description: 'Most vendor price increases are negotiable. Here is how to evaluate the increase, what to push back on, and the email that gets you a better outcome.',
+    date: '2026-03-28',
+    readTime: '6 min read',
+    category: 'Negotiation',
+    content: `
+## Your vendor just raised the price. Here is what to do next.
+
+You open the email: "Effective next quarter, pricing will increase by 8%." No explanation, no breakdown, just a number and a new invoice.
+
+Your instinct is to accept it or blow up the relationship. Neither is the right move. Most price increases are negotiable, and the vendors sending them know it. They are counting on you to absorb the hit without asking questions.
+
+Here is how to respond strategically.
+
+---
+
+## Why vendors increase prices (and why most are negotiable)
+
+Vendors raise prices for three reasons. Only one of them is fully justified.
+
+**1. CPI/inflation-based increases:** These are tied to actual cost increases in labor, infrastructure, or materials. They are usually modest (2-4%) and often written into the contract. These are the most defensible.
+
+**2. Stealth increases:** The vendor adds a new fee, changes the billing unit, or restructures tiers so you end up paying more without the sticker price technically changing. Example: moving from per-user to per-seat billing where "seats" include API keys and service accounts.
+
+**3. Opportunistic increases:** The vendor knows switching costs are high and you are unlikely to leave. They test a 7-12% increase because most customers will pay it. There is no cost basis for the increase. It is pure margin expansion.
+
+**The key insight:** Types 2 and 3 are almost always negotiable. Even type 1 has room if you ask the right questions.
+
+---
+
+## How to evaluate if the increase is justified
+
+Before you push back, do 5 minutes of homework:
+
+**Check the contract.** Does it specify a cap on annual increases? If the contract says "up to 5%" and they are asking for 8%, you have an immediate argument.
+
+**Ask for the breakdown.** A legitimate cost increase should come with specifics: which costs went up, by how much, and how that translates to your pricing. If the vendor cannot explain it, the increase is not cost-driven.
+
+**Benchmark the market.** What are comparable vendors charging? If you are paying $85/user/month and the market range is $60-80, the increase makes the gap worse, not better.
+
+**Check your usage.** Have you grown significantly? If you added 40% more users, a 5% price increase on a larger base might be reasonable. If usage is flat and the price is going up, that is pure margin.
+
+---
+
+## The 3 ways to push back
+
+You do not have to accept or reject the increase outright. There are three negotiation strategies, and you can combine them.
+
+### 1. Cap it
+
+**What to ask:** "We understand costs increase over time. Can we cap this at 3% instead of 8%? We would also like to lock that cap for the next 2 years."
+
+**Why it works:** You are not refusing the increase entirely. You are showing you are reasonable while cutting the actual impact by 60%.
+
+### 2. Delay it
+
+**What to ask:** "Can we push the effective date by 6 months? That gives us time to adjust our budget and avoids a mid-quarter cost change."
+
+**Why it works:** A 6-month delay on an 8% increase saves you 4% of annual spend. The vendor keeps the increase but you buy time and reduce the immediate hit.
+
+### 3. Trade for it
+
+**What to ask:** "If we are absorbing this increase, we need something in return. Can we get [extended payment terms / additional seats / a price lock for 2 years / removal of the auto-renewal clause]?"
+
+**Why it works:** The vendor gets their revenue. You get tangible value back. Nobody loses.
+
+---
+
+## How to write the pushback email
+
+Do not call. Do not schedule a meeting. Write an email. It gives you control of the framing, creates a written record, and removes the pressure of a live conversation.
+
+> Hi [Name],
+>
+> Thanks for the heads up on the pricing change. We value the partnership and want to keep things moving.
+>
+> Before we accept the new rate, I wanted to discuss a few things:
+>
+> 1. Can you share the cost basis for the 8% increase? We would like to understand what is driving it.
+> 2. Would you consider capping it at 3-4%? That is more in line with what we are seeing from other vendors.
+> 3. If the full increase stands, could we offset it with [extended terms / additional seats / a 2-year price lock]?
+>
+> We are committed to continuing the relationship. If we can align on this, I am happy to confirm the renewal this week.
+>
+> Best regards,
+> [Your Name]
+
+**Why this works:** It is specific, it is professional, and it gives the vendor three paths to yes. You are not threatening to leave. You are asking reasonable questions and offering to close quickly.
+
+---
+
+## What happens next
+
+In most cases, you will get one of three responses:
+
+**1. They reduce the increase.** This happens about 60% of the time. The vendor comes back with 4-5% instead of 8%. Take it if it is reasonable.
+
+**2. They hold firm on price but offer something else.** Additional seats, extended terms, a price lock. Evaluate the total value, not just the rate.
+
+**3. They say no to everything.** This is rare, but it happens. Now you know the relationship is transactional, and you should start evaluating alternatives for the next renewal cycle.
+
+---
+
+## The bottom line
+
+A price increase is not a crisis. It is a negotiation opportunity. The vendor sent you a number. Your job is to send back a better one.
+
+TermLift does this automatically. Paste the price increase notice, and it identifies the type of increase, calculates the impact, and generates a pushback email with specific asks.
+
+**[Try it free](/try)**
+`,
+  },
+  {
+    slug: 'saas-renewal-checklist',
+    title: 'SaaS renewal checklist: 10 things to check before you sign',
+    description: 'A quick-reference checklist for SaaS renewals. 10 items, what to check, why it matters, and exactly what to ask your vendor.',
+    date: '2026-03-24',
+    readTime: '5 min read',
+    category: 'SaaS',
+    content: `
+## 10 checks. 15 minutes. Thousands in potential savings.
+
+SaaS renewals arrive with a deadline and an invoice. The vendor wants you to sign quickly. Your job is to slow down for 15 minutes and run through this list.
+
+Every item below has saved real money for real buyers. Print it, bookmark it, or paste it into your renewal workflow.
+
+---
+
+## 1. Seat count
+
+**Check:** How many seats are you paying for vs. how many people actually log in?
+
+**Why it matters:** The average SaaS contract has 20-30% unused seats. At $50/user/month, 10 unused seats cost you $6,000/year for nothing.
+
+**What to ask:** "We want to right-size from [current] to [target] seats based on actual usage. Can you adjust the renewal?"
+
+---
+
+## 2. Auto-renewal notice period
+
+**Check:** How many days before renewal do you need to give written notice to cancel or renegotiate?
+
+**Why it matters:** A 30-day notice window on a 12-month contract gives you almost no time to evaluate alternatives. Miss it and you are locked in for another year at whatever price the vendor sets.
+
+**What to ask:** "Can we extend the notice period to 60 or 90 days? And can you commit to sending a reminder email 90 days before renewal?"
+
+---
+
+## 3. Price escalation clause
+
+**Check:** Does the contract allow annual price increases? Is there a cap?
+
+**Why it matters:** A 7% annual escalation on a $40,000 contract adds $8,400 in extra costs over 3 years compared to a locked rate. Many contracts say "subject to annual review" with no cap at all.
+
+**What to ask:** "Can we cap annual increases at 3% or CPI, whichever is lower? Or lock the price for the full term in exchange for a multi-year commitment?"
+
+---
+
+## 4. Commitment term
+
+**Check:** Are you signing for 12, 24, or 36 months? Can you exit early?
+
+**Why it matters:** Longer terms usually mean better pricing, but they also mean less flexibility. If your team changes size or your needs shift, you are stuck paying for something that no longer fits.
+
+**What to ask:** "What is the pricing difference between 12 and 24 months? And can we include an early exit clause after 12 months with a 2-month fee?"
+
+---
+
+## 5. Payment terms
+
+**Check:** Are you paying annually upfront, quarterly, or monthly? When is payment due?
+
+**Why it matters:** Annual upfront payment is a cash flow hit and gives the vendor your money before they deliver a full year of service. Monthly billing keeps leverage in your hands. If you do pay upfront, you should get a discount.
+
+**What to ask:** "Is there a discount for annual prepayment? If not, can we switch to quarterly billing?"
+
+---
+
+## 6. Bundled features you do not use
+
+**Check:** What tier are you on? What features does it include? Which ones do you actually use?
+
+**Why it matters:** SaaS vendors bundle aggressively. You might be on an Enterprise tier paying for SSO, advanced analytics, and API access when your team only uses the core product. Downgrading one tier could save 20-35%.
+
+**What to ask:** "We are only using [specific features]. Can we move to [lower tier] and save the difference?"
+
+---
+
+## 7. Usage data
+
+**Check:** What does your actual usage look like? Logins, active users, feature adoption, storage consumed.
+
+**Why it matters:** Usage data is your strongest negotiation tool. If 60% of your licensed users have not logged in this quarter, you have a clear, data-backed case for reducing seats or renegotiating the rate.
+
+**What to ask:** "Can you share our usage report for the last 6 months? We want to make sure our renewal aligns with actual consumption."
+
+---
+
+## 8. Competitive alternatives
+
+**Check:** What are 2-3 comparable tools charging for the same functionality?
+
+**Why it matters:** You do not need to switch vendors to benefit from competition. Simply knowing the market rate gives you a benchmark. If your vendor is 25% above market, that is a conversation worth having.
+
+**What to ask:** "We have been evaluating the market and comparable solutions are priced at [range]. Can you help us close the gap?"
+
+---
+
+## 9. Contract end date
+
+**Check:** When exactly does the current contract end? Is it the date you think it is?
+
+**Why it matters:** Contracts that auto-renewed last year might have shifted the renewal date. If you are negotiating based on the wrong end date, you could miss the window entirely. Check the signed agreement, not your memory.
+
+**What to ask:** "Can you confirm the exact end date and the notice deadline for this renewal? I want to make sure we are aligned."
+
+---
+
+## 10. Exit clause
+
+**Check:** What happens if you need to leave mid-contract? Is there a termination for convenience clause?
+
+**Why it matters:** Business changes. Acquisitions happen. Teams restructure. If your contract has no exit clause, you are paying the full term regardless of whether the tool still makes sense. A clean exit clause with 60-90 days notice and a reasonable fee is standard and worth negotiating.
+
+**What to ask:** "Can we add a termination for convenience clause with 90 days notice and a pro-rata refund of prepaid fees?"
+
+---
+
+## The bottom line
+
+None of these checks take more than 2 minutes. Together, they take about 15 minutes and consistently save 10-25% on SaaS renewals.
+
+TermLift runs this entire analysis automatically. Paste your renewal quote, and it checks every item on this list, flags the risks, calculates the savings, and drafts the negotiation email for you.
+
+**[Try it free](/try)**
+`,
+  },
 ]
 
 import { blogPostsFr } from './blog-fr'

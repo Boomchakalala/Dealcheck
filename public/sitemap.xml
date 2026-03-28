@@ -96,6 +96,18 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://www.termlift.com/blog/saas-renewal-checklist</loc>
+    <lastmod>2026-03-24</lastmod>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://www.termlift.com/blog/how-to-respond-to-vendor-price-increase</loc>
+    <lastmod>2026-03-28</lastmod>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://www.termlift.com/privacy</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
