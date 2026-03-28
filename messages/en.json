@@ -186,10 +186,15 @@
     "about": "About",
     "contact": "Contact",
     "rights": "© 2026 TermLift. All rights reserved.",
-    "description": "Turn vendor quotes into better deals.",
+    "description": "Analyze your vendor quotes. Identify contract risks and potential savings.",
     "product": "Product",
     "company": "Company",
-    "trust": "Trust & Security"
+    "trust": "Trust & Security",
+    "trustNoSignup": "No signup required",
+    "trustFastAnalysis": "Analysis in minutes",
+    "trustNoDataStored": "Data not stored",
+    "ctaTitle": "Ready to analyze your quote?",
+    "ctaButton": "Analyze my quote"
   },
   "about": {
     "heroTitle": "Built by someone who's been on your side of the table",

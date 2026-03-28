@@ -186,10 +186,15 @@
     "about": "À propos",
     "contact": "Contact",
     "rights": "© 2026 TermLift. Tous droits réservés.",
-    "description": "Négociez mieux vos contrats fournisseurs.",
+    "description": "Analysez vos devis fournisseurs. Identifiez les risques contractuels et les économies potentielles.",
     "product": "Produit",
     "company": "Entreprise",
-    "trust": "Confiance et sécurité"
+    "trust": "Confiance et sécurité",
+    "trustNoSignup": "Sans inscription",
+    "trustFastAnalysis": "Analyse en quelques minutes",
+    "trustNoDataStored": "Données non conservées",
+    "ctaTitle": "Prêt à analyser votre devis ?",
+    "ctaButton": "Analyser mon devis"
   },
   "about": {
     "heroTitle": "Conçu par quelqu'un qui a été de votre côté de la table",
