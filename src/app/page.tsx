@@ -87,13 +87,14 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href="/example"
-                  className="inline-flex items-center justify-center w-full sm:w-auto px-7 sm:px-8 py-3.5 text-sm sm:text-base font-medium rounded-xl border border-slate-200 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-all"
+                  className="group inline-flex items-center justify-center w-full sm:w-auto px-7 sm:px-8 py-3.5 text-sm sm:text-base font-semibold rounded-xl border-2 border-emerald-200 text-emerald-700 bg-emerald-50/50 hover:bg-emerald-100 hover:border-emerald-300 transition-all"
                 >
                   {t('hero.ctaSecondary')}
+                  <ArrowRight className="w-4 h-4 ml-2 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
               </div>
 
-              <p className="text-xs text-slate-400 mt-4 sm:mt-5 text-center sm:text-left">{t('hero.noSignup')}</p>
+              <p className="text-sm text-slate-500 font-medium mt-4 sm:mt-5 text-center sm:text-left">{t('hero.noSignup')}</p>
             </div>
 
             {/* Right: Product Preview — compact mini-preview */}
