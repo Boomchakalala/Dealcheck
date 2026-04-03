@@ -295,58 +295,8 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
                 </div>
 
                 {/* AI action buttons */}
-                <div className="mt-4 space-y-2">
-                  {/* AI comparison — from rounds or uploaded doc */}
-                  {(() => {
-                    const canAnalyze = roundCount >= 2 || !!extractedDocText
-                    const label = aiLoading
-                      ? (extractedDocText ? 'Analyzing document vs original...' : 'Analyzing your rounds...')
-                      : extractedDocText
-                        ? 'Compare uploaded document to original quote'
-                        : 'Auto-fill from your rounds'
-                    const sublabel = canAnalyze
-                      ? (extractedDocText
-                          ? 'AI compares the uploaded document against your Round 1 analysis'
-                          : 'Compares your negotiation rounds to extract final terms and savings')
-                      : `Upload a final document above, or add more rounds (you have ${roundCount})`
-                    return (
-                      <button
-                        type="button"
-                        onClick={handleAICalc}
-                        disabled={aiLoading || !canAnalyze}
-                        className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all group ${
-                          canAnalyze
-                            ? 'border-emerald-200 bg-white hover:bg-emerald-50/50 hover:border-emerald-300 cursor-pointer'
-                            : 'border-slate-100 bg-slate-50/50 cursor-not-allowed'
-                        }`}
-                      >
-                        {aiLoading ? (
-                          <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                            <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
-                          </div>
-                        ) : (
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                            canAnalyze ? 'bg-emerald-100' : 'bg-slate-100'
-                          }`}>
-                            <Zap className={`w-4 h-4 ${canAnalyze ? 'text-emerald-600' : 'text-slate-400'}`} />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-xs font-semibold ${canAnalyze ? 'text-slate-800' : 'text-slate-400'}`}>
-                            {label}
-                          </p>
-                          <p className={`text-[10px] mt-0.5 ${canAnalyze ? 'text-slate-500' : 'text-slate-400'}`}>
-                            {sublabel}
-                          </p>
-                        </div>
-                        {!aiLoading && canAnalyze && (
-                          <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:text-emerald-600 flex-shrink-0 transition-colors" />
-                        )}
-                      </button>
-                    )
-                  })()}
-
-                  {/* Upload signed contract */}
+                <div className="mt-4 space-y-3">
+                  {/* Step 1: Upload signed contract */}
                   <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp" className="hidden" onChange={handleFileSelect} />
                   {uploadedFile ? (
                     <div className="flex items-center gap-3 p-3.5 bg-white rounded-xl border border-emerald-200">
@@ -355,9 +305,9 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-slate-800 truncate">{uploadedFile}</p>
-                        <p className="text-[10px] text-emerald-600 mt-0.5">{uploadLoading ? 'Extracting text...' : extractedDocText ? 'Ready for AI comparison' : 'Signed contract attached'}</p>
+                        <p className="text-[10px] text-emerald-600 mt-0.5">{uploadLoading ? 'Extracting text...' : extractedDocText ? 'Document ready' : 'Processing...'}</p>
                       </div>
-                      <button onClick={() => setUploadedFile(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded transition-colors">
+                      <button onClick={() => { setUploadedFile(null); setExtractedDocText(null) }} className="p-1 text-slate-400 hover:text-slate-600 rounded transition-colors">
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -371,9 +321,52 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
                         <Upload className="w-4 h-4 text-emerald-500" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-slate-700">Upload signed contract</p>
-                        <p className="text-[10px] text-slate-500 mt-0.5">PDF of the final executed agreement for AI comparison</p>
+                        <p className="text-xs font-semibold text-slate-700">Upload final document</p>
+                        <p className="text-[10px] text-slate-500 mt-0.5">PDF, image, or DOCX of the signed agreement</p>
                       </div>
+                    </button>
+                  )}
+
+                  {/* Step 2: Launch AI comparison — big green button when doc is ready */}
+                  {extractedDocText && !uploadLoading && (
+                    <button
+                      type="button"
+                      onClick={handleAICalc}
+                      disabled={aiLoading}
+                      className="w-full flex items-center justify-center gap-2.5 p-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-all shadow-sm disabled:opacity-60"
+                    >
+                      {aiLoading ? (
+                        <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing document vs original quote...</>
+                      ) : (
+                        <><Sparkles className="w-4 h-4" /> Compare to original quote</>
+                      )}
+                    </button>
+                  )}
+
+                  {/* Fallback: Auto-fill from rounds (when no doc uploaded but 2+ rounds exist) */}
+                  {!extractedDocText && roundCount >= 2 && (
+                    <button
+                      type="button"
+                      onClick={handleAICalc}
+                      disabled={aiLoading}
+                      className="w-full flex items-center gap-3 p-3.5 rounded-xl border border-emerald-200 bg-white hover:bg-emerald-50/50 hover:border-emerald-300 text-left transition-all group"
+                    >
+                      {aiLoading ? (
+                        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                          <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                          <Zap className="w-4 h-4 text-emerald-600" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-slate-800">
+                          {aiLoading ? 'Analyzing your rounds...' : 'Or auto-fill from your rounds'}
+                        </p>
+                        <p className="text-[10px] mt-0.5 text-slate-500">Compares Round 1 vs latest round</p>
+                      </div>
+                      {!aiLoading && <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:text-emerald-600 flex-shrink-0 transition-colors" />}
                     </button>
                   )}
                 </div>
