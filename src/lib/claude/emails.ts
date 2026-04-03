@@ -19,7 +19,8 @@ Three versions:
 - final_push: deadline-driven. You're signaling you'll go elsewhere if this doesn't land. Urgent but never aggressive.
 
 Each email must:
-- Start with a greeting ("Hi [Name]," or "Hey [Name]," if you have the name, "Hi," if not)
+- Start with a warm greeting ("Hi [Name]," followed by "I hope all is well." or "I hope you're doing well." or similar)
+- End with "Thanks in advance for your flexibility on this." or "Thanks in advance for looking into this." before the sign-off
 - End with "Best regards," then "[Your Name]" on a new line
 - Reference real details from the quote (amounts, terms, product names)
 - Include EVERY must-have ask from the analysis. If the analysis found 4 asks, the email must mention all 4. Do not drop asks to keep the email short.
