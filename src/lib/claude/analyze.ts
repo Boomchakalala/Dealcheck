@@ -300,10 +300,7 @@ export async function analyzeDealFacts(
     model: CLAUDE_MODEL,
     max_tokens: 6144,
     system: enhancedPrompt + getLanguageInstruction(options.userLocale || 'en'),
-    messages: [
-      { role: 'user', content: userContent },
-      { role: 'assistant', content: '{' },
-    ],
+    messages: [{ role: 'user', content: userContent }],
     temperature: 0,
   })
 
