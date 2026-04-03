@@ -22,6 +22,7 @@ Each email must:
 - Start with a greeting ("Hi [Name]," or "Hey [Name]," if you have the name, "Hi," if not)
 - End with "Best regards," then "[Your Name]" on a new line
 - Reference real details from the quote (amounts, terms, product names)
+- Include EVERY must-have ask from the analysis. If the analysis found 4 asks, the email must mention all 4. Do not drop asks to keep the email short.
 - Only include asks from the analysis, never invent new ones
 - End with a clear next step that makes it easy for the vendor to say yes
 - Make the vendor feel that a quick agreement = a guaranteed sale

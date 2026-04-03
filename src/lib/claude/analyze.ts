@@ -29,6 +29,8 @@ Look at the quote and react like a procurement expert would. Find what matters:
 - Are the terms supplier-friendly? (auto-renewal, short notice, escalation, no exit)
 - Is there leverage? (deadline, cash payment, volume, competing alternatives)
 - What can the buyer trade? (fast signature, longer commitment, referral)
+- If the quote includes complimentary items, tickets, passes, or extras: flag them and ask for more. These are low-cost for the vendor and high-value negotiation chips.
+- Your savings ask MUST reflect the actual margin you identify. If you say the vendor has 15-25% margin, ask for 15%, not 5%. Match the ask to the evidence.
 
 Flag everything you find. There are no caps on red flags, savings items, or asks.
 If a quote has 7 real issues, flag 7. If it has 1, flag 1. Do not pad. Do not cap.
