@@ -224,6 +224,18 @@ function clean(val: string): string | undefined {
   return val
 }
 
+/** Clean contact name — extract first name, fix casing */
+function cleanContactName(name: string): string | undefined {
+  const cleaned = clean(name)
+  if (!cleaned) return undefined
+  // Fix ALL CAPS: "EMMANUEL PICHEREAU" → "Emmanuel Pichereau"
+  const fixed = cleaned.replace(/\b[A-Z]{2,}\b/g, (word) =>
+    word.charAt(0) + word.slice(1).toLowerCase()
+  )
+  // Return first name only
+  return fixed.split(/\s+/)[0]
+}
+
 export function rigidToLegacyFacts(rigid: RigidExtraction): import('./extract').ExtractedFacts {
   return {
     vendor: rigid.vendor,
@@ -236,7 +248,7 @@ export function rigidToLegacyFacts(rigid: RigidExtraction): import('./extract').
     pricing_model: clean(rigid.financials.pricing_model) || 'Not specified',
     currency: rigid.financials.currency || 'USD',
     deal_type: clean(rigid.contract_terms.deal_type) || 'New purchase',
-    contact_name: clean(rigid.context.contact_name),
+    contact_name: cleanContactName(rigid.context.contact_name),
     renewal_date: clean(rigid.context.renewal_date),
     signing_deadline: clean(rigid.context.signing_deadline),
   }

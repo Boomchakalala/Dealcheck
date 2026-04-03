@@ -223,7 +223,8 @@ export function detectRedFlags(extraction: RigidExtraction): CodeRedFlag[] {
   }
 
   // 9. Deposit required
-  if (fin.deposit_required !== 'not_stated' && fin.deposit_required.toLowerCase() !== 'none' && fin.deposit_required.toLowerCase() !== 'no') {
+  const depositClean = fin.deposit_required.replace(/[€$£¥,.\s]/g, '').replace(/^0+$/, '0')
+  if (fin.deposit_required !== 'not_stated' && fin.deposit_required.toLowerCase() !== 'none' && fin.deposit_required.toLowerCase() !== 'no' && depositClean !== '0' && depositClean !== '000') {
     flags.push({
       type: 'Payment Terms',
       severity: 'low',
@@ -335,7 +336,9 @@ export function detectRedFlags(extraction: RigidExtraction): CodeRedFlag[] {
   }
 
   // 15. No liability cap
-  if (ct.liability_cap === 'not_stated' && totalAmount > 20000) {
+  // Skip liability cap check for one-time purchases (equipment, vehicles, events)
+  const isOngoingContract = ct.term_length !== 'not_stated' && !isOneTimePurchase(extraction.category, fin.billing_frequency)
+  if (ct.liability_cap === 'not_stated' && totalAmount > 20000 && isOngoingContract) {
     flags.push({
       type: 'Terms',
       severity: 'low',
@@ -366,6 +369,13 @@ function parseTermMonths(term: string): number | null {
   if (lower.includes('one-time') || lower.includes('one time')) return 0
 
   return null
+}
+
+function isOneTimePurchase(category: string, billing: string): boolean {
+  const lower = (category || '').toLowerCase() + ' ' + (billing || '').toLowerCase()
+  return lower.includes('equipment') || lower.includes('vehicle') || lower.includes('one-time')
+    || lower.includes('event') || lower.includes('sponsorship') || lower.includes('hardware')
+    || lower.includes('product') || lower.includes('purchase')
 }
 
 function isServiceCategory(category: string): boolean {

@@ -143,7 +143,9 @@ export async function analyzeDeal(
       return !dedupedAiFlags.some(af =>
         af.issue.toLowerCase().includes(cf.issue.substring(0, 25).toLowerCase()) ||
         cf.issue.toLowerCase().includes(af.issue.substring(0, 25).toLowerCase()) ||
-        (af.type === cf.type && af.score_category === cf.score_category)
+        (af.type === cf.type && af.score_category === cf.score_category) ||
+        // Source Insight is always a duplicate if AI already flagged intermediary
+        (cf.type === 'Source Insight' && af.type === 'Source Insight')
       )
     })
 

@@ -98,14 +98,23 @@ CALIBRATION RULES:
 - If pricing evidence is weak (savings_confidence is "low"), shift the analysis toward structure, terms, scope clarity, billing, renewal, or risk. Do not become useless just because you cannot justify a price cut.
 - If a quote appears genuinely competitive, say so, but still find the cleanup asks. Even the best quotes have at least one thing worth tightening.
 
-Be aggressive where justified. A good procurement lead would:
-- Always ask for a discount on the headline price (5% minimum on any negotiated quote)
+Be aggressive where justified. Scale the savings ask to the deal type:
+- SaaS renewals with existing discounts: push for 5-10% additional
+- Equipment and vehicles through dealers: push for 8-15% (dealers carry 10-25% margin)
+- Professional services and retainers: push for 10-15% on hourly rates, cap escalation
+- Sponsorship, events, and marketing spend: push for 15-25% (high margin, low marginal cost)
+- One-time purchases with intermediaries: push for 8-12%
+- Clean, competitive quotes with thin margin: 3-5% is still worth asking
+
+DO NOT default to "5% standard discount" on every deal. Match the ask to the margin. If your analysis identifies 15-25% dealer margin, asking for 5% is leaving money on the table.
+
+A good procurement lead would:
 - Challenge every fee, pack, and add-on separately
 - Push for volume, loyalty, early-payment, or multi-year discounts where relevant
 - Include extras or accessories in the deal price
 - Right-size quantity to actual usage
 - Challenge intermediary/reseller/dealer margin
-- On equipment, vehicles, or high-value goods: dealers carry 10-25% margin. A cash buyer should push for 5-10% off minimum. "The price looks fair" is not a reason to stop pushing.
+- On high-value goods: if you identify margin, your savings ask must reflect it
 
 Payment term improvements are NOT savings. They go in cash_flow_improvements, not potential_savings.
 
@@ -196,7 +205,7 @@ Return valid JSON only:
   "red_flags": [
     {
       "type": "Commercial|Renewal|Scope|Payment Terms|Source Insight|Implementation|Usage Risk|Deposit|Bundling",
-      "severity": "high|medium|low",
+      "severity": "high|medium|low (HIGH = financial exposure over 10% of total commitment or one-sided risk clauses; MEDIUM = meaningful commercial issue worth negotiating; LOW = minor optimization only)",
       "score_category": "pricing|terms|leverage",
       "issue": "",
       "why_it_matters": "",
