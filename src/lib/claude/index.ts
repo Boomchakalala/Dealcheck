@@ -24,11 +24,10 @@ export { detectRedFlags, type CodeRedFlag } from './red-flags'
 export { calculateDeterministicScore } from './score-deterministic'
 
 import { classifyQuote } from './classify'
-import { extractRigid, generateDocumentHash, rigidToLegacyFacts, type RigidExtraction } from './extract-rigid'
-import { detectRedFlags, type CodeRedFlag } from './red-flags'
-import { calculateDeterministicScore } from './score-deterministic'
+import { extractRigid, generateDocumentHash, rigidToLegacyFacts } from './extract-rigid'
 import { analyzeDealFacts } from './analyze'
 import { generateEmailDrafts } from './emails'
+import { calculateQuoteScore } from './score'
 import { validateTotalCommitment } from './validate-total'
 import { DealOutputSchema, type DealOutputType } from '../schemas'
 import { parseMoney, normalizeAmount } from '../currency'
@@ -83,16 +82,8 @@ export async function analyzeDeal(
       console.log('[TermLift] Step 1b: Total overridden to:', validation.total)
     }
 
-    // ─── Step 2: Code-based red flag detection (deterministic) ───
-    console.log('[TermLift] Step 2: Detecting red flags in code...')
-    const codeFlags = detectRedFlags(rigidFacts)
-    console.log('[TermLift] Step 2 done:', codeFlags.length, 'flags detected')
-    for (const flag of codeFlags) {
-      console.log(`[TermLift]   [${flag.severity}] ${flag.type}: ${flag.issue}`)
-    }
-
-    // ─── Step 3: AI analysis — free to judge, no constraints ───
-    console.log('[TermLift] Step 3: AI analysis (Opus)...')
+    // ─── Step 2: AI analysis (Opus, free to judge) ───
+    console.log('[TermLift] Step 2: AI analysis...')
     const analysis = await analyzeDealFacts(rawFacts, classification, extractedText, {
       dealType,
       goal,
@@ -104,71 +95,22 @@ export async function analyzeDeal(
       pdfData,
       userPreferences,
     })
-    console.log('[TermLift] Step 3 done:', analysis.verdict_type, '|', analysis.red_flags?.length, 'AI flags')
+    console.log('[TermLift] Step 2 done:', analysis.verdict_type, '|', analysis.red_flags?.length, 'flags |', analysis.score, 'score')
 
-    // ─── Step 3a: Merge AI flags + code flags (code fills gaps only) ───
-    const aiFlags = analysis.red_flags || []
-    const codeFlagsNotCoveredByAI = codeFlags.filter(cf => {
-      return !aiFlags.some(af =>
-        af.issue.toLowerCase().includes(cf.issue.substring(0, 20).toLowerCase()) ||
-        cf.issue.toLowerCase().includes(af.issue.substring(0, 20).toLowerCase()) ||
-        (af.type === cf.type && af.score_category === cf.score_category) ||
-        (cf.type === 'Source Insight' && af.type === 'Source Insight')
-      )
-    })
-    const mergedFlags = [
-      ...aiFlags,
-      ...codeFlagsNotCoveredByAI.map(cf => ({
-        type: cf.type,
-        severity: cf.severity,
-        score_category: cf.score_category,
-        issue: cf.issue,
-        why_it_matters: cf.why_it_matters,
-        what_to_ask_for: cf.what_to_ask_for,
-        if_they_push_back: cf.if_they_push_back,
-      })),
-    ]
-
-    // ─── Step 3b: Savings — let AI estimate freely, only cap insanity ───
+    // ─── Step 2b: Sanity check savings ───
     const ps = analysis.potential_savings as any
     const commitAmount = parseMoney(rawFacts.total_commitment).amount
-    let savingsTotal = 0
-
     if (ps?.must_have) {
-      savingsTotal = (ps.must_have as any[]).reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : 0), 0)
-
-      // Only guard: savings cannot exceed total commitment
-      if (commitAmount > 0 && savingsTotal > commitAmount) {
-        console.warn(`[TermLift] GUARD: savings (${savingsTotal}) > total (${commitAmount}). Capping to 40%.`)
-        const scaleFactor = (commitAmount * 0.4) / savingsTotal
-        for (const item of ps.must_have) {
-          if (typeof item.amount === 'number') item.amount = Math.round(item.amount * scaleFactor)
-        }
-        savingsTotal = (ps.must_have as any[]).reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : 0), 0)
+      const savingsFromItems = (ps.must_have as any[]).reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : 0), 0)
+      if (commitAmount > 0 && savingsFromItems > commitAmount) {
+        console.warn(`[TermLift] GUARD: savings (${savingsFromItems}) > total (${commitAmount}).`)
       }
-      ps.total = savingsTotal
+      // Always recalculate total from items
+      ps.total = savingsFromItems
     }
 
-    // ─── Step 4: Deterministic score from ALL flags ───
-    const allFlagsForScoring: CodeRedFlag[] = [
-      ...codeFlags,
-      ...aiFlags.map(f => ({
-        type: f.type || 'Commercial',
-        severity: (f.severity || 'medium') as 'high' | 'medium' | 'low',
-        score_category: (f.score_category || 'pricing') as 'pricing' | 'terms' | 'leverage',
-        issue: f.issue,
-        why_it_matters: f.why_it_matters,
-        what_to_ask_for: f.what_to_ask_for,
-        if_they_push_back: f.if_they_push_back,
-        points: f.severity === 'high' ? 12 : f.severity === 'medium' ? 8 : 4,
-      })),
-    ]
-    console.log('[TermLift] Step 4: Scoring from', allFlagsForScoring.length, 'flags + savings', savingsTotal)
-    const scoreData = calculateDeterministicScore(allFlagsForScoring, rawFacts.total_commitment, savingsTotal)
-    console.log('[TermLift] Step 4 done:', scoreData.score, scoreData.score_label)
-
-    // ─── Step 5: Generate emails ───
-    console.log('[TermLift] Step 5: Generating emails...')
+    // ─── Step 3: Generate emails ───
+    console.log('[TermLift] Step 3: Generating emails...')
     let emails
     try {
       emails = await generateEmailDrafts({
@@ -178,7 +120,7 @@ export async function analyzeDeal(
         term: rawFacts.term,
         contact_name: rawFacts.contact_name,
         verdict: analysis.verdict,
-        red_flags: mergedFlags,
+        red_flags: analysis.red_flags,
         what_to_ask_for: analysis.what_to_ask_for,
         negotiation_plan: analysis.negotiation_plan,
         quick_read: analysis.quick_read,
@@ -204,14 +146,13 @@ export async function analyzeDeal(
         if (emails[key]?.body) emails[key].body = ensureSignOff(emails[key].body)
       }
     }
-    console.log('[TermLift] Step 5 done')
+    console.log('[TermLift] Step 3 done')
 
-    // ─── Step 6: Assemble output ───
+    // ─── Step 4: Assemble output ───
     const assembled: any = {
       vendor: rawFacts.vendor,
       category: rawFacts.category,
       description: rawFacts.description,
-      leverage_assessment: analysis.leverage_assessment,
       snapshot: {
         vendor_product: rawFacts.vendor_product,
         term: rawFacts.term,
@@ -228,28 +169,30 @@ export async function analyzeDeal(
       verdict_type: analysis.verdict_type,
       price_insight: analysis.price_insight,
       quick_read: analysis.quick_read,
-      red_flags: mergedFlags, // Code flags + AI-only flags
+      red_flags: analysis.red_flags,
       negotiation_plan: analysis.negotiation_plan,
       what_to_ask_for: analysis.what_to_ask_for,
       potential_savings: analysis.potential_savings,
       cash_flow_improvements: analysis.cash_flow_improvements,
-      score: scoreData.score,
-      score_label: scoreData.score_label,
-      score_breakdown: scoreData.score_breakdown,
-      score_rationale: scoreData.score_rationale,
+      score: analysis.score,
+      score_label: analysis.score_label,
+      score_breakdown: analysis.score_breakdown,
+      score_rationale: analysis.score_rationale,
       assumptions: analysis.assumptions,
       disclaimer: analysis.disclaimer,
       email_drafts: emails,
     }
 
+    // ─── Step 5: Validate and score ───
     const validated = DealOutputSchema.parse(assembled)
+    const scoreData = calculateQuoteScore(validated)
 
     // Sanitize total_commitment
     if (validated.snapshot?.total_commitment) {
       validated.snapshot.total_commitment = normalizeAmount(validated.snapshot.total_commitment)
     }
 
-    console.log('[TermLift] Pipeline complete — score:', scoreData.score, '| flags:', mergedFlags.length, '| savings:', savingsTotal)
+    console.log('[TermLift] Pipeline complete — score:', scoreData.score)
     return { ...validated, ...scoreData }
 
   } catch (error) {

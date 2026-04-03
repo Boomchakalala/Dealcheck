@@ -7,43 +7,31 @@ import type { DealOutput, DealOutputV2 } from '@/types'
 // ---------------------------------------------------------------------------
 
 const EMAIL_PROMPT = `
-Write negotiation emails that sound like a real person wrote them in 5 minutes. These should be READY TO SEND, not templates.
+Write negotiation emails that sound like a real person wrote them in 5 minutes.
 
-CRITICAL RULES:
+The tone is warm, collaborative, and confident. You're genuinely interested in the deal. You're asking, not demanding. But you're clear about what you want and you make the vendor feel that saying yes means closing the deal today.
 
-1. NEVER open with "Thanks for the proposal" or "The quote looks great." That is AI slop. Real people open with context or get straight to the point.
-
-2. NEVER say "I'm excited about" or "we're excited to" before asking for a discount. It undercuts every ask that follows.
-
-3. NEVER say "working through our budget" or "wondering if there's flexibility." Be direct about what you want and why.
-
-4. Lead with the SIZE of your commitment and what that means for the vendor. "$110K is a significant investment" or "We're renewing a 750-seat contract" or "We're paying cash today." The vendor needs to feel the weight of losing this deal.
-
-5. Every ask must include a SPECIFIC NUMBER. Not "is there flexibility on pricing" but "we need the price at $95,000" or "can we get the rate to $3.50/parcel."
-
-6. End with a clear close: "If we can land here, I'll sign this week." Not "what are your thoughts?"
-
-OPENING APPROACHES (vary by context, never use the same one twice):
-- "We want to move forward on this. Before we sign, [specific issue]."
-- "We've reviewed the proposal in detail. There are [X] points we need to resolve."
-- "We're ready to commit [amount]. Here's what we need to get there."
-- "Quick one before we finalize. [Specific ask]."
+Think of someone who writes: "Could we look at this together?", "Can we imagine a scenario where...", "If there's flexibility here, I'm ready to move forward." Friendly, but with substance behind every ask.
 
 Three versions:
-- neutral: warm but direct. You want the deal, you're clear about what needs to change. Conversational but every sentence has substance.
-- firm: professional pushback. You've stated what you need. No filler, no softening. Still respectful but unmistakably clear.
-- final_push: deadline-driven. You have an alternative and you're signaling it. Urgent, specific, closes with a hard deadline.
+- neutral: warm and collaborative. You like the offer, you want to work it out. Conversational.
+- firm: direct and professional. You've been clear about what you need. No fluff, still respectful.
+- final_push: deadline-driven. You're signaling you'll go elsewhere if this doesn't land. Urgent but never aggressive.
 
 Each email must:
-- Start with "Hi [Name]," (first name only, never full name, never all caps)
+- Start with a greeting ("Hi [Name]," or "Hey [Name]," if you have the name, "Hi," if not)
 - End with "Best regards," then "[Your Name]" on a new line
-- Reference real details from the quote (specific amounts, terms, product names)
+- Reference real details from the quote (amounts, terms, product names)
 - Only include asks from the analysis, never invent new ones
-- Be 6-12 sentences max. Tight. No padding.
+- End with a clear next step that makes it easy for the vendor to say yes
+- Make the vendor feel that a quick agreement = a guaranteed sale
 
-Subject lines: dead simple. "Re: [Vendor] proposal" or "[Vendor] renewal, follow-up". Nothing clever.
+Subject lines: keep them dead simple. Vendor name + plain reference. "Re: Ewigo proposal", "Salesforce renewal, follow-up". Nothing clever.
 
 Never use en dash or em dash characters. Use commas, colons, or normal hyphens.
+
+Never open by complimenting the price then immediately asking for a discount. That is contradictory and vendors see through it. Instead, lead with context: budget constraints, internal approval requirements, competing priorities. The discount should feel like a consequence of your situation, not a tactic.
+
 Write like a human. If it sounds like AI wrote it, rewrite it.
 `
 
