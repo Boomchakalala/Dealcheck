@@ -125,20 +125,30 @@ export async function analyzeDeal(
     })
     console.log('[TermLift] Step 3 done:', analysis.verdict_type)
 
-    // ─── Step 3a: Merge flags ───
-    // AI flags are the primary output — they're commercially sharp and deal-specific.
-    // Code flags fill gaps the AI missed (structural checks).
-    // Strategy: use ALL AI flags, then add code flags that cover topics the AI didn't.
+    // ─── Step 3a: Merge and deduplicate flags ───
+    // AI flags are primary. Code flags fill structural gaps AI missed.
     const aiFlags = analysis.red_flags || []
+
+    // Deduplicate AI flags themselves (AI sometimes repeats with slightly different wording)
+    const seenTopics = new Set<string>()
+    const dedupedAiFlags = aiFlags.filter(f => {
+      const key = f.type.toLowerCase() + ':' + f.issue.substring(0, 40).toLowerCase().replace(/[^a-z0-9]/g, '')
+      if (seenTopics.has(key)) return false
+      seenTopics.add(key)
+      return true
+    })
+
+    // Add code flags that cover topics AI didn't mention
     const codeFlagsNotCoveredByAI = codeFlags.filter(cf => {
-      // Only add code flag if AI didn't already cover the same topic
-      return !aiFlags.some(af =>
+      return !dedupedAiFlags.some(af =>
         af.issue.toLowerCase().includes(cf.issue.substring(0, 25).toLowerCase()) ||
-        cf.issue.toLowerCase().includes(af.issue.substring(0, 25).toLowerCase())
+        cf.issue.toLowerCase().includes(af.issue.substring(0, 25).toLowerCase()) ||
+        (af.type === cf.type && af.score_category === cf.score_category)
       )
     })
+
     const mergedFlags = [
-      ...aiFlags,
+      ...dedupedAiFlags,
       ...codeFlagsNotCoveredByAI.map(cf => ({
         type: cf.type,
         severity: cf.severity,
@@ -149,8 +159,6 @@ export async function analyzeDeal(
         if_they_push_back: cf.if_they_push_back,
       })),
     ]
-    // For scoring, use all unique flags
-    const aiOnlyFlags = aiFlags
 
     // ─── Step 3b: Savings validation ───
     const leverageAssessment = analysis.leverage_assessment

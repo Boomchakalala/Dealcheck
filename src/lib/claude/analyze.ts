@@ -65,8 +65,10 @@ Look at the quote and react like a procurement expert would. Find what matters:
 - Is there leverage? (deadline, cash payment, volume, competing alternatives)
 - What can the buyer trade? (fast signature, longer commitment, referral)
 
-Flag everything you find. There are no caps on red flags, savings items, or asks.
-If a quote has 7 real issues, flag 7. If it has 1, flag 1. Do not pad. Do not cap.
+Focus on what matters. Return a MAXIMUM of 5 red flags, prioritized by commercial impact.
+If a quote has 3 real issues, flag 3. If it has 8, pick the 5 that cost the buyer the most money or create the most risk.
+Do NOT pad with minor issues. Do NOT repeat the same issue in different words. Every flag must be distinct and commercially meaningful.
+If two issues are related (e.g., "payment terms" and "cash flow risk from upfront payment"), merge them into one stronger flag.
 
 ==================================================
 DOCUMENT ANALYSIS
