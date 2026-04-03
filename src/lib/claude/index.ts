@@ -27,28 +27,12 @@ import { classifyQuote } from './classify'
 import { extractRigid, generateDocumentHash, rigidToLegacyFacts, type RigidExtraction } from './extract-rigid'
 import { detectRedFlags, type CodeRedFlag } from './red-flags'
 import { calculateDeterministicScore } from './score-deterministic'
-import { analyzeDealFacts, type LeverageAssessment, type LeverageLevel } from './analyze'
+import { analyzeDealFacts } from './analyze'
 import { generateEmailDrafts } from './emails'
 import { validateTotalCommitment } from './validate-total'
 import { DealOutputSchema, type DealOutputType } from '../schemas'
 import { parseMoney, normalizeAmount } from '../currency'
 import type { DealOutput } from '@/types'
-
-/**
- * Derive assertiveness band (1-4) from the 5 leverage dimension scores.
- */
-function deriveAssertivenessBand(la: LeverageAssessment | undefined): { band: 1 | 2 | 3 | 4; maxSavingsPct: number } {
-  if (!la) return { band: 2, maxSavingsPct: 25 }
-
-  const levelScore = (l: LeverageLevel): number => l === 'high' ? 3 : l === 'moderate' ? 2 : 1
-  const total = levelScore(la.price_leverage) + levelScore(la.terms_leverage) +
-    levelScore(la.structural_leverage) + levelScore(la.risk_leverage) + levelScore(la.ambiguity_leverage)
-
-  if (total >= 12) return { band: 1, maxSavingsPct: 40 }
-  if (total >= 9)  return { band: 2, maxSavingsPct: 30 }
-  if (total >= 7)  return { band: 3, maxSavingsPct: 25 }
-  return { band: 4, maxSavingsPct: 20 }
-}
 
 /**
  * Main analysis pipeline — v2 with deterministic extraction and scoring.
@@ -107,10 +91,8 @@ export async function analyzeDeal(
       console.log(`[TermLift]   [${flag.severity}] ${flag.type}: ${flag.issue}`)
     }
 
-    // ─── Step 3: AI analysis for judgment calls ───
-    // AI receives the code flags as context — it adds market judgment, strategy, and savings estimates
-    // but does NOT regenerate the red flags
-    console.log('[TermLift] Step 3: AI analysis (judgment layer)...')
+    // ─── Step 3: AI analysis — free to judge, no constraints ───
+    console.log('[TermLift] Step 3: AI analysis (Opus)...')
     const analysis = await analyzeDealFacts(rawFacts, classification, extractedText, {
       dealType,
       goal,
@@ -121,36 +103,21 @@ export async function analyzeDeal(
       allPages,
       pdfData,
       userPreferences,
-      codeFlags, // Pass code-generated flags to the AI
     })
-    console.log('[TermLift] Step 3 done:', analysis.verdict_type)
+    console.log('[TermLift] Step 3 done:', analysis.verdict_type, '|', analysis.red_flags?.length, 'AI flags')
 
-    // ─── Step 3a: Merge and deduplicate flags ───
-    // AI flags are primary. Code flags fill structural gaps AI missed.
+    // ─── Step 3a: Merge AI flags + code flags (code fills gaps only) ───
     const aiFlags = analysis.red_flags || []
-
-    // Deduplicate AI flags themselves (AI sometimes repeats with slightly different wording)
-    const seenTopics = new Set<string>()
-    const dedupedAiFlags = aiFlags.filter(f => {
-      const key = f.type.toLowerCase() + ':' + f.issue.substring(0, 40).toLowerCase().replace(/[^a-z0-9]/g, '')
-      if (seenTopics.has(key)) return false
-      seenTopics.add(key)
-      return true
-    })
-
-    // Add code flags that cover topics AI didn't mention
     const codeFlagsNotCoveredByAI = codeFlags.filter(cf => {
-      return !dedupedAiFlags.some(af =>
-        af.issue.toLowerCase().includes(cf.issue.substring(0, 25).toLowerCase()) ||
-        cf.issue.toLowerCase().includes(af.issue.substring(0, 25).toLowerCase()) ||
+      return !aiFlags.some(af =>
+        af.issue.toLowerCase().includes(cf.issue.substring(0, 20).toLowerCase()) ||
+        cf.issue.toLowerCase().includes(af.issue.substring(0, 20).toLowerCase()) ||
         (af.type === cf.type && af.score_category === cf.score_category) ||
-        // Source Insight is always a duplicate if AI already flagged intermediary
         (cf.type === 'Source Insight' && af.type === 'Source Insight')
       )
     })
-
     const mergedFlags = [
-      ...dedupedAiFlags,
+      ...aiFlags,
       ...codeFlagsNotCoveredByAI.map(cf => ({
         type: cf.type,
         severity: cf.severity,
@@ -162,9 +129,7 @@ export async function analyzeDeal(
       })),
     ]
 
-    // ─── Step 3b: Savings validation ───
-    const leverageAssessment = analysis.leverage_assessment
-    const { band: assertivenessBand } = deriveAssertivenessBand(leverageAssessment)
+    // ─── Step 3b: Savings — let AI estimate freely, only cap insanity ───
     const ps = analysis.potential_savings as any
     const commitAmount = parseMoney(rawFacts.total_commitment).amount
     let savingsTotal = 0
@@ -174,24 +139,17 @@ export async function analyzeDeal(
 
       // Only guard: savings cannot exceed total commitment
       if (commitAmount > 0 && savingsTotal > commitAmount) {
-        console.warn(`[TermLift] GUARD: savings (${savingsTotal}) > total_commitment (${commitAmount}). Capping to 40%.`)
-        const maxSavings = commitAmount * 0.4
-        const scaleFactor = maxSavings / savingsTotal
+        console.warn(`[TermLift] GUARD: savings (${savingsTotal}) > total (${commitAmount}). Capping to 40%.`)
+        const scaleFactor = (commitAmount * 0.4) / savingsTotal
         for (const item of ps.must_have) {
-          if (typeof item.amount === 'number') {
-            item.amount = Math.round(item.amount * scaleFactor)
-          }
+          if (typeof item.amount === 'number') item.amount = Math.round(item.amount * scaleFactor)
         }
         savingsTotal = (ps.must_have as any[]).reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : 0), 0)
       }
-
-      // Recalculate total from items
       ps.total = savingsTotal
     }
 
-    // ─── Step 4: Deterministic score ───
-    // Score from ALL flags (code + AI)
-    // AI flags scored by severity: high=12, medium=8, low=4
+    // ─── Step 4: Deterministic score from ALL flags ───
     const allFlagsForScoring: CodeRedFlag[] = [
       ...codeFlags,
       ...aiFlags.map(f => ({
@@ -205,9 +163,9 @@ export async function analyzeDeal(
         points: f.severity === 'high' ? 12 : f.severity === 'medium' ? 8 : 4,
       })),
     ]
-    console.log('[TermLift] Step 4: Deterministic scoring...', codeFlags.length, 'code flags +', aiFlags.length, 'AI flags =', allFlagsForScoring.length, 'total for scoring')
+    console.log('[TermLift] Step 4: Scoring from', allFlagsForScoring.length, 'flags + savings', savingsTotal)
     const scoreData = calculateDeterministicScore(allFlagsForScoring, rawFacts.total_commitment, savingsTotal)
-    console.log('[TermLift] Step 4 done: score =', scoreData.score, scoreData.score_label)
+    console.log('[TermLift] Step 4 done:', scoreData.score, scoreData.score_label)
 
     // ─── Step 5: Generate emails ───
     console.log('[TermLift] Step 5: Generating emails...')
@@ -224,8 +182,6 @@ export async function analyzeDeal(
         what_to_ask_for: analysis.what_to_ask_for,
         negotiation_plan: analysis.negotiation_plan,
         quick_read: analysis.quick_read,
-        assertiveness_band: assertivenessBand,
-        best_negotiation_angle: leverageAssessment?.best_negotiation_angle,
       }, userLocale)
     } catch (emailError) {
       console.error('[TermLift] Email generation failed, using fallbacks:', emailError)
@@ -255,7 +211,7 @@ export async function analyzeDeal(
       vendor: rawFacts.vendor,
       category: rawFacts.category,
       description: rawFacts.description,
-      leverage_assessment: leverageAssessment,
+      leverage_assessment: analysis.leverage_assessment,
       snapshot: {
         vendor_product: rawFacts.vendor_product,
         term: rawFacts.term,
