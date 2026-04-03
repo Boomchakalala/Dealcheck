@@ -68,16 +68,39 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
     setWhatChanged(prev => prev.includes(id) ? prev.filter(o => o !== id) : [...prev, id])
   }
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [extractedDocText, setExtractedDocText] = useState<string | null>(null)
+  const [uploadLoading, setUploadLoading] = useState(false)
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file && file.type === 'application/pdf') setUploadedFile(file.name)
+    if (!file) return
+    setUploadLoading(true)
+    setUploadedFile(file.name)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch('/api/upload', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (res.ok && data.extractedText) {
+        setExtractedDocText(data.extractedText)
+      }
+    } catch {
+      setUploadedFile(null)
+      setExtractedDocText(null)
+    }
+    setUploadLoading(false)
   }
 
   const handleAICalc = async () => {
-    if (roundCount < 2) return
     setAiLoading(true)
     try {
-      const res = await fetch(`/api/deal/${dealId}/estimate-close`, { method: 'POST' })
+      const res = await fetch(`/api/deal/${dealId}/estimate-close`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          finalDocumentText: extractedDocText || undefined,
+        }),
+      })
       const data = await res.json()
       if (res.ok) {
         if (data.final_total) setFinalTotal(data.final_total)
@@ -269,54 +292,66 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
 
                 {/* AI action buttons */}
                 <div className="mt-4 space-y-2">
-                  {/* Auto-fill from rounds */}
-                  <button
-                    type="button"
-                    onClick={handleAICalc}
-                    disabled={aiLoading || roundCount < 2}
-                    className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all group ${
-                      roundCount >= 2
-                        ? 'border-emerald-200 bg-white hover:bg-emerald-50/50 hover:border-emerald-300 cursor-pointer'
-                        : 'border-slate-100 bg-slate-50/50 cursor-not-allowed'
-                    }`}
-                  >
-                    {aiLoading ? (
-                      <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                        <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
-                      </div>
-                    ) : (
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                        roundCount >= 2 ? 'bg-emerald-100' : 'bg-slate-100'
-                      }`}>
-                        <Zap className={`w-4 h-4 ${roundCount >= 2 ? 'text-emerald-600' : 'text-slate-400'}`} />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-xs font-semibold ${roundCount >= 2 ? 'text-slate-800' : 'text-slate-400'}`}>
-                        {aiLoading ? 'Analyzing your rounds...' : 'Auto-fill from your rounds'}
-                      </p>
-                      <p className={`text-[10px] mt-0.5 ${roundCount >= 2 ? 'text-slate-500' : 'text-slate-400'}`}>
-                        {roundCount >= 2
-                          ? 'Compares your negotiation rounds to extract final terms and savings'
-                          : `Needs at least 2 rounds (you have ${roundCount})`
-                        }
-                      </p>
-                    </div>
-                    {!aiLoading && roundCount >= 2 && (
-                      <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:text-emerald-600 flex-shrink-0 transition-colors" />
-                    )}
-                  </button>
+                  {/* AI comparison — from rounds or uploaded doc */}
+                  {(() => {
+                    const canAnalyze = roundCount >= 2 || !!extractedDocText
+                    const label = aiLoading
+                      ? (extractedDocText ? 'Analyzing document vs original...' : 'Analyzing your rounds...')
+                      : extractedDocText
+                        ? 'Compare uploaded document to original quote'
+                        : 'Auto-fill from your rounds'
+                    const sublabel = canAnalyze
+                      ? (extractedDocText
+                          ? 'AI compares the uploaded document against your Round 1 analysis'
+                          : 'Compares your negotiation rounds to extract final terms and savings')
+                      : `Upload a final document above, or add more rounds (you have ${roundCount})`
+                    return (
+                      <button
+                        type="button"
+                        onClick={handleAICalc}
+                        disabled={aiLoading || !canAnalyze}
+                        className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-all group ${
+                          canAnalyze
+                            ? 'border-emerald-200 bg-white hover:bg-emerald-50/50 hover:border-emerald-300 cursor-pointer'
+                            : 'border-slate-100 bg-slate-50/50 cursor-not-allowed'
+                        }`}
+                      >
+                        {aiLoading ? (
+                          <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                            <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
+                          </div>
+                        ) : (
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                            canAnalyze ? 'bg-emerald-100' : 'bg-slate-100'
+                          }`}>
+                            <Zap className={`w-4 h-4 ${canAnalyze ? 'text-emerald-600' : 'text-slate-400'}`} />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-xs font-semibold ${canAnalyze ? 'text-slate-800' : 'text-slate-400'}`}>
+                            {label}
+                          </p>
+                          <p className={`text-[10px] mt-0.5 ${canAnalyze ? 'text-slate-500' : 'text-slate-400'}`}>
+                            {sublabel}
+                          </p>
+                        </div>
+                        {!aiLoading && canAnalyze && (
+                          <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:text-emerald-600 flex-shrink-0 transition-colors" />
+                        )}
+                      </button>
+                    )
+                  })()}
 
                   {/* Upload signed contract */}
                   <input ref={fileInputRef} type="file" accept=".pdf" className="hidden" onChange={handleFileSelect} />
                   {uploadedFile ? (
                     <div className="flex items-center gap-3 p-3.5 bg-white rounded-xl border border-emerald-200">
                       <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-4 h-4 text-emerald-600" />
+                        {uploadLoading ? <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" /> : <FileText className="w-4 h-4 text-emerald-600" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-slate-800 truncate">{uploadedFile}</p>
-                        <p className="text-[10px] text-emerald-600 mt-0.5">Signed contract attached</p>
+                        <p className="text-[10px] text-emerald-600 mt-0.5">{uploadLoading ? 'Extracting text...' : extractedDocText ? 'Ready for AI comparison' : 'Signed contract attached'}</p>
                       </div>
                       <button onClick={() => setUploadedFile(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded transition-colors">
                         <X className="w-3.5 h-3.5" />

@@ -16,6 +16,15 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Parse optional body (finalDocumentText from uploaded doc)
+    let finalDocumentText: string | undefined
+    try {
+      const body = await request.json()
+      finalDocumentText = body?.finalDocumentText
+    } catch {
+      // No body is fine — we'll compare rounds instead
+    }
+
     // Get deal with all rounds
     const { data: deal, error: dealError } = await supabase
       .from('deals')
@@ -39,14 +48,56 @@ export async function POST(
     const latestRound = sortedRounds[sortedRounds.length - 1]
 
     const firstOutput = firstRound.output_json
-    const latestOutput = latestRound.output_json
 
-    if (!firstOutput || !latestOutput) {
+    if (!firstOutput) {
       return NextResponse.json({ error: 'Missing round data' }, { status: 400 })
     }
 
-    // Build comparison prompt
-    const prompt = `You are a procurement analyst. Compare the first and latest rounds of a negotiation to estimate what was won.
+    // Build comparison prompt — either comparing rounds or comparing Round 1 vs uploaded final doc
+    let prompt: string
+
+    if (finalDocumentText) {
+      // Compare Round 1 analysis against the uploaded final document
+      prompt = `You are a procurement analyst. Compare the ORIGINAL quote analysis against the FINAL signed document to determine what was won in the negotiation.
+
+ORIGINAL QUOTE ANALYSIS (Round 1):
+- Total Commitment: ${firstOutput.snapshot?.total_commitment || 'Unknown'}
+- Term: ${firstOutput.snapshot?.term || 'Unknown'}
+- Pricing Model: ${firstOutput.snapshot?.pricing_model || 'Unknown'}
+- Billing/Payment: ${firstOutput.snapshot?.billing_payment || 'Unknown'}
+- Red Flags Found: ${JSON.stringify(firstOutput.red_flags?.map((f: any) => f.issue) || [])}
+- Must-Have Asks: ${JSON.stringify(firstOutput.what_to_ask_for?.must_have || [])}
+- Nice-to-Have Asks: ${JSON.stringify(firstOutput.what_to_ask_for?.nice_to_have || [])}
+
+FINAL SIGNED DOCUMENT:
+${finalDocumentText}
+
+Instructions:
+- Read the final document carefully. Extract the final total, payment terms, and any terms that differ from the original analysis.
+- Compare against the original total_commitment. Calculate savings_amount and savings_percent if both values are available.
+- Identify which original red flags were addressed in the final document.
+- Identify which must-have and nice-to-have asks were achieved.
+- Look for any additional wins not in the original asks (e.g., complimentary items, extended terms, extras).
+- For final_total, return the final contract value as a clean currency string (e.g., "$100,000" or "€100,000").
+- For what_changed, pick from these options: Price, Term length, Payment terms, Auto-renewal, Cancellation policy, Scope, SLA/Support, Liability, Security, Other
+- Write a 3-5 sentence summary of the negotiation outcome. Be specific about what was won.
+
+Return ONLY valid JSON (no markdown, no code fences):
+{
+  "final_total": "<currency string>",
+  "savings_amount": <number or null>,
+  "savings_percent": <number or null>,
+  "what_changed": [<strings from the options above>],
+  "summary": "<3-5 sentence summary of wins>"
+}`
+    } else {
+      // Compare rounds against each other
+      const latestOutput = latestRound.output_json
+      if (!latestOutput) {
+        return NextResponse.json({ error: 'Missing round data' }, { status: 400 })
+      }
+
+      prompt = `You are a procurement analyst. Compare the first and latest rounds of a negotiation to estimate what was won.
 
 FIRST ROUND (Round ${firstRound.round_number}):
 - Total Commitment: ${firstOutput.snapshot?.total_commitment || 'Unknown'}
@@ -84,6 +135,7 @@ Return ONLY valid JSON (no markdown, no code fences):
   "what_changed": [<strings from the options above>],
   "summary": "<2-3 sentence summary>"
 }`
+    }
 
     // Determine locale from cookie
     const locale = (await cookies()).get('termlift_lang')?.value || 'en'
@@ -107,6 +159,7 @@ Return ONLY valid JSON (no markdown, no code fences):
     }
 
     return NextResponse.json({
+      final_total: result.final_total ?? null,
       savings_amount: result.savings_amount ?? null,
       savings_percent: result.savings_percent ?? null,
       what_changed: result.what_changed || [],
