@@ -125,18 +125,21 @@ export async function analyzeDeal(
     })
     console.log('[TermLift] Step 3 done:', analysis.verdict_type)
 
-    // ─── Step 3a: Merge code flags with any AI-added flags ───
-    // Code flags are the foundation. AI may add subjective flags (market insight, bundling)
-    // but we tag them differently.
-    const aiOnlyFlags = (analysis.red_flags || []).filter(aiFlag => {
-      // Keep AI flags that don't duplicate code flags
-      return !codeFlags.some(cf =>
-        cf.issue.toLowerCase().includes(aiFlag.issue.substring(0, 30).toLowerCase()) ||
-        aiFlag.issue.toLowerCase().includes(cf.issue.substring(0, 30).toLowerCase())
+    // ─── Step 3a: Merge flags ───
+    // AI flags are the primary output — they're commercially sharp and deal-specific.
+    // Code flags fill gaps the AI missed (structural checks).
+    // Strategy: use ALL AI flags, then add code flags that cover topics the AI didn't.
+    const aiFlags = analysis.red_flags || []
+    const codeFlagsNotCoveredByAI = codeFlags.filter(cf => {
+      // Only add code flag if AI didn't already cover the same topic
+      return !aiFlags.some(af =>
+        af.issue.toLowerCase().includes(cf.issue.substring(0, 25).toLowerCase()) ||
+        cf.issue.toLowerCase().includes(af.issue.substring(0, 25).toLowerCase())
       )
     })
     const mergedFlags = [
-      ...codeFlags.map(cf => ({
+      ...aiFlags,
+      ...codeFlagsNotCoveredByAI.map(cf => ({
         type: cf.type,
         severity: cf.severity,
         score_category: cf.score_category,
@@ -145,8 +148,9 @@ export async function analyzeDeal(
         what_to_ask_for: cf.what_to_ask_for,
         if_they_push_back: cf.if_they_push_back,
       })),
-      ...aiOnlyFlags,
     ]
+    // For scoring, use all unique flags
+    const aiOnlyFlags = aiFlags
 
     // ─── Step 3b: Savings validation ───
     const leverageAssessment = analysis.leverage_assessment
@@ -178,11 +182,9 @@ export async function analyzeDeal(
     // ─── Step 4: Deterministic score ───
     // Score from ALL flags (code + AI)
     // AI flags scored by severity: high=12, medium=8, low=4
-    // Slightly higher than code flags because AI flags represent subjective risks
-    // that the code engine couldn't detect (market overpricing, vague scope, one-sided clauses)
     const allFlagsForScoring: CodeRedFlag[] = [
       ...codeFlags,
-      ...aiOnlyFlags.map(f => ({
+      ...aiFlags.map(f => ({
         type: f.type || 'Commercial',
         severity: (f.severity || 'medium') as 'high' | 'medium' | 'low',
         score_category: (f.score_category || 'pricing') as 'pricing' | 'terms' | 'leverage',
@@ -193,7 +195,7 @@ export async function analyzeDeal(
         points: f.severity === 'high' ? 12 : f.severity === 'medium' ? 8 : 4,
       })),
     ]
-    console.log('[TermLift] Step 4: Deterministic scoring...', codeFlags.length, 'code flags +', aiOnlyFlags.length, 'AI flags =', allFlagsForScoring.length, 'total')
+    console.log('[TermLift] Step 4: Deterministic scoring...', codeFlags.length, 'code flags +', aiFlags.length, 'AI flags =', allFlagsForScoring.length, 'total for scoring')
     const scoreData = calculateDeterministicScore(allFlagsForScoring, rawFacts.total_commitment, savingsTotal)
     console.log('[TermLift] Step 4 done: score =', scoreData.score, scoreData.score_label)
 

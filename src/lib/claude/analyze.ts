@@ -334,7 +334,7 @@ export async function analyzeDealFacts(
 
   // Build code flags context for the AI
   const codeFlagsContext = options.codeFlags?.length
-    ? `\nCODE-DETECTED RED FLAGS (these have already been identified by our system — do NOT duplicate them in your red_flags output, but DO reference them in your strategy, verdict, and what_to_ask_for):\n${options.codeFlags.map(f => `- [${f.severity}] ${f.type}: ${f.issue} → Ask: ${f.what_to_ask_for}`).join('\n')}`
+    ? `\nSYSTEM-DETECTED ISSUES (our code already flagged these structural checks — you may reference, expand on, or add sharper commercial context to them, but focus your red_flags output on the COMMERCIALLY IMPORTANT issues that code cannot detect: pricing fairness, market overpricing, one-sided risk clauses, vague deliverables, missing protections specific to this deal type, and anything that costs the buyer real money):\n${options.codeFlags.map(f => `- [${f.severity}] ${f.type}: ${f.issue}`).join('\n')}`
     : ''
 
   // Build context parts
