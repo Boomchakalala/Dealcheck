@@ -24,7 +24,7 @@ export { detectRedFlags, type CodeRedFlag } from './red-flags'
 export { calculateDeterministicScore } from './score-deterministic'
 
 import { classifyQuote } from './classify'
-import { extractRigid, generateDocumentHash, rigidToLegacyFacts } from './extract-rigid'
+import { extractFinancialFacts } from './extract'
 import { analyzeDealFacts } from './analyze'
 import { generateEmailDrafts } from './emails'
 import { calculateQuoteScore } from './score'
@@ -55,25 +55,14 @@ export async function analyzeDeal(
     const classification = await classifyQuote(extractedText, dealType, imageData, allPages, pdfData)
     console.log('[TermLift] Step 0 done:', classification.quote_type, classification.deal_size_bracket)
 
-    // ─── Step 1: Rigid extraction ───
-    console.log('[TermLift] Step 1: Rigid extraction...')
-    const docHash = generateDocumentHash(extractedText || '')
-    console.log('[TermLift] Document hash:', docHash.substring(0, 12) + '...')
-
-    // TODO: Check cache here (Supabase extraction_cache table)
-    // For now, always extract fresh — cache layer can be added without changing the pipeline
-
-    const rigidFacts = await extractRigid(extractedText, dealType, imageData, allPages, pdfData)
-    console.log('[TermLift] Step 1 done:', rigidFacts.vendor, rigidFacts.financials.total_commitment)
-
-    // Convert to legacy format for backward compatibility
-    const rawFacts = rigidToLegacyFacts(rigidFacts)
+    // ─── Step 1: Extract financial facts ───
+    console.log('[TermLift] Step 1: Extracting financial facts...')
+    const rawFacts = await extractFinancialFacts(extractedText, dealType, imageData, allPages, pdfData)
+    console.log('[TermLift] Step 1 done:', rawFacts.vendor, rawFacts.total_commitment)
 
     // ─── Step 1a: Normalize total_commitment ───
-    const rawTotalString = rawFacts.total_commitment
     rawFacts.total_commitment = normalizeAmount(rawFacts.total_commitment)
-    const { amount: totalCommitmentAmount, currency: totalCommitmentCurrency } = parseMoney(rawFacts.total_commitment)
-    console.log('[TermLift] Step 1a: Normalized total:', rawTotalString, '→', rawFacts.total_commitment)
+    console.log('[TermLift] Step 1a: Normalized total:', rawFacts.total_commitment)
 
     // ─── Step 1b: Code-validate total_commitment ───
     const validation = validateTotalCommitment(rawFacts.total_commitment, extractedText)
