@@ -158,11 +158,11 @@ export function calculateQuoteScore(output: DealOutputType): {
 }
 
 function getLabel(score: number): string {
-  if (score >= 80) return 'Ready to sign'
-  if (score >= 65) return 'Solid, negotiate the details'
-  if (score >= 45) return 'Needs negotiation'
-  if (score >= 25) return 'Push back hard'
-  return "Don't sign this"
+  if (score >= 80) return 'Low risk, minor improvements possible'
+  if (score >= 65) return 'Mostly fair, a few points to tighten'
+  if (score >= 45) return 'Several issues to address'
+  if (score >= 25) return 'Significant concerns found'
+  return 'Major issues, do not sign as-is'
 }
 
 function buildDefaultRationale(score: number, flagCount: number): string {

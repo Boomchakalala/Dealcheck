@@ -323,6 +323,7 @@ export async function analyzeDealFacts(
     allPages?: Array<{ base64: string; mimeType: string }>
     pdfData?: { base64: string; mimeType: string }
     userPreferences?: { payment_terms?: string; top_priority?: string; auto_renewal?: string }
+    codeFlags?: Array<{ type: string; severity: string; issue: string; what_to_ask_for: string }>
   }
 ): Promise<AnalysisOutput> {
   // Build the enhanced prompt with overlays
@@ -331,11 +332,17 @@ export async function analyzeDealFacts(
   const preferencesDirective = buildPreferencesDirective(options.userPreferences)
   const enhancedPrompt = ANALYSIS_PROMPT + '\n\n' + overlay + '\n\n' + savingsDirective + '\n\n' + preferencesDirective
 
+  // Build code flags context for the AI
+  const codeFlagsContext = options.codeFlags?.length
+    ? `\nCODE-DETECTED RED FLAGS (these have already been identified by our system — do NOT duplicate them in your red_flags output, but DO reference them in your strategy, verdict, and what_to_ask_for):\n${options.codeFlags.map(f => `- [${f.severity}] ${f.type}: ${f.issue} → Ask: ${f.what_to_ask_for}`).join('\n')}`
+    : ''
+
   // Build context parts
   const contextParts = [
     `Deal Type: ${options.dealType}`,
     buildClassificationContext(classification),
     `\nVERIFIED FINANCIAL FACTS (use these as ground truth, do NOT recalculate):\n${JSON.stringify(facts, null, 2)}`,
+    codeFlagsContext,
     options.goal && `User Goal: ${options.goal}`,
     options.notes && `User Notes: ${options.notes}`,
     options.previousRoundOutput && `MULTI-ROUND ANALYSIS CONTEXT:\nThis is a follow-up round. Previous analysis: ${JSON.stringify(options.previousRoundOutput, null, 2)}\nKeep scoring consistent. Only change findings if the quote materially changed.`,
