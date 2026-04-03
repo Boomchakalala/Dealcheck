@@ -4,9 +4,10 @@ export const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-export const CLAUDE_MODEL = 'claude-sonnet-4-20250514'
-export const CLAUDE_CLASSIFY_MODEL = 'claude-haiku-4-5-20251001'
-export const CLAUDE_MODEL_ID = CLAUDE_MODEL
+export const CLAUDE_MODEL = 'claude-sonnet-4-20250514'          // Extraction, emails, general calls
+export const CLAUDE_MODEL_ANALYSIS = 'claude-opus-4-6'          // Analysis only — market judgment, severity, savings
+export const CLAUDE_CLASSIFY_MODEL = 'claude-haiku-4-5-20251001' // Classification — fast, cheap
+export const CLAUDE_MODEL_ID = CLAUDE_MODEL_ANALYSIS
 
 export type ClaudeImageMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
 

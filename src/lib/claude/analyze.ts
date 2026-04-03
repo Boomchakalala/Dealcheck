@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { anthropic, CLAUDE_MODEL, getResponseText, parseJsonFromContent, getLanguageInstruction, buildImageContent, type ClaudeImageMediaType } from './client'
+import { anthropic, CLAUDE_MODEL_ANALYSIS, getResponseText, parseJsonFromContent, getLanguageInstruction, buildImageContent, type ClaudeImageMediaType } from './client'
 import { QUOTE_TYPE_OVERLAYS, buildSavingsDirective, buildClassificationContext } from './overlays'
 import type { QuoteClassificationType } from '../schemas'
 import type { DealOutput } from '@/types'
@@ -374,7 +374,7 @@ export async function analyzeDealFacts(
   }
 
   const response = await anthropic.messages.create({
-    model: CLAUDE_MODEL,
+    model: CLAUDE_MODEL_ANALYSIS,
     max_tokens: 6144,
     system: enhancedPrompt + getLanguageInstruction(options.userLocale || 'en'),
     messages: [{ role: 'user', content: userContent }],
