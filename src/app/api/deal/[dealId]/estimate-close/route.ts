@@ -16,11 +16,13 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Parse optional body (finalDocumentText from uploaded doc)
+    // Parse optional body (finalDocumentText from uploaded doc, originalTotal override)
     let finalDocumentText: string | undefined
+    let originalTotalOverride: string | undefined
     try {
       const body = await request.json()
       finalDocumentText = body?.finalDocumentText
+      originalTotalOverride = body?.originalTotal
     } catch {
       // No body is fine — we'll compare rounds instead
     }
@@ -56,12 +58,15 @@ export async function POST(
     // Build comparison prompt — either comparing rounds or comparing Round 1 vs uploaded final doc
     let prompt: string
 
+    // Use the override total if provided (latest round's total from UI), otherwise fall back to Round 1
+    const baselineTotal = originalTotalOverride || firstOutput.snapshot?.total_commitment || 'Unknown'
+
     if (finalDocumentText) {
-      // Compare Round 1 analysis against the uploaded final document
+      // Compare original quote against the uploaded final document
       prompt = `You are a procurement analyst. Compare the ORIGINAL quote analysis against the FINAL signed document to determine what was won in the negotiation.
 
-ORIGINAL QUOTE ANALYSIS (Round 1):
-- Total Commitment: ${firstOutput.snapshot?.total_commitment || 'Unknown'}
+ORIGINAL QUOTE (before negotiation):
+- Total Commitment: ${baselineTotal}
 - Term: ${firstOutput.snapshot?.term || 'Unknown'}
 - Pricing Model: ${firstOutput.snapshot?.pricing_model || 'Unknown'}
 - Billing/Payment: ${firstOutput.snapshot?.billing_payment || 'Unknown'}
@@ -100,7 +105,7 @@ Return ONLY valid JSON (no markdown, no code fences):
       prompt = `You are a procurement analyst. Compare the first and latest rounds of a negotiation to estimate what was won.
 
 FIRST ROUND (Round ${firstRound.round_number}):
-- Total Commitment: ${firstOutput.snapshot?.total_commitment || 'Unknown'}
+- Total Commitment: ${baselineTotal}
 - Term: ${firstOutput.snapshot?.term || 'Unknown'}
 - Pricing Model: ${firstOutput.snapshot?.pricing_model || 'Unknown'}
 - Billing/Payment: ${firstOutput.snapshot?.billing_payment || 'Unknown'}

@@ -103,6 +103,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           finalDocumentText: extractedDocText || undefined,
+          originalTotal: currentTotal || undefined,
         }),
       })
       const data = await res.json()
