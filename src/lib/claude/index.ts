@@ -44,10 +44,10 @@ function deriveAssertivenessBand(la: LeverageAssessment | undefined): { band: 1 
   const total = levelScore(la.price_leverage) + levelScore(la.terms_leverage) +
     levelScore(la.structural_leverage) + levelScore(la.risk_leverage) + levelScore(la.ambiguity_leverage)
 
-  if (total >= 12) return { band: 1, maxSavingsPct: 35 }
-  if (total >= 9)  return { band: 2, maxSavingsPct: 25 }
-  if (total >= 7)  return { band: 3, maxSavingsPct: 15 }
-  return { band: 4, maxSavingsPct: 10 }
+  if (total >= 12) return { band: 1, maxSavingsPct: 40 }
+  if (total >= 9)  return { band: 2, maxSavingsPct: 30 }
+  if (total >= 7)  return { band: 3, maxSavingsPct: 25 }
+  return { band: 4, maxSavingsPct: 20 }
 }
 
 /**
@@ -178,8 +178,23 @@ export async function analyzeDeal(
     }
 
     // ─── Step 4: Deterministic score ───
-    console.log('[TermLift] Step 4: Deterministic scoring...')
-    const scoreData = calculateDeterministicScore(codeFlags, rawFacts.total_commitment, savingsTotal)
+    // Score from ALL flags (code + AI), not just code flags
+    // AI flags get default points based on severity since they don't have explicit points
+    const allFlagsForScoring: CodeRedFlag[] = [
+      ...codeFlags,
+      ...aiOnlyFlags.map(f => ({
+        type: f.type || 'Commercial',
+        severity: (f.severity || 'medium') as 'high' | 'medium' | 'low',
+        score_category: (f.score_category || 'pricing') as 'pricing' | 'terms' | 'leverage',
+        issue: f.issue,
+        why_it_matters: f.why_it_matters,
+        what_to_ask_for: f.what_to_ask_for,
+        if_they_push_back: f.if_they_push_back,
+        points: f.severity === 'high' ? 10 : f.severity === 'medium' ? 6 : 3,
+      })),
+    ]
+    console.log('[TermLift] Step 4: Deterministic scoring...', codeFlags.length, 'code flags +', aiOnlyFlags.length, 'AI flags =', allFlagsForScoring.length, 'total')
+    const scoreData = calculateDeterministicScore(allFlagsForScoring, rawFacts.total_commitment, savingsTotal)
     console.log('[TermLift] Step 4 done: score =', scoreData.score, scoreData.score_label)
 
     // ─── Step 5: Generate emails ───
