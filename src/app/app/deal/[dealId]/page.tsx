@@ -64,7 +64,9 @@ export default async function DealPage({
 
   const sortedRounds = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number) || []
   const latestRound = sortedRounds[0]
+  const firstRound = sortedRounds[sortedRounds.length - 1]
   const latestOutput = latestRound?.output_json
+  const firstOutput = firstRound?.output_json
   const schemaVersion = latestRound?.schema_version || 'v1'
   const isV2 = schemaVersion === 'v2'
 
@@ -76,6 +78,7 @@ export default async function DealPage({
   const category = (latestOutput as DealOutput)?.category
   const description = (latestOutput as DealOutput)?.description || (latestOutput as DealOutput)?.quick_read?.conclusion || null
   const totalCommitment = latestOutput?.snapshot?.total_commitment
+  const originalTotal = firstOutput?.snapshot?.total_commitment
   const term = latestOutput?.snapshot?.term
 
   const redFlagCount = isV2
@@ -184,6 +187,7 @@ export default async function DealPage({
               savingsPercent={deal.savings_percent}
               closedAt={deal.closed_at}
               currentTotal={totalCommitment}
+              originalTotal={originalTotal}
               roundCount={sortedRounds.length}
               whatChanged={deal.what_changed}
               userPlan={userPlan}

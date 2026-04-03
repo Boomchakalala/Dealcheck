@@ -20,6 +20,7 @@ interface DealHeaderClientProps {
   savingsPercent?: number | null
   closedAt?: string | null
   currentTotal?: string
+  originalTotal?: string
   roundCount?: number
   whatChanged?: string[] | null
   userPlan?: string
@@ -40,6 +41,7 @@ export function DealHeaderClient({
   savingsPercent,
   closedAt,
   currentTotal,
+  originalTotal,
   roundCount,
   whatChanged,
   userPlan = 'free',
@@ -154,7 +156,7 @@ export function DealHeaderClient({
       {showCloseModal && (
         <CloseDealModal
           dealId={dealId}
-          currentTotal={currentTotal}
+          currentTotal={originalTotal || currentTotal}
           roundCount={roundCount || 0}
           onClose={() => setShowCloseModal(false)}
           onSuccess={() => {
