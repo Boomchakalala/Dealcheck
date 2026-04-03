@@ -218,20 +218,26 @@ export async function extractRigid(
  * Convert RigidExtraction to the legacy ExtractedFacts format
  * for backward compatibility with existing pipeline components.
  */
+/** Clean "not_stated" values — replace with undefined or a sensible display value */
+function clean(val: string): string | undefined {
+  if (!val || val === 'not_stated' || val === 'Unknown' || val === 'unknown') return undefined
+  return val
+}
+
 export function rigidToLegacyFacts(rigid: RigidExtraction): import('./extract').ExtractedFacts {
   return {
     vendor: rigid.vendor,
     vendor_product: rigid.vendor_product,
-    category: rigid.category,
-    description: rigid.description,
-    term: rigid.contract_terms.term_length,
+    category: clean(rigid.category) || rigid.category,
+    description: clean(rigid.description) || rigid.description,
+    term: clean(rigid.contract_terms.term_length) || 'Not specified',
     total_commitment: rigid.financials.total_commitment,
-    billing_payment: rigid.financials.billing_frequency,
-    pricing_model: rigid.financials.pricing_model,
-    currency: rigid.financials.currency,
-    deal_type: rigid.contract_terms.deal_type,
-    contact_name: rigid.context.contact_name !== 'not_stated' ? rigid.context.contact_name : undefined,
-    renewal_date: rigid.context.renewal_date !== 'not_stated' ? rigid.context.renewal_date : undefined,
-    signing_deadline: rigid.context.signing_deadline !== 'not_stated' ? rigid.context.signing_deadline : undefined,
+    billing_payment: clean(rigid.financials.billing_frequency) || 'Not specified',
+    pricing_model: clean(rigid.financials.pricing_model) || 'Not specified',
+    currency: rigid.financials.currency || 'USD',
+    deal_type: clean(rigid.contract_terms.deal_type) || 'New purchase',
+    contact_name: clean(rigid.context.contact_name),
+    renewal_date: clean(rigid.context.renewal_date),
+    signing_deadline: clean(rigid.context.signing_deadline),
   }
 }

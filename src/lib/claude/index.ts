@@ -150,7 +150,7 @@ export async function analyzeDeal(
 
     // ─── Step 3b: Savings validation ───
     const leverageAssessment = analysis.leverage_assessment
-    const { band: assertivenessBand, maxSavingsPct } = deriveAssertivenessBand(leverageAssessment)
+    const { band: assertivenessBand } = deriveAssertivenessBand(leverageAssessment)
     const ps = analysis.potential_savings as any
     const commitAmount = parseMoney(rawFacts.total_commitment).amount
     let savingsTotal = 0
@@ -158,19 +158,17 @@ export async function analyzeDeal(
     if (ps?.must_have) {
       savingsTotal = (ps.must_have as any[]).reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : 0), 0)
 
-      // Cap savings to assertiveness band max
-      if (commitAmount > 0) {
-        const maxSavings = commitAmount * (maxSavingsPct / 100)
-        if (savingsTotal > maxSavings) {
-          console.warn(`[TermLift] GUARD: savings (${savingsTotal}) exceeds band ${assertivenessBand} max (${maxSavingsPct}% = ${maxSavings}). Scaling.`)
-          const scaleFactor = maxSavings / savingsTotal
-          for (const item of ps.must_have) {
-            if (typeof item.amount === 'number') {
-              item.amount = Math.round(item.amount * scaleFactor)
-            }
+      // Only guard: savings cannot exceed total commitment
+      if (commitAmount > 0 && savingsTotal > commitAmount) {
+        console.warn(`[TermLift] GUARD: savings (${savingsTotal}) > total_commitment (${commitAmount}). Capping to 40%.`)
+        const maxSavings = commitAmount * 0.4
+        const scaleFactor = maxSavings / savingsTotal
+        for (const item of ps.must_have) {
+          if (typeof item.amount === 'number') {
+            item.amount = Math.round(item.amount * scaleFactor)
           }
-          savingsTotal = (ps.must_have as any[]).reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : 0), 0)
         }
+        savingsTotal = (ps.must_have as any[]).reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : 0), 0)
       }
 
       // Recalculate total from items
@@ -178,8 +176,10 @@ export async function analyzeDeal(
     }
 
     // ─── Step 4: Deterministic score ───
-    // Score from ALL flags (code + AI), not just code flags
-    // AI flags get default points based on severity since they don't have explicit points
+    // Score from ALL flags (code + AI)
+    // AI flags scored by severity: high=12, medium=8, low=4
+    // Slightly higher than code flags because AI flags represent subjective risks
+    // that the code engine couldn't detect (market overpricing, vague scope, one-sided clauses)
     const allFlagsForScoring: CodeRedFlag[] = [
       ...codeFlags,
       ...aiOnlyFlags.map(f => ({
@@ -190,7 +190,7 @@ export async function analyzeDeal(
         why_it_matters: f.why_it_matters,
         what_to_ask_for: f.what_to_ask_for,
         if_they_push_back: f.if_they_push_back,
-        points: f.severity === 'high' ? 10 : f.severity === 'medium' ? 6 : 3,
+        points: f.severity === 'high' ? 12 : f.severity === 'medium' ? 8 : 4,
       })),
     ]
     console.log('[TermLift] Step 4: Deterministic scoring...', codeFlags.length, 'code flags +', aiOnlyFlags.length, 'AI flags =', allFlagsForScoring.length, 'total')
