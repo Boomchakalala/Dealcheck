@@ -36,21 +36,28 @@ export async function POST(
       return NextResponse.json({ error: 'Deal not found' }, { status: 404 })
     }
 
-    const sortedRounds = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number) || []
-    const latestRound = sortedRounds[0]
-    const baseTotal = latestRound?.output_json?.snapshot?.total_commitment
+    const sortedRounds = deal.rounds?.sort((a: any, b: any) => a.round_number - b.round_number) || []
+    const firstRound = sortedRounds[0]
+    const latestRound = sortedRounds[sortedRounds.length - 1]
+    const firstOutput = firstRound?.output_json
+    const latestOutput = latestRound?.output_json
+
+    // Use Round 1 for the original position, latest round for current state
+    const originalSnapshot = firstOutput?.snapshot || latestOutput?.snapshot || {}
+    const originalTotal = firstOutput?.snapshot?.total_commitment || latestOutput?.snapshot?.total_commitment
 
     const locale = (await cookies()).get('termlift_lang')?.value || 'en'
     const langInstruction = getLanguageInstruction(locale)
 
     let closeSummary = null
-    if (latestRound?.output_json && (normalizedOutcome === 'closed_won')) {
+    if (firstOutput && (normalizedOutcome === 'closed_won')) {
       try {
-        const redFlags = latestRound.output_json.red_flags?.map((f: any) => `- ${f.issue}: ${f.why_it_matters || ''}`).join('\n') || 'None'
-        const mustHaves = latestRound.output_json.what_to_ask_for?.must_have?.map((a: string) => `- ${a}`).join('\n') || 'None'
-        const niceToHaves = latestRound.output_json.what_to_ask_for?.nice_to_have?.map((a: string) => `- ${a}`).join('\n') || 'None'
-        const verdict = latestRound.output_json.verdict || ''
-        const snapshot = latestRound.output_json.snapshot || {}
+        // Use Round 1's red flags and asks — these are what the user was negotiating on
+        const redFlags = firstOutput.red_flags?.map((f: any) => `- ${f.issue}: ${f.why_it_matters || ''}`).join('\n') || 'None'
+        const mustHaves = firstOutput.what_to_ask_for?.must_have?.map((a: string) => `- ${a}`).join('\n') || 'None'
+        const niceToHaves = firstOutput.what_to_ask_for?.nice_to_have?.map((a: string) => `- ${a}`).join('\n') || 'None'
+        const verdict = firstOutput.verdict || ''
+        const snapshot = originalSnapshot
 
         const summaryPrompt = `Analyze this closed procurement deal and return ONLY valid JSON (no markdown, no code fences).
 
@@ -59,7 +66,7 @@ DEAL CONTEXT:
 - Product/Service: ${snapshot.vendor_product || 'Unknown'}
 - Term: ${snapshot.term || 'Unknown'}
 - Pricing model: ${snapshot.pricing_model || 'Unknown'}
-- Original total: ${baseTotal || 'Unknown'}
+- Original total (Round 1): ${originalTotal || 'Unknown'}
 - Final total: ${finalTotal || 'Not specified'}
 - Cash savings: ${savingsAmount ? `${savingsAmount.toLocaleString()}` : 'None'}${savingsPercent ? ` (${savingsPercent.toFixed(1)}%)` : ''}
 - What user says changed: ${whatChanged?.length ? whatChanged.join(', ') : 'Not specified'}
