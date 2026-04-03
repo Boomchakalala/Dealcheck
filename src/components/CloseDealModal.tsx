@@ -77,12 +77,16 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
     setUploadLoading(true)
     setUploadedFile(file.name)
     try {
+      // Send file to /api/extract which handles PDF, DOCX, and images
       const formData = new FormData()
       formData.append('file', file)
-      const res = await fetch('/api/upload', { method: 'POST', body: formData })
+      const res = await fetch('/api/extract', { method: 'POST', body: formData })
       const data = await res.json()
-      if (res.ok && data.extractedText) {
-        setExtractedDocText(data.extractedText)
+      if (res.ok && data.text) {
+        setExtractedDocText(data.text)
+      } else {
+        setError(data.error || 'Failed to extract text from document')
+        setUploadedFile(null)
       }
     } catch {
       setUploadedFile(null)
@@ -343,7 +347,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
                   })()}
 
                   {/* Upload signed contract */}
-                  <input ref={fileInputRef} type="file" accept=".pdf" className="hidden" onChange={handleFileSelect} />
+                  <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp" className="hidden" onChange={handleFileSelect} />
                   {uploadedFile ? (
                     <div className="flex items-center gap-3 p-3.5 bg-white rounded-xl border border-emerald-200">
                       <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
