@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import { Card } from '@/components/ui/card'
@@ -47,7 +49,7 @@ export default async function DealPage({
     .single()
 
   const userPlan = (profile?.plan || 'free') as Plan
-  const isAdmin = profile?.is_admin || false
+  const isAdmin = !!profile?.is_admin
 
   const { data: deal } = await supabase
     .from('deals')
