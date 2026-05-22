@@ -50,15 +50,14 @@ export async function analyzeDeal(
   userPreferences?: { payment_terms?: string; top_priority?: string; auto_renewal?: string }
 ): Promise<DealOutputType> {
   try {
-    // ─── Step 0: Classify the quote (fast, uses Haiku) ───
-    console.log('[TermLift] Step 0: Classifying quote...')
-    const classification = await classifyQuote(extractedText, dealType, imageData, allPages, pdfData)
-    console.log('[TermLift] Step 0 done:', classification.quote_type, classification.deal_size_bracket)
-
-    // ─── Step 1: Extract financial facts ───
-    console.log('[TermLift] Step 1: Extracting financial facts...')
-    const rawFacts = await extractFinancialFacts(extractedText, dealType, imageData, allPages, pdfData)
-    console.log('[TermLift] Step 1 done:', rawFacts.vendor, rawFacts.total_commitment)
+    // ─── Steps 0+1: Classify + extract in parallel ───
+    // Both only read the quote — neither depends on the other, so run them together.
+    console.log('[TermLift] Steps 0+1: Classifying + extracting facts (parallel)...')
+    const [classification, rawFacts] = await Promise.all([
+      classifyQuote(extractedText, dealType, imageData, allPages, pdfData),
+      extractFinancialFacts(extractedText, dealType, imageData, allPages, pdfData),
+    ])
+    console.log('[TermLift] Steps 0+1 done:', classification.quote_type, classification.deal_size_bracket, '|', rawFacts.vendor, rawFacts.total_commitment)
 
     // ─── Step 1a: Normalize total_commitment ───
     rawFacts.total_commitment = normalizeAmount(rawFacts.total_commitment)

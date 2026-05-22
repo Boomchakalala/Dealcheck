@@ -1,153 +1,141 @@
 'use client'
 
 import Link from 'next/link'
-import { UnifiedHeader } from '@/components/UnifiedHeader'
+import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
-import { ArrowRight, Shield, Eye, Target, Sparkles, Lock, Users, Heart } from 'lucide-react'
+import { ArrowRight, Shield, Eye, Target, Lock, Users, Heart } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+
+const sora = "'Sora', sans-serif"
+const mono = "'JetBrains Mono', monospace"
+const green = '#1DB954'
 
 export default function AboutPage() {
   const t = useTranslations()
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <UnifiedHeader variant="public" />
+    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
+      <MarketingHeader />
 
       <main className="flex-1">
-        {/* Hero */}
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/40 via-white to-white pointer-events-none" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.08)_0%,transparent_65%)] pointer-events-none" />
+        {/* ─── HERO ─────────────────────────────────────── */}
+        <section className="relative px-6 pt-20 sm:pt-28 pb-16 overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 700px 360px at 50% 0%, rgba(29,185,84,0.13) 0%, transparent 70%)' }} />
+          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-          <div className="relative max-w-3xl mx-auto px-5 sm:px-8 pt-24 sm:pt-32 pb-16 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-emerald-200/60 shadow-sm mb-6">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-xs font-semibold text-emerald-700 tracking-wide">{t('footer.about')}</span>
-            </div>
-            <h1 className="text-[2rem] sm:text-[2.75rem] leading-[1.12] font-bold text-slate-900 tracking-tight mb-5">
+          <div className="relative max-w-3xl mx-auto text-center">
+            <p className="text-[12px] mb-4 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>
+              {t('footer.about')}
+            </p>
+            <h1 className="text-slate-900 mb-5" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(34px, 4.8vw, 54px)', lineHeight: 1.05, letterSpacing: '-0.028em' }}>
               {t('about.heroTitle')}
             </h1>
-            <p className="text-base sm:text-lg text-slate-500 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-[17px] text-slate-500 leading-relaxed max-w-2xl mx-auto">
               {t('about.heroSubtitle')}
             </p>
           </div>
-        </div>
+        </section>
 
-        {/* Why TermLift Exists */}
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-6">
-            {t('about.whyTitle')}
-          </h2>
-          <div className="text-base text-slate-600 leading-relaxed space-y-4">
-            {(t('about.whyContent') as string).split('\n\n').map((paragraph, i) => (
-              <p key={i}>{paragraph}</p>
-            ))}
+        {/* ─── WHY TERMLIFT EXISTS ──────────────────────── */}
+        <section className="px-6 py-16">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-slate-900 mb-6" style={{ fontFamily: sora, fontWeight: 700, fontSize: 'clamp(26px, 3.4vw, 36px)', lineHeight: 1.12, letterSpacing: '-0.022em' }}>
+              {t('about.whyTitle')}
+            </h2>
+            <div className="text-[16px] text-slate-600 leading-relaxed space-y-4">
+              {(t('about.whyContent') as string).split('\n\n').map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* What Makes Us Different — 3 cards */}
-        <div className="bg-slate-50/60 border-y border-slate-200/60">
-          <div className="max-w-5xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-10 text-center">
+        {/* ─── WHAT MAKES US DIFFERENT ──────────────────── */}
+        <section className="px-6 py-20 bg-slate-50/70 border-y border-slate-100">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-slate-900 text-center mb-12" style={{ fontFamily: sora, fontWeight: 700, fontSize: 'clamp(26px, 3.4vw, 36px)', lineHeight: 1.12, letterSpacing: '-0.022em' }}>
               {t('about.differenceTitle')}
             </h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-2xl border border-slate-200 p-7 shadow-sm hover:shadow-lg transition-all duration-300">
-                <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center mb-4">
-                  <Target className="w-5 h-5 text-emerald-600" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {[
+                { icon: <Target className="w-6 h-6" />, title: t('about.card1Title'), desc: t('about.card1Desc') },
+                { icon: <Users className="w-6 h-6" />, title: t('about.card2Title'), desc: t('about.card2Desc') },
+                { icon: <Lock className="w-6 h-6" />, title: t('about.card3Title'), desc: t('about.card3Desc') },
+              ].map((c, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-slate-200 p-7 hover:border-emerald-300 hover:shadow-lg hover:-translate-y-1 transition-all">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style={{ background: 'rgba(29,185,84,0.12)', color: green }}>
+                    {c.icon}
+                  </div>
+                  <h3 className="text-[17px] font-bold text-slate-900 mb-2" style={{ fontFamily: sora }}>{c.title}</h3>
+                  <p className="text-[13.5px] text-slate-500 leading-relaxed">{c.desc}</p>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 mb-2">{t('about.card1Title')}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{t('about.card1Desc')}</p>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-slate-200 p-7 shadow-sm hover:shadow-lg transition-all duration-300">
-                <div className="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-4">
-                  <Users className="w-5 h-5 text-blue-600" />
-                </div>
-                <h3 className="text-base font-bold text-slate-900 mb-2">{t('about.card2Title')}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{t('about.card2Desc')}</p>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-slate-200 p-7 shadow-sm hover:shadow-lg transition-all duration-300">
-                <div className="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center mb-4">
-                  <Lock className="w-5 h-5 text-purple-600" />
-                </div>
-                <h3 className="text-base font-bold text-slate-900 mb-2">{t('about.card3Title')}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{t('about.card3Desc')}</p>
-              </div>
+              ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Who Built This */}
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-8 text-center">
-            {t('about.founderTitle')}
-          </h2>
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 shadow-sm text-center">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-5 shadow-lg">
-              <span className="text-xl font-bold text-white">KO</span>
+        {/* ─── WHO BUILT THIS ───────────────────────────── */}
+        <section className="px-6 py-20">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-slate-900 mb-8" style={{ fontFamily: sora, fontWeight: 700, fontSize: 'clamp(26px, 3.4vw, 36px)', lineHeight: 1.12, letterSpacing: '-0.022em' }}>
+              {t('about.founderTitle')}
+            </h2>
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 shadow-sm">
+              <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: `linear-gradient(135deg, ${green} 0%, #15a047 100%)`, boxShadow: '0 12px 28px -8px rgba(29,185,84,0.5)' }}>
+                <span className="text-xl font-bold text-white" style={{ fontFamily: sora }}>KO</span>
+              </div>
+              <p className="text-[14.5px] text-slate-600 leading-relaxed max-w-lg mx-auto">
+                {t('about.founderBio')}
+              </p>
             </div>
-            <p className="text-sm text-slate-600 leading-relaxed max-w-lg mx-auto">
-              {t('about.founderBio')}
-            </p>
           </div>
-        </div>
+        </section>
 
-        {/* Values */}
-        <div className="bg-slate-50/60 border-y border-slate-200/60">
-          <div className="max-w-4xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-10 text-center">
+        {/* ─── VALUES ───────────────────────────────────── */}
+        <section className="px-6 py-20 bg-slate-50/70 border-y border-slate-100">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-slate-900 text-center mb-12" style={{ fontFamily: sora, fontWeight: 700, fontSize: 'clamp(26px, 3.4vw, 36px)', lineHeight: 1.12, letterSpacing: '-0.022em' }}>
               {t('about.valuesTitle')}
             </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
-                  <Eye className="w-5 h-5 text-amber-600" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                { icon: <Eye className="w-5 h-5" />, title: t('about.value1Title'), desc: t('about.value1Desc') },
+                { icon: <Heart className="w-5 h-5" />, title: t('about.value2Title'), desc: t('about.value2Desc') },
+                { icon: <Shield className="w-5 h-5" />, title: t('about.value3Title'), desc: t('about.value3Desc') },
+              ].map((v, i) => (
+                <div key={i} className="text-center">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(29,185,84,0.12)', color: green }}>
+                    {v.icon}
+                  </div>
+                  <h3 className="text-[15.5px] font-bold text-slate-900 mb-1.5" style={{ fontFamily: sora }}>{v.title}</h3>
+                  <p className="text-[13.5px] text-slate-500 leading-relaxed">{v.desc}</p>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 mb-1.5">{t('about.value1Title')}</h3>
-                <p className="text-sm text-slate-600">{t('about.value1Desc')}</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                  <Heart className="w-5 h-5 text-emerald-600" />
-                </div>
-                <h3 className="text-base font-bold text-slate-900 mb-1.5">{t('about.value2Title')}</h3>
-                <p className="text-sm text-slate-600">{t('about.value2Desc')}</p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mx-auto mb-4">
-                  <Shield className="w-5 h-5 text-blue-600" />
-                </div>
-                <h3 className="text-base font-bold text-slate-900 mb-1.5">{t('about.value3Title')}</h3>
-                <p className="text-sm text-slate-600">{t('about.value3Desc')}</p>
-              </div>
+              ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* CTA */}
-        <div className="bg-gradient-to-r from-emerald-600 to-emerald-700">
-          <div className="max-w-4xl mx-auto px-5 sm:px-8 py-16 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6">
+        {/* ─── CTA — quiet white band ───────────────────── */}
+        <section className="px-6 py-20 text-center">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-slate-900 mb-6" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(28px, 3.8vw, 40px)', lineHeight: 1.1, letterSpacing: '-0.025em' }}>
               {t('about.ctaTitle')}
             </h2>
             <Link
               href="/try"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-emerald-700 rounded-xl font-semibold hover:bg-emerald-50 transition-all shadow-lg hover:shadow-xl"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[14.5px] font-bold text-white no-underline transition-all hover:shadow-lg hover:-translate-y-0.5"
+              style={{ background: green, boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}
             >
               {t('about.ctaButton')}
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4" />
             </Link>
-            <div className="mt-6 flex items-center justify-center gap-4">
-              <Link href="/example" className="text-sm font-medium text-emerald-200 hover:text-white">See examples</Link>
-              <span className="text-emerald-400">|</span>
-              <Link href="/pricing" className="text-sm font-medium text-emerald-200 hover:text-white">View pricing</Link>
+            <div className="mt-6 flex items-center justify-center gap-4 text-[13px]">
+              <Link href="/demo" className="font-medium text-slate-500 hover:text-slate-900 transition-colors">See the demo</Link>
+              <span className="text-slate-300">|</span>
+              <Link href="/pricing" className="font-medium text-slate-500 hover:text-slate-900 transition-colors">View pricing</Link>
             </div>
           </div>
-        </div>
+        </section>
       </main>
 
       <MarketingFooter />

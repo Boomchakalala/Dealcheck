@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { UnifiedHeader } from '@/components/UnifiedHeader'
+import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { getPostBySlug, getAllPosts } from '@/lib/blog'
 import { ArrowLeft, Clock } from 'lucide-react'
@@ -82,25 +82,26 @@ export default async function BlogPostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <UnifiedHeader variant="public" />
+      <MarketingHeader />
 
       {/* Hero banner */}
-      <div className="bg-gradient-to-b from-slate-50 to-white">
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-16 sm:pt-24 pb-10">
-          <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-emerald-600 transition-colors mb-6">
+      <div className="relative overflow-hidden px-6 pt-16 sm:pt-24 pb-10">
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 600px 300px at 50% 0%, rgba(29,185,84,0.10) 0%, transparent 70%)' }} />
+        <div className="relative max-w-3xl mx-auto">
+          <Link href="/blog" className="inline-flex items-center gap-1.5 text-[13px] text-slate-400 hover:text-emerald-600 transition-colors mb-6">
             <ArrowLeft className="w-3.5 h-3.5" /> {t('blog.backToBlog')}
           </Link>
 
-          <div className="flex items-center gap-3 mb-5">
-            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">{post.category}</span>
-            <span className="flex items-center gap-1 text-xs text-slate-400">
+          <div className="flex items-center gap-3 mb-5 flex-wrap">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{post.category}</span>
+            <span className="flex items-center gap-1 text-[12px] text-slate-400">
               <Clock className="w-3 h-3" />
               {post.readTime}
             </span>
-            <span className="text-xs text-slate-400">{new Date(post.date).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+            <span className="text-[12px] text-slate-400">{new Date(post.date).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight">{post.title}</h1>
+          <h1 className="text-slate-900" style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 'clamp(28px, 4vw, 44px)', lineHeight: 1.1, letterSpacing: '-0.025em' }}>{post.title}</h1>
         </div>
       </div>
 
@@ -123,12 +124,12 @@ export default async function BlogPostPage({ params }: Props) {
         {/* Author card */}
         <div className="mt-14 border-t border-slate-200 pt-8">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-sm font-bold text-emerald-700">KQ</span>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #1DB954 0%, #15a047 100%)' }}>
+              <span className="text-sm font-bold text-white" style={{ fontFamily: "'Sora', sans-serif" }}>KO</span>
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-900">{t('blog.writtenBy')}</p>
-              <p className="text-xs text-slate-500">{t('blog.writtenByDesc')}</p>
+              <p className="text-[14px] font-bold text-slate-900" style={{ fontFamily: "'Sora', sans-serif" }}>{t('blog.writtenBy')}</p>
+              <p className="text-[12.5px] text-slate-500">{t('blog.writtenByDesc')}</p>
             </div>
           </div>
         </div>
@@ -138,21 +139,23 @@ export default async function BlogPostPage({ params }: Props) {
           <EmailCapture source="blog" />
         </div>
 
-        {/* CTA */}
-        <div className="mt-8 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-8 sm:p-10 text-center">
-          <h3 className="text-xl font-bold text-white mb-3">{t('blog.ctaTitle')}</h3>
-          <p className="text-sm text-emerald-100 mb-5 max-w-md mx-auto">{locale === 'fr' ? 'Collez votre devis fournisseur et obtenez alertes, économies et un email prêt à envoyer en quelques minutes.' : 'Paste your vendor quote and get back red flags, savings, and a ready-to-send email in minutes.'}</p>
+        {/* CTA — quiet card */}
+        <div className="mt-8 rounded-2xl border-2 border-emerald-200 p-8 sm:p-10 text-center" style={{ background: 'linear-gradient(135deg, rgba(29,185,84,0.06) 0%, rgba(255,255,255,1) 100%)' }}>
+          <h3 className="text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 24, letterSpacing: '-0.02em' }}>{t('blog.ctaTitle')}</h3>
+          <p className="text-[14px] text-slate-500 mb-6 max-w-md mx-auto leading-relaxed">{locale === 'fr' ? 'Collez votre devis fournisseur et obtenez alertes, économies et un email prêt à envoyer en quelques minutes.' : 'Paste your vendor quote and get back red flags, savings, and a ready-to-send email in minutes.'}</p>
           <Link
             href="/try"
-            className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-xl bg-white text-emerald-700 hover:bg-emerald-50 transition-all shadow-lg"
+            className="inline-flex items-center gap-2 px-6 py-3.5 text-[14.5px] font-bold rounded-xl text-white no-underline transition-all hover:shadow-lg hover:-translate-y-0.5"
+            style={{ background: '#1DB954', boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}
           >
             {t('blog.ctaButton')}
+            <ArrowLeft className="w-4 h-4 rotate-180" />
           </Link>
         </div>
 
         {/* Back to blog */}
         <div className="mt-8 text-center">
-          <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-400 hover:text-emerald-600 transition-colors">
+          <Link href="/blog" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-400 hover:text-emerald-600 transition-colors">
             <ArrowLeft className="w-3.5 h-3.5" /> {t('blog.allPosts')}
           </Link>
         </div>

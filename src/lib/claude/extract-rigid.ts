@@ -174,9 +174,10 @@ export async function extractRigid(
   const visualContent = buildImageContent(imageData, allPages, pdfData)
   const hasVisualInput = !!visualContent
 
-  const userPrompt = hasVisualInput
+  const userPrompt = (hasVisualInput
     ? `Deal Type: ${dealType}\n\nExtract ALL facts from the attached quote into the rigid schema. Read every table, line item, clause, date, and fee.${extractedText ? `\n\nExtracted text (for reference):\n${extractedText}` : ''}`
-    : `Deal Type: ${dealType}\n\nExtract ALL facts from this quote into the rigid schema:\n${extractedText}`
+    : `Deal Type: ${dealType}\n\nExtract ALL facts from this quote into the rigid schema:\n${extractedText}`)
+    + `\n\nRespond with ONLY the JSON object. Begin your response with the { character — no preamble, no explanation, no markdown fences. Output raw JSON and nothing else.`
 
   let userContent: Anthropic.MessageParam['content']
   if (visualContent) {
@@ -191,7 +192,6 @@ export async function extractRigid(
     system: RIGID_EXTRACTION_PROMPT,
     messages: [
       { role: 'user', content: userContent },
-      { role: 'assistant', content: '{' },
     ],
     temperature: 0,
   })

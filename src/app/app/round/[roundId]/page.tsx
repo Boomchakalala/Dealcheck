@@ -41,7 +41,7 @@ export default async function RoundPage({
   const isV2 = schemaVersion === 'v2'
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-center gap-4">
         <Link href={`/app/deal/${deal.id}`}>
           <Button variant="outline" size="sm" className="gap-2">
@@ -52,43 +52,43 @@ export default async function RoundPage({
       </div>
 
       {/* Round Header */}
-      <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-        <div className="flex items-start justify-between mb-4">
+      <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex items-start justify-between mb-6">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-bold text-gray-900">
+            <div className="flex items-center gap-3 mb-3">
+              <h1 className="text-3xl font-bold text-slate-900">
                 Round {round.round_number}
               </h1>
               <Badge variant={round.status === 'done' ? 'default' : 'destructive'}>
                 {round.status}
               </Badge>
             </div>
-            <p className="text-gray-600">{deal.title}</p>
+            <p className="text-slate-600 text-base">{deal.title}</p>
           </div>
         </div>
 
-        <div className="space-y-2 text-sm text-gray-500">
+        <div className="space-y-2.5 text-sm text-slate-600">
           {round.note && (
             <p>
-              <span className="font-semibold">Note:</span> {round.note}
+              <span className="font-semibold text-slate-700">Note:</span> {round.note}
             </p>
           )}
           <p>
-            <span className="font-semibold">Created:</span>{' '}
+            <span className="font-semibold text-slate-700">Created:</span>{' '}
             {new Date(round.created_at).toLocaleString()}
           </p>
           <p>
-            <span className="font-semibold">Model:</span> {round.model_version || 'gpt-4o'}
+            <span className="font-semibold text-slate-700">Model:</span> {round.model_version || 'gpt-4o'}
           </p>
           {isV2 && (
             <p>
-              <span className="font-semibold">Schema:</span> V2 (Selective, issue-driven)
+              <span className="font-semibold text-slate-700">Schema:</span> V2 (Selective, issue-driven)
             </p>
           )}
         </div>
 
         {round.error_message && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mt-6 p-4 bg-red-50/80 border border-red-200 rounded-xl">
             <p className="text-sm text-red-800">
               <span className="font-semibold">Error:</span> {round.error_message}
             </p>
@@ -107,12 +107,12 @@ export default async function RoundPage({
 
       {/* Extracted Text (if saved) */}
       {round.extracted_text && (
-        <details className="bg-white p-6 rounded-lg border border-gray-200">
-          <summary className="cursor-pointer font-semibold text-gray-900">
+        <details className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <summary className="cursor-pointer font-semibold text-slate-900 hover:text-slate-700 transition-colors py-2">
             View Extracted Text
           </summary>
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">
+          <div className="mt-4 p-5 bg-slate-50 rounded-xl border border-slate-200">
+            <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans leading-relaxed">
               {round.extracted_text}
             </pre>
           </div>

@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { UnifiedHeader } from '@/components/UnifiedHeader'
+import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { CheckCircle2, Sparkles, ArrowRight, X } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { UpgradeButton } from '@/components/UpgradeButton'
+import { PrimaryButton } from '@/components/PrimaryButton'
 
 export const metadata: Metadata = {
   title: 'Pricing — TermLift | Free Vendor Quote Analysis Tool',
@@ -20,30 +21,26 @@ export default async function PricingPage() {
   const proFeatures = t.raw('pricingPage.proFeatures') as string[]
 
   return (
-    <div className="min-h-screen bg-white flex flex-col relative">
-      {/* Noise texture overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.015] mix-blend-overlay">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }} />
-      </div>
+    <div className="min-h-screen bg-white flex flex-col relative overflow-x-hidden">
+      {/* Noise texture removed — caused GPU-intensive repaints and scroll freezing */}
 
       {/* Header */}
-      <UnifiedHeader variant="public" />
+      <MarketingHeader />
 
       <main className="flex-1">
         {/* Hero */}
         <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/40 via-white to-white pointer-events-none" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.08)_0%,transparent_65%)] pointer-events-none" />
+          {/* Landing-style radial mesh + grid pattern */}
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 800px 400px at 80% 20%, rgba(29,185,84,0.14) 0%, transparent 70%), radial-gradient(ellipse 600px 400px at 20% 60%, rgba(16,185,129,0.08) 0%, transparent 70%)' }} />
+          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-          <div className="relative max-w-6xl mx-auto px-5 sm:px-8 pt-28 sm:pt-36 pb-20">
+          <div className="relative max-w-6xl mx-auto px-5 sm:px-8 pt-20 sm:pt-28 pb-20">
             <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-emerald-200/60 shadow-sm mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-emerald-200/80 shadow-sm mb-6">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-xs font-semibold text-emerald-700 tracking-wide">{t('pricingPage.transparentPricing')}</span>
+                <span className="text-xs font-semibold text-emerald-700 tracking-wide" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{t('pricingPage.transparentPricing')}</span>
               </div>
-              <h1 className="text-[2.25rem] sm:text-[3rem] leading-[1.08] font-bold text-slate-900 tracking-tight mb-4 max-w-xl mx-auto">
+              <h1 className="text-[2.25rem] sm:text-[3rem] leading-[1.04] font-bold text-slate-900 tracking-tight mb-4 max-w-xl mx-auto" style={{ fontFamily: 'Sora, sans-serif', letterSpacing: '-0.025em' }}>
                 {t('pricing.title')}
               </h1>
               <p className="text-lg text-slate-500 leading-relaxed max-w-xl mx-auto">
@@ -52,13 +49,16 @@ export default async function PricingPage() {
             </div>
 
             {/* 3-Tier Grid */}
-            <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto">
+            <div className="relative">
+              {/* Subtle gradient mesh background */}
+              <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/20 via-transparent to-emerald-50/10 rounded-3xl pointer-events-none blur-2xl" />
+              <div className="grid md:grid-cols-3 gap-6 lg:gap-7 max-w-4xl mx-auto relative">
 
               {/* Starter (Free) */}
-              <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 flex flex-col">
-                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">{t('pricing.starter')}</p>
+              <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-7 sm:p-8 shadow-sm hover:shadow-xl hover:border-slate-300 transition-all duration-300 flex flex-col">
+                <p className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{t('pricing.starter')}</p>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-slate-900 tracking-tight">{t('pricingPage.freePrice')}</span>
+                  <span className="text-[44px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif', letterSpacing: '-0.03em' }}>{t('pricingPage.freePrice')}</span>
                 </div>
                 <p className="text-sm text-slate-500 mb-6 leading-relaxed">
                   {t('pricingPage.starterDesc')}
@@ -71,24 +71,21 @@ export default async function PricingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/try"
-                  className="block w-full text-center px-5 py-3 text-sm font-semibold rounded-xl border border-slate-200 text-slate-700 hover:border-slate-300 hover:text-slate-900 hover:shadow-sm transition-all"
-                >
+                <PrimaryButton href="/try" variant="ghost" size="md" className="w-full">
                   {t('pricingPage.starterCta')}
-                </Link>
+                </PrimaryButton>
               </div>
 
               {/* Essentials (EUR15/mo) — NEW */}
-              <div className="rounded-2xl border-2 border-emerald-500/60 p-6 relative bg-gradient-to-b from-emerald-50/50 to-white shadow-lg shadow-emerald-100/50 hover:shadow-2xl hover:shadow-emerald-100/60 transition-all duration-300 flex flex-col">
+              <div className="rounded-2xl border-2 border-emerald-500/60 p-7 sm:p-8 relative bg-gradient-to-b from-emerald-50/50 to-white shadow-xl shadow-emerald-100/60 hover:shadow-2xl hover:shadow-emerald-100/80 hover:-translate-y-1 transition-all duration-300 flex flex-col">
                 <div className="absolute -top-3.5 left-6">
-                  <span className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold rounded-full tracking-wide shadow-lg">
-                    {t('pricing.mostPopular').toUpperCase()}
+                  <span className="px-3 py-1.5 bg-emerald-500 text-white text-[10px] font-bold rounded-full tracking-widest uppercase shadow-md" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    {t('pricing.mostPopular')}
                   </span>
                 </div>
-                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">{t('pricing.essentials')}</p>
+                <p className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{t('pricing.essentials')}</p>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-slate-900 tracking-tight">{t('pricingPage.essentialsPrice')}</span>
+                  <span className="text-[44px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif', letterSpacing: '-0.03em' }}>{t('pricingPage.essentialsPrice')}</span>
                   <span className="text-slate-500 ml-1.5 text-lg">{t('pricingPage.proPerMo')}</span>
                 </div>
                 <p className="text-sm text-slate-500 mb-6 leading-relaxed">
@@ -105,15 +102,15 @@ export default async function PricingPage() {
                 <UpgradeButton
                   plan="essentials"
                   label={t('pricingPage.essentialsCta')}
-                  className="block w-full text-center px-5 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm"
+                  className="block w-full text-center px-5 py-3 text-sm font-bold rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition-all hover:-translate-y-0.5 shadow-[0_8px_24px_-6px_rgba(29,185,84,0.45)] hover:shadow-[0_12px_32px_-8px_rgba(29,185,84,0.55)]"
                 />
               </div>
 
               {/* Pro (EUR39/mo) */}
-              <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-6 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300 flex flex-col">
-                <p className="text-xs font-semibold tracking-widest text-slate-400 uppercase mb-4">{t('pricing.pro')}</p>
+              <div className="rounded-2xl border-2 border-slate-200/80 bg-white p-7 sm:p-8 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-300 flex flex-col">
+                <p className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{t('pricing.pro')}</p>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-slate-900 tracking-tight">{t('pricingPage.proPrice')}</span>
+                  <span className="text-[44px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif', letterSpacing: '-0.03em' }}>{t('pricingPage.proPrice')}</span>
                   <span className="text-slate-500 ml-1.5 text-lg">{t('pricingPage.proPerMo')}</span>
                 </div>
                 <p className="text-sm text-slate-500 mb-6 leading-relaxed">
@@ -130,16 +127,17 @@ export default async function PricingPage() {
                 <UpgradeButton
                   plan="pro"
                   label={t('pricingPage.proCta')}
-                  className="block w-full text-center px-5 py-3 text-sm font-semibold rounded-xl border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 transition-all"
+                  className="block w-full text-center px-5 py-3 text-sm font-bold rounded-xl border-2 border-emerald-500 text-emerald-700 bg-white hover:bg-emerald-50 transition-all hover:-translate-y-0.5 shadow-[0_4px_12px_-4px_rgba(29,185,84,0.25)]"
                 />
               </div>
 
+              </div>
             </div>
           </div>
 
           {/* Example link */}
           <div className="text-center mt-8 pb-8">
-            <Link href="/example" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors group">
+            <Link href="/demo" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-emerald-600 transition-colors group">
               {t('pricingPage.seeExample')}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -147,9 +145,9 @@ export default async function PricingPage() {
         </div>
 
         {/* Feature Comparison */}
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-16 sm:py-20">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-10 text-center">{t('pricingPage.comparePlans')}</h2>
-          <div className="overflow-x-auto">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-20 sm:py-28">
+          <h2 className="text-2xl sm:text-[34px] font-bold text-slate-900 mb-12 text-center" style={{ fontFamily: 'Sora, sans-serif', letterSpacing: '-0.022em' }}>{t('pricingPage.comparePlans')}</h2>
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b-2 border-slate-200">
@@ -199,8 +197,8 @@ export default async function PricingPage() {
 
         {/* FAQ */}
         <div className="max-w-3xl mx-auto px-5 sm:px-8 py-20 sm:py-28">
-          <p className="text-xs font-semibold tracking-widest text-emerald-700 uppercase mb-3 text-center">{t('pricingPage.commonQuestions')}</p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-12 text-center">{t('pricingPage.faqTitle')}</h2>
+          <p className="text-[12px] font-bold tracking-widest text-emerald-600 uppercase mb-3 text-center" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{t('pricingPage.commonQuestions')}</p>
+          <h2 className="text-2xl sm:text-[34px] font-bold text-slate-900 mb-12 text-center" style={{ fontFamily: 'Sora, sans-serif', letterSpacing: '-0.022em' }}>{t('pricingPage.faqTitle')}</h2>
           <div className="space-y-0 border-t border-slate-200/60">
             {[
               { q: t('pricingPage.faq1q'), a: t('pricingPage.faq1a') },

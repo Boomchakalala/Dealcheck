@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { UnifiedHeader } from '@/components/UnifiedHeader'
-import { AppFooter } from '@/components/AppFooter'
+import { AppSidebar } from '@/components/AppSidebar'
 import { FeedbackWidget } from '@/components/FeedbackWidget'
 
 export default async function AppLayout({
@@ -28,18 +27,20 @@ export default async function AppLayout({
   const usageCount = profile?.usage_count || 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50/80 to-white flex flex-col">
-      <UnifiedHeader
-        variant="app"
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-25 to-white">
+      <AppSidebar
         userEmail={user.email || 'user@example.com'}
         isUpgraded={isPaid}
         usageCount={usageCount}
         isAdmin={isAdmin}
+        plan={profile?.plan || 'free'}
       />
-      <main className="max-w-7xl mx-auto px-5 sm:px-8 py-10 flex-1 w-full">
-        {children}
+      {/* Main content — offset by sidebar on desktop, full-width on mobile */}
+      <main className="min-h-screen transition-all duration-200 md:ml-[var(--sidebar-width,210px)]">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8 pb-24 md:pb-8">
+          {children}
+        </div>
       </main>
-      <AppFooter />
       <FeedbackWidget />
     </div>
   )

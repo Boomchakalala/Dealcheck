@@ -4,15 +4,16 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { CloseDealModal } from '@/components/CloseDealModal'
-import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, MoreHorizontal, Info } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, MoreHorizontal } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
 import { useI18n } from '@/i18n/context'
-import { ScoreCircle } from '@/components/ScoreCircle'
 import { normalizeAmount, detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
 
 interface DealListClientProps {
   deals: any[]
   onDealDeleted?: (dealId: string) => void
+  /** Base path for deal links. Defaults to '/app' for the real app; pass '/demo' for the demo. */
+  linkBase?: string
 }
 
 function getLatestRound(deal: any) {
@@ -34,14 +35,15 @@ function getTimeAgo(date: string, t: (key: string, vars?: Record<string, string 
 }
 
 function getStatusConfig(deal: any, t: (key: string, vars?: Record<string, string | number>) => string) {
-  if (deal.status?.startsWith('closed_')) {
+  const isClosed = deal.status?.startsWith('closed_')
+  if (isClosed) {
     const outcome = deal.status.replace('closed_', '')
-    if (outcome === 'won') return { label: t('dealList.won'), badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', border: 'border-l-emerald-500', icon: <CheckCircle2 className="w-3 h-3" /> }
-    if (outcome === 'lost') return { label: t('dealList.lost'), badge: 'bg-red-100 text-red-700 border-red-200', border: 'border-l-red-400', icon: <TrendingDown className="w-3 h-3" /> }
-    if (outcome === 'paused') return { label: t('dealList.noChange'), badge: 'bg-amber-100 text-amber-700 border-amber-200', border: 'border-l-slate-300', icon: <Pause className="w-3 h-3" /> }
-    return { label: t('dealList.noChange'), badge: 'bg-slate-100 text-slate-600 border-slate-200', border: 'border-l-slate-300', icon: null }
+    if (outcome === 'won') return { label: t('dealList.won'), badge: 'bg-emerald-100 text-emerald-700 border border-emerald-200', icon: <CheckCircle2 className="w-3.5 h-3.5" /> }
+    if (outcome === 'lost') return { label: t('dealList.lost'), badge: 'bg-slate-100 text-slate-500', icon: <TrendingDown className="w-3.5 h-3.5" /> }
+    if (outcome === 'paused') return { label: t('dealList.noChange'), badge: 'bg-slate-100 text-slate-500', icon: <Pause className="w-3.5 h-3.5" /> }
+    return { label: t('dealList.noChange'), badge: 'bg-slate-100 text-slate-500', icon: null }
   }
-  return { label: t('dealList.active'), badge: 'bg-amber-50 text-amber-700 border-amber-200', border: 'border-l-amber-400', icon: null }
+  return { label: t('dealList.active'), badge: 'bg-emerald-50 text-emerald-700 border border-emerald-200', icon: null }
 }
 
 function normalizeCategory(raw: string): string {
@@ -61,50 +63,15 @@ function formatAmount(value: string): string {
   return normalizeAmount(value)
 }
 
-function formatSavings(amount: number, locale: string, currencyHint?: string): string {
+function formatSavingsStr(amount: number, locale: string, currencyHint?: string): string {
   const currency = currencyHint ? detectCurrency(currencyHint) : 'EUR'
   return formatCurrency(amount, currency)
-}
-
-function parseSavingsNumber(str: string): number {
-  if (!str) return 0
-
-  // Handle K/M suffixes first
-  const kmMatch = str.match(/([\d.,\s]+)\s*([KkMm])/)
-  if (kmMatch) {
-    const num = parseFloat(kmMatch[1].replace(/[\s,]/g, ''))
-    const suffix = kmMatch[2].toUpperCase()
-    if (suffix === 'K') return num * 1000
-    if (suffix === 'M') return num * 1000000
-  }
-
-  // Check for range: "3,000-6,000" or "3 000–6 000" — take midpoint
-  const rangeMatch = str.match(/([\d.,\s]+)[-–—]\s*([\d.,\s]+)/)
-  if (rangeMatch) {
-    const parse = (s: string) => {
-      let n = s.replace(/[€$£¥\s]/g, '').replace(/,/g, '')
-      if (/^\d{1,3}(\.\d{3})+$/.test(n)) n = n.replace(/\./g, '')
-      return parseFloat(n)
-    }
-    const a = parse(rangeMatch[1]), b = parse(rangeMatch[2])
-    if (!isNaN(a) && !isNaN(b) && a > 0 && b > 0) return (a + b) / 2
-    if (!isNaN(a) && a > 0) return a
-  }
-
-  // Single number
-  let cleaned = str.replace(/[€$£¥]/g, '').replace(/saved|économisés?|potentiel|per year|\/year|\/yr|\/an|over contract life/gi, '').trim()
-  cleaned = cleaned.replace(/\s/g, '')
-  if (/^\d{1,3}(\.\d{3})+$/.test(cleaned)) cleaned = cleaned.replace(/\./g, '')
-  cleaned = cleaned.replace(/,/g, '')
-  const num = parseFloat(cleaned)
-  return isNaN(num) ? 0 : num
 }
 
 function getPotentialSavings(deal: any): number {
   const latestRound = getLatestRound(deal)
   const ps = latestRound?.output_json?.potential_savings
   if (!ps) return 0
-  // New must-have format — compute from items, not total field
   if (ps.must_have) {
     return (ps.must_have as any[]).reduce((sum: number, item: any) => {
       const amt = typeof item.amount === 'number' ? item.amount : parseMoney(String(item.amount || '0')).amount
@@ -112,15 +79,67 @@ function getPotentialSavings(deal: any): number {
     }, 0)
   }
   if (ps.total !== undefined) return typeof ps.total === 'number' ? ps.total : parseMoney(String(ps.total || '0')).amount
-  // Old range format
   if (ps.optimistic_ceiling !== undefined) return typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseMoney(String(ps.optimistic_ceiling || '0')).amount
-  // Old array format
   if (Array.isArray(ps)) {
     const hasConf = ps.some((item: any) => item.confidence)
     const items = hasConf ? ps.filter((item: any) => item.confidence !== 'low') : ps
     return items.reduce((sum: number, item: any) => sum + parseMoney(item.annual_impact || '').amount, 0)
   }
   return 0
+}
+
+// Score ring — exact spec: 36x36, r=14, circumference=87.96
+function ScoreRing({ score, isClosed, isWon }: { score: number; isClosed: boolean; isWon: boolean }) {
+  const size = 42
+  const r = 16
+  const circumference = 2 * Math.PI * r
+  const offset = circumference * (1 - score / 100)
+
+  let ringStroke: string
+  let numColor: string
+  let trackStroke: string
+
+  if (isWon) {
+    ringStroke = '#1DB954'
+    numColor = '#15803D'
+    trackStroke = '#c5e8d0'
+  } else if (isClosed) {
+    ringStroke = '#9CA3AF'
+    numColor = '#9CA3AF'
+    trackStroke = '#E4E6EA'
+  } else if (score >= 60) {
+    ringStroke = '#1DB954'
+    numColor = '#15803D'
+    trackStroke = '#D1FAE5'
+  } else if (score >= 40) {
+    ringStroke = '#F59E0B'
+    numColor = '#B45309'
+    trackStroke = '#FEF3C7'
+  } else {
+    ringStroke = '#EF4444'
+    numColor = '#DC2626'
+    trackStroke = '#FECDC5'
+  }
+
+  return (
+    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={trackStroke} strokeWidth={3.5} />
+        <circle
+          cx={size / 2} cy={size / 2} r={r} fill="none"
+          stroke={ringStroke} strokeWidth={3.5}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="font-bold leading-none" style={{ fontSize: 12, color: numColor }}>
+          {score}
+        </span>
+      </div>
+    </div>
+  )
 }
 
 function DealMenu({ dealId, isClosed, totalCommitment, roundCount, hasSavings, onClose, onDelete, t }: {
@@ -144,12 +163,12 @@ function DealMenu({ dealId, isClosed, totalCommitment, roundCount, hasSavings, o
     <div ref={menuRef} className="relative">
       <button
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open) }}
-        className="p-1.5 rounded-lg text-slate-300 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+        className="p-1 rounded-md text-[#9CA3AF] hover:text-[#6B7280] hover:bg-[#F3F4F6] transition-colors"
       >
         <MoreHorizontal className="w-4 h-4" />
       </button>
       {open && (
-        <div className="absolute right-0 top-8 z-20 w-40 bg-white rounded-lg shadow-lg border border-slate-200 py-1">
+        <div className="absolute right-0 top-8 z-20 w-40 bg-white rounded-lg shadow-lg border border-[#EAECEF] py-1">
           {!isClosed && (
             <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); onClose(dealId, totalCommitment, roundCount) }} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />{t('dealList.closeDeal')}
@@ -164,14 +183,13 @@ function DealMenu({ dealId, isClosed, totalCommitment, roundCount, hasSavings, o
   )
 }
 
-export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListClientProps) {
+export function DealListClient({ deals: initialDeals, onDealDeleted, linkBase = '/app' }: DealListClientProps) {
   const router = useRouter()
   const { t, locale } = useI18n()
   const [deals, setDeals] = useState(initialDeals)
   const [dealToClose, setDealToClose] = useState<{ id: string; total?: string; roundCount: number } | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  // Sync with server data when props change (e.g. after router.refresh())
   useEffect(() => { setDeals(initialDeals) }, [initialDeals])
 
   const handleClose = (dealId: string, total?: string, roundCount?: number) => {
@@ -206,8 +224,8 @@ export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListC
           const rawCategory = latestOutput?.category || ''
           const category = rawCategory ? normalizeCategory(rawCategory) : null
           const quoteScore = latestOutput?.score as number | undefined
-          const scoreLabel = latestOutput?.score_label as string | undefined
-          const isClosed = deal.status?.startsWith('closed_')
+          const isClosed = !!deal.status?.startsWith('closed_')
+          const isWon = deal.status === 'closed_won'
           const totalCommitment = latestOutput?.snapshot?.total_commitment
           const redFlagCount = latestOutput?.red_flags?.length || 0
           const roundCount = deal.rounds?.length || 0
@@ -216,123 +234,103 @@ export function DealListClient({ deals: initialDeals, onDealDeleted }: DealListC
           const achievedSavings = deal.savings_amount || 0
           const savingsToShow = isClosed && achievedSavings > 0 ? achievedSavings : potentialSavings
 
-          // Determine negotiation step: 1=Analyzed, 2=Negotiating, 3=Closed
-          const step = isClosed ? 3 : roundCount > 1 ? 2 : 1
+          // Company initial for icon
+          const initial = (vendorName || 'D').charAt(0).toUpperCase()
 
           return (
-            <Link key={deal.id} href={`/app/deal/${deal.id}`}>
-              <div className={`bg-white rounded-xl border border-slate-200 border-l-4 ${status.border} px-5 py-4 hover:shadow-lg transition-all cursor-pointer group ${deletingId === deal.id ? 'opacity-50' : ''}`}>
-                <div className="flex items-start gap-4">
-
-                  {/* Left: vendor + category + meta */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <h3 className="text-base font-semibold text-slate-900 group-hover:text-emerald-700 transition-colors break-words">
-                        {vendorName}
-                      </h3>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${status.badge}`}>
-                          {status.label}
-                        </span>
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                          <DealMenu
-                            dealId={deal.id} isClosed={!!isClosed} totalCommitment={totalCommitment}
-                            roundCount={roundCount} hasSavings={achievedSavings > 0}
-                            onClose={handleClose} onDelete={handleDelete} t={t}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap mb-2">
-                      {category && (
-                        <span className="inline-flex text-[10px] text-slate-400 font-medium bg-slate-50 px-2 py-0.5 rounded-full">{category}</span>
-                      )}
-                      {redFlagCount > 0 && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
-                          <AlertTriangle className="w-3 h-3" />
-                          {redFlagCount}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                      <span>{t(roundCount !== 1 ? 'time.rounds' : 'time.round', { count: roundCount })}</span>
-                      <span className="text-slate-300">·</span>
-                      <span>{getTimeAgo(deal.updated_at, t, locale)}</span>
-                    </div>
-
-                    {/* Negotiation progress steps */}
-                    <div className="flex items-center gap-1 mt-2.5">
-                      {[1, 2, 3].map((s) => (
-                        <div key={s} className="flex items-center gap-1">
-                          <div className={`w-2 h-2 rounded-full ${s <= step ? 'bg-emerald-500' : 'bg-slate-200'}`} />
-                          {s < 3 && <div className={`w-4 h-px ${s < step ? 'bg-emerald-400' : 'bg-slate-200'}`} />}
-                        </div>
-                      ))}
-                      <span className="text-[9px] text-slate-400 ml-1">
-                        {step === 1 ? (locale === 'fr' ? 'Analysé' : 'Analyzed')
-                          : step === 2 ? (locale === 'fr' ? 'En négociation' : 'Negotiating')
-                          : (locale === 'fr' ? 'Clôturé' : 'Closed')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Right: value + savings + score */}
-                  <div className="text-right flex-shrink-0 space-y-1.5">
-                    {totalCommitment && (
-                      <p className="text-base font-bold text-slate-900">{formatAmount(totalCommitment)}</p>
-                    )}
-                    {savingsToShow > 0 && (() => {
-                      const totalAmount = parseMoney(totalCommitment || '0').amount
-                      const savingsPct = totalAmount > 0 ? Math.min((savingsToShow / totalAmount) * 100, 50) : 0
-                      const isMeaningful = savingsToShow >= 100 && savingsPct >= 1
-
-                      if (isClosed && achievedSavings > 0) {
-                        return (
-                          <span className="inline-flex text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                            {formatSavings(Math.round(savingsToShow), locale, totalCommitment)} {locale === 'fr' ? 'économisés' : 'saved'}
-                          </span>
-                        )
-                      }
-                      if (isMeaningful) {
-                        return (
-                          <span className="inline-flex text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                            {formatSavings(Math.round(savingsToShow), locale, totalCommitment)} {locale === 'fr' ? 'potentiel' : 'potential'}
-                          </span>
-                        )
-                      }
-                      return null
-                    })()}
-                    {quoteScore != null && (() => {
-                      const sc = quoteScore
-                      const ringColor = sc >= 80 ? 'stroke-emerald-500' : sc >= 65 ? 'stroke-amber-500' : sc >= 45 ? 'stroke-orange-500' : 'stroke-red-500'
-                      const trackColor = sc >= 80 ? 'stroke-emerald-100' : sc >= 65 ? 'stroke-amber-100' : sc >= 45 ? 'stroke-orange-100' : 'stroke-red-100'
-                      const textColor = sc >= 80 ? 'text-emerald-600' : sc >= 65 ? 'text-amber-600' : sc >= 45 ? 'text-orange-600' : 'text-red-600'
-                      const lbl = sc >= 80 ? (locale === 'fr' ? 'Prêt' : 'Ready')
-                        : sc >= 65 ? (locale === 'fr' ? 'Solide' : 'Solid')
-                        : sc >= 45 ? (locale === 'fr' ? 'À négocier' : 'Negotiate')
-                        : sc >= 25 ? (locale === 'fr' ? 'Surcoté' : 'Overpriced')
-                        : (locale === 'fr' ? 'À fuir' : 'Walk away')
-                      return (
-                        <div className="flex items-center justify-end gap-1.5 mt-0.5">
-                          <ScoreCircle
-                            score={sc} size={30} strokeWidth={2.5}
-                            trackClass={trackColor} ringClass={ringColor} textClass={textColor}
-                            showOutOf={false}
-                          />
-                          <span className={`text-[10px] font-bold ${textColor}`}>{lbl}</span>
-                          <span
-                            className="text-slate-300 hover:text-slate-500 cursor-help"
-                            title={locale === 'fr'
-                              ? 'Le score reflète la qualité des termes et le risque, pas le prix. Les économies montrent votre opportunité de négociation.'
-                              : 'Score reflects contract terms and risk quality, not price. Savings shows your negotiation opportunity.'}
-                          >
-                            <Info className="w-3 h-3" />
-                          </span>
-                        </div>
-                      )
-                    })()}
-                  </div>
+            <Link key={deal.id} href={`${linkBase}/deal/${deal.id}`}>
+              <div
+                className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all cursor-pointer group ${
+                  deletingId === deal.id ? 'opacity-50' : ''
+                } ${isWon
+                  ? 'bg-emerald-50 border-2 border-emerald-300 shadow-sm hover:shadow-md'
+                  : isClosed
+                  ? 'bg-slate-50 border border-slate-200 opacity-80 hover:opacity-100 hover:border-slate-300'
+                  : 'bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-sm'
+                }`}
+              >
+                {/* Icon */}
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  isWon ? 'bg-emerald-500' : isClosed ? 'bg-slate-200' : 'bg-slate-100'
+                }`}>
+                  {isWon ? (
+                    <CheckCircle2 className="w-5 h-5 text-white" />
+                  ) : (
+                    <span className={`text-[14px] font-bold ${isClosed ? 'text-slate-400' : 'text-slate-600'}`}>
+                      {initial}
+                    </span>
+                  )}
                 </div>
+
+                {/* Vendor + meta */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[15px] font-semibold truncate ${isWon ? 'text-emerald-900' : isClosed ? 'text-slate-500' : 'text-slate-900'}`}>
+                      {vendorName}
+                    </span>
+                    <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${status.badge}`}>
+                      {status.icon}
+                      {status.label}
+                    </span>
+                    {redFlagCount > 0 && !isClosed && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#FAECE7] text-[#993C1D]">
+                        <AlertTriangle className="w-3 h-3" />
+                        {redFlagCount} {redFlagCount === 1 ? 'flag' : 'flags'}
+                      </span>
+                    )}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                      <DealMenu
+                        dealId={deal.id} isClosed={isClosed} totalCommitment={totalCommitment}
+                        roundCount={roundCount} hasSavings={achievedSavings > 0}
+                        onClose={handleClose} onDelete={handleDelete} t={t}
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[12px] text-slate-400 mt-0.5">
+                    {category && <>{category} &middot; </>}{getTimeAgo(deal.updated_at, t, locale)}
+                  </p>
+                </div>
+
+                {/* Amount + savings */}
+                <div className="text-right flex-shrink-0">
+                  {totalCommitment ? (
+                    <p className={`text-[15px] font-bold ${isWon ? 'text-emerald-800' : isClosed ? 'text-slate-400' : 'text-slate-900'}`}>
+                      {formatAmount(totalCommitment)}
+                    </p>
+                  ) : (
+                    <p className="text-[15px] font-bold text-slate-300">—</p>
+                  )}
+                  {savingsToShow > 0 && (() => {
+                    const totalAmount = parseMoney(totalCommitment || '0').amount
+                    const savingsPct = totalAmount > 0 ? Math.min((savingsToShow / totalAmount) * 100, 50) : 0
+                    const isMeaningful = savingsToShow >= 100 && savingsPct >= 1
+
+                    if (isClosed && achievedSavings > 0) {
+                      return (
+                        <p className={`text-[12px] font-medium mt-0.5 ${isWon ? 'text-emerald-600' : 'text-slate-400'}`}>
+                          {formatSavingsStr(Math.round(savingsToShow), locale, totalCommitment)} {locale === 'fr' ? 'économisés' : 'saved'}
+                        </p>
+                      )
+                    }
+                    if (isMeaningful) {
+                      return (
+                        <p className="text-[12px] font-medium text-emerald-600 mt-0.5">
+                          {formatSavingsStr(Math.round(savingsToShow), locale, totalCommitment)} {locale === 'fr' ? 'potentiel' : 'potential'}
+                        </p>
+                      )
+                    }
+                    return null
+                  })()}
+                </div>
+
+                {/* Score ring */}
+                {quoteScore != null ? (
+                  <ScoreRing score={quoteScore} isClosed={isClosed} isWon={isWon} />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[11px] font-semibold text-slate-300">--</span>
+                  </div>
+                )}
               </div>
             </Link>
           )

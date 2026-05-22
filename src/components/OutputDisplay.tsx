@@ -7,13 +7,16 @@ import { useT, useI18n } from '@/i18n/context'
 import { normalizeAmount, detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
 import { ScoreCircle } from '@/components/ScoreCircle'
 
+export type DealTab = 'overview' | 'redflags' | 'strategy' | 'email'
+
 interface OutputDisplayProps {
   output: DealOutput
   roundId?: string // Optional - only available in authenticated flow
   hideHeader?: boolean // Hide title + metric cards when rendered inside deal page
+  activeTab?: DealTab // When set, only render sections for that tab. Undefined = show all.
 }
 
-export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDisplayProps) {
+export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }: OutputDisplayProps) {
   const { locale } = useI18n()
   const [expandedFlags, setExpandedFlags] = useState<number[]>(
     // Expand all flags by default
@@ -314,7 +317,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   <div className="flex-shrink-0 flex items-center gap-5">
                     <ScoreCircle score={score} size={100} trackClass={scoreColor.track} ringClass={scoreColor.ring} textClass={scoreColor.text} />
                     <div className="md:hidden">
-                      <p className={`text-lg font-bold ${scoreColor.text} mb-0.5`}>{output.score_label}</p>
+                      <p className={`text-lg font-bold ${scoreColor.text} mb-0.5`} style={{ fontFamily: 'Sora, sans-serif' }}>{output.score_label}</p>
                       {output.score_rationale && (
                         <p className="text-xs text-slate-500 leading-relaxed max-w-[240px]">{output.score_rationale}</p>
                       )}
@@ -325,7 +328,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                 {/* Verdict + stats */}
                 <div className="flex-1 min-w-0">
                   <div className="hidden md:block mb-3">
-                    <p className={`text-lg font-bold ${scoreColor.text} mb-0.5`}>{output.score_label}</p>
+                    <p className={`text-xl font-bold ${scoreColor.text} mb-0.5`} style={{ fontFamily: 'Sora, sans-serif' }}>{output.score_label}</p>
                     {output.score_rationale && (
                       <p className="text-sm text-slate-500 leading-relaxed">{output.score_rationale}</p>
                     )}
@@ -334,22 +337,22 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   {/* Inline stats row */}
                   <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
                     <div>
-                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.totalCommitment')}</p>
-                      <p className="text-lg font-bold text-slate-900">
+                      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.totalCommitment')}</p>
+                      <p className="text-lg font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
                         {output.snapshot?.total_commitment ? normalizeAmount(output.snapshot.total_commitment) : t('output.na')}
                       </p>
                       <p className="text-[11px] text-slate-500">{output.snapshot?.term || t('output.12MonthContract')}</p>
                     </div>
                     <div className="w-px h-10 bg-slate-200 hidden sm:block" />
                     <div>
-                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.redFlags')}</p>
-                      <p className="text-lg font-bold text-red-600">{output.red_flags?.length || 0}</p>
+                      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{t('output.redFlags')}</p>
+                      <p className="text-lg font-bold text-red-600" style={{ fontFamily: 'Sora, sans-serif' }}>{output.red_flags?.length || 0}</p>
                       <p className="text-[11px] text-slate-500">{output.red_flags?.length === 1 ? t('output.issueToAddress') : t('output.issuesToAddress')}</p>
                     </div>
                     <div className="w-px h-10 bg-slate-200 hidden sm:block" />
                     <div>
-                      <p className="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('output.potentialSavings')}</p>
-                      <p className="text-lg font-bold text-emerald-700">
+                      <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider mb-0.5">{t('output.potentialSavings')}</p>
+                      <p className="text-lg font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>
                         {headlineTotal > 0 ? formatSavings(headlineTotal) : t('output.na')}
                       </p>
                       <p className="text-[11px] text-slate-500">
@@ -365,8 +368,8 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
         )
       })()}
 
-      {/* Score breakdown (always visible) */}
-      {output.score != null && output.score_breakdown && (() => {
+      {/* Score breakdown — OVERVIEW tab */}
+      {(!activeTab || activeTab === 'overview') && output.score != null && output.score_breakdown && (() => {
         const bd = output.score_breakdown
         type Deduction = { points: number; reason: string }
 
@@ -446,9 +449,9 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
       })()}
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* DEAL SNAPSHOT */}
+      {/* DEAL SNAPSHOT — OVERVIEW tab */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm mb-6">
+      {(!activeTab || activeTab === 'overview') && <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm mb-6">
         <button
           onClick={() => {}}
           className="flex items-center gap-2 mb-4 text-left w-full"
@@ -543,12 +546,12 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
             )
           })()}
         </div>
-      </div>
+      </div>}
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* WHAT'S ALREADY SOLID */}
+      {/* WHAT'S ALREADY SOLID — OVERVIEW tab */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      {output.quick_read?.whats_solid && output.quick_read.whats_solid.length > 0 && (
+      {(!activeTab || activeTab === 'overview') && output.quick_read?.whats_solid && output.quick_read.whats_solid.length > 0 && (
         <div className="bg-white rounded-xl border-2 border-slate-200 shadow-sm mb-6 overflow-hidden">
           <button
             onClick={() => setShowSolid(!showSolid)}
@@ -586,9 +589,9 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
       )}
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* RED FLAGS TO ADDRESS - Always Visible */}
+      {/* RED FLAGS — REDFLAGS tab */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      {output.red_flags && output.red_flags.length > 0 && (
+      {(!activeTab || activeTab === 'redflags') && output.red_flags && output.red_flags.length > 0 && (
         <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm mb-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
@@ -647,12 +650,18 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   ? 'bg-indigo-100 text-indigo-700 border-indigo-200'
                   : severity === 'HIGH' ? 'bg-red-100 text-red-700 border-red-200' : severity === 'MEDIUM' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200'
 
+                const cardBg = isAddressed
+                  ? 'bg-gradient-to-br from-emerald-50 to-emerald-50/30 border-emerald-200'
+                  : isSourceInsight
+                    ? 'bg-gradient-to-br from-indigo-50 to-indigo-50/30 border-indigo-200'
+                    : severity === 'HIGH'
+                      ? 'bg-gradient-to-br from-red-50 to-white border-red-200'
+                      : severity === 'MEDIUM'
+                        ? 'bg-gradient-to-br from-amber-50 to-white border-amber-200'
+                        : 'bg-gradient-to-br from-slate-50 to-white border-slate-200'
+
                 return (
-                  <div key={idx} className={`rounded-xl border-2 overflow-hidden transition-all ${
-                    isAddressed
-                      ? 'bg-emerald-50/50 border-emerald-200'
-                      : isSourceInsight ? 'bg-indigo-50/50 border-indigo-200' : 'bg-slate-50 border-slate-200'
-                  }`}>
+                  <div key={idx} className={`rounded-xl border-2 overflow-hidden transition-all hover:shadow-md ${cardBg}`}>
                     <button
                       onClick={() => toggleFlag(idx)}
                       className="w-full px-5 py-4 flex items-start justify-between hover:bg-slate-100/50 transition-colors text-left"
@@ -668,14 +677,14 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                               <span className="text-white font-bold text-xs">{idx + 1}</span>
                             )}
                           </div>
-                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${severityColor} uppercase tracking-wider`}>
+                          <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded border ${severityColor} uppercase tracking-wider`}>
                             {isSourceInsight ? 'Source Insight' : severity === 'HIGH' ? t('output.severity.high') : severity === 'MEDIUM' ? t('output.severity.medium') : t('output.severity.low')}
                           </span>
                           {flag.type && !isSourceInsight && (
-                            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{flag.type}</span>
+                            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{flag.type}</span>
                           )}
                         </div>
-                        <h3 className={`font-bold text-base text-slate-900 mb-1 ${isAddressed ? 'line-through opacity-60' : ''}`}>
+                        <h3 className={`font-bold text-[16px] text-slate-900 mb-1 ${isAddressed ? 'line-through opacity-60' : ''}`} style={{ fontFamily: 'Sora, sans-serif' }}>
                           {flag.issue}
                         </h3>
                         {financialImpact && (
@@ -733,7 +742,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                                 title={t('output.copyToClipboard')}
                               >
                                 {copiedAsk === idx ? (
-                                  <span className="text-[10px] font-bold text-emerald-700">{t('output.copied')}</span>
+                                  <span className="text-[11px] font-bold text-emerald-700">{t('output.copied')}</span>
                                 ) : (
                                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -754,7 +763,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                                 title={t('output.copyToClipboard')}
                               >
                                 {copiedAsk === idx + 100 ? (
-                                  <span className="text-[10px] font-bold text-slate-700">{t('output.copied')}</span>
+                                  <span className="text-[11px] font-bold text-slate-700">{t('output.copied')}</span>
                                 ) : (
                                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -785,9 +794,9 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
       )}
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* SECTION 1: YOUR NEGOTIATION STRATEGY - Simplified */}
+      {/* SECTION 1: YOUR NEGOTIATION STRATEGY — STRATEGY tab */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      <div className="mb-8">
+      {(!activeTab || activeTab === 'strategy') && <div className="mb-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
             <span className="text-white font-bold text-sm">1</span>
@@ -824,17 +833,17 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                     setCopiedCol('push')
                     setTimeout(() => setCopiedCol(null), 2000)
                   }}
-                  className="text-[10px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-slate-100"
+                  className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-slate-100"
                 >
                   {copiedCol === 'push' ? t('output.copied') : t('output.copyAll')}
                 </button>
               </div>
-              <p className="text-[10px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whatYouShouldAskVendorToChange')}</p>
+              <p className="text-[11px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whatYouShouldAskVendorToChange')}</p>
               <div className="space-y-2.5 flex-1">
                 {output.what_to_ask_for?.must_have?.map((item, idx) => (
                   <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3">
                     {idx === 0 && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white mb-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-600 text-white mb-2">
                         {t('output.mustHave')}
                       </span>
                     )}
@@ -844,7 +853,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                 {output.what_to_ask_for?.nice_to_have?.map((item, idx) => (
                   <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3">
                     {idx === 0 && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-400 text-white mb-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-slate-400 text-white mb-2">
                         {t('output.niceToHave')}
                       </span>
                     )}
@@ -870,12 +879,12 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                     setCopiedCol('leverage')
                     setTimeout(() => setCopiedCol(null), 2000)
                   }}
-                  className="text-[10px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-emerald-100"
+                  className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-emerald-100"
                 >
                   {copiedCol === 'leverage' ? t('output.copied') : t('output.copyAll')}
                 </button>
               </div>
-              <p className="text-[10px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whyTheyShouldSayYes')}</p>
+              <p className="text-[11px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whyTheyShouldSayYes')}</p>
               <ul className="space-y-2.5 flex-1">
                 {output.negotiation_plan?.leverage_you_have?.map((item, idx) => (
                   <li key={idx} className="bg-white border-l-[3px] border-l-emerald-400 border border-emerald-200 rounded-lg p-3 flex items-start gap-2.5">
@@ -902,12 +911,12 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                     setCopiedCol('offer')
                     setTimeout(() => setCopiedCol(null), 2000)
                   }}
-                  className="text-[10px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-slate-100"
+                  className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-slate-100"
                 >
                   {copiedCol === 'offer' ? t('output.copied') : t('output.copyAll')}
                 </button>
               </div>
-              <p className="text-[10px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whatYouCanGiveToGetWhatYouWant')}</p>
+              <p className="text-[11px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whatYouCanGiveToGetWhatYouWant')}</p>
               <ul className="space-y-2.5 flex-1">
                 {output.negotiation_plan?.trades_you_can_offer?.map((item, idx) => (
                   <li key={idx} className="bg-white border border-slate-200 rounded-lg p-3 flex items-start gap-2.5">
@@ -921,12 +930,12 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
             </div>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* SECTION 2: SAVINGS IMPACT - Simplified */}
+      {/* SECTION 2: SAVINGS IMPACT — STRATEGY tab */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      {(savingsData.mustHave.length > 0 || savingsData.niceToHave.length > 0) && (() => {
+      {(!activeTab || activeTab === 'strategy') && (savingsData.mustHave.length > 0 || savingsData.niceToHave.length > 0) && (() => {
         const dealTotal = output.snapshot?.total_commitment || ''
         const currencySymbol = dealTotal.includes('€') ? '€' : dealTotal.includes('£') ? '£' : dealTotal.includes('C$') ? 'C$' : dealTotal.includes('A$') ? 'A$' : '$'
         const fmtCurrency = (amount: number) => {
@@ -961,10 +970,10 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                 </div>
               </div>
               <div className="text-right bg-emerald-50 rounded-xl px-5 py-3 border-2 border-emerald-200">
-                <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide mb-0.5">{t('output.potentialSavings')}</p>
+                <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wide mb-0.5">{t('output.potentialSavings')}</p>
                 <p className="text-2xl sm:text-3xl font-bold text-emerald-700">{fmtCurrency(headlineTotal)}</p>
                 {niceToHaveTotal > 0 && (
-                  <p className="text-[10px] text-emerald-600 mt-0.5">+ {fmtCurrency(niceToHaveTotal)} {t('output.bonusIfNegotiated')}</p>
+                  <p className="text-[11px] text-emerald-600 mt-0.5">+ {fmtCurrency(niceToHaveTotal)} {t('output.bonusIfNegotiated')}</p>
                 )}
               </div>
             </div>
@@ -972,7 +981,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
             {/* Visual comparison bar */}
             {dealTotalNum > 0 && savingsPctLocal > 0 && (
               <div className="mb-6">
-                <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1.5">
+                <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1.5">
                   <span>{t('output.originalQuote')} <span className="font-semibold text-slate-700">{dealTotal}</span></span>
                   <span>{t('output.potentialSavings')} <span className="font-semibold text-emerald-700">{fmtCurrency(headlineTotal)}</span></span>
                 </div>
@@ -980,7 +989,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   <div className="h-full bg-slate-300 rounded-l-full transition-all duration-500" style={{ width: `${100 - savingsPctLocal}%` }} />
                   <div className="h-full bg-emerald-500 rounded-r-full transition-all duration-500" style={{ width: `${savingsPctLocal}%` }} />
                 </div>
-                <div className="flex items-center justify-between text-[10px] mt-1">
+                <div className="flex items-center justify-between text-[11px] mt-1">
                   <span className="text-slate-400">{t('output.afterSavings', { amount: fmtCurrency(Math.max(0, dealTotalNum - headlineTotal)) })}</span>
                   <span className="font-semibold text-emerald-600">{t('output.percentSavings', { pct: savingsPctLocal.toFixed(0) })}</span>
                 </div>
@@ -1017,7 +1026,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                     <div key={idx} className="bg-amber-50 border-2 border-amber-200 rounded-lg p-4">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <span className="text-lg font-bold text-amber-700 break-words min-w-0">{fmtCurrency(item.amount)}</span>
-                        <span className="text-[9px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold flex-shrink-0">{t('output.worthAsking')}</span>
+                        <span className="text-[11px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold flex-shrink-0">{t('output.worthAsking')}</span>
                       </div>
                       <p className="text-sm text-slate-800 font-medium leading-relaxed">{item.ask}</p>
                       {item.rationale && <p className="text-xs text-amber-600 mt-1.5 italic">{item.rationale}</p>}
@@ -1059,11 +1068,9 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
       })()}
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* SECTION 3: TAKE ACTION - EMAIL BUILDER */}
+      {/* CASH FLOW & RISK — STRATEGY tab */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      <div className="mb-8">
-        {/* Cash Flow & Risk Improvements */}
-        {output.cash_flow_improvements && output.cash_flow_improvements.length > 0 && (
+      {(!activeTab || activeTab === 'strategy') && output.cash_flow_improvements && output.cash_flow_improvements.length > 0 && (
           <div className="bg-white rounded-xl border-2 border-blue-200 p-5 shadow-sm mb-8">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
@@ -1071,14 +1078,14 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
               </div>
               <div>
                 <h3 className="text-base font-bold text-slate-900">{t('output.cashFlowAndRiskImprovements')}</h3>
-                <p className="text-[10px] text-slate-500">{t('output.nonCashImprovements')}</p>
+                <p className="text-[11px] text-slate-500">{t('output.nonCashImprovements')}</p>
               </div>
             </div>
             <div className="space-y-2.5">
               {output.cash_flow_improvements.map((item, idx) => (
                 <div key={idx} className="bg-blue-50 border border-blue-200 rounded-lg p-3.5">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                    <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
                       item.category === 'cash_flow' ? 'bg-blue-100 text-blue-700 border border-blue-200' :
                       'bg-amber-100 text-amber-700 border border-amber-200'
                     }`}>
@@ -1092,6 +1099,10 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
           </div>
         )}
 
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* TAKE ACTION - EMAIL BUILDER — EMAIL tab */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {(!activeTab || activeTab === 'email') && <div className="mb-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shadow-md">
             <span className="text-white font-bold text-sm">3</span>
@@ -1127,15 +1138,15 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   <button
                     key={idx}
                     onClick={() => setActiveEmailTab(idx)}
-                    className={`relative px-4 py-3.5 rounded-lg border-2 transition-all ${
+                    className={`relative px-4 py-3.5 rounded-xl border-2 transition-all hover:-translate-y-0.5 ${
                       activeEmailTab === idx
-                        ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-200'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
+                        ? 'bg-emerald-50 border-emerald-500 shadow-[0_4px_12px_-4px_rgba(29,185,84,0.35)]'
+                        : 'bg-white border-slate-200 hover:border-emerald-300'
                     }`}
                   >
                     <div className="text-center">
-                      <div className="text-xs sm:text-sm font-bold text-slate-900 mb-0.5">{tab.label}</div>
-                      <div className="text-[10px] sm:text-xs text-slate-600 hidden sm:block">{tab.desc}</div>
+                      <div className="text-xs sm:text-sm font-bold text-slate-900 mb-0.5" style={{ fontFamily: 'Sora, sans-serif' }}>{tab.label}</div>
+                      <div className="text-[11px] sm:text-xs text-slate-600 hidden sm:block">{tab.desc}</div>
                     </div>
                     {activeEmailTab === idx && (
                       <div className="absolute top-2 right-2">
@@ -1312,12 +1323,12 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
             </div>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* ASSUMPTIONS & DISCLAIMER */}
+      {/* ASSUMPTIONS & DISCLAIMER — EMAIL tab */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      <div className="bg-blue-50 rounded-xl border-2 border-blue-200 overflow-hidden shadow-sm mb-6">
+      {(!activeTab || activeTab === 'email') && <div className="bg-blue-50 rounded-xl border-2 border-blue-200 overflow-hidden shadow-sm mb-6">
         <button
           onClick={() => setShowAssumptions(!showAssumptions)}
           className="w-full px-6 py-4 flex items-center justify-between hover:bg-blue-100/50 transition-colors text-left"
@@ -1355,12 +1366,12 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
             </div>
           </div>
         )}
-      </div>
+      </div>}
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* ANALYSIS HISTORY */}
+      {/* ANALYSIS HISTORY — hidden when tabbed */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden shadow-sm mb-6">
+      {!activeTab && <div className="bg-white rounded-xl border-2 border-slate-200 overflow-hidden shadow-sm mb-6">
         <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b-2 border-slate-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -1391,7 +1402,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-base font-bold text-slate-900">{t('output.round1InitialAnalysis')}</span>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
                         {t('output.actionRequired')}
                       </span>
                     </div>
@@ -1429,13 +1440,13 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
             <p className="text-xs text-slate-400">{t('output.uploadVendorResponses')}</p>
           </div>
         </div>
-      </div>
+      </div>}
 
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/* BOTTOM ACTION BAR - Static footer at bottom */}
+      {/* BOTTOM ACTION BAR — hidden when tabbed */}
       {/* ══════════════════════════════════════════════════════════════ */}
-      <div className="mt-8 bg-white border-t-2 border-slate-200 shadow-sm rounded-xl overflow-hidden">
+      {!activeTab && <div className="mt-8 bg-white border-t-2 border-slate-200 shadow-sm rounded-xl overflow-hidden">
         <div className="px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
@@ -1452,7 +1463,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false }: OutputDis
             <span>{t('output.markDealAsClosed')}</span>
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   )
 }

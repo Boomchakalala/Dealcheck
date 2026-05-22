@@ -11,12 +11,27 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Brand: Spotify green #1DB954 — overrides Tailwind's default emerald scale
+     so every emerald-* utility across the app becomes brand green automatically. */
+  --color-emerald-50:  #ebf9f0;
+  --color-emerald-100: #cdf0d8;
+  --color-emerald-200: #9ce2b3;
+  --color-emerald-300: #6cd58c;
+  --color-emerald-400: #3ec96a;
+  --color-emerald-500: #1DB954;
+  --color-emerald-600: #199e48;
+  --color-emerald-700: #15843c;
+  --color-emerald-800: #116930;
+  --color-emerald-900: #0d4f24;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Hero product preview entrance animation */
@@ -33,4 +48,45 @@ body {
 
 .animate-hero-card {
   animation: hero-card-enter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+/* Step number ring pulse animation */
+@keyframes ring-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+}
+
+.animate-ring-pulse {
+  animation: ring-pulse 2.5s infinite;
+}
+
+/* Better touch targets on mobile */
+@media (max-width: 640px) {
+  a, button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent horizontal overflow */
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* Focus styles for accessibility */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #1DB954;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(29, 185, 84, 0.15);
+  color: inherit;
 }

@@ -1,136 +1,173 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { UnifiedHeader } from '@/components/UnifiedHeader'
+import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
-import { HelpCircle, Mail, ArrowRight } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { Info, Upload, CheckCircle2, Lock, CreditCard, Shield, Plus, ArrowRight } from 'lucide-react'
+
+const sora = "'Sora', sans-serif"
+const mono = "'JetBrains Mono', monospace"
+const green = '#1DB954'
+
+type Section = 'what' | 'upload' | 'output' | 'privacy' | 'billing' | 'trouble'
+
+const sections: { key: Section; name: string; icon: React.ReactNode }[] = [
+  { key: 'what', name: 'What TermLift does', icon: <Info className="w-4 h-4" /> },
+  { key: 'upload', name: 'Uploading quotes', icon: <Upload className="w-4 h-4" /> },
+  { key: 'output', name: 'Analysis output', icon: <CheckCircle2 className="w-4 h-4" /> },
+  { key: 'privacy', name: 'Privacy & data', icon: <Lock className="w-4 h-4" /> },
+  { key: 'billing', name: 'Account & billing', icon: <CreditCard className="w-4 h-4" /> },
+  { key: 'trouble', name: 'Troubleshooting', icon: <Shield className="w-4 h-4" /> },
+]
+
+const faqData: Record<Section, { title: string; sub: string; items: { q: string; a: string }[] }> = {
+  what: {
+    title: 'What TermLift does',
+    sub: 'Understanding how TermLift works and what to expect',
+    items: [
+      { q: 'What is TermLift?', a: 'TermLift is an AI-powered tool that helps you negotiate better vendor deals. Upload a quote or contract, and it finds red flags, estimates potential savings, builds a negotiation plan with specific asks, and drafts ready-to-send reply emails.' },
+      { q: 'What TermLift is NOT', a: "TermLift is not legal advice, not a guarantee of savings, and not a replacement for reading your contracts. It's a starting point that gives you leverage and structure — but you should always review the outputs yourself and consult a professional for legal or financial decisions." },
+      { q: 'How does the AI analysis work?', a: "Text is extracted from your document (PDF, image, or pasted text) and sent to Anthropic's Claude AI, which is prompted specifically for procurement analysis. It reads the full content, identifies risks, builds a negotiation strategy, and generates structured output." },
+    ],
+  },
+  upload: {
+    title: 'Uploading quotes',
+    sub: 'How to get your vendor quotes into TermLift',
+    items: [
+      { q: 'How do I upload a quote?', a: 'You have four options: paste text directly into the text box, upload a PDF file, upload an image (PNG, JPG, or WEBP), or take a screenshot of a pricing page or email. Just drag and drop or click the upload area on the analysis page.' },
+      { q: 'What file formats are supported?', a: 'PDF, PNG, JPG, WEBP, or plain text paste. Maximum file size is 10 MB. For best results with images, make sure the text in the image is clearly readable.' },
+      { q: 'Can I analyze an email from a vendor?', a: 'Yes. Just copy the email text and paste it directly into the text input. You can include the full email — subject line, body, pricing tables, terms — and TermLift will analyze all of it.' },
+    ],
+  },
+  output: {
+    title: 'Analysis output',
+    sub: 'What you get back and how to use it',
+    items: [
+      { q: 'What do I get back from an analysis?', a: 'You get a complete negotiation package: a verdict summary, red flags with suggested mitigations, a negotiation plan split into must-have and nice-to-have asks, estimated potential savings, and ready-to-send email drafts in three different tones.' },
+      { q: 'What are the email drafts for?', a: "They're ready-to-copy replies you can send directly to your vendor. Each analysis generates three versions — Friendly (collaborative tone), Direct (professional and to the point), and Firm (assertive with clear expectations). Pick the one that fits your relationship with the vendor and copy it." },
+      { q: 'Is the AI always accurate?', a: 'No. AI can miss details, misinterpret terms, or make errors. TermLift is a starting point for negotiation, not the final word. Always review the outputs against your original documents before acting on them. If something looks off, it probably is — trust your judgment.' },
+    ],
+  },
+  privacy: {
+    title: 'Privacy & data',
+    sub: 'How we handle your documents and data',
+    items: [
+      { q: 'Is my data private?', a: 'Yes. Uploaded files are deleted immediately after text extraction. Your text is not stored unless you explicitly save the deal to your account. All data is encrypted in transit (TLS) and at rest. Your documents are never used for AI training.' },
+      { q: 'What if I upload confidential documents?', a: "Treat TermLift like any cloud-based tool. Don't upload documents you're contractually prohibited from sharing with third-party services. Your text is sent to Anthropic's API for processing. See our Privacy Policy and Terms for full details." },
+    ],
+  },
+  billing: {
+    title: 'Account & billing',
+    sub: 'Plans, pricing, and account management',
+    items: [
+      { q: "What's the free plan?", a: 'You get 1 free analysis with no signup required. Create an account and you get 3 more — 4 total on the Starter plan. No credit card needed.' },
+      { q: 'What does Essentials cost?', a: '€15/month for 10 analyses a month, saved deals, up to 2 negotiation rounds per deal, full deal history, and PDF export. Cancel anytime.' },
+      { q: 'What does Pro cost?', a: '€39/month for unlimited analyses, unlimited negotiation rounds, a full spend dashboard, and savings tracking. Cancel anytime.' },
+      { q: 'Can I delete my account?', a: "Yes. Go to your profile settings and choose 'Delete account.' All your data — saved deals, analysis history, account info — is permanently removed. This cannot be undone." },
+    ],
+  },
+  trouble: {
+    title: 'Troubleshooting',
+    sub: 'Common issues and how to fix them',
+    items: [
+      { q: 'What if the analysis fails?', a: 'Try running it again. If it keeps failing, the document may be too long or in an unsupported format. Try pasting just the key sections as plain text instead. If the problem persists, email hello@termlift.com and we\'ll help.' },
+      { q: "The analysis doesn't match my document", a: "AI can misinterpret content, especially from images or complex PDFs with tables and fine print. For better results, try pasting the key sections as plain text instead of uploading a file. If the analysis is way off, let us know at hello@termlift.com so we can improve." },
+    ],
+  },
+}
 
 export default function HelpPage() {
-  const t = useTranslations()
-
-  const faqCategories = [
-    {
-      title: t('helpPage.cat1'),
-      faqs: [
-        { q: t('helpPage.cat1q1'), a: t('helpPage.cat1a1') },
-        { q: t('helpPage.cat1q2'), a: t('helpPage.cat1a2') },
-        { q: t('helpPage.cat1q3'), a: t('helpPage.cat1a3') },
-      ],
-    },
-    {
-      title: t('helpPage.cat2'),
-      faqs: [
-        { q: t('helpPage.cat2q1'), a: t('helpPage.cat2a1') },
-        { q: t('helpPage.cat2q2'), a: t('helpPage.cat2a2') },
-        { q: t('helpPage.cat2q3'), a: t('helpPage.cat2a3') },
-      ],
-    },
-    {
-      title: t('helpPage.cat3'),
-      faqs: [
-        { q: t('helpPage.cat3q1'), a: t('helpPage.cat3a1') },
-        { q: t('helpPage.cat3q2'), a: t('helpPage.cat3a2') },
-        { q: t('helpPage.cat3q3'), a: t('helpPage.cat3a3') },
-      ],
-    },
-    {
-      title: t('helpPage.cat4'),
-      faqs: [
-        { q: t('helpPage.cat4q1'), a: t('helpPage.cat4a1') },
-        { q: t('helpPage.cat4q2'), a: t('helpPage.cat4a2') },
-      ],
-    },
-    {
-      title: t('helpPage.cat5'),
-      faqs: [
-        { q: t('helpPage.cat5q1'), a: t('helpPage.cat5a1') },
-        { q: t('helpPage.cat5q2'), a: t('helpPage.cat5a2') },
-        { q: t('helpPage.cat5q3'), a: t('helpPage.cat5a3') },
-        { q: t('helpPage.cat5q4'), a: t('helpPage.cat5a4') },
-      ],
-    },
-    {
-      title: t('helpPage.cat6'),
-      faqs: [
-        { q: t('helpPage.cat6q1'), a: t('helpPage.cat6a1') },
-        { q: t('helpPage.cat6q2'), a: t('helpPage.cat6a2') },
-      ],
-    },
-  ]
+  const [openItems, setOpenItems] = useState<Record<string, boolean>>({})
+  const toggleItem = (key: string) => setOpenItems(prev => ({ ...prev, [key]: !prev[key] }))
 
   return (
-    <div className="min-h-screen bg-white flex flex-col relative">
-      {/* Noise texture overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.015] mix-blend-overlay">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }} />
-      </div>
-
-      {/* Header */}
-      <UnifiedHeader variant="public" />
+    <div className="flex flex-col min-h-screen bg-white">
+      <MarketingHeader />
 
       <main className="flex-1">
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-50/60 to-white pointer-events-none" />
-          <div className="relative max-w-3xl mx-auto px-5 sm:px-8 pt-24 sm:pt-32 pb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/60 shadow-sm mb-6">
-              <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-xs font-semibold text-emerald-700 tracking-wide">{t('helpPage.badge')}</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-4">
-              {t('helpPage.title')}
+        {/* ─── HERO ─────────────────────────────────────── */}
+        <section className="relative px-6 pt-20 sm:pt-28 pb-14 overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 700px 340px at 50% 0%, rgba(29,185,84,0.12) 0%, transparent 70%)' }} />
+          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+          <div className="relative max-w-3xl mx-auto text-center">
+            <p className="text-[12px] mb-4 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>Help center</p>
+            <h1 className="text-slate-900 mb-4" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(34px, 4.8vw, 52px)', lineHeight: 1.05, letterSpacing: '-0.028em' }}>
+              How can we help?
             </h1>
-            <p className="text-lg text-slate-500 leading-relaxed max-w-xl mb-16">
-              {t('helpPage.subtitle')}
+            <p className="text-[17px] text-slate-500 leading-relaxed max-w-xl mx-auto">
+              Everything you need to get the most out of TermLift — quotes, output, privacy, billing, and fixes.
             </p>
           </div>
-        </div>
+        </section>
 
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 pb-8">
-          {faqCategories.map((category, ci) => (
-            <div key={ci} className={ci > 0 ? 'mt-12' : ''}>
-              <h2 className="text-sm font-semibold text-emerald-700 uppercase tracking-wider mb-4">
-                {category.title}
-              </h2>
-              <div className="space-y-0 border-t border-slate-200/60">
-                {category.faqs.map((item, i) => (
-                  <details key={i} className="group border-b border-slate-200/60">
-                    <summary className="flex items-center justify-between cursor-pointer py-6 text-left">
-                      <span className="text-base font-medium text-slate-900 pr-8">{item.q}</span>
-                      <span className="w-7 h-7 rounded-full bg-slate-100 group-open:bg-emerald-100 text-slate-400 group-open:text-emerald-600 flex items-center justify-center group-open:rotate-45 transition-all duration-200 text-lg leading-none flex-shrink-0">+</span>
-                    </summary>
-                    <p className="pb-6 text-sm text-slate-600 leading-relaxed max-w-2xl -mt-1">{item.a}</p>
-                  </details>
-                ))}
+        {/* ─── FAQ SECTIONS ─────────────────────────────── */}
+        <section className="px-6 pb-16">
+          <div className="max-w-3xl mx-auto space-y-12">
+            {sections.map((section) => {
+              const data = faqData[section.key]
+              return (
+                <div key={section.key}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(29,185,84,0.12)', color: green }}>
+                      {section.icon}
+                    </div>
+                    <div>
+                      <h2 className="text-[19px] font-bold text-slate-900 leading-tight" style={{ fontFamily: sora }}>{data.title}</h2>
+                      <p className="text-[12.5px] text-slate-400">{data.sub}</p>
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 overflow-hidden divide-y divide-slate-100">
+                    {data.items.map((item, i) => {
+                      const key = `${section.key}-${i}`
+                      const isOpen = !!openItems[key]
+                      return (
+                        <div key={key}>
+                          <button
+                            onClick={() => toggleItem(key)}
+                            className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-slate-50/70 transition-colors"
+                          >
+                            <span className="text-[14px] font-semibold text-slate-900">{item.q}</span>
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${isOpen ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'}`}>
+                              <Plus className="w-3.5 h-3.5 transition-transform" style={{ transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)' }} />
+                            </div>
+                          </button>
+                          {isOpen && (
+                            <p className="px-5 pb-4 -mt-1 text-[13.5px] text-slate-500 leading-relaxed">{item.a}</p>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ─── STILL HAVE QUESTIONS ─────────────────────── */}
+        <section className="px-6 pb-20">
+          <div className="max-w-3xl mx-auto">
+            <div className="rounded-2xl border-2 border-emerald-200 p-7 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5" style={{ background: 'linear-gradient(135deg, rgba(29,185,84,0.06) 0%, rgba(255,255,255,1) 100%)' }}>
+              <div>
+                <h3 className="text-[18px] font-bold text-slate-900 mb-1" style={{ fontFamily: sora }}>Still have questions?</h3>
+                <p className="text-[13.5px] text-slate-500">We&apos;re here to help — reach out anytime.</p>
+              </div>
+              <div className="flex gap-2.5 flex-shrink-0">
+                <a href="mailto:hello@termlift.com" className="text-[13px] font-semibold px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:border-slate-300 transition-colors">
+                  hello@termlift.com
+                </a>
+                <Link
+                  href="/try"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-bold px-4 py-2.5 rounded-xl text-white transition-all hover:-translate-y-0.5"
+                  style={{ background: green, boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}
+                >
+                  Try free <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
             </div>
-          ))}
-
-          <div className="mt-20 rounded-2xl border-2 border-slate-200/80 bg-gradient-to-br from-slate-50 to-white p-10 text-center shadow-sm hover:shadow-lg transition-all duration-300">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-5 shadow-sm">
-              <Mail className="w-6 h-6" />
-            </div>
-            <p className="text-base font-semibold text-slate-900 mb-2">{t('helpPage.stillHaveQuestions')}</p>
-            <p className="text-sm text-slate-500 mb-5">{t('helpPage.wereHereToHelp')}</p>
-            <a
-              href="mailto:hello@termlift.com"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800 transition-colors group"
-            >
-              hello@termlift.com
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
           </div>
-
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/try" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">Try your first analysis free</Link>
-            <span className="hidden sm:inline text-slate-300">|</span>
-            <Link href="/example" className="text-sm font-medium text-slate-600 hover:text-slate-900">See example analyses</Link>
-            <span className="hidden sm:inline text-slate-300">|</span>
-            <Link href="/pricing" className="text-sm font-medium text-slate-600 hover:text-slate-900">View pricing</Link>
-          </div>
-        </div>
+        </section>
       </main>
 
       <MarketingFooter />

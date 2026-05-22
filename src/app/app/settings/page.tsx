@@ -21,7 +21,6 @@ export default async function SettingsPage() {
     .eq('id', user.id)
     .single()
 
-  // Get deal stats
   const { data: deals } = await supabase
     .from('deals')
     .select('id, status, savings_amount, rounds (id, output_json)')
@@ -36,7 +35,6 @@ export default async function SettingsPage() {
   const activeDeals = allDeals.filter(d => !d.status?.startsWith('closed_'))
   const closedDeals = allDeals.filter(d => d.status?.startsWith('closed_'))
 
-  // Total savings identified from AI analysis (all deals)
   const totalSavingsIdentified = allDeals.reduce((sum, d) => {
     const rounds = (d as any).rounds || []
     const latest = rounds.sort((a: any, b: any) => (b.round_number || 0) - (a.round_number || 0))[0]
@@ -53,21 +51,15 @@ export default async function SettingsPage() {
   const plan = profile?.plan || 'free'
   const planLabel = plan === 'essentials' ? 'Essentials' : plan === 'pro' ? 'Pro' : plan === 'business' ? 'Business' : 'Starter'
 
-  // Calculate "joined X months ago"
   const createdAt = new Date(user.created_at)
   const now = new Date()
   const monthsAgo = (now.getFullYear() - createdAt.getFullYear()) * 12 + (now.getMonth() - createdAt.getMonth())
-  const joinedAgo = monthsAgo === 0
-    ? t('time.thisMonth')
-    : monthsAgo === 1
-      ? t('time.oneMonthAgo')
-      : t('time.monthsAgo', { count: monthsAgo })
+  const joinedAgo = monthsAgo === 0 ? t('time.thisMonth') : monthsAgo === 1 ? t('time.oneMonthAgo') : t('time.monthsAgo', { count: monthsAgo })
 
-  // Get locale for date formatting
   const locale = (await cookies()).get('termlift_lang')?.value === 'fr' ? 'fr-FR' : 'en-US'
 
   return (
-    <div className="max-w-2xl mx-auto pb-12">
+    <div className="-mx-5 sm:-mx-8 -mt-8 -mb-8 md:-mb-8">
       <SettingsClient
         email={user.email || ''}
         firstName={profile?.first_name || ''}

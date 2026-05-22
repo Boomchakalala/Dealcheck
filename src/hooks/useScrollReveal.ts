@@ -5,10 +5,11 @@ import { useEffect, useRef, useState } from 'react'
 /**
  * Triggers a CSS class when the element scrolls into view.
  * Uses Intersection Observer — zero performance cost.
+ * Also checks on mount if the element is already visible or has been scrolled past.
  */
 export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
-  threshold = 0.15,
-  rootMargin = '0px 0px -40px 0px'
+  threshold = 0.05,
+  rootMargin = '0px 0px 200px 0px'
 ) {
   const ref = useRef<T>(null)
   const [isVisible, setIsVisible] = useState(false)
@@ -17,11 +18,18 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
     const el = ref.current
     if (!el) return
 
+    // Immediately check if element is already in or above the viewport
+    const rect = el.getBoundingClientRect()
+    if (rect.top < window.innerHeight + 200) {
+      setIsVisible(true)
+      return
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true)
-          observer.unobserve(el) // only trigger once
+          observer.unobserve(el)
         }
       },
       { threshold, rootMargin }

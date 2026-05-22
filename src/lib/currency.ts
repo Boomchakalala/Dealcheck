@@ -147,8 +147,8 @@ export function formatCurrency(amount: number, currency: Currency): string {
     return `${symbol}${rounded.toLocaleString('en-US')}`
   }
 
-  // For small amounts — show 2 decimals (except JPY)
-  if (noDecimals) {
+  // For small amounts — show 2 decimals only if fractional (except JPY)
+  if (noDecimals || Number.isInteger(amount)) {
     return `${symbol}${Math.round(amount).toLocaleString('en-US')}`
   }
 
@@ -170,28 +170,45 @@ export function normalizeAmount(raw: string): string {
   }
   const symbol = symbols[currency]
 
-  // Strip all currency symbols and text suffixes
+  // Strip currency symbols, text suffixes, and spaces (spaces = thousands separator)
   let cleaned = raw
     .replace(/€|EUR|\$|USD|£|GBP|C\$|CAD|A\$|AUD|CHF|¥|JPY/gi, '')
     .replace(/\/(an|year|yr|month|mo|mois)/gi, '')
+    .replace(/\s/g, '')
     .trim()
 
-  // Handle French-style numbers: "21 456,00" → "21456.00"
-  // If we see digits with spaces as thousands separators and comma as decimal
-  if (/\d\s\d/.test(cleaned) || /\d,\d{2}$/.test(cleaned)) {
-    cleaned = cleaned.replace(/\s/g, '') // remove spaces
-    cleaned = cleaned.replace(/,(\d{2})$/, '.$1') // convert trailing ,XX to .XX
-    // If comma is thousands separator (e.g., "21,456"), leave as-is after space removal
-    if (/,\d{3}/.test(cleaned)) {
-      cleaned = cleaned.replace(/,/g, '')
-    }
-  }
-
-  // Remove any remaining non-numeric chars except . and ,
+  // Keep only digits, dots, commas
   cleaned = cleaned.replace(/[^\d.,]/g, '')
 
-  // Handle remaining commas as thousands separators
-  cleaned = cleaned.replace(/,/g, '')
+  // Resolve thousands vs decimal separators.
+  // Rule: when both '.' and ',' appear, the RIGHTMOST one is the decimal separator.
+  const lastDot = cleaned.lastIndexOf('.')
+  const lastComma = cleaned.lastIndexOf(',')
+
+  if (lastDot >= 0 && lastComma >= 0) {
+    if (lastComma > lastDot) {
+      // European: "55.085,00" → dots are thousands, comma is decimal
+      cleaned = cleaned.replace(/\./g, '').replace(',', '.')
+    } else {
+      // US: "55,085.00" → commas are thousands
+      cleaned = cleaned.replace(/,/g, '')
+    }
+  } else if (lastComma >= 0) {
+    const commaCount = (cleaned.match(/,/g) || []).length
+    const afterComma = cleaned.length - lastComma - 1
+    // A single comma with exactly 2 trailing digits is a decimal ("55085,00"); else thousands
+    cleaned = (commaCount === 1 && afterComma === 2)
+      ? cleaned.replace(',', '.')
+      : cleaned.replace(/,/g, '')
+  } else if (lastDot >= 0) {
+    const dotCount = (cleaned.match(/\./g) || []).length
+    const afterDot = cleaned.length - lastDot - 1
+    // Multiple dots, or a single dot with 3 trailing digits ("55.085"), = thousands separators.
+    // A single dot with 1-2 trailing digits ("1.50") is a genuine decimal — leave it.
+    if (dotCount > 1 || afterDot === 3) {
+      cleaned = cleaned.replace(/\./g, '')
+    }
+  }
 
   const num = parseFloat(cleaned)
   if (isNaN(num)) return raw // Can't parse, return original

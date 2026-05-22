@@ -81,9 +81,10 @@ export async function extractFinancialFacts(
   const visualContent = buildImageContent(imageData, allPages, pdfData)
   const hasVisualInput = !!visualContent
 
-  const userPrompt = hasVisualInput
+  const userPrompt = (hasVisualInput
     ? `Deal Type: ${dealType}\n\nPlease extract the financial facts from the attached quote document. Read the entire document carefully — pay close attention to tables, pricing columns, totals, terms, and dates.${extractedText ? `\n\nExtracted text (for reference):\n${extractedText}` : ''}`
-    : `Deal Type: ${dealType}\n\nExtract the financial facts from this quote:\n${extractedText}`
+    : `Deal Type: ${dealType}\n\nExtract the financial facts from this quote:\n${extractedText}`)
+    + `\n\nRespond with ONLY the JSON object. Begin your response with the { character — no preamble, no explanation, no markdown fences. Output raw JSON and nothing else.`
 
   let userContent: Anthropic.MessageParam['content']
   if (visualContent) {
@@ -102,9 +103,12 @@ export async function extractFinancialFacts(
     system: EXTRACTION_PROMPT,
     messages: [
       { role: 'user', content: userContent },
-      { role: 'assistant', content: '{' },
     ],
     temperature: 0,
+    // Extraction is mechanical fact-pulling — no reasoning needed. Low effort + no
+    // thinking is the fast path (Sonnet 4.6 otherwise defaults to high effort).
+    thinking: { type: 'disabled' },
+    output_config: { effort: 'low' },
   })
 
   if (response.stop_reason === 'max_tokens') {

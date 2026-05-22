@@ -15,6 +15,13 @@ const nextConfig: NextConfig = {
   // Exclude pdf-parse from bundling to prevent test code execution
   serverExternalPackages: ['pdf-parse', 'canvas'],
 
+  async redirects() {
+    return [
+      { source: '/example', destination: '/demo', permanent: true },
+      { source: '/example/:path*', destination: '/demo/:path*', permanent: true },
+    ]
+  },
+
   async headers() {
     return [
       {

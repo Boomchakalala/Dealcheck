@@ -304,6 +304,10 @@ export async function analyzeDealFacts(
     system: enhancedPrompt + getLanguageInstruction(options.userLocale || 'en'),
     messages: [{ role: 'user', content: userContent }],
     temperature: 0,
+    // 'medium' is the balanced default; Sonnet 4.6 otherwise runs 'high' which is
+    // overkill for this task and roughly doubles latency. Bump to 'high' if analysis
+    // quality regresses.
+    output_config: { effort: 'medium' },
   })
 
   if (response.stop_reason === 'max_tokens') {

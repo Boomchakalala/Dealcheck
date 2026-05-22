@@ -4,8 +4,11 @@ export const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-export const CLAUDE_MODEL = 'claude-sonnet-4-20250514'          // Extraction, emails, general calls
-export const CLAUDE_MODEL_ANALYSIS = 'claude-opus-4-6'          // Analysis only — market judgment, severity, savings
+// Per commit 8cde00f: analysis was reverted from Opus to Sonnet due to timeouts + JSON errors.
+// If you want to try Opus again, use 'claude-opus-4-7' (current Opus; 4.6 is also valid but
+// the same family that caused the original issues). Test thoroughly before flipping.
+export const CLAUDE_MODEL = 'claude-sonnet-4-6'                 // Extraction, emails, general calls
+export const CLAUDE_MODEL_ANALYSIS = 'claude-sonnet-4-6'        // Analysis — Sonnet (Opus 4.x caused timeouts/JSON errors here)
 export const CLAUDE_CLASSIFY_MODEL = 'claude-haiku-4-5-20251001' // Classification — fast, cheap
 export const CLAUDE_MODEL_ID = CLAUDE_MODEL_ANALYSIS
 
@@ -28,8 +31,10 @@ export function getResponseText(response: Anthropic.Message): string {
 export function parseJsonFromContent(content: string): unknown {
   const trimmed = content.trim()
   const stripped = trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
-  // Prepend '{' if needed (assistant prefill strips the leading brace)
-  const full = stripped.startsWith('{') ? stripped : '{' + stripped
+  // Start at the first '{' — the JSON object start. Tolerates any preamble text
+  // the model may emit before the object (we no longer prefill the assistant turn).
+  const firstBrace = stripped.indexOf('{')
+  const full = firstBrace >= 0 ? stripped.substring(firstBrace) : stripped
   // Extract only the JSON object — Claude sometimes adds trailing text after the closing '}'
   let depth = 0
   let inString = false

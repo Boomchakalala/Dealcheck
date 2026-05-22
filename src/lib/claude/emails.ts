@@ -108,6 +108,7 @@ Return ONLY JSON with this structure:
         getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
       temperature: 0,
+      output_config: { effort: 'medium' },
     })
 
     const content = getResponseText(response)
@@ -227,6 +228,7 @@ Return ONLY JSON with this structure:
         getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
       temperature: 0,
+      output_config: { effort: 'medium' },
     })
 
     const content = getResponseText(response)
@@ -351,6 +353,7 @@ Return ONLY JSON:
         getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
       temperature: 0,
+      output_config: { effort: 'medium' },
     })
 
     const content = getResponseText(response)

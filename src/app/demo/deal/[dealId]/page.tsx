@@ -1,72 +1,58 @@
-export const dynamic = 'force-dynamic'
-
-import { createClient } from '@/lib/supabase/server'
-import { notFound, redirect } from 'next/navigation'
-
-import { DealHeaderClient } from '@/components/DealHeaderClient'
-import { DealScrollView } from '@/components/DealScrollView'
-import { FeatureGate } from '@/components/FeatureGate'
-import { ChevronRight, CheckCircle2, DollarSign, AlertTriangle, TrendingUp, Calendar } from 'lucide-react'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { cookies } from 'next/headers'
-import { AddRoundForm } from './AddRoundForm'
-import type { Plan } from '@/lib/tiers'
-import type { DealOutput, DealOutputV2 } from '@/types'
+import { ChevronRight, CheckCircle2, DollarSign, AlertTriangle, TrendingUp, Calendar, ArrowRight } from 'lucide-react'
+import { DealScrollView } from '@/components/DealScrollView'
+import { getDemoDeal, demoDeals } from '@/lib/demo-data'
 import { normalizeAmount, detectCurrency, formatCurrency, parseMoney as parseMoneyLib } from '@/lib/currency'
+import type { DealOutput } from '@/types'
 
-export default async function DealPage({
-  params,
-}: {
-  params: Promise<{ dealId: string }>
-}) {
+export function generateStaticParams() {
+  return demoDeals.map((d) => ({ dealId: d.id }))
+}
+
+export default async function DemoDealPage({ params }: { params: Promise<{ dealId: string }> }) {
   const { dealId } = await params
-  const supabase = await createClient()
+  const deal = getDemoDeal(dealId)
+  if (!deal) notFound()
 
-  const cookieStore = await cookies()
-  const locale = (cookieStore.get('termlift_lang')?.value || 'en') as 'en' | 'fr'
-  const messages: Record<string, Record<string, string>> = { en: require('@/i18n/en.json'), fr: require('@/i18n/fr.json') }
+  // Load translations the same way /app/deal/[id] does
+  const messages = {
+    en: require('@/i18n/en.json'),
+    fr: require('@/i18n/fr.json'),
+  }
+  const locale: 'en' | 'fr' = 'en'
   const t = (key: string, vars?: Record<string, string | number>) => {
     let text = messages[locale]?.[key] || messages.en[key] || key
     if (vars) Object.entries(vars).forEach(([k, v]) => { text = text.replace(`{${k}}`, String(v)) })
     return text
   }
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
-  const { data: profile } = await supabase.from('profiles').select('plan, is_admin').eq('id', user.id).single()
-  const userPlan = (profile?.plan || 'free') as Plan
-  const isAdmin = !!profile?.is_admin
-
-  const { data: deal } = await supabase.from('deals').select(`*, rounds (*)`).eq('id', dealId).eq('user_id', user.id).single()
-  if (!deal) notFound()
-
-  const sortedRounds = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number) || []
+  const sortedRounds = [...deal.rounds].sort((a, b) => b.round_number - a.round_number)
   const latestRound = sortedRounds[0]
   const firstRound = sortedRounds[sortedRounds.length - 1]
   const latestOutput = latestRound?.output_json
   const firstOutput = firstRound?.output_json
-  const isV2 = (latestRound?.schema_version || 'v1') === 'v2'
 
-  const dealName = deal.vendor || (isV2 ? (latestOutput as DealOutputV2)?.commercial_facts?.supplier : (latestOutput as DealOutput)?.vendor) || deal.title || 'Deal'
+  const dealName = deal.vendor || latestOutput?.vendor || deal.title || 'Deal'
   const category = (latestOutput as DealOutput)?.category
   const description = (latestOutput as DealOutput)?.description || (latestOutput as DealOutput)?.quick_read?.conclusion || null
   const totalCommitment = latestOutput?.snapshot?.total_commitment
   const originalTotal = firstOutput?.snapshot?.total_commitment
   const term = latestOutput?.snapshot?.term
 
-  const redFlagCount = isV2 ? (latestOutput as DealOutputV2)?.priority_points?.length || 0 : (latestOutput as DealOutput)?.red_flags?.length || 0
+  const redFlagCount = (latestOutput as DealOutput)?.red_flags?.length || 0
 
   const ps = (latestOutput as DealOutput)?.potential_savings as any
   const potentialSavings = ps?.must_have
     ? (ps.must_have as any[]).reduce((sum: number, item: any) => sum + (typeof item.amount === 'number' ? item.amount : parseMoneyLib(String(item.amount || '0')).amount), 0)
     : ps?.total !== undefined ? (typeof ps.total === 'number' ? ps.total : parseMoneyLib(String(ps.total || '0')).amount)
     : ps?.optimistic_ceiling !== undefined ? (typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseMoneyLib(String(ps.optimistic_ceiling || '0')).amount)
-    : Array.isArray(ps) ? ps.filter((s: any) => s.confidence !== 'low').reduce((sum: number, s: any) => sum + parseMoneyLib(s.annual_impact || '').amount, 0) : 0
+    : Array.isArray(ps) ? ps.filter((s: any) => s.confidence !== 'low').reduce((sum: number, s: any) => sum + parseMoneyLib(s.annual_impact || '').amount, 0)
+    : 0
 
   const dealCurrency = detectCurrency(totalCommitment || '')
   const snapshotDealType = (latestOutput as DealOutput)?.snapshot?.deal_type
-  const effectiveDealType = snapshotDealType || (deal.deal_type === 'New' ? 'New purchase' : 'Renewal')
+  const effectiveDealType = snapshotDealType || 'Renewal'
 
   const shortVendorName = dealName.replace(/\s*(International|Inc\.?|LLC|Ltd\.?|Limited|Corp\.?|Corporation|GmbH|S\.?A\.?S?\.?|B\.?V\.?|PLC|AG|SE|\(.*?\))\s*/gi, ' ').replace(/\s+/g, ' ').trim()
 
@@ -88,35 +74,37 @@ export default async function DealPage({
   const ringCirc = 2 * Math.PI * ringR
   const ringOffset = ringCirc * (1 - sc / 100)
 
+  // Demo signup CTA shown in place of "add round" form
+  const addRoundForm = (
+    <div className="bg-gradient-to-br from-emerald-50 via-white to-emerald-50/60 border-2 border-emerald-200 rounded-2xl p-6 text-center">
+      <h4 className="text-[17px] font-bold text-slate-900 mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>Want to add the next round?</h4>
+      <p className="text-[13px] text-slate-600 mb-4 max-w-md mx-auto">In the real app, drop in the vendor&apos;s counter-offer and TermLift tracks the negotiation as it evolves.</p>
+      <Link
+        href="/login?from=demo"
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5"
+        style={{ background: '#1DB954', boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}
+      >
+        Sign up to use it for real <ArrowRight className="w-3.5 h-3.5" />
+      </Link>
+    </div>
+  )
+
   return (
     <div className="-mx-5 sm:-mx-8 -mt-8 -mb-8 md:-mb-8 flex flex-col min-h-screen bg-slate-50">
-      {/* ── TOPBAR (sticky) ──────────────────────── */}
-      <div className="h-14 flex items-center justify-between px-6 flex-shrink-0 sticky top-0 z-20 bg-white border-b border-slate-200">
+      {/* Topbar */}
+      <div className="h-14 flex items-center justify-between px-6 flex-shrink-0 sticky top-[44px] z-20 bg-white border-b border-slate-200">
         <nav className="flex items-center gap-2 min-w-0">
-          <Link href="/app" className="text-[13px] text-slate-400 hover:text-slate-600 transition-colors">{t('deal.breadcrumbDeals')}</Link>
+          <Link href="/demo" className="text-[13px] text-slate-400 hover:text-slate-600 transition-colors">Deals</Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-300 flex-shrink-0" />
           <span className="text-[13px] font-semibold text-slate-900 truncate">{shortVendorName}</span>
           {isWon && <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200">Won</span>}
         </nav>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <DealHeaderClient
-            dealId={dealId}
-            dealStatus={deal.status || 'in_progress'}
-            closeSummary={deal.close_summary}
-            savingsAmount={deal.savings_amount}
-            savingsPercent={deal.savings_percent}
-            closedAt={deal.closed_at}
-            currentTotal={totalCommitment}
-            originalTotal={originalTotal}
-            roundCount={sortedRounds.length}
-            whatChanged={deal.what_changed}
-            userPlan={userPlan}
-            isAdmin={isAdmin}
-          />
-        </div>
+        <span className="text-[11px] text-slate-400 uppercase tracking-widest hidden sm:inline" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+          Sample deal
+        </span>
       </div>
 
-      {/* ── STATUS BANNER ──────────────────────── */}
+      {/* Status banner */}
       {isClosedAny ? (
         isWon ? (
           <div className="px-6 py-5 bg-emerald-600 flex items-center justify-between">
@@ -126,25 +114,18 @@ export default async function DealPage({
               </div>
               <div>
                 <p className="text-[17px] font-bold text-white" style={{ fontFamily: 'Sora, sans-serif' }}>
-                  Deal Won{(deal.savings_amount ?? 0) > 0 && ` — ${formatCurrency(Math.round(deal.savings_amount), dealCurrency)} saved`}
+                  Deal Won{(deal.savings_amount ?? 0) > 0 && ` — ${formatCurrency(Math.round(deal.savings_amount ?? 0), dealCurrency)} saved`}
                 </p>
                 <p className="text-[13px] text-emerald-200">
-                  {deal.savings_percent != null && `${deal.savings_percent.toFixed(1)}% reduction · `}{shortVendorName}{deal.closed_at && ` · Closed ${new Date(deal.closed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                  {shortVendorName}{deal.closed_at && ` · Closed ${new Date(deal.closed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
                 </p>
               </div>
             </div>
-            <Link
-              href={`/app/deal/${dealId}/outcome`}
-              className="flex items-center gap-2 bg-white text-emerald-700 text-[13px] font-bold px-5 py-2.5 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm flex-shrink-0"
-            >
-              View full outcome →
-            </Link>
           </div>
         ) : (
           <div className="px-6 py-3 flex items-center gap-2 bg-slate-100 border-b border-slate-200">
             <div className="w-2 h-2 rounded-full bg-slate-500 flex-shrink-0" />
             <span className="text-[13px] font-medium text-slate-500">Closed — Signed at original terms</span>
-            {deal.closed_at && <span className="text-[12px] text-slate-400">· {new Date(deal.closed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>}
           </div>
         )
       ) : (
@@ -154,17 +135,13 @@ export default async function DealPage({
             <span className="text-[13px] font-medium text-emerald-700">Active · Round {sortedRounds.length} in progress</span>
             <span className="text-[12px] text-emerald-400">· Started {startedDate}</span>
           </div>
-          <a href="#add-round" className="text-[12px] text-emerald-500 cursor-pointer hover:text-emerald-700 font-medium transition-colors">
-            Upload vendor response →
-          </a>
         </div>
       )}
 
-      {/* ── SCORE HERO ──────────────────────────── */}
+      {/* Score Hero — mirrors /app/deal/[id] exactly */}
       <div className={`bg-gradient-to-br ${heroScoreBg} border-b-2 ${heroScoreBorder}`}>
         <div className="px-8 py-8">
           <div className="flex items-center gap-8">
-            {/* Score ring */}
             {score != null && (
               <div className="relative flex-shrink-0" style={{ width: 120, height: 120 }}>
                 <svg width={120} height={120} viewBox="0 0 120 120" className="-rotate-90">
@@ -179,16 +156,16 @@ export default async function DealPage({
             )}
             <div className="flex-1">
               <h1 className="text-[26px] font-bold text-slate-900 mb-1" style={{ fontFamily: 'Sora, sans-serif' }}>{shortVendorName}{description ? ` — ${description.split(' ').slice(0, 6).join(' ')}` : ''}</h1>
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
                 {category && <span className="text-[12px] px-2.5 py-1 rounded-lg bg-white/70 text-slate-600 font-medium border border-slate-200/50">{category}</span>}
                 <span className="text-[12px] px-2.5 py-1 rounded-lg bg-emerald-100/70 text-emerald-700 font-medium border border-emerald-200/50">{effectiveDealType}</span>
                 <span className="text-[12px] px-2.5 py-1 rounded-lg bg-white/70 text-slate-600 font-medium border border-slate-200/50">
-                  {t(sortedRounds.length === 1 ? 'deal.roundsCompleted_one' : 'deal.roundsCompleted_other', { count: sortedRounds.length })}{isWon ? ' · Won' : ''}
+                  {sortedRounds.length === 1 ? `${sortedRounds.length} round` : `${sortedRounds.length} rounds`}{isWon ? ' · Won' : ''}
                 </span>
               </div>
               {isWon ? (
                 <>
-                  <p className="text-[16px] font-semibold text-emerald-700 mb-1">Deal closed{(deal.savings_amount ?? 0) > 0 && ` — ${formatCurrency(Math.round(deal.savings_amount), dealCurrency)} saved (${deal.savings_percent?.toFixed(1)}% reduction)`}</p>
+                  <p className="text-[16px] font-semibold text-emerald-700 mb-1">Deal closed{(deal.savings_amount ?? 0) > 0 && ` — ${formatCurrency(Math.round(deal.savings_amount ?? 0), dealCurrency)} saved`}</p>
                   <p className="text-[13px] text-slate-500 leading-relaxed max-w-2xl">{scoreRationale || ''}</p>
                 </>
               ) : (
@@ -201,7 +178,7 @@ export default async function DealPage({
           </div>
 
           {/* Stat cards */}
-          <div className="grid grid-cols-4 gap-3 mt-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
             <div className="bg-white/80 backdrop-blur rounded-xl p-4 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <DollarSign className="w-4 h-4 text-slate-400" />
@@ -218,16 +195,15 @@ export default async function DealPage({
                 </div>
                 <p className="text-[22px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>
                   {(deal.savings_amount ?? 0) > 0 && totalCommitment
-                    ? formatCurrency(Math.round(parseMoneyLib(totalCommitment).amount - deal.savings_amount), dealCurrency)
+                    ? formatCurrency(Math.round(parseMoneyLib(totalCommitment).amount - (deal.savings_amount ?? 0)), dealCurrency)
                     : '—'}
                 </p>
-                <p className="text-[11px] text-emerald-500 mt-0.5">{deal.savings_percent != null ? `${deal.savings_percent.toFixed(1)}% less` : ''}</p>
               </div>
             ) : (
               <div className="bg-white/80 backdrop-blur rounded-xl p-4 border border-red-200/50 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <AlertTriangle className="w-4 h-4 text-red-500" />
-                  <span className="text-[11px] font-semibold text-red-400 uppercase tracking-wider">{t('output.redFlags')}</span>
+                  <span className="text-[11px] font-semibold text-red-400 uppercase tracking-wider">Red flags</span>
                 </div>
                 <p className="text-[22px] font-bold text-red-600" style={{ fontFamily: 'Sora, sans-serif' }}>{redFlagCount}</p>
                 <p className="text-[11px] text-red-400 mt-0.5">{redFlagCount === 1 ? 'issue' : 'issues'} to address</p>
@@ -239,7 +215,7 @@ export default async function DealPage({
                 <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">{isWon ? 'Saved' : 'Savings'}</span>
               </div>
               <p className="text-[22px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>
-                {isWon && (deal.savings_amount ?? 0) > 0 ? formatCurrency(Math.round(deal.savings_amount), dealCurrency)
+                {isWon && (deal.savings_amount ?? 0) > 0 ? formatCurrency(Math.round(deal.savings_amount ?? 0), dealCurrency)
                   : potentialSavings > 0 ? formatCurrency(potentialSavings, dealCurrency)
                   : '—'}
               </p>
@@ -258,13 +234,13 @@ export default async function DealPage({
         </div>
       </div>
 
-      {/* ── SCROLL CONTENT ──────────────────────── */}
+      {/* Real DealScrollView with mock data — identical to /app */}
       {latestOutput && (
         <DealScrollView
           latestOutput={latestOutput}
           latestRoundId={latestRound.id}
-          isV2={isV2}
-          schemaVersion={latestRound?.schema_version || 'v1'}
+          isV2={false}
+          schemaVersion="v1"
           score={score}
           scoreLabel={scoreLabel}
           scoreRationale={scoreRationale}
@@ -275,22 +251,18 @@ export default async function DealPage({
           formatSavingsStr={potentialSavings > 0 ? formatCurrency(potentialSavings, dealCurrency) : undefined}
           dealCurrency={dealCurrency}
           sortedRounds={sortedRounds}
-          dealId={dealId}
+          dealId={deal.id}
           dealStatus={deal.status}
           locale={locale}
-          closeSummary={deal.close_summary}
+          closeSummary={null}
           savingsAmount={deal.savings_amount}
-          savingsPercent={deal.savings_percent}
+          savingsPercent={null}
           closedAt={deal.closed_at}
-          whatChanged={deal.what_changed}
+          whatChanged={null}
           originalTotal={originalTotal}
-          userPlan={userPlan}
-          isAdmin={isAdmin}
-          addRoundForm={
-            <FeatureGate feature="multi_round" plan={userPlan} isAdmin={isAdmin}>
-              <AddRoundForm dealId={dealId} roundNumber={sortedRounds.length + 1} />
-            </FeatureGate>
-          }
+          userPlan="pro"
+          isAdmin={false}
+          addRoundForm={addRoundForm}
           messages={messages}
         />
       )}

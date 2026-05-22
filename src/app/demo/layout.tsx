@@ -1,0 +1,58 @@
+import Link from 'next/link'
+import { AppSidebar } from '@/components/AppSidebar'
+import { Sparkles, ArrowRight } from 'lucide-react'
+import { DEMO_USER_EMAIL, demoProfile } from '@/lib/demo-data'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Demo — Explore TermLift with sample data',
+  description: 'Click around a fully-populated TermLift workspace with sample deals. No signup required.',
+  robots: {
+    index: true,
+    follow: true,
+  },
+}
+
+export default function DemoLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-25 to-white">
+      <AppSidebar
+        userEmail={DEMO_USER_EMAIL}
+        isUpgraded={false}
+        usageCount={demoProfile.usage_count}
+        isAdmin={false}
+        plan={demoProfile.plan}
+        linkBase="/demo"
+        demoMode={true}
+      />
+
+      <main className="min-h-screen transition-all duration-200 md:ml-[var(--sidebar-width,210px)]">
+        {/* Sticky demo banner */}
+        <div className="sticky top-0 z-30 border-b border-emerald-200 bg-white/95 backdrop-blur-md shadow-[0_2px_8px_-4px_rgba(15,23,42,0.08)]">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 py-2.5 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <Sparkles className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+              <span className="text-[12.5px] sm:text-[13.5px] text-slate-700 truncate">
+                <span className="font-semibold">You&apos;re exploring TermLift</span>
+                <span className="hidden sm:inline text-slate-500"> with sample data — sign up to use it with your own quotes.</span>
+              </span>
+            </div>
+            <Link
+              href="/login?from=demo"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[12.5px] font-bold text-white whitespace-nowrap transition-all hover:shadow-lg hover:-translate-y-0.5"
+              style={{ background: '#1DB954', boxShadow: '0 4px 12px -2px rgba(29,185,84,0.4)' }}
+            >
+              <span className="hidden sm:inline">Sign up free</span>
+              <span className="sm:hidden">Sign up</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8 pb-24 md:pb-8">
+          {children}
+        </div>
+      </main>
+    </div>
+  )
+}

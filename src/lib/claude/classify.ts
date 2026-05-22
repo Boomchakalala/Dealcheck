@@ -97,7 +97,7 @@ export async function classifyQuote(
   const hasImages = !pdfData && allPages && allPages.length > 0
   const hasSingleImage = !pdfData && imageData && SUPPORTED_IMAGE_MIME_TYPES.includes(imageData.mimeType as ClaudeImageMediaType)
 
-  const userPrompt = `Deal Type: ${dealType}\n\nClassify this quote:\n${extractedText || '(see attached document)'}`
+  const userPrompt = `Deal Type: ${dealType}\n\nClassify this quote:\n${extractedText || '(see attached document)'}\n\nRespond with ONLY the JSON object described above. Begin your response with the { character — no preamble, no explanation, no markdown fences. Output raw JSON and nothing else.`
 
   let userContent: Anthropic.MessageParam['content']
 
@@ -122,7 +122,6 @@ export async function classifyQuote(
     system: CLASSIFICATION_PROMPT,
     messages: [
       { role: 'user', content: userContent },
-      { role: 'assistant', content: '{' },
     ],
     temperature: 0,
   })

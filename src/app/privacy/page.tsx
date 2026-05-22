@@ -1,6 +1,6 @@
 'use client'
 
-import { UnifiedHeader } from '@/components/UnifiedHeader'
+import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { Shield } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -11,19 +11,21 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <UnifiedHeader variant="public" />
+      <MarketingHeader />
 
       <main className="flex-1">
-        <div className="relative overflow-hidden bg-gradient-to-b from-slate-50/60 to-white">
-          <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-20 sm:pt-24 pb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200/60 shadow-sm mb-6">
-              <Shield className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-xs font-semibold text-emerald-700 tracking-wide">{t('privacyPage.badge')}</span>
+        <div className="relative overflow-hidden px-6 pt-20 sm:pt-24 pb-12">
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 600px 280px at 50% 0%, rgba(29,185,84,0.10) 0%, transparent 70%)' }} />
+          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+          <div className="relative max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <Shield className="w-4 h-4 text-emerald-600" />
+              <span className="text-[12px] font-bold tracking-widest uppercase text-emerald-600" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{t('privacyPage.badge')}</span>
             </div>
-            <h1 className="text-[2.25rem] sm:text-[3rem] leading-[1.08] font-bold text-slate-900 tracking-tight mb-3">
+            <h1 className="text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 'clamp(32px, 4.5vw, 48px)', lineHeight: 1.06, letterSpacing: '-0.028em' }}>
               {t('privacyPage.title')}
             </h1>
-            <p className="text-sm text-slate-400">{t('privacyPage.lastUpdated')}</p>
+            <p className="text-[13px] text-slate-400">{t('privacyPage.lastUpdated')}</p>
           </div>
         </div>
 
@@ -50,7 +52,7 @@ export default function PrivacyPage() {
             </div>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s1Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s1Title')}</h2>
               <p className="mb-2">
                 {t('privacyPage.s1p1')}
               </p>
@@ -61,7 +63,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s2Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s2Title')}</h2>
 
               <div className="space-y-4">
                 <div>
@@ -101,7 +103,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s3Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s3Title')}</h2>
               <ul className="space-y-2 ml-4">
                 <li>• {t('privacyPage.s3Item1')}</li>
                 <li>• {t('privacyPage.s3Item2')}</li>
@@ -113,7 +115,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s4Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s4Title')}</h2>
               <p className="mb-4">{t('privacyPage.s4Intro')}</p>
 
               <div className="space-y-3">
@@ -140,14 +142,14 @@ export default function PrivacyPage() {
                 </div>
 
                 <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
-                  <p className="font-medium text-slate-900 mb-1">{t('privacyPage.s4Stripe')} <span className="text-xs text-slate-400 font-normal">({t('privacyPage.s4StripeSoon')})</span></p>
+                  <p className="font-medium text-slate-900 mb-1">{t('privacyPage.s4Stripe')}</p>
                   <p className="text-sm">{t('privacyPage.s4StripeDesc')}</p>
                 </div>
               </div>
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s5Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s5Title')}</h2>
               <ul className="space-y-2 ml-4">
                 <li>• <span className="font-medium">{t('privacyPage.s5Item1Prefix')}</span> {t('privacyPage.s5Item1')}</li>
                 <li>• <span className="font-medium">{t('privacyPage.s5Item2Prefix')}</span> {t('privacyPage.s5Item2')}</li>
@@ -158,7 +160,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s6Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s6Title')}</h2>
               <p className="mb-3">{t('privacyPage.s6Intro')}</p>
               <div className="space-y-4">
                 <div>
@@ -189,7 +191,7 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s7Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s7Title')}</h2>
               <p className="mb-3">{t('privacyPage.s7Intro')}</p>
               <ul className="space-y-2 ml-4">
                 <li>• <span className="font-medium">{t('privacyPage.s7Access')}</span> {t('privacyPage.s7AccessDesc')}</li>
@@ -204,28 +206,28 @@ export default function PrivacyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s8Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s8Title')}</h2>
               <p>
                 {t('privacyPage.s8Text')}
               </p>
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s9Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s9Title')}</h2>
               <p>
                 {t('privacyPage.s9Text')}
               </p>
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s10Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s10Title')}</h2>
               <p>
                 {t('privacyPage.s10Text')}
               </p>
             </section>
 
             <section>
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">{t('privacyPage.s11Title')}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>{t('privacyPage.s11Title')}</h2>
               <div className="bg-slate-50 rounded-lg border border-slate-200 p-5">
                 <p className="text-sm">
                   <span className="font-medium">{t('privacyPage.s11Privacy')}</span>{' '}
