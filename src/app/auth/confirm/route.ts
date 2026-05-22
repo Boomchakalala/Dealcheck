@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { applyVipStatus } from '@/lib/vip-emails'
 import { NextResponse } from 'next/server'
 
 // Handles email confirmation links and password reset links from Supabase
@@ -39,6 +40,7 @@ export async function GET(request: Request) {
             locale: 'en',
           })
         }
+        await applyVipStatus(supabase, user.id, user.email)
       }
 
       return NextResponse.redirect(`${origin}${next}`)

@@ -521,33 +521,32 @@ This quote expires in 14 days.`
             )}
           </div>
 
-          {/* Footer strip */}
-          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 sm:px-5 py-3 bg-slate-50 dark:bg-slate-900/60 border-t-[0.5px] border-slate-200 dark:border-slate-800">
-            {/* Left — Try demo */}
-            <button
-              type="button"
-              onClick={handleUseDemoText}
-              disabled={uploading || analyzing}
-              className="inline-flex items-center gap-1.5 px-2 py-2 text-[12.5px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors disabled:opacity-50"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              Try demo
-            </button>
-            {/* Center — Analyse CTA */}
+          {/* Footer strip — stacks on mobile (CTA full-width on top), 3-col grid on sm+ */}
+          <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-3 bg-slate-50 dark:bg-slate-900/60 border-t-[0.5px] border-slate-200 dark:border-slate-800">
+            {/* Center — Analyse CTA (order-1 on mobile, default order on sm+) */}
             <button
               type="button"
               onClick={handleSubmit}
               disabled={!canAnalyse}
-              className="justify-self-center inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 text-[14px] font-bold text-white bg-[#1DB954] rounded-[11px] hover:bg-[#19a449] active:scale-[0.98] disabled:opacity-60 disabled:hover:bg-[#1DB954] disabled:active:scale-100 transition-all"
+              className="w-full sm:w-auto order-1 sm:order-2 sm:justify-self-center inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3 sm:py-2.5 text-[14px] font-bold text-white bg-[#1DB954] rounded-[11px] hover:bg-[#19a449] active:scale-[0.98] disabled:opacity-60 disabled:hover:bg-[#1DB954] disabled:active:scale-100 transition-all"
             >
               {analyzing
                 ? <><Loader2 className="w-4 h-4 animate-spin" /> Analysing…</>
                 : <><Zap className="w-4 h-4" /> Analyse this quote</>}
             </button>
-            {/* Right — trust */}
-            <div className="text-right leading-tight">
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">~2 min</p>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500">files deleted after</p>
+            {/* Left — Try demo (order-2 on mobile = below CTA, order-1 on sm+ = leftmost) */}
+            <button
+              type="button"
+              onClick={handleUseDemoText}
+              disabled={uploading || analyzing}
+              className="order-2 sm:order-1 justify-self-center sm:justify-self-start inline-flex items-center gap-1.5 px-2 py-2 text-[12.5px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors disabled:opacity-50"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Try demo
+            </button>
+            {/* Right — trust (order-3 on mobile = bottom, order-3 on sm+ = right) */}
+            <div className="order-3 text-center sm:text-right leading-tight">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">~2 min · files deleted after</p>
             </div>
           </div>
         </div>

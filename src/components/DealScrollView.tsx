@@ -166,9 +166,9 @@ export function DealScrollView(props: DealScrollViewProps) {
 
       {/* ═══ SECTION 1: OVERVIEW (white bg) ═══ */}
       <div className="bg-white border-b border-slate-200">
-        <div className="p-8">
+        <div className="p-5 sm:p-8">
           {/* Deal snapshot + Score breakdown side by side */}
-          <div className="grid grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {/* Deal snapshot — left col */}
             <div className="col-span-3">
               <div className="flex items-center gap-2.5 mb-5">
@@ -178,7 +178,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                 <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide">{t('output.dealSnapshot')}</p>
               </div>
               {o?.snapshot && (
-                <div className="grid grid-cols-3 gap-y-5 gap-x-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-y-5 gap-x-6">
                   {[
                     { label: t('output.vendor'), val: (o.snapshot.vendor_product || o.vendor || '').split('/')[0].trim() },
                     { label: t('output.total'), val: o.snapshot.total_commitment ? normalizeAmount(o.snapshot.total_commitment) : '—' },
@@ -264,7 +264,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
       {/* ═══ SECTION 2: RED FLAGS (red-tinted bg) ═══ */}
       <div className="bg-red-50/40 border-b border-red-200">
-        <div className="p-8">
+        <div className="p-5 sm:p-8">
           {/* Section header */}
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center shadow-md">
@@ -330,7 +330,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
       {/* ═══ SECTION 3: STRATEGY (emerald-tinted bg) ═══ */}
       <div className="bg-emerald-50/40 border-b border-emerald-200">
-        <div className="p-8">
+        <div className="p-5 sm:p-8">
           {/* Section header */}
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center shadow-md">
@@ -345,7 +345,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           </div>
 
           {/* 3-col grid: Push for, Leverage, Can offer */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Push for */}
             <div className="bg-white border-2 border-emerald-200 rounded-2xl p-5 shadow-sm">
               <div className="flex items-center gap-2.5 mb-4">
@@ -499,7 +499,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
       {/* ═══ SECTION 4: EMAIL (slate bg) ═══ */}
       <div className="bg-slate-100 border-b border-slate-200">
-        <div className="p-8">
+        <div className="p-5 sm:p-8">
           {/* Section header */}
           <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center shadow-md">
@@ -514,7 +514,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           </div>
 
           {/* 3-col tone selector */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             {emailTones.map((tone, i) => {
               const isActive = emailTab === i
               return (
@@ -584,8 +584,8 @@ export function DealScrollView(props: DealScrollViewProps) {
 
       {/* ═══ SECTION 5: ROUNDS + ASSUMPTIONS (white bg) ═══ */}
       <div className="bg-white">
-        <div className="p-8">
-          <div className="grid grid-cols-5 gap-6">
+        <div className="p-5 sm:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {/* Rounds timeline — left col */}
             <div className="col-span-3">
               <div className="flex items-center gap-2.5 mb-4">

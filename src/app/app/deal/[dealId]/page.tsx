@@ -201,7 +201,7 @@ export default async function DealPage({
           </div>
 
           {/* Stat cards */}
-          <div className="grid grid-cols-4 gap-3 mt-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
             <div className="bg-white/80 backdrop-blur rounded-xl p-4 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <DollarSign className="w-4 h-4 text-slate-400" />

@@ -186,7 +186,7 @@ export default function LandingV2() {
           MARQUEE — what we catch
          ═══════════════════════════════════════════════════ */}
       <div className="overflow-hidden whitespace-nowrap py-5 bg-slate-900 border-y border-slate-800/50">
-        <div className="inline-block" style={{ animation: 'marquee 38s linear infinite', fontFamily: sora, fontStyle: 'italic', fontSize: 32, fontWeight: 500 }}>
+        <div className="inline-block" style={{ animation: 'marquee 38s linear infinite', fontFamily: sora, fontStyle: 'italic', fontSize: 'clamp(20px, 3.5vw, 32px)', fontWeight: 500 }}>
           {[
             'Auto-renewal traps', 'Hidden price hikes', 'Phantom seat fees', 'Vague SLAs',
             'Multi-year lock-ins', 'Missing loyalty discounts', 'Uncapped fuel surcharges',
@@ -205,7 +205,7 @@ export default function LandingV2() {
       {/* ═══════════════════════════════════════════════════
           WHAT YOU GET — 3 real product surfaces
          ═══════════════════════════════════════════════════ */}
-      <section id="product" className="relative px-6 py-28 bg-gradient-to-b from-white to-slate-50/60">
+      <section id="product" className="relative px-6 py-16 sm:py-28 bg-gradient-to-b from-white to-slate-50/60">
         <div className="relative max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <p className="text-[12px] mb-3 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>One paste &middot; Three outputs</p>
@@ -315,7 +315,7 @@ export default function LandingV2() {
       {/* ═══════════════════════════════════════════════════
           PERSONALISED — Negotiation preferences
          ═══════════════════════════════════════════════════ */}
-      <section id="preferences" className="relative px-6 py-28 bg-slate-900 text-white overflow-hidden">
+      <section id="preferences" className="relative px-6 py-16 sm:py-28 bg-slate-900 text-white overflow-hidden">
         {/* Background flair */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(29,185,84,0.15) 0%, transparent 70%)' }} />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%)' }} />
@@ -444,7 +444,7 @@ export default function LandingV2() {
       {/* ═══════════════════════════════════════════════════
           REAL WINS — from /example data
          ═══════════════════════════════════════════════════ */}
-      <section className="relative px-6 py-28 bg-white">
+      <section className="relative px-6 py-16 sm:py-28 bg-white">
         <div className="relative max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-[12px] mb-3 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>Real wins</p>
@@ -509,7 +509,7 @@ export default function LandingV2() {
       {/* ═══════════════════════════════════════════════════
           DASHBOARD REVEAL
          ═══════════════════════════════════════════════════ */}
-      <section className="relative px-6 py-28 overflow-hidden" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)' }}>
+      <section className="relative px-6 py-16 sm:py-28 overflow-hidden" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)' }}>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, rgba(29,185,84,0.08) 0%, transparent 60%)' }} />
 
         <div className="relative max-w-6xl mx-auto">
@@ -615,8 +615,8 @@ export default function LandingV2() {
       {/* ═══════════════════════════════════════════════════
           PULL QUOTE
          ═══════════════════════════════════════════════════ */}
-      <section className="relative px-6 py-28 bg-slate-900 text-white overflow-hidden border-y border-slate-800">
-        <div className="absolute -top-32 -right-12 select-none pointer-events-none" style={{ fontFamily: sora, fontSize: 600, fontWeight: 800, color: green, opacity: 0.05, lineHeight: 1 }}>&euro;</div>
+      <section className="relative px-6 py-16 sm:py-28 bg-slate-900 text-white overflow-hidden border-y border-slate-800">
+        <div className="absolute -top-16 sm:-top-32 -right-8 sm:-right-12 select-none pointer-events-none" style={{ fontFamily: sora, fontSize: 'clamp(280px, 50vw, 600px)', fontWeight: 800, color: green, opacity: 0.05, lineHeight: 1 }}>&euro;</div>
 
         <div className="relative max-w-5xl mx-auto">
           <h2 className="max-w-[900px]" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(36px, 5.5vw, 64px)', lineHeight: 1.04, letterSpacing: '-0.025em' }}>
@@ -632,7 +632,7 @@ export default function LandingV2() {
             ].map((s, i) => (
               <div key={s.label} className="py-7 px-5" style={{ borderRight: i < 3 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
                 <div className="text-[11px] uppercase tracking-widest text-slate-500 mb-2" style={{ fontFamily: mono }}>{s.label}</div>
-                <div style={{ fontFamily: sora, fontSize: 48, fontWeight: 800, lineHeight: 1, color: green }}>{s.val}</div>
+                <div style={{ fontFamily: sora, fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 800, lineHeight: 1, color: green }}>{s.val}</div>
               </div>
             ))}
           </div>
@@ -688,7 +688,7 @@ export default function LandingV2() {
           PRICING — HIDDEN. Reactivate by removing the {false && wrapper.
          ═══════════════════════════════════════════════════ */}
       {false && (
-      <section id="pricing" className="relative px-6 py-28 overflow-hidden">
+      <section id="pricing" className="relative px-6 py-16 sm:py-28 overflow-hidden">
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, rgba(29,185,84,0.08) 0%, transparent 60%)' }} />
 
         <div className="relative max-w-5xl mx-auto">

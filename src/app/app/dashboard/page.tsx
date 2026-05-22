@@ -293,7 +293,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* KPI row */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Saved */}
           <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4 shadow-[0_8px_24px_-6px_rgba(29,185,84,0.35)]">
             <div className="flex items-center gap-2 mb-1.5">
@@ -342,10 +342,10 @@ export default async function DashboardPage() {
       </div>
 
       {/* ═══ MAIN GRID ═══ */}
-      <div className="px-8 py-6 space-y-6">
+      <div className="px-5 sm:px-8 py-6 space-y-6">
 
         {/* ROW 1: Spend by Category (3) + Monthly Spend (2) */}
-        <div className="grid grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
           {/* Spend by category */}
           <div className="col-span-3 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-5">
@@ -416,7 +416,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* ROW 2: Upcoming Renewals (3) + Performance (2) */}
-        <div className="grid grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
           {/* Upcoming renewals */}
           <div className="col-span-3 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-2.5 mb-5">
@@ -514,7 +514,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* ROW 3: Savings Over Time (3) + Top Wins (2) */}
-        <div className="grid grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
           {/* Savings over time */}
           <div className="col-span-3 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-2.5 mb-5">
@@ -650,7 +650,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* ROW 4: Category Avg Score + Budget Projection + Activity */}
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {/* Category avg score */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center gap-2.5 mb-5">
@@ -707,7 +707,7 @@ export default async function DashboardPage() {
             {/* Big projected number */}
             <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-5 text-center mb-4">
               <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider mb-1">Projected total savings</p>
-              <p className="text-[36px] font-bold text-emerald-800 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>{projectedSavings > 0 ? fmt(Math.round(projectedSavings)) : '\u2014'}</p>
+              <p className="text-[28px] sm:text-[36px] font-bold text-emerald-800 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>{projectedSavings > 0 ? fmt(Math.round(projectedSavings)) : '\u2014'}</p>
               <p className="text-[12px] text-emerald-500 mt-1.5">based on {savingsConversionRate}% capture rate</p>
             </div>
             {/* Breakdown */}

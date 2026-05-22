@@ -151,7 +151,7 @@ export function SettingsClient({
   return (
     <div className="flex flex-col h-[calc(100vh)]">
       {/* ── TOPBAR ──────────────────────────────── */}
-      <div className="h-14 px-8 bg-white flex items-center flex-shrink-0 border-b border-slate-200">
+      <div className="h-14 px-5 sm:px-8 bg-white flex items-center flex-shrink-0 border-b border-slate-200">
         <span className="text-[18px] font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>Settings</span>
       </div>
 
@@ -268,7 +268,7 @@ export function SettingsClient({
                 {/* Usage stats */}
                 <div className="pt-5 border-t border-slate-100">
                   <p className="text-[12px] font-bold text-slate-900 uppercase tracking-wide mb-4">{t('settingsClient.usage')}</p>
-                  <div className="grid grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                     <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center"><FileText className="w-3.5 h-3.5 text-slate-500" /></div>

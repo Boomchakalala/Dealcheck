@@ -167,7 +167,7 @@ export default async function OutcomePage({
             {cashSavingsNum > 0 && (
               <div className="text-right">
                 <p className="text-[12px] font-semibold text-emerald-300 uppercase tracking-wider mb-2">Total saved</p>
-                <p className="text-[48px] font-bold text-white leading-none" style={{ fontFamily: 'Sora, sans-serif', letterSpacing: '-2px' }}>{fmt(cashSavingsNum)}</p>
+                <p className="text-[32px] sm:text-[48px] font-bold text-white leading-none" style={{ fontFamily: 'Sora, sans-serif', letterSpacing: '-2px' }}>{fmt(cashSavingsNum)}</p>
                 {cashSavingsPct != null && <p className="text-[16px] font-semibold text-emerald-200 mt-2">{cashSavingsPct.toFixed(1)}% reduction</p>}
               </div>
             )}
@@ -178,7 +178,7 @@ export default async function OutcomePage({
       {/* ── STATS ROW (white bg) ────────────────── */}
       <div className="bg-white border-b border-slate-200">
         <div className="px-8 py-6">
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4">
               <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider mb-1">Capture rate</p>
               <p className="text-[24px] font-bold text-emerald-700 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>{captureRate}%</p>
@@ -206,7 +206,7 @@ export default async function OutcomePage({
       {/* ── WINS + TIMELINE (2-col, white bg) ───── */}
       <div className="bg-white border-b border-slate-200">
         <div className="px-8 py-8">
-          <div className="grid grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {/* LEFT — Wins secured */}
             <div className="col-span-3">
               <div className="flex items-center gap-2.5 mb-5">
