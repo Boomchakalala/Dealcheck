@@ -162,24 +162,27 @@ export default async function DealPage({
 
       {/* ── SCORE HERO ──────────────────────────── */}
       <div className={`bg-gradient-to-br ${heroScoreBg} border-b-2 ${heroScoreBorder}`}>
-        <div className="px-8 py-8">
-          <div className="flex items-center gap-8">
+        <div className="px-5 sm:px-8 py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
             {/* Score ring */}
             {score != null && (
-              <div className="relative flex-shrink-0" style={{ width: 120, height: 120 }}>
-                <svg width={120} height={120} viewBox="0 0 120 120" className="-rotate-90">
+              <div className="relative flex-shrink-0 mx-auto sm:mx-0" style={{ width: 96, height: 96 }}>
+                <svg width={96} height={96} viewBox="0 0 120 120" className="-rotate-90">
                   <circle cx={60} cy={60} r={ringR} fill="none" stroke={scoreTrackColor} strokeWidth={7} />
                   <circle cx={60} cy={60} r={ringR} fill="none" stroke={scoreRingColor} strokeWidth={7} strokeDasharray={ringCirc} strokeDashoffset={ringOffset} strokeLinecap="round" />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[34px] font-bold leading-none" style={{ color: scoreTextColor, fontFamily: 'Sora, sans-serif' }}>{sc}</span>
-                  <span className="text-[12px] text-slate-400 leading-none mt-1">/100</span>
+                  <span className="text-[28px] sm:text-[34px] font-bold leading-none" style={{ color: scoreTextColor, fontFamily: 'Sora, sans-serif' }}>{sc}</span>
+                  <span className="text-[11px] text-slate-400 leading-none mt-1">/100</span>
                 </div>
               </div>
             )}
-            <div className="flex-1">
-              <h1 className="text-[26px] font-bold text-slate-900 mb-1" style={{ fontFamily: 'Sora, sans-serif' }}>{shortVendorName}{description ? ` — ${description.split(' ').slice(0, 6).join(' ')}` : ''}</h1>
-              <div className="flex items-center gap-2 mb-3">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900 mb-1 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+                {shortVendorName}
+                {description && <span className="hidden sm:inline"> &mdash; {description.split(' ').slice(0, 6).join(' ')}</span>}
+              </h1>
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
                 {category && <span className="text-[12px] px-2.5 py-1 rounded-lg bg-white/70 text-slate-600 font-medium border border-slate-200/50">{category}</span>}
                 <span className="text-[12px] px-2.5 py-1 rounded-lg bg-emerald-100/70 text-emerald-700 font-medium border border-emerald-200/50">{effectiveDealType}</span>
                 <span className="text-[12px] px-2.5 py-1 rounded-lg bg-white/70 text-slate-600 font-medium border border-slate-200/50">

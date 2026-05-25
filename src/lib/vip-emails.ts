@@ -5,8 +5,9 @@ const VIP_EMAILS = new Set([
   'swann.vincent@nuvellis.tech',
 ])
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function applyVipStatus(
-  supabase: { from: (table: string) => { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<unknown> } } },
+  supabase: any,
   userId: string,
   email: string | null | undefined,
 ): Promise<void> {
