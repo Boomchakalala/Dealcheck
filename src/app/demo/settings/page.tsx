@@ -51,13 +51,13 @@ export default function DemoSettingsPage() {
     <div className="-mx-5 sm:-mx-8 -mt-8 bg-slate-50 min-h-screen">
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-7">
-        <h1 className="text-[26px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Settings</h1>
+        <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Settings</h1>
         <p className="text-[13px] text-slate-500 mt-0.5">Tune how TermLift negotiates on your behalf</p>
       </div>
 
       <div className="px-5 sm:px-8 py-6 max-w-3xl">
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 md:p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
             <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
               <Handshake className="w-5 h-5 text-emerald-600" />
             </div>
@@ -67,7 +67,7 @@ export default function DemoSettingsPage() {
             </div>
           </div>
 
-          <div className="space-y-7">
+          <div className="space-y-5 sm:space-y-7">
             {/* Top priority */}
             <div>
               <p className="text-[12px] font-medium text-slate-500 mb-3 flex items-center gap-1.5">

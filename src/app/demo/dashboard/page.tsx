@@ -17,7 +17,7 @@ export default function DemoDashboardPage() {
       <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-7">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-[26px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Dashboard</h1>
+            <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Dashboard</h1>
             <p className="text-[13px] text-slate-500 mt-0.5">{demoDeals.length} sample deals · {formatEur(demoDashboard.totalSpend)} spend analysed</p>
           </div>
           <Link
@@ -37,7 +37,7 @@ export default function DemoDashboardPage() {
               </div>
               <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider">Saved</p>
             </div>
-            <p className="text-[26px] font-bold text-emerald-800 leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>{formatEur(demoDashboard.savingsAchieved)}</p>
+            <p className="text-[20px] sm:text-[26px] font-bold text-emerald-800 leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>{formatEur(demoDashboard.savingsAchieved)}</p>
             <p className="text-[12px] text-emerald-500 mt-1">{demoDashboard.wonCount} won deals</p>
           </div>
           {[
@@ -50,7 +50,7 @@ export default function DemoDashboardPage() {
                 <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">{k.icon}</div>
                 <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{k.label}</p>
               </div>
-              <p className={`text-[26px] font-bold leading-none ${k.accent ? 'text-emerald-700' : 'text-slate-900'}`} style={{ fontFamily: 'Sora, sans-serif' }}>{k.val}</p>
+              <p className={`text-[20px] sm:text-[26px] font-bold leading-none ${k.accent ? 'text-emerald-700' : 'text-slate-900'}`} style={{ fontFamily: 'Sora, sans-serif' }}>{k.val}</p>
               <p className="text-[12px] text-slate-400 mt-1">{k.sub}</p>
             </div>
           ))}
@@ -58,11 +58,11 @@ export default function DemoDashboardPage() {
       </div>
 
       {/* Two rows of charts */}
-      <div className="px-5 sm:px-8 py-6 space-y-5">
+      <div className="px-5 sm:px-8 py-6 space-y-4 sm:space-y-5">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
           {/* Spend by category */}
-          <div className="lg:col-span-3 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-5">
+          <div className="lg:col-span-3 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-3 sm:mb-5">
               <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide">Spend by category</p>
               <p className="text-[12px] text-slate-400">Total: {formatEur(demoDashboard.totalSpend)}</p>
             </div>
@@ -91,8 +91,8 @@ export default function DemoDashboardPage() {
           </div>
 
           {/* Monthly spend bars */}
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide mb-5">Monthly spend</p>
+          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+            <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide mb-3 sm:mb-5">Monthly spend</p>
             <div className="flex items-end gap-3 h-[140px] mb-3">
               {demoDashboard.monthlySpend.map((m) => (
                 <div key={m.month} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
@@ -111,8 +111,8 @@ export default function DemoDashboardPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
           {/* Upcoming renewals */}
-          <div className="lg:col-span-3 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-2.5 mb-5">
+          <div className="lg:col-span-3 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+            <div className="flex items-center gap-2.5 mb-3 sm:mb-5">
               <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-amber-600" />
               </div>
@@ -146,8 +146,8 @@ export default function DemoDashboardPage() {
           </div>
 
           {/* Top wins */}
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide mb-5">Top wins</p>
+          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+            <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide mb-3 sm:mb-5">Top wins</p>
             <div className="space-y-3">
               {demoDashboard.topWins.map((w, i) => (
                 <div key={w.vendor} className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200">

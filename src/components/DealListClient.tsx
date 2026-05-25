@@ -268,7 +268,7 @@ export function DealListClient({ deals: initialDeals, onDealDeleted, linkBase = 
                     <span className={`text-[15px] font-semibold truncate ${isWon ? 'text-emerald-900' : isClosed ? 'text-slate-500' : 'text-slate-900'}`}>
                       {vendorName}
                     </span>
-                    <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${status.badge}`}>
+                    <span className={`hidden sm:inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${status.badge}`}>
                       {status.icon}
                       {status.label}
                     </span>

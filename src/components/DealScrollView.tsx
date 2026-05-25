@@ -299,7 +299,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                       <p className="text-[13px] text-slate-600 leading-relaxed mt-2">{flag.why_it_matters}</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 mt-5 ml-11">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4 sm:mt-5 ml-0 sm:ml-11">
                     <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
                       <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                         <Zap className="w-3.5 h-3.5" />{t('output.whatToAskFor')}
