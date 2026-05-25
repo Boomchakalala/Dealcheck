@@ -205,21 +205,21 @@ export default async function DealPage({
 
           {/* Stat cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-            <div className="bg-white/80 backdrop-blur rounded-xl p-4 border border-slate-200/50 shadow-sm">
+            <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <DollarSign className="w-4 h-4 text-slate-400" />
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{isWon ? 'Original' : 'Total'}</span>
               </div>
-              <p className={`text-[22px] font-bold ${isWon ? 'text-slate-400 line-through' : 'text-slate-900'}`} style={{ fontFamily: 'Sora, sans-serif' }}>{totalCommitment ? normalizeAmount(totalCommitment) : '—'}</p>
+              <p className={`text-[18px] sm:text-[22px] font-bold ${isWon ? 'text-slate-400 line-through' : 'text-slate-900'}`} style={{ fontFamily: 'Sora, sans-serif' }}>{totalCommitment ? normalizeAmount(totalCommitment) : '—'}</p>
               <p className="text-[11px] text-slate-400 mt-0.5">{term || ''}</p>
             </div>
             {isWon ? (
-              <div className="bg-white/80 backdrop-blur rounded-xl p-4 border border-emerald-200/50 shadow-sm">
+              <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-emerald-200/50 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <DollarSign className="w-4 h-4 text-emerald-500" />
                   <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">Final price</span>
                 </div>
-                <p className="text-[22px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>
+                <p className="text-[18px] sm:text-[22px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>
                   {(deal.savings_amount ?? 0) > 0 && totalCommitment
                     ? formatCurrency(Math.round(parseMoneyLib(totalCommitment).amount - deal.savings_amount), dealCurrency)
                     : '—'}
@@ -227,28 +227,28 @@ export default async function DealPage({
                 <p className="text-[11px] text-emerald-500 mt-0.5">{deal.savings_percent != null ? `${deal.savings_percent.toFixed(1)}% less` : ''}</p>
               </div>
             ) : (
-              <div className="bg-white/80 backdrop-blur rounded-xl p-4 border border-red-200/50 shadow-sm">
+              <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-red-200/50 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <AlertTriangle className="w-4 h-4 text-red-500" />
                   <span className="text-[11px] font-semibold text-red-400 uppercase tracking-wider">{t('output.redFlags')}</span>
                 </div>
-                <p className="text-[22px] font-bold text-red-600" style={{ fontFamily: 'Sora, sans-serif' }}>{redFlagCount}</p>
+                <p className="text-[18px] sm:text-[22px] font-bold text-red-600" style={{ fontFamily: 'Sora, sans-serif' }}>{redFlagCount}</p>
                 <p className="text-[11px] text-red-400 mt-0.5">{redFlagCount === 1 ? 'issue' : 'issues'} to address</p>
               </div>
             )}
-            <div className="bg-white/80 backdrop-blur rounded-xl p-4 border border-emerald-200/50 shadow-sm">
+            <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-emerald-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <TrendingUp className="w-4 h-4 text-emerald-500" />
                 <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">{isWon ? 'Saved' : 'Savings'}</span>
               </div>
-              <p className="text-[22px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <p className="text-[18px] sm:text-[22px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {isWon && (deal.savings_amount ?? 0) > 0 ? formatCurrency(Math.round(deal.savings_amount), dealCurrency)
                   : potentialSavings > 0 ? formatCurrency(potentialSavings, dealCurrency)
                   : '—'}
               </p>
               <p className="text-[11px] text-emerald-500 mt-0.5">{isWon ? 'achieved' : 'potential'}</p>
             </div>
-            <div className="bg-white/80 backdrop-blur rounded-xl p-4 border border-slate-200/50 shadow-sm">
+            <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <Calendar className="w-4 h-4 text-slate-400" />
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{isWon ? 'Closed' : 'Started'}</span>

@@ -260,7 +260,7 @@ export default function AppHomePage() {
             </div>
             <div className="min-w-0">
               <p className="text-[12px] text-emerald-600 font-semibold">{locale === 'fr' ? 'Économies réalisées' : 'Savings achieved'}</p>
-              <p className="text-3xl font-bold text-emerald-800 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <p className="text-2xl sm:text-3xl font-bold text-emerald-800 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {totalAchievedSavings > 0 ? formatCurrencyValue(totalAchievedSavings) : '—'}
               </p>
               <p className="text-[12px] text-emerald-500">
@@ -278,7 +278,7 @@ export default function AppHomePage() {
             </div>
             <div className="min-w-0">
               <p className="text-[12px] text-slate-500 font-semibold">{locale === 'fr' ? 'Économies potentielles' : 'Potential savings'}</p>
-              <p className="text-[24px] font-bold text-slate-900 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <p className="text-[20px] sm:text-[24px] font-bold text-slate-900 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {totalPotentialSavings > 0 ? formatCurrencyValue(totalPotentialSavings) : '—'}
               </p>
               <p className="text-[12px] text-slate-400">
@@ -296,7 +296,7 @@ export default function AppHomePage() {
             </div>
             <div className="min-w-0">
               <p className="text-[12px] text-slate-500 font-semibold">{t('app.deals')}</p>
-              <p className="text-[24px] font-bold text-slate-900 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>{deals.length}</p>
+              <p className="text-[20px] sm:text-[24px] font-bold text-slate-900 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>{deals.length}</p>
               <p className="text-[12px] text-slate-400">{activeDeals.length} {locale === 'fr' ? 'actifs' : 'active'} · {closedDeals.length} {locale === 'fr' ? 'clôturés' : 'closed'}</p>
             </div>
           </div>

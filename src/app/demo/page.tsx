@@ -39,7 +39,7 @@ export default function DemoDealsListPage() {
             </div>
             <div className="min-w-0">
               <p className="text-[12px] text-emerald-600 font-semibold">Savings achieved</p>
-              <p className="text-3xl font-bold text-emerald-800 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <p className="text-2xl sm:text-3xl font-bold text-emerald-800 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {formatEur(demoDashboard.savingsAchieved)}
               </p>
               <p className="text-[12px] text-emerald-500">from {demoDashboard.wonCount} closed deals</p>
@@ -52,7 +52,7 @@ export default function DemoDealsListPage() {
             </div>
             <div className="min-w-0">
               <p className="text-[12px] text-slate-500 font-semibold">Potential savings</p>
-              <p className="text-[24px] font-bold text-slate-900 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <p className="text-[20px] sm:text-[24px] font-bold text-slate-900 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {formatEur(demoDashboard.savingsIdentified)}
               </p>
               <p className="text-[12px] text-slate-400">across {active.length} active deals</p>
@@ -65,7 +65,7 @@ export default function DemoDealsListPage() {
             </div>
             <div className="min-w-0">
               <p className="text-[12px] text-slate-500 font-semibold">Total deals</p>
-              <p className="text-[24px] font-bold text-slate-900 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>{demoDeals.length}</p>
+              <p className="text-[20px] sm:text-[24px] font-bold text-slate-900 leading-tight tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>{demoDeals.length}</p>
               <p className="text-[12px] text-slate-400">{active.length} active · {closed.length} closed</p>
             </div>
           </div>

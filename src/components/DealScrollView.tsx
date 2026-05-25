@@ -168,7 +168,7 @@ export function DealScrollView(props: DealScrollViewProps) {
       <div className="bg-white border-b border-slate-200">
         <div className="p-5 sm:p-8">
           {/* Deal snapshot + Score breakdown side by side */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
             {/* Deal snapshot — left col */}
             <div className="col-span-3">
               <div className="flex items-center gap-2.5 mb-5">
@@ -266,12 +266,12 @@ export function DealScrollView(props: DealScrollViewProps) {
       <div className="bg-red-50/40 border-b border-red-200">
         <div className="p-5 sm:p-8">
           {/* Section header */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-4 sm:mb-6">
             <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center shadow-md">
               <AlertTriangle className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {sortedFlags.length} {sortedFlags.length === 1 ? 'red flag' : 'red flags'} found
               </h2>
               <p className="text-[13px] text-slate-500">
@@ -288,7 +288,7 @@ export function DealScrollView(props: DealScrollViewProps) {
               const numBg = isHigh ? 'bg-red-600' : isMed ? 'bg-amber-500' : 'bg-slate-400'
               const sevBg = isHigh ? 'bg-red-600' : isMed ? 'bg-amber-500' : 'bg-slate-500'
               return (
-                <div key={idx} className="bg-white border-2 border-red-200 rounded-2xl p-6 shadow-sm">
+                <div key={idx} className="bg-white border-2 border-red-200 rounded-2xl p-4 sm:p-6 shadow-sm">
                   <div className="flex items-start gap-3.5">
                     <div className={`w-8 h-8 rounded-full ${numBg} text-white text-[13px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5`}>{displayPos + 1}</div>
                     <div className="flex-1">
@@ -332,12 +332,12 @@ export function DealScrollView(props: DealScrollViewProps) {
       <div className="bg-emerald-50/40 border-b border-emerald-200">
         <div className="p-5 sm:p-8">
           {/* Section header */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-4 sm:mb-6">
             <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center shadow-md">
               <Zap className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Your negotiation playbook</h2>
+              <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Your negotiation playbook</h2>
               <p className="text-[13px] text-slate-500">
                 {locale === 'fr' ? 'Quoi demander, votre levier, et quoi offrir en retour' : 'What to push for, your leverage, and what to offer in return'}
               </p>
@@ -347,7 +347,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           {/* 3-col grid: Push for, Leverage, Can offer */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Push for */}
-            <div className="bg-white border-2 border-emerald-200 rounded-2xl p-5 shadow-sm">
+            <div className="bg-white border-2 border-emerald-200 rounded-2xl p-4 sm:p-5 shadow-sm">
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
                   <Target className="w-4 h-4 text-emerald-600" />
@@ -369,7 +369,7 @@ export function DealScrollView(props: DealScrollViewProps) {
             </div>
 
             {/* Leverage */}
-            <div className="bg-white border-2 border-slate-200 rounded-2xl p-5 shadow-sm">
+            <div className="bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
                   <Shield className="w-4 h-4 text-slate-600" />
@@ -385,7 +385,7 @@ export function DealScrollView(props: DealScrollViewProps) {
             </div>
 
             {/* Can offer */}
-            <div className="bg-white border-2 border-slate-200 rounded-2xl p-5 shadow-sm">
+            <div className="bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
                   <TrendingUp className="w-4 h-4 text-slate-600" />
@@ -415,19 +415,19 @@ export function DealScrollView(props: DealScrollViewProps) {
                     </div>
                     <p className="text-[14px] font-bold text-white uppercase tracking-wide">{t('output.savingsImpact')}</p>
                   </div>
-                  <span className="text-[24px] font-bold text-white" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtSav(savingsData.total)}</span>
+                  <span className="text-[20px] sm:text-[24px] font-bold text-white" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtSav(savingsData.total)}</span>
                 </div>
-                <div className="bg-emerald-50 p-6">
+                <div className="bg-emerald-50 p-4 sm:p-6">
                   {/* Before -> After */}
                   <div className="flex items-end justify-between mb-4">
                     <div>
                       <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Original quote</p>
-                      <p className="text-[26px] font-bold text-slate-400 line-through" style={{ fontFamily: 'Sora, sans-serif' }}>{totalCommitment ? normalizeAmount(totalCommitment) : '—'}</p>
+                      <p className="text-[20px] sm:text-[26px] font-bold text-slate-400 line-through" style={{ fontFamily: 'Sora, sans-serif' }}>{totalCommitment ? normalizeAmount(totalCommitment) : '—'}</p>
                     </div>
                     <ArrowRight className="w-6 h-6 text-emerald-400 mb-3" />
                     <div className="text-right">
                       <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider mb-1">After savings</p>
-                      <p className="text-[26px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtSav(afterAmt)}</p>
+                      <p className="text-[20px] sm:text-[26px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtSav(afterAmt)}</p>
                     </div>
                   </div>
                   <div className="h-3 bg-emerald-100 rounded-full overflow-hidden mb-2">
@@ -479,7 +479,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
           {/* Cash flow card — blue tint */}
           {o?.cash_flow_improvements && o.cash_flow_improvements.length > 0 && (
-            <div className="mt-4 bg-blue-50/60 border-2 border-blue-200 rounded-2xl p-5 shadow-sm">
+            <div className="mt-4 bg-blue-50/60 border-2 border-blue-200 rounded-2xl p-4 sm:p-5 shadow-sm">
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
                   <Briefcase className="w-4 h-4 text-blue-600" />
@@ -501,12 +501,12 @@ export function DealScrollView(props: DealScrollViewProps) {
       <div className="bg-slate-100 border-b border-slate-200">
         <div className="p-5 sm:p-8">
           {/* Section header */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-4 sm:mb-6">
             <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center shadow-md">
               <Mail className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Ready-to-send negotiation email</h2>
+              <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Ready-to-send negotiation email</h2>
               <p className="text-[13px] text-slate-500">
                 {locale === 'fr' ? 'Choisissez un ton, personnalisez, et envoyez' : 'Pick a tone, customize if needed, and send it'}
               </p>
@@ -539,7 +539,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                 className="flex-1 text-[14px] font-semibold text-white bg-transparent border-none focus:outline-none p-0 placeholder-slate-400"
               />
             </div>
-            <div className="bg-slate-50 p-6">
+            <div className="bg-slate-50 p-4 sm:p-6">
               <p className="text-[11px] text-slate-400 font-medium mb-3 flex items-center gap-1.5">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 Click to edit subject and body
@@ -585,7 +585,7 @@ export function DealScrollView(props: DealScrollViewProps) {
       {/* ═══ SECTION 5: ROUNDS + ASSUMPTIONS (white bg) ═══ */}
       <div className="bg-white">
         <div className="p-5 sm:p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
             {/* Rounds timeline — left col */}
             <div className="col-span-3">
               <div className="flex items-center gap-2.5 mb-4">
