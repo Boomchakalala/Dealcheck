@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronRight, CheckCircle2, DollarSign, AlertTriangle, TrendingUp, Calendar, ArrowRight } from 'lucide-react'
 import { DealScrollView } from '@/components/DealScrollView'
+import { HeroVerdict } from '@/components/HeroVerdict'
 import { getDemoDeal, demoDeals } from '@/lib/demo-data'
 import { normalizeAmount, detectCurrency, formatCurrency, parseMoney as parseMoneyLib } from '@/lib/currency'
 import type { DealOutput } from '@/types'
@@ -33,14 +34,16 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
   const latestOutput = latestRound?.output_json
   const firstOutput = firstRound?.output_json
 
-  const dealName = deal.vendor || latestOutput?.vendor || deal.title || 'Deal'
+  const rawDealName = deal.vendor || latestOutput?.vendor || deal.title || 'Deal'
+  // AI `title` is pipe-delimited ("Vendor | Type | Date") — keep only the vendor segment for the H1.
+  const dealName = String(rawDealName).split('|')[0].trim() || 'Deal'
   const category = (latestOutput as DealOutput)?.category
-  const description = (latestOutput as DealOutput)?.description || (latestOutput as DealOutput)?.quick_read?.conclusion || null
   const totalCommitment = latestOutput?.snapshot?.total_commitment
   const originalTotal = firstOutput?.snapshot?.total_commitment
   const term = latestOutput?.snapshot?.term
 
   const redFlagCount = (latestOutput as DealOutput)?.red_flags?.length || 0
+  const watchCount = (latestOutput as DealOutput)?.watchItems?.length || 0
 
   const ps = (latestOutput as DealOutput)?.potential_savings as any
   const potentialSavings = ps?.must_have
@@ -157,7 +160,6 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
             <div className="flex-1 min-w-0">
               <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900 mb-1 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {shortVendorName}
-                {description && <span className="hidden sm:inline"> &mdash; {description.split(' ').slice(0, 6).join(' ')}</span>}
               </h1>
               <div className="flex items-center gap-2 mb-3 flex-wrap">
                 {category && <span className="text-[12px] px-2.5 py-1 rounded-lg bg-white/70 text-slate-600 font-medium border border-slate-200/50">{category}</span>}
@@ -174,7 +176,7 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
               ) : (
                 <>
                   {scoreLabel && <p className="text-[16px] font-semibold mb-1" style={{ color: scoreTextColor }}>{scoreLabel}</p>}
-                  {scoreRationale && <p className="text-[13px] text-slate-600 leading-relaxed max-w-2xl">{scoreRationale}</p>}
+                  {scoreRationale && <HeroVerdict text={scoreRationale} className="text-[13px] text-slate-600 leading-relaxed max-w-2xl" />}
                 </>
               )}
             </div>
@@ -182,7 +184,7 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
 
           {/* Stat cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-            <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-slate-200/50 shadow-sm">
+            <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <DollarSign className="w-4 h-4 text-slate-400" />
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{isWon ? 'Original' : 'Total'}</span>
@@ -191,7 +193,7 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
               <p className="text-[11px] text-slate-400 mt-0.5">{term || ''}</p>
             </div>
             {isWon ? (
-              <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-emerald-200/50 shadow-sm">
+              <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <DollarSign className="w-4 h-4 text-emerald-500" />
                   <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">Final price</span>
@@ -203,16 +205,17 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
                 </p>
               </div>
             ) : (
-              <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-red-200/50 shadow-sm">
+              <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-red-200/50 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <AlertTriangle className="w-4 h-4 text-red-500" />
                   <span className="text-[11px] font-semibold text-red-400 uppercase tracking-wider">Red flags</span>
                 </div>
                 <p className="text-[18px] sm:text-[22px] font-bold text-red-600" style={{ fontFamily: 'Sora, sans-serif' }}>{redFlagCount}</p>
                 <p className="text-[11px] text-red-400 mt-0.5">{redFlagCount === 1 ? 'issue' : 'issues'} to address</p>
+                {watchCount > 0 && <p className="text-[10px] text-slate-400 mt-0.5">+{watchCount} minor item{watchCount === 1 ? '' : 's'}</p>}
               </div>
             )}
-            <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-emerald-200/50 shadow-sm">
+            <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <TrendingUp className="w-4 h-4 text-emerald-500" />
                 <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">{isWon ? 'Saved' : 'Savings'}</span>
@@ -224,7 +227,7 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
               </p>
               <p className="text-[11px] text-emerald-500 mt-0.5">{isWon ? 'achieved' : 'potential'}</p>
             </div>
-            <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-slate-200/50 shadow-sm">
+            <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <Calendar className="w-4 h-4 text-slate-400" />
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{isWon ? 'Closed' : 'Started'}</span>
@@ -267,6 +270,7 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
           isAdmin={false}
           addRoundForm={addRoundForm}
           messages={messages}
+          demoMode={true}
         />
       )}
     </div>

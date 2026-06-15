@@ -36,12 +36,15 @@ export default async function AppLayout({
         plan={profile?.plan || 'free'}
       />
       {/* Main content — offset by sidebar on desktop, full-width on mobile */}
-      <main className="min-h-screen transition-all duration-200 md:ml-[var(--sidebar-width,210px)]">
+      <main className="min-h-screen overflow-x-hidden transition-all duration-200 md:ml-[var(--sidebar-width,210px)]">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-8 pb-24 md:pb-8">
           {children}
         </div>
       </main>
-      <FeedbackWidget />
+      {/* Floating feedback widget overlaps content on small screens — desktop only */}
+      <div className="hidden md:block">
+        <FeedbackWidget />
+      </div>
     </div>
   )
 }

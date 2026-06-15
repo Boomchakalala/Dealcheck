@@ -542,7 +542,7 @@ export default function LandingV2() {
                 </div>
                 {[
                   { label: 'Pipeline', val: '€38k', sub: '7 active', icon: <Target className="w-4 h-4 text-slate-600" /> },
-                  { label: 'Spend tracked', val: '€186k', sub: '11 deals', icon: <BarChart3 className="w-4 h-4 text-slate-600" /> },
+                  { label: 'Spend tracked', val: '€186k', sub: '13 deals', icon: <BarChart3 className="w-4 h-4 text-slate-600" /> },
                   { label: 'Win rate', val: '67%', sub: '4 of 6 closed', icon: <CheckCircle2 className="w-4 h-4 text-emerald-600" /> },
                 ].map(k => (
                   <div key={k.label} className="bg-white border border-slate-200 rounded-xl p-4">

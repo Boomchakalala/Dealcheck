@@ -18,7 +18,7 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-25 to-white">
       <AppSidebar
         userEmail={DEMO_USER_EMAIL}
-        isUpgraded={false}
+        isUpgraded={true}
         usageCount={demoProfile.usage_count}
         isAdmin={false}
         plan={demoProfile.plan}

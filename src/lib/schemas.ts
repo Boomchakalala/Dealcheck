@@ -67,6 +67,10 @@ export const DealOutputSchema = z.object({
     recommendation: z.string(),
     category: z.enum(['cash_flow', 'risk']),
   })).optional().default([]),
+  watchItems: z.array(z.object({
+    description: z.string(),
+    category: z.string().optional().default('other'),
+  })).optional().default([]),
   score: z.number().min(0).max(100).optional(),
   score_label: z.string().optional(),
   score_breakdown: z.object({

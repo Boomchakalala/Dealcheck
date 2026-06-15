@@ -264,21 +264,21 @@ export function DealListClient({ deals: initialDeals, onDealDeleted, linkBase = 
 
                 {/* Vendor + meta */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[15px] font-semibold truncate ${isWon ? 'text-emerald-900' : isClosed ? 'text-slate-500' : 'text-slate-900'}`}>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className={`min-w-0 text-[15px] font-semibold truncate ${isWon ? 'text-emerald-900' : isClosed ? 'text-slate-500' : 'text-slate-900'}`}>
                       {vendorName}
                     </span>
-                    <span className={`hidden sm:inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${status.badge}`}>
+                    <span className={`hidden sm:inline-flex flex-shrink-0 items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${status.badge}`}>
                       {status.icon}
                       {status.label}
                     </span>
                     {redFlagCount > 0 && !isClosed && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#FAECE7] text-[#993C1D]">
+                      <span className="inline-flex flex-shrink-0 items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#FAECE7] text-[#993C1D]">
                         <AlertTriangle className="w-3 h-3" />
                         {redFlagCount} {redFlagCount === 1 ? 'flag' : 'flags'}
                       </span>
                     )}
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                    <div className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                       <DealMenu
                         dealId={deal.id} isClosed={isClosed} totalCommitment={totalCommitment}
                         roundCount={roundCount} hasSavings={achievedSavings > 0}

@@ -245,7 +245,7 @@ export default function AppHomePage() {
     <div className="-mx-5 sm:-mx-8 -mt-8 bg-slate-50">
       {/* ── HEADER + STATS ─────────────────────────────────────── */}
       <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-7">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between md:gap-0 mb-6">
           <h1 className="text-[26px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{locale === 'fr' ? 'Vos contrats' : 'Your deals'}</h1>
           <PrimaryButton href="/app/new" size="md">
             <Plus className="w-4 h-4" />
@@ -304,8 +304,8 @@ export default function AppHomePage() {
       </div>
 
       {/* ── SEARCH + FILTERS ───────────────────────────────────── */}
-      <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-3 flex items-center gap-3">
-        <div className="relative w-[220px] flex-shrink-0">
+      <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-3 flex flex-col md:flex-row md:items-center gap-3">
+        <div className="relative w-full md:w-[220px] md:flex-shrink-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
@@ -315,7 +315,7 @@ export default function AppHomePage() {
             className="w-full pl-9 pr-3 py-2 text-[13px] bg-slate-50 border border-slate-200 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
           />
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
           {filterPills.map((pill) => (
             <button
               key={pill.key}
@@ -330,7 +330,7 @@ export default function AppHomePage() {
             </button>
           ))}
         </div>
-        <div className="flex-1" />
+        <div className="hidden md:block flex-1" />
         <Link href="/app/dashboard" className="text-[13px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1">
           {t('app.fullDashboard')} <span>&rarr;</span>
         </Link>

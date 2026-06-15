@@ -1,8 +1,10 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
-import { getAllPosts } from '@/lib/blog'
-import { ArrowRight, Clock } from 'lucide-react'
+import { BlogIndexClient } from '@/components/BlogIndexClient'
+import { getAllPosts, getCategories } from '@/lib/blog'
+import { ArrowRight } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { cookies } from 'next/headers'
 
@@ -10,9 +12,29 @@ const sora = "'Sora', sans-serif"
 const mono = "'JetBrains Mono', monospace"
 const green = '#1DB954'
 
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = (await cookies()).get('termlift_lang')?.value || 'en'
+  const fr = locale === 'fr'
+  const title = fr ? 'Blog — Conseils de négociation fournisseurs' : 'Blog — Vendor negotiation advice'
+  const description = fr
+    ? 'Conseils de négociation concrets pour les équipes sans service achats : renouvellements SaaS, devis fournisseurs, leasing et contrats.'
+    : 'Practical negotiation advice for teams without a procurement department: SaaS renewals, vendor quotes, equipment leases, and contracts.'
+  const ogTitle = fr ? 'Blog TermLift — Conseils de négociation' : 'TermLift Blog — Vendor negotiation advice'
+  const ogDesc = fr ? 'Conseils de négociation concrets pour les équipes sans service achats.' : 'Practical negotiation advice for teams without a procurement department.'
+  return {
+    title,
+    description,
+    alternates: { canonical: 'https://www.termlift.com/blog' },
+    openGraph: { title: ogTitle, description: ogDesc, type: 'website', url: 'https://www.termlift.com/blog' },
+    twitter: { card: 'summary_large_image', title: ogTitle, description: ogDesc },
+  }
+}
+
 export default async function BlogPage() {
   const locale = (await cookies()).get('termlift_lang')?.value || 'en'
-  const posts = getAllPosts(locale)
+  // Strip the heavy `content` field before sending to the client component.
+  const posts = getAllPosts(locale).map(({ content: _content, ...rest }) => rest)
+  const categories = getCategories(locale)
   const t = await getTranslations({ locale })
 
   return (
@@ -20,9 +42,9 @@ export default async function BlogPage() {
       <MarketingHeader />
 
       <main>
-        {/* ─── HERO ─────────────────────────────────────── */}
-        <section className="relative px-6 pt-20 sm:pt-28 pb-14 overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 700px 340px at 50% 0%, rgba(29,185,84,0.12) 0%, transparent 70%)' }} />
+        {/* ─── HERO — full-bleed tinted band ─────────────── */}
+        <section className="relative w-full px-6 pt-20 sm:pt-28 pb-12 sm:pb-16 overflow-hidden bg-[#FAFAF7] border-b border-slate-100">
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 760px 360px at 50% 0%, rgba(29,185,84,0.12) 0%, transparent 70%)' }} />
           <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
           <div className="relative max-w-3xl mx-auto text-center">
             <p className="text-[12px] mb-4 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>{t('blog.subtitle')}</p>
@@ -35,54 +57,22 @@ export default async function BlogPage() {
           </div>
         </section>
 
-        {/* ─── POST LIST ────────────────────────────────── */}
-        <section className="px-6 pb-16">
-          <div className="max-w-3xl mx-auto space-y-4">
-            {posts.map((post, i) => {
-              const featured = i === 0
-              return (
-                <Link key={post.slug} href={`/blog/${post.slug}`} className="block group no-underline">
-                  <article
-                    className={`rounded-2xl p-6 sm:p-7 transition-all hover:-translate-y-1 ${
-                      featured
-                        ? 'border-2 border-emerald-200 hover:border-emerald-300 hover:shadow-xl'
-                        : 'bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-lg'
-                    }`}
-                    style={featured ? { background: 'linear-gradient(135deg, rgba(29,185,84,0.06) 0%, rgba(255,255,255,1) 100%)' } : undefined}
-                  >
-                    <div className="flex items-center gap-3 mb-3 flex-wrap">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md" style={{ fontFamily: mono }}>{post.category}</span>
-                      <span className="flex items-center gap-1 text-[12px] text-slate-400">
-                        <Clock className="w-3 h-3" />{post.readTime}
-                      </span>
-                      <span className="text-[12px] text-slate-400">
-                        {new Date(post.date).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                      </span>
-                    </div>
-                    <h2
-                      className="font-bold text-slate-900 mb-2 group-hover:text-emerald-700 transition-colors"
-                      style={{ fontFamily: sora, fontSize: featured ? 24 : 19, lineHeight: 1.2, letterSpacing: '-0.02em' }}
-                    >
-                      {post.title}
-                    </h2>
-                    <p className="text-[14px] text-slate-500 leading-relaxed mb-4">{post.description}</p>
-                    <span className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-emerald-600 group-hover:text-emerald-700">
-                      {locale === 'fr' ? 'Lire l\'article' : 'Read article'}
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  </article>
-                </Link>
-              )
-            })}
+        {/* ─── POSTS — wide container ─────────────────────── */}
+        <section className="w-full px-6 py-12 sm:py-16">
+          <div className="max-w-5xl mx-auto">
+            <BlogIndexClient posts={posts} categories={categories} locale={locale} />
           </div>
         </section>
 
-        {/* ─── CTA — quiet white band ───────────────────── */}
-        <section className="px-6 py-20 border-t border-slate-200 text-center">
+        {/* ─── CTA — full-bleed light green band ──────────── */}
+        <section
+          className="w-full px-6 py-16 sm:py-20 text-center border-t border-emerald-100"
+          style={{ background: 'linear-gradient(180deg, rgba(29,185,84,0.06) 0%, rgba(29,185,84,0.02) 100%)' }}
+        >
           <div className="max-w-2xl mx-auto">
-            <h3 className="text-slate-900 mb-4" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(26px, 3.6vw, 38px)', lineHeight: 1.1, letterSpacing: '-0.025em' }}>
+            <h2 className="text-slate-900 mb-4" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(26px, 3.6vw, 38px)', lineHeight: 1.1, letterSpacing: '-0.025em' }}>
               {t('examplePage.readyToAnalyze')}
-            </h3>
+            </h2>
             <p className="text-[15.5px] text-slate-500 mb-7 leading-relaxed max-w-md mx-auto">
               {locale === 'fr' ? 'Collez un devis fournisseur et obtenez alertes, économies et un email de négociation en quelques minutes.' : 'Paste a vendor quote and get back red flags, savings, and a negotiation email in minutes.'}
             </p>

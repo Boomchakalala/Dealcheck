@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { parseMoney, formatCurrency, convertCurrency, type Currency } from '@/lib/currency'
+import { parseMoney, formatCurrency, convertCurrency, fetchRates, type Currency } from '@/lib/currency'
 import { cookies } from 'next/headers'
 import { normalizeAmount } from '@/lib/currency'
 import DashboardDatePicker from '@/components/DashboardDatePicker'
@@ -45,6 +45,29 @@ function fmtCompact(n: number, sym: string): string {
   return `${sym}${Math.round(n)}`
 }
 
+// Single source of truth for score → colour. Thresholds match the Score Distribution
+// buckets exactly (red 0-39, amber 40-59, green 60+), so a 59 is the same colour everywhere.
+function scoreBand(score: number): { bar: string; text: string } {
+  if (score < 40) return { bar: 'bg-red-500', text: 'text-red-600' }
+  if (score < 60) return { bar: 'bg-amber-500', text: 'text-amber-600' }
+  return { bar: 'bg-emerald-500', text: 'text-emerald-600' }
+}
+
+// Turn a raw max into an honest axis: a clean ceiling and even step (1/2/2.5/5 × 10ⁿ),
+// so gridlines land on round numbers instead of max×0.33 / max×0.66.
+function niceAxis(maxV: number, targetSteps = 4): { max: number; step: number; ticks: number[] } {
+  if (maxV <= 0) return { max: 4, step: 1, ticks: [0, 1, 2, 3, 4] }
+  const rough = maxV / targetSteps
+  const pow = Math.pow(10, Math.floor(Math.log10(rough)))
+  const n = rough / pow
+  const niceN = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10
+  const step = niceN * pow
+  const max = Math.ceil(maxV / step) * step
+  const ticks: number[] = []
+  for (let t = 0; t <= max + 1e-6; t += step) ticks.push(t)
+  return { max, step, ticks }
+}
+
 function timeAgo(date: string): string {
   const d = Math.floor((Date.now() - new Date(date).getTime()) / 86400000)
   if (d === 0) return 'Today'
@@ -74,6 +97,9 @@ export default async function DashboardPage() {
   const sym = baseCurrency === 'EUR' ? '€' : baseCurrency === 'GBP' ? '£' : baseCurrency === 'CAD' ? 'C$' : baseCurrency === 'AUD' ? 'A$' : '$'
 
   // ── enrich deals ───────────────────────────
+  // Warm the exchange-rate cache ONCE so every conversion below uses one snapshot
+  // (otherwise the concurrent Promise.all could each fire a cold fetch and drift).
+  await fetchRates()
   const enrichedDeals = await Promise.all(
     allDeals.map(async (deal) => {
       const latestRound = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number)[0]
@@ -92,6 +118,11 @@ export default async function DashboardPage() {
       else if (ps?.total !== undefined) potentialSavings = typeof ps.total === 'number' ? ps.total : parseSavingsAmount(String(ps.total))
       else if (ps?.optimistic_ceiling !== undefined) potentialSavings = typeof ps.optimistic_ceiling === 'number' ? ps.optimistic_ceiling : parseSavingsAmount(String(ps.optimistic_ceiling))
       else if (Array.isArray(ps)) { const items = ps.some((i: any) => i.confidence) ? ps.filter((i: any) => i.confidence !== 'low') : ps; potentialSavings = items.reduce((s: number, i: any) => s + parseSavingsAmount(i.annual_impact), 0) }
+      // Potential savings are in the deal's own currency — convert to base like the other figures.
+      if (potentialSavings > 0) {
+        const { currency: poc } = parseMoney(totalStr); const pfc = dealCurrency || poc
+        if (pfc !== baseCurrency) potentialSavings = await convertCurrency(potentialSavings, pfc, baseCurrency)
+      }
       return { ...deal, _amount: convertedAmount, _achievedSavings: convertedSavings, _potentialSavings: potentialSavings, _category: normalizeCategory(output?.category || 'Uncategorized'), _vendor: deal.vendor || output?.vendor || 'Unknown', _redFlagCount: output?.red_flags?.length || 0, _totalCommitment: totalStr || '', _quoteScore: output?.score as number | undefined }
     })
   )
@@ -191,33 +222,32 @@ export default async function DashboardPage() {
   // Projected savings
   const projectedSavings = savingsAchieved + (savingsIdentified * savingsConversionRate / 100)
 
-  // Monthly savings (group closed deals by month)
-  const monthlySavingsMap = new Map<string, number>()
-  closedDeals.forEach(d => {
-    const date = new Date(d.closed_at || d.updated_at)
-    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-    monthlySavingsMap.set(key, (monthlySavingsMap.get(key) || 0) + d._achievedSavings)
+  // Savings over time — each closed deal that captured savings is a DISCRETE event,
+  // in chronological close order, with a running cumulative total.
+  const savingsClosed = [...closedDeals]
+    .filter(d => d._achievedSavings > 0)
+    .sort((a, b) => new Date(a.closed_at || a.updated_at).getTime() - new Date(b.closed_at || b.updated_at).getTime())
+  let savCum = 0
+  const savingsSteps = savingsClosed.map(d => {
+    savCum += d._achievedSavings
+    return { id: d.id as string, date: (d.closed_at || d.updated_at) as string, vendor: d._vendor as string, amount: d._achievedSavings as number, cumulative: savCum }
   })
-  const monthlySavings = Array.from(monthlySavingsMap.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([month, amount]) => ({ month, amount }))
+  const savingsTotal = savCum
 
-  // Cumulative savings for area chart
-  let cumulative = 0
-  const cumulativeSavings = monthlySavings.map(m => {
-    cumulative += m.amount
-    return { month: m.month, amount: m.amount, cumulative }
-  })
-  const maxCumulative = cumulative || 1
-
-  // Monthly spend by month (group all deals by created month)
-  const monthlySpendMap = new Map<string, number>()
+  // Monthly spend by month (group all deals by created month), CHRONOLOGICAL: oldest left → newest right.
+  // Key by YYYY-MM so it sorts correctly; the label travels with the data.
+  const monthlySpendMap = new Map<string, { label: string; amount: number }>()
   enrichedDeals.forEach(d => {
     const date = new Date(d.created_at)
-    const key = date.toLocaleDateString('en-US', { month: 'short' })
-    monthlySpendMap.set(key, (monthlySpendMap.get(key) || 0) + d._amount)
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+    const label = date.toLocaleDateString('en-US', { month: 'short' })
+    const e = monthlySpendMap.get(key) || { label, amount: 0 }
+    e.amount += d._amount
+    monthlySpendMap.set(key, e)
   })
-  const monthlySpendData = Array.from(monthlySpendMap.entries()).map(([month, amount]) => ({ month, amount }))
+  const monthlySpendData = Array.from(monthlySpendMap.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, v]) => ({ month: v.label, amount: v.amount }))
   const maxMonthlySpend = Math.max(...monthlySpendData.map(m => m.amount), 1)
 
   // Upcoming renewals from closed deals
@@ -277,8 +307,8 @@ export default async function DashboardPage() {
     <div className="-mx-5 sm:-mx-8 -mt-8 -mb-8 md:-mb-8 flex flex-col min-h-screen bg-slate-50">
 
       {/* ═══ HEADER ═══ */}
-      <div className="bg-white border-b border-slate-200 px-8 py-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-6">
+        <div className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between md:gap-0 mb-6">
           <div>
             <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif', letterSpacing: '-0.02em' }}>Dashboard</h1>
             <p className="text-[13px] text-slate-500 mt-0.5">{enrichedDeals.length} deals tracked &middot; {fmtCompact(totalSpend, sym)} spend analyzed</p>
@@ -295,47 +325,47 @@ export default async function DashboardPage() {
         {/* KPI row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Saved */}
-          <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4 shadow-[0_8px_24px_-6px_rgba(29,185,84,0.35)]">
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 shadow-[0_8px_24px_-6px_rgba(29,185,84,0.35)]">
             <div className="flex items-center gap-2 mb-1.5">
               <div className="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
               </div>
-              <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider">Saved</p>
+              <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-wider">Saved</p>
             </div>
-            <p className="text-[20px] sm:text-[26px] font-bold text-emerald-800 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>{savingsAchieved > 0 ? fmt(savingsAchieved) : '\u2014'}</p>
+            <p className="text-[20px] sm:text-[30px] font-bold text-emerald-800 tracking-tight leading-none tabular-nums" style={{ fontFamily: 'Sora, sans-serif' }}>{savingsAchieved > 0 ? fmt(savingsAchieved) : '\u2014'}</p>
             <p className="text-[12px] text-emerald-500 mt-1">{wonDeals.length} won deals</p>
           </div>
           {/* Pipeline */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
             <div className="flex items-center gap-2 mb-1.5">
               <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
                 <svg className="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
               </div>
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Pipeline</p>
+              <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Pipeline</p>
             </div>
-            <p className="text-[20px] sm:text-[26px] font-bold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>{fmt(savingsIdentified)}</p>
+            <p className="text-[20px] sm:text-[30px] font-bold text-slate-900 tracking-tight leading-none tabular-nums" style={{ fontFamily: 'Sora, sans-serif' }}>{fmt(savingsIdentified)}</p>
             <p className="text-[12px] text-slate-400 mt-1">{activeDealsList.length} active deals</p>
           </div>
           {/* Spend tracked */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
             <div className="flex items-center gap-2 mb-1.5">
               <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
                 <svg className="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Spend tracked</p>
+              <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Spend tracked</p>
             </div>
-            <p className="text-[20px] sm:text-[26px] font-bold text-slate-900 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtCompact(totalSpend, sym)}</p>
+            <p className="text-[20px] sm:text-[30px] font-bold text-slate-900 tracking-tight leading-none tabular-nums" style={{ fontFamily: 'Sora, sans-serif' }}>{fmt(totalSpend)}</p>
             <p className="text-[12px] text-slate-400 mt-1">{enrichedDeals.length} deals</p>
           </div>
           {/* Win rate */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
+          <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
             <div className="flex items-center gap-2 mb-1.5">
               <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center">
                 <svg className="w-4 h-4 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               </div>
-              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Win rate</p>
+              <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Win rate</p>
             </div>
-            <p className="text-[20px] sm:text-[26px] font-bold text-emerald-700 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>{winRate}%</p>
+            <p className="text-[20px] sm:text-[30px] font-bold text-emerald-700 tracking-tight leading-none tabular-nums" style={{ fontFamily: 'Sora, sans-serif' }}>{winRate}%</p>
             <p className="text-[12px] text-slate-400 mt-1">{wonDeals.length} of {closedDeals.length} closed</p>
           </div>
         </div>
@@ -369,12 +399,12 @@ export default async function DashboardPage() {
                         <span className="text-[11px] text-slate-400">{c.count} deals</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        {catSavings > 0 && <span className="text-[11px] text-emerald-600 font-medium">{fmtCompact(catSavings, sym)} saved</span>}
-                        <span className="text-[13px] font-bold text-slate-900">{fmtCompact(c.spend, sym)}</span>
+                        {catSavings > 0 && <span className="text-[11px] text-emerald-600 font-medium tabular-nums">{fmtCompact(catSavings, sym)} saved</span>}
+                        <span className="text-[13px] font-bold text-slate-900 tabular-nums text-right min-w-[56px]" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtCompact(c.spend, sym)}</span>
                       </div>
                     </div>
                     <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pct}%`, opacity: pct > 20 ? 1 : 0.6 }} />
+                      <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${pct}%` }} />
                     </div>
                   </div>
                 )
@@ -396,8 +426,8 @@ export default async function DashboardPage() {
                 <div className="flex items-end gap-3 h-[120px] mb-3">
                   {monthlySpendData.map(m => (
                     <div key={m.month} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-                      <span className="text-[11px] font-bold text-slate-600">{fmtCompact(m.amount, sym)}</span>
-                      <div className="w-full rounded-t-lg bg-emerald-500 transition-all" style={{ height: `${Math.max(8, (m.amount / maxMonthlySpend) * 80)}%` }} />
+                      <span className="text-[11px] font-bold text-slate-600 tabular-nums" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtCompact(m.amount, sym)}</span>
+                      <div className="w-full rounded-t-lg bg-emerald-500 transition-all" style={{ height: `${Math.max(14, (m.amount / maxMonthlySpend) * 80)}%` }} />
                     </div>
                   ))}
                 </div>
@@ -417,7 +447,8 @@ export default async function DashboardPage() {
 
         {/* ROW 2: Upcoming Renewals (3) + Performance (2) */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-          {/* Upcoming renewals */}
+          {/* Upcoming renewals — only render when at least one won deal has a renewal date */}
+          {renewalDeals.length > 0 && (
           <div className="col-span-3 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
             <div className="flex items-center gap-2.5 mb-5">
               <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center">
@@ -428,8 +459,7 @@ export default async function DashboardPage() {
                 <p className="text-[12px] text-slate-400">Signed contracts coming up for renewal</p>
               </div>
             </div>
-            {renewalDeals.length > 0 ? (
-              <div className="space-y-2.5">
+            <div className="space-y-2.5">
                 {renewalDeals.map(r => {
                   const isNear = r.daysOut < 180
                   return (
@@ -455,21 +485,11 @@ export default async function DashboardPage() {
                   )
                 })}
               </div>
-            ) : (
-              <div className="flex items-center justify-center py-10">
-                <div className="text-center">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-2">
-                    <svg className="w-5 h-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                  </div>
-                  <p className="text-[13px] text-slate-400">No upcoming renewals</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Close deals to track renewal dates</p>
-                </div>
-              </div>
-            )}
           </div>
+          )}
 
-          {/* Performance with win rate ring */}
-          <div className="col-span-2 bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          {/* Performance with win rate ring — fills the row when renewals is absent */}
+          <div className={`${renewalDeals.length > 0 ? 'col-span-2' : 'col-span-5'} bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm`}>
             <div className="flex items-center gap-2.5 mb-5">
               <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <svg className="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -526,67 +546,78 @@ export default async function DashboardPage() {
                 <p className="text-[12px] text-slate-400">Cumulative savings from closed deals</p>
               </div>
             </div>
-            {cumulativeSavings.length > 0 ? (
-              <>
-                <div className="relative h-[140px] mb-3">
-                  {/* Y-axis labels */}
-                  <div className="absolute left-0 top-0 bottom-0 w-10 flex flex-col justify-between text-[10px] text-slate-400 font-medium">
-                    <span>{fmtCompact(maxCumulative, sym)}</span>
-                    <span>{fmtCompact(maxCumulative * 0.66, sym)}</span>
-                    <span>{fmtCompact(maxCumulative * 0.33, sym)}</span>
-                    <span>{sym}0</span>
-                  </div>
-                  {/* Grid lines */}
-                  <div className="ml-12 h-full flex flex-col justify-between">
-                    {[0,1,2,3].map(i => <div key={i} className="border-b border-slate-100" />)}
-                  </div>
-                  {/* SVG area chart */}
-                  <div className="absolute left-12 right-0 top-0 bottom-0">
-                    <svg width="100%" height="100%" viewBox={`0 0 ${Math.max(cumulativeSavings.length - 1, 1) * 100 + 1} 140`} preserveAspectRatio="none">
-                      <defs>
-                        <linearGradient id="savingsGradDash" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" className="text-emerald-600" stopColor="currentColor" stopOpacity="0.15" />
-                          <stop offset="100%" className="text-emerald-600" stopColor="currentColor" stopOpacity="0.02" />
-                        </linearGradient>
-                      </defs>
-                      {/* Filled area */}
-                      <path d={`M0,140 ${cumulativeSavings.map((p, i) => `L${i * 100},${140 - (p.cumulative / maxCumulative) * 135}`).join(' ')} L${(cumulativeSavings.length - 1) * 100},140 Z`} fill="url(#savingsGradDash)" />
-                      {/* Line */}
-                      <path d={cumulativeSavings.map((p, i) => `${i === 0 ? 'M' : 'L'}${i * 100},${140 - (p.cumulative / maxCumulative) * 135}`).join(' ')} fill="none" className="stroke-emerald-600" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                      {/* Dots */}
-                      {cumulativeSavings.map((p, i) => (
-                        <circle key={i} cx={i * 100} cy={140 - (p.cumulative / maxCumulative) * 135} r={i === cumulativeSavings.length - 1 ? 5 : 4} className="fill-emerald-600" stroke={i === cumulativeSavings.length - 1 ? 'white' : 'none'} strokeWidth={i === cumulativeSavings.length - 1 ? 2 : 0} />
-                      ))}
-                    </svg>
-                  </div>
+            {savingsSteps.length === 0 ? (
+              /* Nothing closed yet — quiet, no empty chart frame. */
+              <p className="text-[13px] text-slate-400 py-6">Close deals to see savings over time.</p>
+            ) : savingsSteps.length < 4 ? (
+              /* Low data — a smooth trend line off 2 points would lie. Show the total
+                 and each closed deal as a discrete, dated event instead. */
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[30px] sm:text-[34px] font-bold text-emerald-800 tracking-tight tabular-nums" style={{ fontFamily: 'Sora, sans-serif' }}>{fmt(savingsTotal)}</span>
+                  <span className="text-[12px] text-slate-400">total saved</span>
                 </div>
-                {/* X-axis */}
-                <div className="ml-12 flex justify-between text-[11px] text-slate-400 font-medium">
-                  {cumulativeSavings.map(m => {
-                    const [y, mo] = m.month.split('-')
-                    const monthName = new Date(Number(y), Number(mo) - 1).toLocaleDateString('en-US', { month: 'short' })
-                    return <span key={m.month}>{monthName}</span>
-                  })}
-                </div>
-                {/* Milestones */}
-                {closedDeals.length > 0 && (
-                  <div className="ml-12 flex gap-3 mt-4 pt-4 border-t border-slate-100 flex-wrap">
-                    {closedDeals.filter(d => d._achievedSavings > 0).slice(0, 3).map(d => (
-                      <div key={d.id} className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <svg className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                        <div>
-                          <p className="text-[11px] font-semibold text-emerald-700">{d._vendor} closed</p>
-                          <p className="text-[11px] text-emerald-500">{fmtCompact(d._achievedSavings, sym)}</p>
-                        </div>
+                <div className="mt-4 space-y-2.5">
+                  {savingsSteps.map((s, i) => (
+                    <div key={s.id} className="flex items-center gap-3">
+                      <div className="flex flex-col items-center flex-shrink-0">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                        {i < savingsSteps.length - 1 && <div className="w-px h-5 bg-emerald-200 mt-0.5" />}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-[140px]">
-                <p className="text-[13px] text-slate-400">Close deals to see savings over time</p>
+                      <span className="text-[12px] text-slate-400 w-[82px] flex-shrink-0 tabular-nums">{new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      <span className="text-[13px] font-medium text-slate-800 flex-1 min-w-0 truncate">{s.vendor}</span>
+                      <span className="text-[13px] font-bold text-emerald-700 tabular-nums flex-shrink-0" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtCompact(s.amount, sym)}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[11px] text-slate-400 mt-4">Chart appears as you close more deals.</p>
               </div>
+            ) : (
+              /* Enough closed deals for a real trend — a STEP chart (flat, then a jump at
+                 each close date) on a clean fixed axis. No interpolation between events. */
+              (() => {
+                const axis = niceAxis(savingsTotal)
+                const n = savingsSteps.length
+                const W = (n - 1) * 100
+                const y = (v: number) => 100 - (v / axis.max) * 100
+                let line = `M0,${y(savingsSteps[0].cumulative)}`
+                for (let i = 1; i < n; i++) {
+                  const x = i * 100
+                  line += ` L${x},${y(savingsSteps[i - 1].cumulative)} L${x},${y(savingsSteps[i].cumulative)}`
+                }
+                const area = `${line} L${W},100 L0,100 Z`
+                const ticksTop = [...axis.ticks].reverse()
+                return (
+                  <>
+                    <div className="relative h-[150px] mb-3">
+                      {/* Y-axis — clean, even gridlines */}
+                      <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-[10px] text-slate-400 font-medium tabular-nums text-right pr-2">
+                        {ticksTop.map((t, i) => <span key={i}>{t === 0 ? `${sym}0` : fmtCompact(t, sym)}</span>)}
+                      </div>
+                      <div className="ml-12 h-full flex flex-col justify-between">
+                        {ticksTop.map((_, i) => <div key={i} className="border-b border-slate-100" />)}
+                      </div>
+                      {/* Stepped cumulative line */}
+                      <div className="absolute left-12 right-0 top-0 bottom-0">
+                        <svg width="100%" height="100%" viewBox={`0 0 ${W} 100`} preserveAspectRatio="none">
+                          <defs>
+                            <linearGradient id="savStepGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" className="text-emerald-600" stopColor="currentColor" stopOpacity="0.12" />
+                              <stop offset="100%" className="text-emerald-600" stopColor="currentColor" stopOpacity="0.02" />
+                            </linearGradient>
+                          </defs>
+                          <path d={area} fill="url(#savStepGrad)" />
+                          <path d={line} fill="none" className="stroke-emerald-600" strokeWidth="2" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+                        </svg>
+                      </div>
+                    </div>
+                    {/* X-axis — actual close dates, chronological */}
+                    <div className="ml-12 flex justify-between text-[11px] text-slate-400 font-medium tabular-nums">
+                      {savingsSteps.map(s => <span key={s.id}>{new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>)}
+                    </div>
+                  </>
+                )
+              })()
             )}
           </div>
 
@@ -649,10 +680,11 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* ROW 4: Category Avg Score + Budget Projection + Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* ROW 4: Category Avg Score + Budget Projection + Activity — grouped as panels on a warm band (de-nested) */}
+        <div className="rounded-2xl bg-[#F4F2EC] p-3 sm:p-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
           {/* Category avg score */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 sm:p-6">
             <div className="flex items-center gap-2.5 mb-5">
               <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center">
                 <svg className="w-5 h-5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
@@ -666,8 +698,7 @@ export default async function DashboardPage() {
               <>
                 <div className="space-y-4">
                   {categoryScores.map(c => {
-                    const color = c.score < 45 ? 'bg-red-500' : c.score < 60 ? 'bg-amber-500' : 'bg-emerald-500'
-                    const textColor = c.score < 45 ? 'text-red-600' : c.score < 60 ? 'text-amber-600' : 'text-emerald-600'
+                    const band = scoreBand(c.score)
                     return (
                       <div key={c.name}>
                         <div className="flex items-center justify-between mb-1">
@@ -675,10 +706,10 @@ export default async function DashboardPage() {
                             <span className="text-[13px] font-medium text-slate-700">{c.name}</span>
                             <span className="text-[11px] text-slate-400">{c.deals}d</span>
                           </div>
-                          <span className={`text-[13px] font-bold ${textColor}`}>{c.score}</span>
+                          <span className={`text-[13px] font-bold tabular-nums ${band.text}`} style={{ fontFamily: 'Sora, sans-serif' }}>{c.score}</span>
                         </div>
                         <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${c.score}%` }} />
+                          <div className={`h-full rounded-full ${band.bar} transition-all`} style={{ width: `${c.score}%` }} />
                         </div>
                       </div>
                     )
@@ -694,7 +725,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Budget projection */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 sm:p-6">
             <div className="flex items-center gap-2.5 mb-5">
               <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <svg className="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -708,7 +739,7 @@ export default async function DashboardPage() {
             <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-5 text-center mb-4">
               <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider mb-1">Projected total savings</p>
               <p className="text-[28px] sm:text-[36px] font-bold text-emerald-800 tracking-tight leading-none" style={{ fontFamily: 'Sora, sans-serif' }}>{projectedSavings > 0 ? fmt(Math.round(projectedSavings)) : '\u2014'}</p>
-              <p className="text-[12px] text-emerald-500 mt-1.5">based on {savingsConversionRate}% capture rate</p>
+              <p className="text-[12px] text-emerald-500 mt-1.5">based on {savingsConversionRate}% capture rate{closedDeals.length < 5 ? ` · only ${closedDeals.length} closed deal${closedDeals.length === 1 ? '' : 's'}` : ''}</p>
             </div>
             {/* Breakdown */}
             <div className="space-y-3">
@@ -732,7 +763,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Activity feed */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 sm:p-6">
             <div className="flex items-center gap-2.5 mb-5">
               <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center">
                 <svg className="w-5 h-5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -771,6 +802,7 @@ export default async function DashboardPage() {
               {activityFeed.length === 0 && <p className="text-[13px] text-slate-400 py-4">No activity yet</p>}
             </div>
           </div>
+          </div>
         </div>
 
         {/* ROW 5: Closed deals table (full width) */}
@@ -787,7 +819,8 @@ export default async function DashboardPage() {
             </div>
           </div>
           {closedDealsData.length > 0 ? (
-            <table className="w-full">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="text-[11px] uppercase text-slate-400 font-semibold border-b-2 border-slate-200">
                   <th className="text-left pb-3">Vendor</th>
@@ -814,9 +847,9 @@ export default async function DashboardPage() {
                     <td className="py-3.5">
                       <span className="text-[12px] text-slate-500">{d.category}</span>
                     </td>
-                    <td className="py-3.5 text-right text-[13px] text-slate-400 line-through">{fmtCompact(d.originalTotal, sym)}</td>
-                    <td className="py-3.5 text-right text-[13px] font-semibold text-slate-900">{fmtCompact(d.finalTotal, sym)}</td>
-                    <td className="py-3.5 text-right text-[13px] font-bold text-emerald-600">{d.savedAmount > 0 ? fmtCompact(d.savedAmount, sym) : '\u2014'}</td>
+                    <td className="py-3.5 text-right text-[13px] text-slate-400 line-through tabular-nums" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtCompact(d.originalTotal, sym)}</td>
+                    <td className="py-3.5 text-right text-[13px] font-semibold text-slate-900 tabular-nums" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtCompact(d.finalTotal, sym)}</td>
+                    <td className="py-3.5 text-right text-[13px] font-bold text-emerald-600 tabular-nums" style={{ fontFamily: 'Sora, sans-serif' }}>{d.savedAmount > 0 ? fmtCompact(d.savedAmount, sym) : '\u2014'}</td>
                     <td className="py-3.5 text-right">
                       {d.savedAmount > 0 ? (
                         <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">{d.savedPct}%</span>
@@ -834,6 +867,7 @@ export default async function DashboardPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           ) : (
             <div className="text-center py-8">
               <p className="text-[13px] text-slate-400">No closed deals yet</p>
@@ -849,12 +883,12 @@ export default async function DashboardPage() {
             </div>
             <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide" style={{ fontFamily: 'Sora, sans-serif' }}>Score distribution</p>
           </div>
-          <div className="flex items-end gap-6">
+          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
             {/* Chart */}
-            <div className="flex-1">
+            <div className="w-full md:flex-1">
               <div className="flex items-end gap-4 h-[80px] mb-3">
                 {scoreBuckets.map(b => {
-                  const barColor = b.label === '0-39' ? 'bg-red-500' : b.label === '40-59' ? 'bg-amber-500' : 'bg-emerald-500'
+                  const barColor = scoreBand(parseInt(b.label, 10)).bar
                   return (
                     <div key={b.label} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
                       <span className="text-[12px] font-bold text-slate-700">{b.deals.length}</span>
@@ -870,13 +904,13 @@ export default async function DashboardPage() {
               </div>
             </div>
             {/* Worst + Best deal cards */}
-            <div className="flex gap-3 flex-shrink-0">
-              <div className="bg-red-50 rounded-xl border border-red-200 p-3.5 w-[130px]">
+            <div className="flex gap-3 w-full md:w-auto md:flex-shrink-0">
+              <div className="bg-red-50 rounded-xl border border-red-200 p-3.5 flex-1 md:flex-none md:w-[130px]">
                 <p className="text-[11px] text-red-600 uppercase font-semibold">Worst deal</p>
                 <p className="text-[18px] font-bold text-red-700" style={{ fontFamily: 'Sora, sans-serif' }}>{lowestScore?._quoteScore || '\u2014'}</p>
                 {lowestScore && <p className="text-[11px] text-red-500 truncate">{lowestScore._vendor}</p>}
               </div>
-              <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-3.5 w-[130px]">
+              <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-3.5 flex-1 md:flex-none md:w-[130px]">
                 <p className="text-[11px] text-emerald-600 uppercase font-semibold">Best deal</p>
                 <p className="text-[18px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>{highestScore?._quoteScore || '\u2014'}</p>
                 {highestScore && <p className="text-[11px] text-emerald-500 truncate">{highestScore._vendor}</p>}

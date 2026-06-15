@@ -51,7 +51,7 @@ export function detectCurrency(text: string): Currency {
 /**
  * Fetch latest exchange rates from API
  */
-async function fetchRates(): Promise<ExchangeRates> {
+export async function fetchRates(): Promise<ExchangeRates> {
   const now = Date.now()
 
   // Return cached rates if still valid

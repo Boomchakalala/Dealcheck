@@ -16,7 +16,7 @@ export { CLAUDE_MODEL_ID, getLanguageInstruction, type ClaudeUserContent } from 
 export { classifyQuote } from './classify'
 export { extractFinancialFacts, type ExtractedFacts } from './extract'
 export { analyzeDealFacts, type AnalysisOutput } from './analyze'
-export { generateEmailDrafts, regenerateEmailDrafts, generateEmailV2 } from './emails'
+export { generateEmailDrafts, regenerateEmailDrafts, generateEmailV2, EMAIL_PROMPT } from './emails'
 export { calculateQuoteScore, parseMoneyAmount } from './score'
 export { validateTotalCommitment } from './validate-total'
 export { extractRigid, generateDocumentHash, rigidToLegacyFacts, type RigidExtraction } from './extract-rigid'
@@ -27,9 +27,9 @@ import { classifyQuote } from './classify'
 import { extractFinancialFacts } from './extract'
 import { analyzeDealFacts } from './analyze'
 import { generateEmailDrafts } from './emails'
-import { calculateQuoteScore } from './score'
 import { validateTotalCommitment } from './validate-total'
 import { DealOutputSchema, type DealOutputType } from '../schemas'
+import { computeScores, normalizeExtraction, scoreLabel } from '../scoring'
 import { parseMoney, normalizeAmount } from '../currency'
 import type { DealOutput } from '@/types'
 
@@ -83,7 +83,7 @@ export async function analyzeDeal(
       pdfData,
       userPreferences,
     })
-    console.log('[TermLift] Step 2 done:', analysis.verdict_type, '|', analysis.red_flags?.length, 'flags |', analysis.score, 'score')
+    console.log('[TermLift] Step 2 done:', analysis.verdict_type, '|', analysis.red_flags?.length, 'flags | extraction:', analysis.extraction ? 'yes' : 'missing')
 
     // ─── Step 2b: Sanity check savings ───
     const ps = analysis.potential_savings as any
@@ -107,9 +107,11 @@ export async function analyzeDeal(
         total_commitment: rawFacts.total_commitment,
         term: rawFacts.term,
         contact_name: rawFacts.contact_name,
+        currency: rawFacts.currency,
         verdict: analysis.verdict,
         red_flags: analysis.red_flags,
         what_to_ask_for: analysis.what_to_ask_for,
+        potential_savings: analysis.potential_savings,
         negotiation_plan: analysis.negotiation_plan,
         quick_read: analysis.quick_read,
       }, userLocale)
@@ -162,26 +164,45 @@ export async function analyzeDeal(
       what_to_ask_for: analysis.what_to_ask_for,
       potential_savings: analysis.potential_savings,
       cash_flow_improvements: analysis.cash_flow_improvements,
-      score: analysis.score,
-      score_label: analysis.score_label,
-      score_breakdown: analysis.score_breakdown,
+      watchItems: analysis.watchItems,
       score_rationale: analysis.score_rationale,
       assumptions: analysis.assumptions,
       disclaimer: analysis.disclaimer,
       email_drafts: emails,
     }
 
-    // ─── Step 5: Validate and score ───
+    // ─── Step 5: Validate, then compute deterministic scores ───
     const validated = DealOutputSchema.parse(assembled)
-    const scoreData = calculateQuoteScore(validated)
 
     // Sanitize total_commitment
     if (validated.snapshot?.total_commitment) {
       validated.snapshot.total_commitment = normalizeAmount(validated.snapshot.total_commitment)
     }
 
-    console.log('[TermLift] Pipeline complete — score:', scoreData.score)
-    return { ...validated, ...scoreData }
+    // Extract-then-compute: the LLM extracted the facts, the engine sets the numbers.
+    const contractTotal = parseMoney(rawFacts.total_commitment).amount
+    const extraction = normalizeExtraction(analysis.extraction, contractTotal)
+    const scores = computeScores(extraction)
+
+    console.log('[TermLift] Pipeline complete — score:', scores.overall, `(p${scores.pricing}/t${scores.terms}/l${scores.leverage})`)
+
+    // Persist the extraction + deductions alongside the computed scores so the deal
+    // carries everything the breakdown UI needs. (No legacy `calculateQuoteScore`.)
+    const result: any = {
+      ...validated,
+      score: scores.overall,
+      score_label: scoreLabel(scores.overall),
+      score_rationale: analysis.score_rationale || '',
+      score_breakdown: {
+        pricing: scores.pricing,
+        terms: scores.terms,
+        leverage: scores.leverage,
+        deductions: scores.deductions,
+      },
+      extraction: analysis.extraction,
+      deductions: scores.deductions,
+    }
+    return result as DealOutputType
 
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)

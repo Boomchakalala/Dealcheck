@@ -87,7 +87,7 @@ export default function HelpPage() {
 
       <main className="flex-1">
         {/* ─── HERO ─────────────────────────────────────── */}
-        <section className="relative px-6 pt-20 sm:pt-28 pb-14 overflow-hidden">
+        <section className="relative px-6 pt-20 sm:pt-28 pb-14 overflow-hidden bg-[#FAFAF7] border-b border-slate-100">
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 700px 340px at 50% 0%, rgba(29,185,84,0.12) 0%, transparent 70%)' }} />
           <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
           <div className="relative max-w-3xl mx-auto text-center">

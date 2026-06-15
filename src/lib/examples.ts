@@ -88,7 +88,7 @@ export const docusignExample: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 6000,
+    total: 7800,
     currency: "EUR",
     must_have: [
       {
@@ -96,14 +96,13 @@ export const docusignExample: DealOutput = {
         amount: 6000,
         rationale: "15 seats are unused — cutting waste is the strongest lever here",
       },
-    ],
-    nice_to_have: [
       {
-        ask: "Loyalty discount on adjusted contract (5-10%)",
-        amount: 1350,
-        rationale: "DocuSign AMs have authority for 10-15% on renewals — expect 5-10% realistically",
+        ask: "10% loyalty discount on the right-sized contract",
+        amount: 1800,
+        rationale: "DocuSign AMs have authority for 10-15% on renewals — 10% on the €18,000 adjusted contract",
       },
     ],
+    nice_to_have: [],
   },
   email_drafts: {
     neutral: {
@@ -169,7 +168,12 @@ Best regards,
       { points: 5, reason: "Annual/upfront payment with no visible discount" },
     ],
   },
-  score_rationale: "3 issues identified. Key concerns: 15 of 40 seats unused, auto-renewal with only 30-day notice period. Estimated savings potential: 25% of total.",
+  score_rationale: "2 issues identified. Key concerns: 15 of 40 seats unused, no loyalty discount after 2 years. Estimated savings potential: 33% of total.",
+  watchItems: [
+    { description: "At €50/user/month, pricing sits at the high end of the e-signature market.", category: "pricing" },
+    { description: "Auto-renewal with 30-day notice is standard for this category, but worth a calendar reminder.", category: "terms" },
+    { description: "No SSO/usage report was included to confirm the active-seat count independently.", category: "scope" },
+  ],
   assumptions: [
     "25 of 40 licensed seats are actively used based on last-login data",
     "PandaDoc Business at ~€35/user/month used as competitive benchmark",
@@ -265,7 +269,7 @@ export const salesforceExample: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 7200,
+    total: 9504,
     currency: "EUR",
     must_have: [
       {
@@ -273,14 +277,13 @@ export const salesforceExample: DealOutput = {
         amount: 7200,
         rationale: "12 seats are unused — right-sizing is the strongest lever",
       },
-    ],
-    nice_to_have: [
       {
-        ask: "Multi-year discount on 2-year commitment (5-8%)",
-        amount: 1800,
-        rationale: "Salesforce AMs routinely offer 8-12% — expect 5-8% realistically",
+        ask: "8% multi-year discount on a 2-year commitment",
+        amount: 2304,
+        rationale: "Salesforce AEs routinely offer 8-12% on multi-year renewals — 8% on the €28,800 adjusted contract",
       },
     ],
+    nice_to_have: [],
   },
   email_drafts: {
     neutral: {
@@ -348,7 +351,7 @@ Best regards,
       { points: 5, reason: "Annual/upfront payment with no visible discount" },
     ],
   },
-  score_rationale: "4 issues identified. Key concerns: 12 of 40 seats unused, price escalation with no cap. Estimated savings potential: 20% of total.",
+  score_rationale: "2 issues identified. Key concerns: 12 of 40 seats unused, no multi-year discount after 3 years. Estimated savings potential: 26% of total.",
   assumptions: [
     "28 of 40 licensed seats are actively used based on last-login audit",
     "Multi-year discount of 8% based on typical Salesforce renewal negotiations",
@@ -502,10 +505,10 @@ Best regards,
       { points: 4, reason: "Annual/upfront payment with no visible discount" },
     ],
   },
-  score_rationale: "2 issues identified. Estimated savings potential: 3% of total.",
+  score_rationale: "1 issue identified: 30-day auto-renew notice on a €22,800 commitment. Estimated savings potential: 3% of total.",
   assumptions: [
-    "42 of 60 licensed seats are actively used",
-    "Reseller prepay rate of €37/user based on comparable M365 Business Premium contracts",
+    "48 of 50 licensed seats are actively used based on login data — effectively no waste",
+    "Reseller prepay rate of €38/user, in line with comparable M365 Business Premium contracts",
   ],
   disclaimer: "This analysis is for informational purposes only and does not constitute legal, financial, or professional advice.",
 }
@@ -606,7 +609,7 @@ export const fedexExample: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 12000,
+    total: 12552,
     currency: "USD",
     must_have: [
       {
@@ -616,7 +619,7 @@ export const fedexExample: DealOutput = {
       },
       {
         ask: "Fuel surcharge capped at 12% (down from 20%)",
-        amount: 3600,
+        amount: 4152,
         rationale: "Market surcharges run 10-14% — 20% is well above standard",
       },
     ],
@@ -692,7 +695,7 @@ Best regards,
       { points: 6, reason: "Tight signing deadline" },
     ],
   },
-  score_rationale: "5 issues identified. Key concerns: price escalation with no cap, no exit clause on 12-month contract. Estimated savings potential: 23% of total.",
+  score_rationale: "3 issues identified. Key concerns: uncapped 20% fuel surcharge, above-market base rate, 7.9% GRI with no ceiling. Estimated savings potential: 24% of total.",
   assumptions: [
     "Average volume of 1,000 parcels/month used for savings calculations",
     "Market fuel surcharge benchmarks based on comparable negotiated accounts",
@@ -797,13 +800,13 @@ export const konicaExample: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 5500,
+    total: 7200,
     currency: "EUR",
     must_have: [
       {
-        ask: "Reduce monthly lease from €870 to €700-750",
-        amount: 4320,
-        rationale: "Ricoh, Canon, Xerox quoting €620-720 for equivalent devices — expect €700-750 realistically",
+        ask: "Reduce monthly lease from €870 to €700",
+        amount: 6120,
+        rationale: "Ricoh, Canon, Xerox quoting €620-720 for equivalent devices — €700 saves €170/month over 3 years",
       },
       {
         ask: "Remove or cap toner exclusivity clause",
@@ -885,7 +888,7 @@ Best regards,
       { points: 6, reason: "Tight signing deadline" },
     ],
   },
-  score_rationale: "5 issues identified. Key concerns: no exit clause on 36-month contract, exclusivity clause. Estimated savings potential: 16% of total.",
+  score_rationale: "3 issues identified. Key concerns: above-market lease rate, mandatory toner lock-in, no early-exit clause. Estimated savings potential: 20% of total.",
   assumptions: [
     "Comparable lease rates based on Ricoh, Canon, and Xerox quotes for equivalent A3/A4 colour MFPs",
     "Toner savings estimate based on 25-35% third-party pricing differential",
@@ -900,8 +903,8 @@ Best regards,
 //   Total estimate: ~€24,150 (using 35hr midpoint)
 //   Hourly rate €210 → €150, 35hrs: €60 x 35 = €2,100/year
 //   Annual increase 12% → 3% on retainer: (12% - 3%) x €16,800 = €1,512/year (year 2)
-//   Hours cap risk mitigation: ~€1,500/year (estimated)
-//   Total savings: €2,100 + €1,512 + €1,500 = €5,112/year
+//   Headline savings (must-have): €2,100 + €1,512 = €3,612/year (15%)
+//   Hours cap = risk mitigation, not a direct saving
 export const bdoExample: DealOutput = {
   leverage_assessment: {
     price_leverage: 'moderate',
@@ -990,18 +993,18 @@ export const bdoExample: DealOutput = {
     ],
   },
   potential_savings: {
-    total: 3200,
+    total: 3612,
     currency: "EUR",
     must_have: [
       {
-        ask: "Hourly rate from €210 to €150-175 (est. 35hrs/yr)",
-        amount: 1750,
-        rationale: "Market rate is €130-160/hour — expect €150-175 realistically",
+        ask: "Hourly rate from €210 to €150 (est. 35hrs/yr)",
+        amount: 2100,
+        rationale: "Market rate is €130-160/hour — €150 saves €60/hour across ~35 hours",
       },
       {
-        ask: "Annual increase cap from 12% to 3-5%",
-        amount: 1450,
-        rationale: "3-5% tied to CPI is industry standard — 12% is indefensible",
+        ask: "Annual increase cap from 12% to 3%",
+        amount: 1512,
+        rationale: "3% tied to CPI is industry standard — 12% is indefensible",
       },
     ],
     nice_to_have: [
@@ -1074,7 +1077,11 @@ Best regards,
     ],
     leverage_deductions: [],
   },
-  score_rationale: "3 issues identified. Key concerns: no SLA defined, vaguely defined scope. Estimated savings potential: 13% of total.",
+  score_rationale: "3 issues identified. Key concerns: €210/hour out-of-scope rate, no cap on out-of-scope hours, 12% annual increase. Estimated savings potential: 15% of total.",
+  watchItems: [
+    { description: "Retainer of €1,400/mo is mid-market for an SME advisory package, not out of line.", category: "pricing" },
+    { description: "60-day cancellation notice is standard for professional-services retainers.", category: "terms" },
+  ],
   assumptions: [
     "35 hours/year used as midpoint estimate for out-of-scope work",
     "Market hourly rates based on comparable mid-market firms (Grant Thornton, Mazars)",

@@ -32,8 +32,13 @@ Look at the quote and react like a procurement expert would. Find what matters:
 - If the quote includes complimentary items, tickets, passes, or extras: flag them and ask for more. These are low-cost for the vendor and high-value negotiation chips.
 - Your savings ask MUST reflect the actual margin you identify. If you say the vendor has 15-25% margin, ask for 15%, not 5%. Match the ask to the evidence.
 
-Flag everything you find. There are no caps on red flags, savings items, or asks.
-If a quote has 7 real issues, flag 7. If it has 1, flag 1. Do not pad. Do not cap.
+Be selective with red flags. An item is a RED FLAG only if it passes BOTH tests:
+1. ACTIONABLE — there is a concrete ask that changes the outcome (a number to push, a clause to add or remove).
+2. MATERIAL — it affects MORE THAN 1% of contract value, OR it creates legal/financial exposure (cancellation terms, auto-renewal, liability, fraud signals).
+
+Pure observations are NOT red flags: "priced at the high end of market", "X is not visible in the document", "typical for this category", "worth reviewing Y". Anything worth noting that fails this test goes into watchItems instead — that is your outlet, so you never need to inflate flags to feel thorough.
+
+It is correct and expected to return only 2-4 red flags on a typical quote. Do NOT pad. A clean quote may have just 1-2 flags plus a few watch items. (Savings items and asks are still uncapped — this limit is about red flags only.)
 
 ==================================================
 DOCUMENT ANALYSIS
@@ -71,42 +76,49 @@ If a red flag has a dollar impact, it MUST also appear as a savings item.
 Each challengeable element is a SEPARATE item. Do not merge them.
 
 ==================================================
-SCORING
+STRUCTURED EXTRACTION (for scoring)
 ==================================================
 
-Score the deal from 0 to 100. The score reflects how good this deal is FOR THE BUYER right now, before any negotiation.
+You do NOT score the deal. A separate deterministic engine computes pricing, terms, and leverage scores from the facts you extract. Your only job here is to extract those facts precisely into the "extraction" object. Be literal: report what the quote says, not how it feels. If a fact is genuinely not in the quote, use null or omit it — do NOT invent terms.
 
-Three components:
+extraction.fees: every fee, surcharge, service charge, gratuity, admin or processing charge, or markup line. For each:
+- name, type (admin|processing|gratuity|tax|other)
+- percentage: of subtotal when expressed as a %, else null
+- dollarAmount: when expressed as an amount, else null
+- isAvoidable: true if the buyer could realistically get it waived or removed (admin, processing, "service charge"); false for genuine government taxes
+- isDisclosedAsNonService: true if it is not payment for a real service the buyer receives
 
-PRICING FAIRNESS (0-50 points):
-How fair is the pricing? Start at 50 and deduct based on what you found.
-- Visible overpricing or inflated fees: deduct 10-20
-- Missing discounts at this volume/scale: deduct 5-10
-- Intermediary/reseller margin: deduct 5-10
-- No pricing issues found: keep at 45-50
+extraction.cancellationTerms:
+- refundSchedule: short text of the refund/cancellation tiers
+- buyerInsideWindow: true if the buyer is already inside a cancellation/penalty window
+- retentionPctInsideWindow: the % the vendor keeps if the buyer cancels inside the window (100 if fully non-refundable, else the tier %, else null)
+- forceMajeurePresent, rescheduleOption, rescheduleFeePct
 
-TERMS AND PROTECTIONS (0-30 points):
-How buyer-friendly are the terms? Start at 30 and deduct.
-- Aggressive auto-renewal or short notice: deduct 5-8
-- No exit clause on long term: deduct 8-10
-- Price escalation without cap: deduct 5-8
-- Vague scope or open-ended billing: deduct 5-8
-- Restrictive cancellation: deduct 5-8
-- Standard terms with nothing unusual: keep at 25-30
+extraction.paymentTerms: depositPct, balanceDueDaysBeforeDelivery (days before delivery the balance is due), achOffered, netTerms (net payment days, else null)
 
-LEVERAGE POSITION (0-20 points):
-How much power does the buyer have? Start at 20 and deduct.
-- Sole provider, no alternatives: deduct 8-10
-- Deadline pressure on buyer: deduct 3-5
-- Long lock-in commitment: deduct 5-7
-- Buyer paying upfront: deduct 2-3
-- Alternatives exist, buyer has time: keep at 15-20
+extraction.vendorRights:
+- unilateralSubstitution: vendor may swap product/service/personnel without consent
+- mandatoryMarketing: buyer must provide testimonials/logo/marketing
+- reciprocalValue: true if the buyer gets something of value in return for any mandatory obligation
 
-SCORE = pricing_fairness + terms_protections + leverage_position
+extraction.tbdLineItems: any line priced as TBD / "to be determined" / estimate / not finalized. For each: description, dollarAmount (best estimate of the exposure).
 
-IMPORTANT: Score and savings are INDEPENDENT. Do not limit savings to match the score. A deal can score 65 and still have 15% savings potential. The score reflects the current state. The savings reflect what the buyer can improve through negotiation.
+extraction.leverageFactors:
+- competingQuoteInHand, daysToDeadline (days to the signing deadline, else null), soleSource (no realistic alternative vendor), dealSizeSignificant (meaningful revenue for the vendor), buyerInsidePenaltyWindow
 
-score_rationale must be specific to THIS deal, referencing the actual issues found.
+extraction.pricingItemized: true if pricing is broken out line-by-line; false if it is a lump sum or bundled.
+
+==================================================
+RED FLAG SEVERITY (assign on every red flag)
+==================================================
+
+HIGH   = financial exposure or a one-sided term affecting MORE THAN 5% of contract value, or total cancellation exposure.
+MEDIUM = 1-5% of contract value, or a meaningful operational risk.
+LOW    = under 1% of contract value, or a convenience issue.
+
+ALWAYS HIGH, regardless of dollar amount: any fraud indicator — changed banking or payment details, a changed contracting entity, or any request to redirect payment. These are HIGH even if the amount is small.
+
+score_rationale: ONE or TWO short, qualitative sentences on where this deal stands for the buyer. Do NOT state or imply a number — the engine sets the score. Reference the actual issues, not generic advice.
 
 ==================================================
 WRITING STYLE
@@ -166,14 +178,21 @@ Return valid JSON only:
   "cash_flow_improvements": [
     {"recommendation": "", "category": "cash_flow|risk"}
   ],
-  "score": 68,
-  "score_label": "Solid, negotiate the details",
-  "score_breakdown": {
-    "pricing_fairness": 32,
-    "terms_protections": 22,
-    "leverage_position": 14
+  "watchItems": [
+    {"description": "One-line note that is worth mentioning but failed the red flag test", "category": "pricing|terms|leverage|scope|other"}
+  ],
+  "extraction": {
+    "pricingItemized": true,
+    "fees": [
+      {"name": "administration charge", "type": "admin", "percentage": 7, "dollarAmount": null, "isAvoidable": true, "isDisclosedAsNonService": true}
+    ],
+    "cancellationTerms": {"refundSchedule": "50% refundable up to 60 days out", "buyerInsideWindow": false, "retentionPctInsideWindow": null, "forceMajeurePresent": true, "rescheduleOption": true, "rescheduleFeePct": null},
+    "paymentTerms": {"depositPct": 25, "balanceDueDaysBeforeDelivery": 0, "achOffered": true, "netTerms": 30},
+    "vendorRights": {"unilateralSubstitution": false, "mandatoryMarketing": false, "reciprocalValue": true},
+    "tbdLineItems": [{"description": "AV package (TBD)", "dollarAmount": 3000}],
+    "leverageFactors": {"competingQuoteInHand": false, "daysToDeadline": 21, "soleSource": false, "dealSizeSignificant": true, "buyerInsidePenaltyWindow": false}
   },
-  "score_rationale": "Specific to this deal, not generic.",
+  "score_rationale": "Short qualitative read for the buyer. No numbers.",
   "assumptions": ["..."],
   "disclaimer": "This analysis is commercial guidance, not legal advice. Verify final terms before signing."
 }
@@ -243,9 +262,11 @@ export interface AnalysisOutput {
     nice_to_have?: Array<{ ask: string; amount: number; rationale: string }>
   }
   cash_flow_improvements?: Array<{ recommendation: string; category: string }>
-  score?: number
-  score_label?: string
-  score_breakdown?: { pricing_fairness: number; terms_protections: number; leverage_position: number }
+  /** Minor notes that failed the red flag qualification test — shown under "Worth noting". */
+  watchItems?: Array<{ description: string; category: string }>
+  /** Raw structured facts the deterministic scorer consumes (normalized downstream). */
+  extraction?: Record<string, any>
+  /** Qualitative one/two-sentence read. The numeric score is computed, not returned here. */
   score_rationale?: string
   assumptions: string[]
   disclaimer: string
@@ -281,7 +302,7 @@ export async function analyzeDealFacts(
     `\nVERIFIED FINANCIAL FACTS (use these as ground truth, do NOT recalculate):\n${JSON.stringify(facts, null, 2)}`,
     options.goal && `User Goal: ${options.goal}`,
     options.notes && `User Notes: ${options.notes}`,
-    options.previousRoundOutput && `MULTI-ROUND ANALYSIS CONTEXT:\nThis is a follow-up round. Previous analysis: ${JSON.stringify(options.previousRoundOutput, null, 2)}\nKeep scoring consistent. Only change findings if the quote materially changed.`,
+    options.previousRoundOutput && `MULTI-ROUND ANALYSIS CONTEXT:\nThis is a follow-up round. Previous analysis: ${JSON.stringify(options.previousRoundOutput, null, 2)}\nKeep findings and extraction consistent. Only change them if the quote materially changed.`,
   ].filter(Boolean)
 
   const visualContent = buildImageContent(options.imageData, options.allPages, options.pdfData)
@@ -300,7 +321,7 @@ export async function analyzeDealFacts(
 
   const response = await anthropic.messages.create({
     model: CLAUDE_MODEL,
-    max_tokens: 6144,
+    max_tokens: 8192,
     system: enhancedPrompt + getLanguageInstruction(options.userLocale || 'en'),
     messages: [{ role: 'user', content: userContent }],
     temperature: 0,

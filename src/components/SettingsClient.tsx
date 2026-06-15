@@ -156,14 +156,14 @@ export function SettingsClient({
       </div>
 
       {/* ── BODY ────────────────────────────────── */}
-      <div className="flex flex-row flex-1 min-h-0 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
 
-        {/* LEFT NAV */}
-        <div className="w-[220px] flex-shrink-0 bg-white px-3 py-5 flex flex-col gap-1 overflow-y-auto border-r border-slate-200">
+        {/* LEFT NAV — vertical sidebar on desktop, horizontal scroll row on mobile */}
+        <div className="w-full md:w-[220px] flex-shrink-0 bg-white px-3 py-3 md:py-5 flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-x-visible md:overflow-y-auto border-b md:border-b-0 md:border-r border-slate-200">
           {navGroups.map((group) => (
-            <div key={group.label}>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2 pt-2">{group.label}</p>
-              <nav className="space-y-0.5">
+            <div key={group.label} className="flex-shrink-0">
+              <p className="hidden md:block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2 pt-2">{group.label}</p>
+              <nav className="flex flex-row md:flex-col gap-1.5 md:gap-0 md:space-y-0.5">
                 {group.items.map((item) => {
                   const isDanger = (item as any).isDanger
                   const isActive = activeSection === item.key
@@ -172,7 +172,7 @@ export function SettingsClient({
                     <button
                       key={item.key}
                       onClick={() => setActiveSection(item.key)}
-                      className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-[13px] font-medium transition-all text-left ${
+                      className={`flex items-center gap-2.5 w-auto md:w-full flex-shrink-0 whitespace-nowrap px-3 py-2 rounded-xl text-[13px] font-medium transition-all text-left ${
                         isDanger
                           ? isActive
                             ? 'bg-red-50 text-red-700'
@@ -202,8 +202,8 @@ export function SettingsClient({
         </div>
 
         {/* CONTENT */}
-        <div className="flex-1 overflow-y-auto p-8 bg-slate-50">
-          <div className={`bg-white border ${activeSection === 'danger' ? 'border-red-300 ring-1 ring-red-100' : 'border-slate-200'} rounded-2xl p-6 shadow-sm`}>
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50">
+          <div className={`bg-white border ${activeSection === 'danger' ? 'border-red-300 ring-1 ring-red-100' : 'border-slate-200'} rounded-2xl p-5 sm:p-6 shadow-sm`}>
             {/* Section header */}
             <div className="flex items-center gap-3 mb-5">
               <div className={`w-9 h-9 rounded-xl ${bgColorMap[current.color]} flex items-center justify-center`}>

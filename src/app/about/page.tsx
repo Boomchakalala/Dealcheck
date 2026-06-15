@@ -93,7 +93,7 @@ export default function AboutPage() {
 
         {/* ─── VALUES ───────────────────────────────────── */}
         <section className="px-6 py-20 bg-slate-50/70 border-y border-slate-100">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <h2 className="text-slate-900 text-center mb-12" style={{ fontFamily: sora, fontWeight: 700, fontSize: 'clamp(26px, 3.4vw, 36px)', lineHeight: 1.12, letterSpacing: '-0.022em' }}>
               {t('about.valuesTitle')}
             </h2>

@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { getClaudeResponse, getLanguageInstruction } from '@/lib/claude'
+import { getClaudeResponse, getLanguageInstruction, EMAIL_PROMPT } from '@/lib/claude'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
@@ -34,11 +34,13 @@ export async function POST(request: Request) {
       roundId,
       customPrompt,
       vendor,
+      contactName,
       totalCommitment,
+      term,
+      currency,
+      selectedAsks,
+      canOffer,
       mustHaveAsks,
-      niceToHaveAsks,
-      redFlags,
-      leverage,
       conclusion,
     } = body
 
@@ -68,38 +70,30 @@ export async function POST(request: Request) {
       }, { status: 429 })
     }
 
-    // Build the asks list
-    const must = mustHaveAsks || []
-    const nice = niceToHaveAsks || []
-    const allAsks = [...must, ...nice]
+    // The user's checkbox selection drives generation. Fall back to the old must-have list
+    // for any client that hasn't been updated yet.
+    const selected: string[] = (Array.isArray(selectedAsks) && selectedAsks.length ? selectedAsks : (mustHaveAsks || [])).filter(Boolean)
+    const offers: string[] = Array.isArray(canOffer) ? canOffer : []
 
-    const basePrompt = `Generate 3 different negotiation email drafts for a procurement deal.
+    const basePrompt = `You are TermLift's email generation engine. Write 3 supplier-facing email variations.
+
+${EMAIL_PROMPT}
 
 DEAL CONTEXT:
-- Vendor: ${vendor || 'the vendor'}
-- Total commitment: ${totalCommitment || 'not specified'}
-- Situation: ${conclusion || 'Negotiation in progress'}
-- Key concerns: ${(redFlags || []).slice(0, 3).join('; ') || 'None specified'}
-- Leverage: ${(leverage || []).slice(0, 3).join('; ') || 'None specified'}
+Vendor: ${vendor || 'the vendor'}
+Contact Name: ${contactName || 'NOT AVAILABLE, use "Hi," as greeting'}
+Total Commitment: ${totalCommitment || 'not specified'}
+Term: ${term || 'not specified'}
+Currency: ${currency || 'match the source quote'}
+Situation: ${conclusion || 'Negotiation in progress'}
 
-PRIORITY ASKS (must include):
-${must.map((a: string, i: number) => `${i + 1}. ${a}`).join('\n')}
+THE ASKS TO PUSH ON (use ALL of these, in this priority order — the first gets the lead position and the most space):
+${selected.map((a: string) => `- ${a}`).join('\n') || '- (none selected — write a short, friendly note that the buyer is happy with the quote and ready to proceed)'}
 
-SECONDARY ASKS (nice to have):
-${nice.map((a: string, i: number) => `${i + 1}. ${a}`).join('\n')}
+WHAT THE BUYER CAN OFFER IN RETURN (trade these against the asks where they fit, in the same breath):
+${offers.map((c: string) => `- ${c}`).join('\n') || '- a fast signature once the points above are settled'}
 
-${customPrompt ? `USER'S CUSTOM REQUEST:\n${customPrompt}\n` : ''}
-
-INSTRUCTIONS:
-- Write 3 distinct email variations with different angles/tones:
-  * Email 1: Friendly & collaborative (warm, partnership-focused)
-  * Email 2: Direct & focused (clear asks, professional)
-  * Email 3: Urgent & firm (deadline-driven, final push)
-- Each email should incorporate the priority asks
-- Keep each email 150-250 words
-- Make them sound human and natural, not templated
-- Include a clear call-to-action
-
+${customPrompt ? `USER'S CUSTOM REQUEST (honor this):\n${customPrompt}\n` : ''}
 Return ONLY valid JSON (no markdown, no code fences):
 {
   "emails": [

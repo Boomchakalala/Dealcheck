@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import {
   FileText,
+  Building2,
   BarChart3,
   Settings,
   User,
@@ -63,6 +64,8 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, l
 
   const workspaceNav = [
     { href: linkBase, icon: FileText, label: t('nav.deals') },
+    // Vendors is an authenticated /app feature; the demo has no /demo/vendors route yet.
+    ...(demoMode ? [] : [{ href: `${linkBase}/vendors`, icon: Building2, label: t('nav.vendors') }]),
     { href: `${linkBase}/dashboard`, icon: BarChart3, label: t('nav.dashboard') },
   ]
 

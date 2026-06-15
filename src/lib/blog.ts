@@ -868,3 +868,29 @@ export function getAllPosts(locale?: string): BlogPost[] {
   const posts = locale === 'fr' ? blogPostsFr : blogPosts
   return [...posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
+
+/** Distinct categories, ordered by how recently a post in that category was published. */
+export function getCategories(locale?: string): string[] {
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const p of getAllPosts(locale)) {
+    if (!seen.has(p.category)) { seen.add(p.category); out.push(p.category) }
+  }
+  return out
+}
+
+/** Up to `limit` posts in the same category (excluding the current one); pads with recent posts. */
+export function getRelatedPosts(slug: string, locale?: string, limit = 3): BlogPost[] {
+  const all = getAllPosts(locale)
+  const current = all.find((p) => p.slug === slug)
+  if (!current) return []
+  const sameCategory = all.filter((p) => p.slug !== slug && p.category === current.category)
+  const result = [...sameCategory]
+  if (result.length < limit) {
+    for (const p of all) {
+      if (result.length >= limit) break
+      if (p.slug !== slug && !result.some((r) => r.slug === p.slug)) result.push(p)
+    }
+  }
+  return result.slice(0, limit)
+}

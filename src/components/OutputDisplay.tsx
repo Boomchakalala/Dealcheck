@@ -370,36 +370,44 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
 
       {/* Score breakdown — OVERVIEW tab */}
       {(!activeTab || activeTab === 'overview') && output.score != null && output.score_breakdown && (() => {
-        const bd = output.score_breakdown
+        const bd = output.score_breakdown as any
         type Deduction = { points: number; reason: string }
+        // New deals: 0-100 pricing/terms/leverage + a flat `deductions` array.
+        // Legacy deals: 50/30/20 split + per-category *_deductions arrays.
+        const isNew = Array.isArray(bd.deductions)
+        const dedFor = (cat: string): Deduction[] =>
+          isNew
+            ? (bd.deductions as any[]).filter((d) => d.category === cat && d.points < 0).map((d) => ({ points: Math.abs(d.points), reason: d.label }))
+            : ((bd[`${cat}_deductions`] || []) as Deduction[])
+        const topReason = (d: Deduction[]) => (d.length > 0 ? d.reduce((a, b) => (a.points >= b.points ? a : b)).reason : '')
 
         const categories = [
           {
             key: 'pricing',
             label: locale === 'fr' ? 'Prix' : 'Pricing',
-            value: bd.pricing_fairness,
-            max: 50,
-            deductions: (bd.pricing_deductions || []) as Deduction[],
+            value: isNew ? (bd.pricing ?? 0) : bd.pricing_fairness,
+            max: isNew ? 100 : 50,
+            deductions: dedFor('pricing'),
             goodPhrase: locale === 'fr' ? 'Prix cohérent avec le marché' : 'Pricing looks fair',
-            badPhrase: (d: Deduction[]) => d.length > 0 ? d.reduce((a, b) => a.points >= b.points ? a : b).reason : '',
+            badPhrase: topReason,
           },
           {
             key: 'terms',
             label: locale === 'fr' ? 'Termes' : 'Terms',
-            value: bd.terms_protections,
-            max: 30,
-            deductions: (bd.terms_deductions || []) as Deduction[],
+            value: isNew ? (bd.terms ?? 0) : bd.terms_protections,
+            max: isNew ? 100 : 30,
+            deductions: dedFor('terms'),
             goodPhrase: locale === 'fr' ? 'Clauses contractuelles acceptables' : 'Contract terms look solid',
-            badPhrase: (d: Deduction[]) => d.length > 0 ? d.reduce((a, b) => a.points >= b.points ? a : b).reason : '',
+            badPhrase: topReason,
           },
           {
             key: 'leverage',
             label: locale === 'fr' ? 'Levier' : 'Leverage',
-            value: bd.leverage_position,
-            max: 20,
-            deductions: (bd.leverage_deductions || []) as Deduction[],
+            value: isNew ? (bd.leverage ?? 0) : bd.leverage_position,
+            max: isNew ? 100 : 20,
+            deductions: dedFor('leverage'),
             goodPhrase: locale === 'fr' ? 'Bonne position de négociation' : 'You have room to negotiate',
-            badPhrase: (d: Deduction[]) => d.length > 0 ? d.reduce((a, b) => a.points >= b.points ? a : b).reason : '',
+            badPhrase: topReason,
           },
         ]
 

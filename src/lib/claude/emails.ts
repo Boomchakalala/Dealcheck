@@ -1,40 +1,44 @@
 import { anthropic, CLAUDE_MODEL, getResponseText, parseJsonFromContent, getLanguageInstruction } from './client'
 import type { DealOutputType } from '../schemas'
 import type { DealOutput, DealOutputV2 } from '@/types'
+import { buildCandidateAsks, defaultSelectedLabels, getCanOffer } from '../email-asks'
 
 // ---------------------------------------------------------------------------
 // EMAIL PROMPT,rules for generating supplier-facing negotiation emails
 // ---------------------------------------------------------------------------
 
-const EMAIL_PROMPT = `
-Write negotiation emails that sound like a real person wrote them in 5 minutes.
+export const EMAIL_PROMPT = `
+You write ONE short negotiation email a busy buyer would actually send. The buyer wants to close this deal: confident, collaborative, signalling they are ready to sign once a few points are settled. Never adversarial, never apologetic.
 
-The tone is warm, collaborative, and confident. You're genuinely interested in the deal. You're asking, not demanding. But you're clear about what you want and you make the vendor feel that saying yes means closing the deal today.
+You are given ONLY the asks the buyer chose to push on, the deal context, and what the buyer can offer in return. Write about those asks and nothing else. Do not reintroduce other issues from the analysis.
 
-Think of someone who writes: "Could we look at this together?", "Can we imagine a scenario where...", "If there's flexibility here, I'm ready to move forward." Friendly, but with substance behind every ask.
+STRUCTURE (this is the part that usually goes wrong):
+- No enumeration. Never start a paragraph with First, Firstly, Second, Secondly, Third, Finally, Lastly. No numbered or bulleted lists in the body. This reads as machine-written and is banned.
+- Lead with the single most important ask (the first one given). Give it the most space: its strongest justification and, where a matching offer exists, what the buyer gives in return, in the same breath ("happy to sign by Friday and pay by wire if we can land the admin charge at 3.5%").
+- Weave the remaining asks in naturally. If two are small or administrative, let them share one short sentence rather than a paragraph each.
+- Vary paragraph length deliberately. A two-line paragraph next to a five-line one reads human; four identical four-line blocks read generated.
+- Trade, do not list. Where an ask has a matching "can offer" item (fast signature, wire/ACH payment, longer term, a reference), present them as an exchange, not a demand then a separate offer.
+- A purely administrative correction (typo, wrong date, missing line) is NOT a negotiation ask. Mention it once, near the end, as a brief factual note ("the quote lists the start date as March 3, I believe that should be May 3"). One sentence.
+- Close in one sentence with a specific next step. Do not recap ("to cover these three points") and do not count the asks.
 
-Three versions:
-- neutral: warm and collaborative. You like the offer, you want to work it out. Conversational.
-- firm: direct and professional. You've been clear about what you need. No fluff, still respectful.
-- final_push: deadline-driven. You're signaling you'll go elsewhere if this doesn't land. Urgent but never aggressive.
+SUBSTANCE (required, every time):
+- Every commercial ask carries concrete numbers: the current figure, the target figure, and where it reads naturally the gap in % or money. Never "a discount" - always "from EUR 17,880 to around EUR 16,450 HT".
+- When an ask has two acceptable resolutions, offer them as an either/or the vendor can choose between ("price it into the revised quote, or cap it at EUR 300 HT in writing, either works").
+- Every ask carries its justification in the same breath: deal size, payment terms, speed to sign, a competing quote, market data. No naked demands.
+- Match the currency and units of the source quote exactly (EUR with HT/TTC for French quotes, USD for US, etc.). Never mix conventions inside one email.
 
-Each email must:
-- Start with a warm greeting ("Hi [Name],"). Where it feels natural, add a polite opener like "I hope all is well." or "I hope you're doing well." Use your judgment — not every email needs it.
-- Where appropriate, close with a warm line before the sign-off like "Thanks in advance for looking into this." or "Appreciate your help on this." Do not force it if the email already has a strong closing line.
-- End with "Best regards," then "[Your Name]" on a new line
-- Reference real details from the quote (amounts, terms, product names)
-- Include EVERY must-have ask from the analysis. If the analysis found 4 asks, the email must mention all 4. Do not drop asks to keep the email short.
-- Only include asks from the analysis, never invent new ones
-- End with a clear next step that makes it easy for the vendor to say yes
-- Make the vendor feel that a quick agreement = a guaranteed sale
+LENGTH: aim for 120-180 words; stay well under 220 even with three or more asks. Vendors skim, so the email must be shorter than the inputs you were given. Never drop a figure or a justification to hit the count - cut adjectives, hedges, and recaps instead.
 
-Subject lines: keep them dead simple. Vendor name + plain reference. "Re: Ewigo proposal", "Salesforce renewal, follow-up". Nothing clever.
+GREETING & SIGN-OFF: open with "Hi [Name]," (use the contact's first name when provided, otherwise "Hi,"). Close with "Best regards," then "[Your Name]" on a new line. No en dashes or em dashes; use commas, colons, or plain hyphens.
 
-Never use en dash or em dash characters. Use commas, colons, or normal hyphens.
+TONE VARIANTS (same structure, only word choice and urgency change):
+- friendly / neutral: warm, partnership-first ("could we look at", "would you be open to").
+- direct / firm: clear, businesslike, asks explicit, still respectful.
+- final_push: deadline-driven, signals the buyer will look elsewhere if it does not land. Urgent, never aggressive.
 
-Never open by complimenting the price then immediately asking for a discount. That is contradictory and vendors see through it. Instead, lead with context: budget constraints, internal approval requirements, competing priorities. The discount should feel like a consequence of your situation, not a tactic.
+Subject lines: dead simple. Vendor name + plain reference ("Re: Ewigo proposal", "Salesforce renewal, follow-up"). Nothing clever.
 
-Write like a human. If it sounds like AI wrote it, rewrite it.
+If it sounds like AI wrote it, rewrite it.
 `
 
 // ---------------------------------------------------------------------------
@@ -48,10 +52,12 @@ export async function generateEmailDrafts(
     total_commitment: string
     term: string
     contact_name?: string
+    currency?: string
     verdict: string
-    red_flags: Array<{ issue: string; what_to_ask_for: string }>
+    red_flags: Array<{ issue: string; what_to_ask_for: string; severity?: string }>
     what_to_ask_for: { must_have: string[]; nice_to_have: string[] }
-    negotiation_plan?: { leverage_you_have: string[] }
+    potential_savings?: any
+    negotiation_plan?: { leverage_you_have?: string[]; trades_you_can_offer?: string[] }
     quick_read?: { conclusion: string }
   },
   userLocale?: string,
@@ -60,35 +66,33 @@ export async function generateEmailDrafts(
   firm: { subject: string; body: string }
   final_push: { subject: string; body: string }
 }> {
-  const prompt = `You are TermLift's email generation engine. Write 3 supplier-facing email variations based on the completed analysis below.
+  // Default to the top 2-3 asks (HIGH severity first, then largest savings). The user can
+  // re-select and regenerate from the deal view; this is the unattended first pass.
+  const candidates = buildCandidateAsks(analysisOutput)
+  const selectedAsks = defaultSelectedLabels(candidates)
+  const canOffer = getCanOffer(analysisOutput)
+
+  const prompt = `You are TermLift's email generation engine. Write 3 supplier-facing email variations.
 
 ${EMAIL_PROMPT}
 
-ANALYSIS CONTEXT:
+DEAL CONTEXT:
 Vendor: ${analysisOutput.vendor}
 Product/Service: ${analysisOutput.vendor_product || analysisOutput.vendor}
-Contact Name: ${analysisOutput.contact_name || 'NOT AVAILABLE, use "Hi," or "Hi there," as greeting'}
+Contact Name: ${analysisOutput.contact_name || 'NOT AVAILABLE, use "Hi," as greeting'}
 Total Commitment: ${analysisOutput.total_commitment}
 Term: ${analysisOutput.term}
-Verdict: ${analysisOutput.verdict}
+Currency: ${analysisOutput.currency || 'match the source quote'}
+Situation: ${analysisOutput.verdict}
 
-CRITICAL: Use ONLY the product/service name shown above. NEVER invent, guess, or hallucinate a different product name. If the product is "Renault Kangoo", do NOT write "Citroën Jumper" or any other name.
+CRITICAL: Use ONLY the product/service name shown above. NEVER invent, guess, or hallucinate a different product name.
+${analysisOutput.contact_name ? `The sales contact's first name is "${analysisOutput.contact_name}". Use "Hi ${analysisOutput.contact_name}," as the greeting in every email.` : ''}
 
-${analysisOutput.contact_name ? `IMPORTANT: The sales contact's first name is "${analysisOutput.contact_name}". You MUST use "Hi ${analysisOutput.contact_name}," or "Hey ${analysisOutput.contact_name}," as the greeting in EVERY email. Do NOT use generic greetings like "Hi," or "Hi there," when you have the name.` : ''}
+THE ASKS TO PUSH ON (use ALL of these, in this priority order — the first gets the lead position and the most space):
+${selectedAsks.map((a) => `- ${a}`).join('\n') || '- (none — write a short, friendly note that the buyer is happy with the quote and ready to proceed)'}
 
-Must-Have Asks:
-${analysisOutput.what_to_ask_for?.must_have?.join('\n') || 'None'}
-
-Nice-to-Have Asks:
-${analysisOutput.what_to_ask_for?.nice_to_have?.join('\n') || 'None'}
-
-Red Flags:
-${analysisOutput.red_flags?.map(f => `- ${f.issue}`).join('\n') || 'None'}
-
-Leverage:
-${analysisOutput.negotiation_plan?.leverage_you_have?.join('\n') || 'None'}
-
-Conclusion: ${analysisOutput.quick_read?.conclusion || 'N/A'}
+WHAT THE BUYER CAN OFFER IN RETURN (trade these against the asks where they fit, in the same breath):
+${canOffer.map((c) => `- ${c}`).join('\n') || '- a fast signature once the points above are settled'}
 
 Return ONLY JSON with this structure:
 {

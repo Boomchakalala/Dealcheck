@@ -184,10 +184,12 @@ export function AnalysisPDF({ output, locale = 'en' }: { output: DealOutput; loc
   const niceToHave = ps?.nice_to_have || []
   const cur = ps?.currency || output.snapshot?.currency || 'EUR'
 
-  const bd = output.score_breakdown
-  const pricingPct = bd ? Math.round((bd.pricing_fairness / 50) * 100) : 0
-  const termsPct = bd ? Math.round((bd.terms_protections / 30) * 100) : 0
-  const leveragePct = bd ? Math.round((bd.leverage_position / 20) * 100) : 0
+  const bd = output.score_breakdown as any
+  // New deals carry 0-100 pricing/terms/leverage; legacy deals carry the 50/30/20 split.
+  const bdNew = bd && Array.isArray(bd.deductions)
+  const pricingPct = bd ? Math.round(((bdNew ? bd.pricing : bd.pricing_fairness) ?? 0) / (bdNew ? 100 : 50) * 100) : 0
+  const termsPct = bd ? Math.round(((bdNew ? bd.terms : bd.terms_protections) ?? 0) / (bdNew ? 100 : 30) * 100) : 0
+  const leveragePct = bd ? Math.round(((bdNew ? bd.leverage : bd.leverage_position) ?? 0) / (bdNew ? 100 : 20) * 100) : 0
 
   return (
     <Document>

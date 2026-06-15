@@ -5,6 +5,7 @@ import { notFound, redirect } from 'next/navigation'
 
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { DealScrollView } from '@/components/DealScrollView'
+import { HeroVerdict } from '@/components/HeroVerdict'
 import { FeatureGate } from '@/components/FeatureGate'
 import { ChevronRight, CheckCircle2, DollarSign, AlertTriangle, TrendingUp, Calendar } from 'lucide-react'
 import Link from 'next/link'
@@ -48,14 +49,17 @@ export default async function DealPage({
   const firstOutput = firstRound?.output_json
   const isV2 = (latestRound?.schema_version || 'v1') === 'v2'
 
-  const dealName = deal.vendor || (isV2 ? (latestOutput as DealOutputV2)?.commercial_facts?.supplier : (latestOutput as DealOutput)?.vendor) || deal.title || 'Deal'
+  const rawDealName = deal.vendor || (isV2 ? (latestOutput as DealOutputV2)?.commercial_facts?.supplier : (latestOutput as DealOutput)?.vendor) || deal.title || 'Deal'
+  // The AI `title` is pipe-delimited ("Vendor | Type | Date"). If it ever lands in the name slot,
+  // keep only the vendor segment so the combined string can never reach the H1.
+  const dealName = String(rawDealName).split('|')[0].trim() || 'Deal'
   const category = (latestOutput as DealOutput)?.category
-  const description = (latestOutput as DealOutput)?.description || (latestOutput as DealOutput)?.quick_read?.conclusion || null
   const totalCommitment = latestOutput?.snapshot?.total_commitment
   const originalTotal = firstOutput?.snapshot?.total_commitment
   const term = latestOutput?.snapshot?.term
 
   const redFlagCount = isV2 ? (latestOutput as DealOutputV2)?.priority_points?.length || 0 : (latestOutput as DealOutput)?.red_flags?.length || 0
+  const watchCount = (latestOutput as DealOutput)?.watchItems?.length || 0
 
   const ps = (latestOutput as DealOutput)?.potential_savings as any
   const potentialSavings = ps?.must_have
@@ -180,7 +184,6 @@ export default async function DealPage({
             <div className="flex-1 min-w-0">
               <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900 mb-1 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {shortVendorName}
-                {description && <span className="hidden sm:inline"> &mdash; {description.split(' ').slice(0, 6).join(' ')}</span>}
               </h1>
               <div className="flex items-center gap-2 mb-3 flex-wrap">
                 {category && <span className="text-[12px] px-2.5 py-1 rounded-lg bg-white/70 text-slate-600 font-medium border border-slate-200/50">{category}</span>}
@@ -197,7 +200,7 @@ export default async function DealPage({
               ) : (
                 <>
                   {scoreLabel && <p className="text-[16px] font-semibold mb-1" style={{ color: scoreTextColor }}>{scoreLabel}</p>}
-                  {scoreRationale && <p className="text-[13px] text-slate-600 leading-relaxed max-w-2xl">{scoreRationale}</p>}
+                  {scoreRationale && <HeroVerdict text={scoreRationale} className="text-[13px] text-slate-600 leading-relaxed max-w-2xl" />}
                 </>
               )}
             </div>
@@ -205,7 +208,7 @@ export default async function DealPage({
 
           {/* Stat cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-            <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-slate-200/50 shadow-sm">
+            <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <DollarSign className="w-4 h-4 text-slate-400" />
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{isWon ? 'Original' : 'Total'}</span>
@@ -214,7 +217,7 @@ export default async function DealPage({
               <p className="text-[11px] text-slate-400 mt-0.5">{term || ''}</p>
             </div>
             {isWon ? (
-              <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-emerald-200/50 shadow-sm">
+              <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <DollarSign className="w-4 h-4 text-emerald-500" />
                   <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">Final price</span>
@@ -227,16 +230,17 @@ export default async function DealPage({
                 <p className="text-[11px] text-emerald-500 mt-0.5">{deal.savings_percent != null ? `${deal.savings_percent.toFixed(1)}% less` : ''}</p>
               </div>
             ) : (
-              <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-red-200/50 shadow-sm">
+              <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-red-200/50 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <AlertTriangle className="w-4 h-4 text-red-500" />
                   <span className="text-[11px] font-semibold text-red-400 uppercase tracking-wider">{t('output.redFlags')}</span>
                 </div>
                 <p className="text-[18px] sm:text-[22px] font-bold text-red-600" style={{ fontFamily: 'Sora, sans-serif' }}>{redFlagCount}</p>
                 <p className="text-[11px] text-red-400 mt-0.5">{redFlagCount === 1 ? 'issue' : 'issues'} to address</p>
+                {watchCount > 0 && <p className="text-[10px] text-slate-400 mt-0.5">+{watchCount} minor item{watchCount === 1 ? '' : 's'}</p>}
               </div>
             )}
-            <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-emerald-200/50 shadow-sm">
+            <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <TrendingUp className="w-4 h-4 text-emerald-500" />
                 <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">{isWon ? 'Saved' : 'Savings'}</span>
@@ -248,7 +252,7 @@ export default async function DealPage({
               </p>
               <p className="text-[11px] text-emerald-500 mt-0.5">{isWon ? 'achieved' : 'potential'}</p>
             </div>
-            <div className="bg-white/80 backdrop-blur rounded-xl p-3 sm:p-4 border border-slate-200/50 shadow-sm">
+            <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <Calendar className="w-4 h-4 text-slate-400" />
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{isWon ? 'Closed' : 'Started'}</span>

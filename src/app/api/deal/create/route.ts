@@ -5,6 +5,7 @@ import { CreateDealSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/claude'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { FREE_ANALYSIS_LIMIT, ESSENTIALS_MONTHLY_LIMIT } from '@/lib/tiers'
+import { resolveVendorForDeal } from '@/lib/vendor-resolve'
 
 // Allow up to 120s for classification + analysis with retries (Vercel Pro plan)
 export const maxDuration = 120
@@ -141,6 +142,14 @@ export async function POST(request: Request) {
 
     if (dealError || !deal) {
       throw new Error('Failed to create deal')
+    }
+
+    // Link to a vendor entity (best-effort — never blocks deal creation).
+    try {
+      const vendorId = await resolveVendorForDeal(supabase, user.id, vendor)
+      if (vendorId) await supabase.from('deals').update({ vendor_id: vendorId }).eq('id', deal.id)
+    } catch (e) {
+      console.error('[TermLift] vendor link failed (non-fatal):', e)
     }
 
     // Create Round 1 with V2 schema

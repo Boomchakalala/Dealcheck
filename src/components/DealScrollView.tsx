@@ -7,6 +7,7 @@ import { normalizeAmount, formatCurrency, parseMoney, detectCurrency } from '@/l
 import type { DealOutput, DealOutputV2 } from '@/types'
 import type { Plan } from '@/lib/tiers'
 import { FeatureGate } from '@/components/FeatureGate'
+import { buildCandidateAsks, defaultSelectedLabels, getCanOffer } from '@/lib/email-asks'
 
 interface DealScrollViewProps {
   latestOutput: any
@@ -36,6 +37,8 @@ interface DealScrollViewProps {
   isAdmin: boolean
   addRoundForm: React.ReactNode
   messages: Record<string, Record<string, string>>
+  /** Demo mode: the "Generate email" button becomes a signup prompt instead of hitting the API. */
+  demoMode?: boolean
 }
 
 // ─── helpers ──────────────────────────────────────────────
@@ -56,7 +59,7 @@ export function DealScrollView(props: DealScrollViewProps) {
     redFlagCount, potentialSavings, dealCurrency,
     sortedRounds, dealId, dealStatus, locale,
     closeSummary, savingsAmount, savingsPercent, closedAt, whatChanged, originalTotal,
-    userPlan, isAdmin, addRoundForm, messages,
+    userPlan, isAdmin, addRoundForm, messages, demoMode,
   } = props
 
   const o = latestOutput as DealOutput
@@ -72,6 +75,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
   // ── collapsible state ─────────────────────
   const [showSolid, setShowSolid] = useState(true)
+  const [expandedBar, setExpandedBar] = useState<string | null>(null)
 
   // ── score colors ──────────────────────────
   const sc = score ?? 0
@@ -117,23 +121,54 @@ export function DealScrollView(props: DealScrollViewProps) {
   const [regenerating, setRegenerating] = useState(false)
   const [regenError, setRegenError] = useState<string | null>(null)
   const [remainingRegens, setRemainingRegens] = useState(3)
-  const [showRegen, setShowRegen] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
 
-  const handleRegenerateEmails = async () => {
-    if (!latestRoundId || remainingRegens <= 0) return
+  // ── ask selection (pre-generation) ────────
+  const askCandidates = useMemo(() => buildCandidateAsks(o), [o])
+  const askStorageKey = `termlift_email_asks_${dealId}`
+  const [selectedAsks, setSelectedAsks] = useState<Set<string>>(() => {
+    try {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem(askStorageKey) : null
+      if (saved) { const arr = JSON.parse(saved); if (Array.isArray(arr) && arr.length) return new Set<string>(arr) }
+    } catch {}
+    return new Set(defaultSelectedLabels(askCandidates))
+  })
+  const persistAsks = (set: Set<string>) => { try { localStorage.setItem(askStorageKey, JSON.stringify([...set])) } catch {} }
+  const toggleAsk = (label: string) => setSelectedAsks((prev) => {
+    const next = new Set(prev)
+    if (next.has(label)) next.delete(label); else next.add(label)
+    persistAsks(next)
+    return next
+  })
+  const hasEmail = !!(o?.email_drafts?.neutral?.body)
+  const [emailMode, setEmailMode] = useState<'select' | 'generated'>(hasEmail ? 'generated' : 'select')
+
+  const handleGenerate = async () => {
+    if (demoMode || !latestRoundId || remainingRegens <= 0) return
     setRegenerating(true); setRegenError(null)
     try {
       const res = await fetch('/api/deal/regenerate-emails', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roundId: latestRoundId, customPrompt: customPrompt.trim() || null, vendor: o?.vendor || o?.snapshot?.vendor_product, totalCommitment: o?.snapshot?.total_commitment, mustHaveAsks: o?.what_to_ask_for?.must_have || [], niceToHaveAsks: o?.what_to_ask_for?.nice_to_have || [], redFlags: o?.red_flags?.map((f: any) => f.issue) || [], leverage: o?.negotiation_plan?.leverage_you_have, conclusion: o?.quick_read?.conclusion }),
+        body: JSON.stringify({
+          roundId: latestRoundId,
+          customPrompt: customPrompt.trim() || null,
+          vendor: o?.vendor || o?.snapshot?.vendor_product,
+          contactName: (o as any)?.contact_name,
+          totalCommitment: o?.snapshot?.total_commitment,
+          term: o?.snapshot?.term,
+          currency: dealCurrency,
+          selectedAsks: [...selectedAsks],
+          canOffer: getCanOffer(o),
+          conclusion: o?.quick_read?.conclusion,
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
       setEmailSubjects(data.emails.map((e: any) => e.subject))
       setEmailBodies(data.emails.map((e: any) => e.body))
       setRemainingRegens(data.remainingRegenerations)
-      setCustomPrompt(''); setShowRegen(false)
+      setCustomPrompt('')
+      setEmailMode('generated')
     } catch (err) { setRegenError(err instanceof Error ? err.message : 'Failed') }
     finally { setRegenerating(false) }
   }
@@ -142,12 +177,35 @@ export function DealScrollView(props: DealScrollViewProps) {
   const sortedFlags = useMemo(() => {
     if (!o?.red_flags) return []
     return o.red_flags.map((flag: any, i: number) => {
-      const amtMatch = flag.why_it_matters?.match(/[\$€£]([\d,]+)/g)
-      const maxAmt = amtMatch ? Math.max(...amtMatch.map((s: string) => parseInt(s.replace(/[^\d]/g, ''), 10) || 0)) : 0
-      const sev = maxAmt >= 5000 ? 'HIGH' : maxAmt >= 1000 ? 'MEDIUM' : 'LOW'
+      // Prefer the model-assigned severity (now authoritative — fraud is forced HIGH there).
+      // Fall back to a dollar-amount heuristic only for older deals with no severity field.
+      const assigned = String(flag.severity || '').toLowerCase()
+      let sev: 'HIGH' | 'MEDIUM' | 'LOW'
+      if (assigned === 'high' || assigned === 'medium' || assigned === 'low') {
+        sev = assigned.toUpperCase() as 'HIGH' | 'MEDIUM' | 'LOW'
+      } else {
+        const amtMatch = flag.why_it_matters?.match(/[\$€£]([\d,]+)/g)
+        const maxAmt = amtMatch ? Math.max(...amtMatch.map((s: string) => parseInt(s.replace(/[^\d]/g, ''), 10) || 0)) : 0
+        sev = maxAmt >= 5000 ? 'HIGH' : maxAmt >= 1000 ? 'MEDIUM' : 'LOW'
+      }
       return { flag, idx: i, severity: sev, order: sev === 'HIGH' ? 0 : sev === 'MEDIUM' ? 1 : 2 }
     }).sort((a: any, b: any) => a.order - b.order)
   }, [o?.red_flags])
+
+  // ── red flag accordion state (HIGH + MEDIUM open by default, LOW collapsed) ──
+  const [openFlags, setOpenFlags] = useState<Record<number, boolean>>(() => {
+    const init: Record<number, boolean> = {}
+    sortedFlags.forEach(({ idx, severity }: any) => { if (severity === 'HIGH' || severity === 'MEDIUM') init[idx] = true })
+    return init
+  })
+  const [showWatch, setShowWatch] = useState(false)
+  const allFlagsOpen = sortedFlags.length > 0 && sortedFlags.every(({ idx }: any) => openFlags[idx])
+  const toggleFlag = (idx: number) => setOpenFlags((p) => ({ ...p, [idx]: !p[idx] }))
+  const toggleAllFlags = () => {
+    const next: Record<number, boolean> = {}
+    if (!allFlagsOpen) sortedFlags.forEach(({ idx }: any) => { next[idx] = true })
+    setOpenFlags(next)
+  }
 
   // ── score breakdown ───────────────────────
   const bd = o?.score_breakdown
@@ -204,28 +262,70 @@ export function DealScrollView(props: DealScrollViewProps) {
                 </div>
                 <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide">Score breakdown</p>
               </div>
-              {bd && score != null && (
-                <div className="space-y-4">
-                  {[
-                    { label: 'Pricing', val: bd.pricing_fairness, max: 50 },
-                    { label: 'Terms', val: bd.terms_protections, max: 30 },
-                    { label: 'Leverage', val: bd.leverage_position, max: 20 },
-                  ].map((r) => {
-                    const pct = Math.round((r.val / r.max) * 100)
-                    const barColor = pct >= 80 ? '#1DB954' : pct >= 60 ? '#F59E0B' : '#E24B4A'
-                    const barTrack = pct >= 80 ? '#D1FAE5' : pct >= 60 ? '#FEF3C7' : '#FECDC5'
-                    return (
-                      <div key={r.label} className="flex items-center gap-3">
-                        <span className="text-[13px] font-medium text-slate-700 w-[70px] flex-shrink-0">{r.label}</span>
-                        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: barTrack }}>
-                          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: barColor }} />
+              {bd && score != null && (() => {
+                const nb = bd as any
+                // New deals carry a flat `deductions` array + 0-100 pricing/terms/leverage.
+                // Legacy deals only have pricing_fairness/terms_protections/leverage_position.
+                const isNew = Array.isArray(nb.deductions)
+                const rows = isNew
+                  ? [
+                      { key: 'pricing', label: 'Pricing', val: nb.pricing ?? 0, max: 100 },
+                      { key: 'terms', label: 'Terms', val: nb.terms ?? 0, max: 100 },
+                      { key: 'leverage', label: 'Leverage', val: nb.leverage ?? 0, max: 100 },
+                    ]
+                  : [
+                      { key: 'pricing', label: 'Pricing', val: nb.pricing_fairness ?? 0, max: 50 },
+                      { key: 'terms', label: 'Terms', val: nb.terms_protections ?? 0, max: 30 },
+                      { key: 'leverage', label: 'Leverage', val: nb.leverage_position ?? 0, max: 20 },
+                    ]
+                return (
+                  <div className="space-y-3">
+                    {rows.map((r) => {
+                      const pct = Math.round((r.val / r.max) * 100)
+                      const barColor = pct >= 80 ? '#1DB954' : pct >= 60 ? '#F59E0B' : '#E24B4A'
+                      const barTrack = pct >= 80 ? '#D1FAE5' : pct >= 60 ? '#FEF3C7' : '#FECDC5'
+                      const items: any[] = isNew ? (nb.deductions as any[]).filter((d) => d.category === r.key) : []
+                      const canExpand = items.length > 0
+                      const open = expandedBar === r.key
+                      const bar = (
+                        <div className="flex items-center gap-3">
+                          <span className="text-[13px] font-medium text-slate-700 w-[72px] flex-shrink-0 text-left flex items-center gap-1">
+                            {r.label}
+                            {canExpand && <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />}
+                          </span>
+                          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: barTrack }}>
+                            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: barColor }} />
+                          </div>
+                          <span className="text-[13px] font-bold w-12 text-right" style={{ color: barColor }}>{pct}%</span>
                         </div>
-                        <span className="text-[13px] font-bold w-12 text-right" style={{ color: barColor }}>{pct}%</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
+                      )
+                      return (
+                        <div key={r.key}>
+                          {canExpand ? (
+                            <button onClick={() => setExpandedBar(open ? null : r.key)} className="w-full">{bar}</button>
+                          ) : bar}
+                          {canExpand && (
+                            <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: open ? '1fr' : '0fr' }}>
+                              <div className="overflow-hidden">
+                                <div className="pl-[72px] pr-12 pt-2 space-y-1.5">
+                                  {items.map((d, i) => (
+                                    <div key={i} className="flex items-center justify-between gap-3 text-[12px]">
+                                      <span className="text-slate-500 leading-snug">{d.label}</span>
+                                      <span className={`font-bold flex-shrink-0 ${d.points < 0 ? 'text-red-500' : 'text-emerald-600'}`} style={{ fontFamily: 'Sora, sans-serif' }}>
+                                        {d.points < 0 ? `−${Math.abs(d.points)}` : `+${d.points}`}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )
+              })()}
             </div>
           </div>
 
@@ -266,63 +366,108 @@ export function DealScrollView(props: DealScrollViewProps) {
       <div className="bg-red-50/40 border-b border-red-200">
         <div className="p-5 sm:p-8">
           {/* Section header */}
-          <div className="flex items-center gap-4 mb-4 sm:mb-6">
-            <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center shadow-md">
-              <AlertTriangle className="w-6 h-6 text-white" />
+          <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center shadow-md flex-shrink-0">
+                <AlertTriangle className="w-6 h-6 text-white" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
+                  {sortedFlags.length} {sortedFlags.length === 1 ? 'red flag' : 'red flags'} found
+                </h2>
+                <p className="text-[13px] text-slate-500">
+                  {locale === 'fr' ? 'Chaque problème inclut des conseils de négociation' : 'Each issue includes what to ask for and a fallback position'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
-                {sortedFlags.length} {sortedFlags.length === 1 ? 'red flag' : 'red flags'} found
-              </h2>
-              <p className="text-[13px] text-slate-500">
-                {locale === 'fr' ? 'Chaque problème inclut des conseils de négociation' : 'Each issue includes what to ask for and a fallback position'}
-              </p>
-            </div>
+            {sortedFlags.length > 1 && (
+              <button onClick={toggleAllFlags} className="text-[12px] font-semibold text-slate-500 hover:text-slate-700 transition-colors flex-shrink-0">
+                {allFlagsOpen ? (locale === 'fr' ? 'Tout réduire' : 'Collapse all') : (locale === 'fr' ? 'Tout afficher' : 'Expand all')}
+              </button>
+            )}
           </div>
 
-          {/* Flag cards */}
-          <div className="space-y-4">
-            {sortedFlags.map(({ flag, idx, severity }: any, displayPos: number) => {
-              const isHigh = severity === 'HIGH'
-              const isMed = severity === 'MEDIUM'
-              const numBg = isHigh ? 'bg-red-600' : isMed ? 'bg-amber-500' : 'bg-slate-400'
-              const sevBg = isHigh ? 'bg-red-600' : isMed ? 'bg-amber-500' : 'bg-slate-500'
-              return (
-                <div key={idx} className="bg-white border-2 border-red-200 rounded-2xl p-4 sm:p-6 shadow-sm">
-                  <div className="flex items-start gap-3.5">
-                    <div className={`w-8 h-8 rounded-full ${numBg} text-white text-[13px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5`}>{displayPos + 1}</div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-3">
-                        <span className="text-[15px] font-bold text-slate-900 leading-snug">{flag.issue}</span>
-                        <span className={`text-[11px] font-bold px-3 py-1 rounded-full text-white flex-shrink-0 ${sevBg}`}>{severity}</span>
+          {/* Accordion — one bordered group, flat rows */}
+          {sortedFlags.length > 0 ? (
+            <div className="bg-white border border-red-200 rounded-2xl shadow-sm divide-y divide-red-100 overflow-hidden">
+              {sortedFlags.map(({ flag, idx, severity }: any, displayPos: number) => {
+                const isHigh = severity === 'HIGH'
+                const isMed = severity === 'MEDIUM'
+                const numBg = isHigh ? 'bg-red-600' : isMed ? 'bg-amber-500' : 'bg-slate-400'
+                const sevBg = isHigh ? 'bg-red-600' : isMed ? 'bg-amber-500' : 'bg-slate-500'
+                const open = !!openFlags[idx]
+                const money = (String(flag.issue || '').match(/[$€£]\s?\d[\d.,]*(?:\/[a-zA-Z]+)?/) || [])[0]
+                return (
+                  <div key={idx}>
+                    {/* Collapsed row */}
+                    <button
+                      onClick={() => toggleFlag(idx)}
+                      className="w-full flex items-center gap-3 px-4 sm:px-5 py-3.5 text-left hover:bg-red-50/40 transition-colors"
+                      aria-expanded={open}
+                    >
+                      <div className={`w-7 h-7 rounded-full ${numBg} text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0`} style={{ fontFamily: 'Sora, sans-serif' }}>{displayPos + 1}</div>
+                      <span className="flex-1 min-w-0 text-[14px] font-bold text-slate-900 truncate">{flag.issue}</span>
+                      {money && <span className="text-[12px] font-bold text-slate-700 flex-shrink-0" style={{ fontFamily: 'Sora, sans-serif' }}>{money}</span>}
+                      <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full text-white flex-shrink-0 ${sevBg}`}>{severity}</span>
+                      <ChevronDown className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+                    </button>
+                    {/* Expanded content — animated height */}
+                    <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: open ? '1fr' : '0fr' }}>
+                      <div className="overflow-hidden">
+                        <div className="pb-4 pr-4 sm:pr-5 pl-[52px] sm:pl-[60px]">
+                          <p className="text-[13px] text-slate-600 leading-relaxed">{flag.why_it_matters}</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div className="border-l-2 border-emerald-500 pl-3">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t('output.whatToAskFor')}</p>
+                              <p className="text-[13px] text-slate-800 font-medium leading-snug">{flag.what_to_ask_for}</p>
+                            </div>
+                            <div className="border-l-2 border-slate-300 pl-3">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t('output.fallbackPosition')}</p>
+                              <p className="text-[13px] text-slate-700 leading-snug">{flag.if_they_push_back}</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-[13px] text-slate-600 leading-relaxed mt-2">{flag.why_it_matters}</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4 sm:mt-5 ml-0 sm:ml-11">
-                    <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
-                      <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <Zap className="w-3.5 h-3.5" />{t('output.whatToAskFor')}
-                      </p>
-                      <p className="text-[13px] text-slate-800 font-medium leading-snug">{flag.what_to_ask_for}</p>
-                    </div>
-                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <Shield className="w-3.5 h-3.5" />{t('output.fallbackPosition')}
-                      </p>
-                      <p className="text-[13px] text-slate-700 leading-snug">{flag.if_they_push_back}</p>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          {sortedFlags.length === 0 && (
+                )
+              })}
+            </div>
+          ) : (
             <div className="text-center py-12">
               <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
               <p className="text-[16px] text-slate-600 font-semibold">No red flags found</p>
               <p className="text-[13px] text-slate-400 mt-1">This deal looks clean — nice work</p>
+            </div>
+          )}
+
+          {/* Worth noting — minor items that didn't meet the red flag bar */}
+          {Array.isArray((o as any)?.watchItems) && (o as any).watchItems.length > 0 && (
+            <div className="mt-4 bg-white border border-slate-200 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setShowWatch(!showWatch)}
+                className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3 text-left hover:bg-slate-50 transition-colors"
+                aria-expanded={showWatch}
+              >
+                <span className="text-[13px] font-semibold text-slate-600">
+                  {showWatch
+                    ? (locale === 'fr' ? 'À noter' : 'Worth noting')
+                    : `${locale === 'fr' ? 'Afficher' : 'Show'} ${(o as any).watchItems.length} ${locale === 'fr' ? 'point(s) mineur(s)' : `minor item${(o as any).watchItems.length === 1 ? '' : 's'}`}`}
+                </span>
+                <ChevronDown className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${showWatch ? 'rotate-180' : ''}`} />
+              </button>
+              <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: showWatch ? '1fr' : '0fr' }}>
+                <div className="overflow-hidden">
+                  <ul className="px-5 sm:px-6 pb-4 pt-1 space-y-1.5">
+                    {(o as any).watchItems.map((w: any, i: number) => (
+                      <li key={i} className="text-[13px] text-slate-500 leading-snug flex items-start gap-2">
+                        <span className="text-slate-300 flex-shrink-0 mt-0.5">&bull;</span>
+                        {w.description}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -501,19 +646,32 @@ export function DealScrollView(props: DealScrollViewProps) {
       <div className="bg-slate-100 border-b border-slate-200">
         <div className="p-5 sm:p-8">
           {/* Section header */}
-          <div className="flex items-center gap-4 mb-4 sm:mb-6">
-            <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center shadow-md">
-              <Mail className="w-6 h-6 text-white" />
+          <div className="flex items-start justify-between gap-3 mb-4 sm:mb-6">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center shadow-md flex-shrink-0">
+                <Mail className="w-6 h-6 text-white" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
+                  {emailMode === 'select'
+                    ? (locale === 'fr' ? 'Sur quoi voulez-vous insister ?' : 'What do you want to push on?')
+                    : (locale === 'fr' ? 'Email de négociation prêt à envoyer' : 'Ready-to-send negotiation email')}
+                </h2>
+                <p className="text-[13px] text-slate-500">
+                  {emailMode === 'select'
+                    ? (locale === 'fr' ? 'Choisissez vos demandes et un ton, puis générez' : 'Pick the asks and a tone, then generate')
+                    : (locale === 'fr' ? 'Choisissez un ton, personnalisez, et envoyez' : 'Pick a tone, customize if needed, and send it')}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Ready-to-send negotiation email</h2>
-              <p className="text-[13px] text-slate-500">
-                {locale === 'fr' ? 'Choisissez un ton, personnalisez, et envoyez' : 'Pick a tone, customize if needed, and send it'}
-              </p>
-            </div>
+            {emailMode === 'generated' && (
+              <button onClick={() => setEmailMode('select')} className="text-[12px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1 flex-shrink-0 mt-1">
+                <Sparkles className="w-3.5 h-3.5" />{locale === 'fr' ? 'Modifier les demandes' : 'Edit asks'}
+              </button>
+            )}
           </div>
 
-          {/* 3-col tone selector */}
+          {/* Tone selector — present in both states */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             {emailTones.map((tone, i) => {
               const isActive = emailTab === i
@@ -529,56 +687,92 @@ export function DealScrollView(props: DealScrollViewProps) {
             })}
           </div>
 
-          {/* Email card */}
-          <div className="border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-            <div className="bg-slate-700 px-6 py-3.5 flex items-center gap-3">
-              <Mail className="w-4 h-4 text-white" />
-              <input
-                type="text" value={emailSubjects[emailTab]}
-                onChange={(e) => { const n = [...emailSubjects]; n[emailTab] = e.target.value; setEmailSubjects(n) }}
-                className="flex-1 text-[14px] font-semibold text-white bg-transparent border-none focus:outline-none p-0 placeholder-slate-400"
-              />
-            </div>
-            <div className="bg-slate-50 p-4 sm:p-6">
-              <p className="text-[11px] text-slate-400 font-medium mb-3 flex items-center gap-1.5">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                Click to edit subject and body
-              </p>
-              <textarea
-                value={emailBodies[emailTab]}
-                onChange={(e) => { const n = [...emailBodies]; n[emailTab] = e.target.value; setEmailBodies(n) }}
-                rows={14}
-                className="w-full text-[13px] text-slate-800 leading-relaxed bg-white rounded-xl p-5 border-2 border-slate-200 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-300"
-              />
-              <div className="flex gap-3 mt-5">
-                <button onClick={() => { window.location.href = `mailto:?subject=${encodeURIComponent(emailSubjects[emailTab])}&body=${encodeURIComponent(emailBodies[emailTab])}` }} className="text-[13px] px-6 py-3 rounded-xl bg-emerald-600 text-white font-bold flex items-center gap-2 hover:bg-emerald-700 transition-colors shadow-sm">
-                  <Send className="w-4 h-4" />{t('output.openInEmailClient')}
-                </button>
-                <button onClick={() => { setCopiedEmail(true); navigator.clipboard.writeText(emailBodies[emailTab]); setTimeout(() => setCopiedEmail(false), 2000) }} className="text-[13px] px-6 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-semibold flex items-center gap-2 hover:bg-slate-50 transition-colors">
-                  {copiedEmail ? <><CheckCircle2 className="w-4 h-4 text-emerald-500" />Copied!</> : <><Copy className="w-4 h-4" />Copy email body</>}
-                </button>
+          {emailMode === 'select' ? (
+            /* ───────── (a) SELECTION STATE ───────── */
+            <div className="space-y-4">
+              <div className="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <p className="px-4 sm:px-5 pt-3.5 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">{locale === 'fr' ? 'Vos demandes' : 'Your asks'}</p>
+                <div className="divide-y divide-slate-100 border-t border-slate-100">
+                  {askCandidates.length === 0 ? (
+                    <p className="px-4 sm:px-5 py-4 text-[13px] text-slate-500">{locale === 'fr' ? 'Aucune demande — ce devis est propre. Générez un court email de confirmation.' : 'No asks to push on — this quote looks clean. Generate a short confirmation instead.'}</p>
+                  ) : askCandidates.map((c, i) => {
+                    const checked = selectedAsks.has(c.label)
+                    return (
+                      <label key={i} className="flex items-start gap-3 px-4 sm:px-5 py-3 cursor-pointer hover:bg-slate-50 transition-colors">
+                        <input type="checkbox" checked={checked} onChange={() => toggleAsk(c.label)} className="mt-0.5 w-4 h-4 accent-emerald-600 flex-shrink-0" />
+                        <span className="flex-1 min-w-0 text-[13px] text-slate-800 leading-snug">{c.label}</span>
+                        {(c.severity === 'high' || c.severity === 'medium' || (c.savings != null && c.savings > 0)) && (
+                          <span className="flex items-center gap-1.5 flex-shrink-0">
+                            {c.savings != null && c.savings > 0 && <span className="text-[11px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtSav(c.savings)}</span>}
+                            {c.severity === 'high' && <span className="text-[9px] font-bold text-white bg-red-600 px-1.5 py-0.5 rounded">HIGH</span>}
+                            {c.severity === 'medium' && <span className="text-[9px] font-bold text-white bg-amber-500 px-1.5 py-0.5 rounded">MED</span>}
+                          </span>
+                        )}
+                      </label>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Regenerate accordion */}
-          {latestRoundId && (
-            <div className="bg-white border-2 border-slate-200 rounded-xl overflow-hidden shadow-sm mt-4">
-              <button onClick={() => setShowRegen(!showRegen)} className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors text-left">
-                <span className="flex items-center gap-2.5 text-[13px] font-bold text-slate-700"><Sparkles className="w-5 h-5 text-emerald-500" />Regenerate emails{remainingRegens > 0 && <span className="text-slate-400 font-normal">({remainingRegens} left)</span>}</span>
-                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${showRegen ? 'rotate-180' : ''}`} />
-              </button>
-              {showRegen && (
-                <div className="p-5 bg-white border-t border-slate-200 space-y-3">
-                  <textarea value={customPrompt} onChange={(e) => setCustomPrompt(e.target.value)} rows={2} className="w-full px-4 py-3 text-[13px] border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300 resize-none" placeholder="Optional: custom instructions (e.g. 'mention we have budget approval')..." />
-                  <button onClick={handleRegenerateEmails} disabled={regenerating || remainingRegens <= 0} className={`w-full px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-[13px] font-bold transition-colors ${regenerating || remainingRegens <= 0 ? 'bg-slate-100 text-slate-400' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'}`}>
-                    {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" />Regenerating...</> : <><Sparkles className="w-4 h-4" />Regenerate all 3 tones</>}
+              {/* Non-blocking >4 asks hint */}
+              {selectedAsks.size > 4 && (
+                <p className="text-[12px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3.5 py-2.5">
+                  {locale === 'fr' ? 'Les meilleurs emails se concentrent sur 2-3 demandes. Plus de demandes = réponses plus faibles.' : 'Strong negotiation emails focus on 2-3 asks. More asks = weaker responses.'}
+                </p>
+              )}
+
+              {/* Optional custom instructions */}
+              <textarea value={customPrompt} onChange={(e) => setCustomPrompt(e.target.value)} rows={2} className="w-full px-4 py-3 text-[13px] border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-300 resize-none" placeholder={locale === 'fr' ? 'Optionnel : instructions personnalisées...' : "Optional: custom instructions (e.g. 'mention we have budget approval')..."} />
+
+              {/* Generate */}
+              {demoMode ? (
+                <Link href="/login?from=demo" className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5" style={{ background: '#1DB954', boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}>
+                  {locale === 'fr' ? 'Inscrivez-vous pour générer' : 'Sign up to generate'}<ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              ) : (
+                <>
+                  <button onClick={handleGenerate} disabled={regenerating || remainingRegens <= 0} className={`w-full px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-[13.5px] font-bold transition-colors ${regenerating || remainingRegens <= 0 ? 'bg-slate-100 text-slate-400' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'}`}>
+                    {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{locale === 'fr' ? 'Génération...' : 'Generating...'}</> : <><Sparkles className="w-4 h-4" />{locale === 'fr' ? "Générer l'email" : 'Generate email'}{remainingRegens > 0 && remainingRegens < 3 ? ` (${remainingRegens} left)` : ''}</>}
+                  </button>
+                  {remainingRegens <= 0 && <p className="text-[12px] text-slate-400 text-center">{locale === 'fr' ? 'Limite de régénération atteinte pour ce round.' : 'Regeneration limit reached for this round.'}</p>}
+                  {hasEmail && <button onClick={() => setEmailMode('generated')} className="w-full text-[12px] text-slate-400 hover:text-slate-600 transition-colors">{locale === 'fr' ? 'Annuler' : 'Cancel'}</button>}
+                </>
+              )}
+              {regenError && <p className="text-[13px] text-red-700 bg-red-50 border-2 border-red-200 rounded-xl p-3.5 font-medium">{regenError}</p>}
+            </div>
+          ) : (
+            /* ───────── (b) GENERATED STATE ───────── */
+            <div className="border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
+              <div className="px-5 sm:px-6 py-3.5 flex items-center gap-3 border-b border-slate-200">
+                <Mail className="w-4 h-4 text-slate-400" />
+                <input
+                  type="text" value={emailSubjects[emailTab]}
+                  onChange={(e) => { const n = [...emailSubjects]; n[emailTab] = e.target.value; setEmailSubjects(n) }}
+                  className="flex-1 text-[14px] font-normal text-slate-900 bg-transparent border-none focus:outline-none p-0 placeholder-slate-400"
+                />
+              </div>
+              <div className="p-4 sm:p-6">
+                <p className="text-[11px] text-slate-400 font-medium mb-3 flex items-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  {locale === 'fr' ? 'Cliquez pour modifier' : 'Click to edit subject and body'}
+                </p>
+                <textarea
+                  value={emailBodies[emailTab]}
+                  onChange={(e) => { const n = [...emailBodies]; n[emailTab] = e.target.value; setEmailBodies(n) }}
+                  rows={14}
+                  className="w-full text-[13px] text-slate-800 leading-relaxed bg-white rounded-xl p-5 border-2 border-slate-200 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-300"
+                />
+                <div className="flex gap-3 mt-5">
+                  <button onClick={() => { window.location.href = `mailto:?subject=${encodeURIComponent(emailSubjects[emailTab])}&body=${encodeURIComponent(emailBodies[emailTab])}` }} className="text-[13px] px-6 py-3 rounded-xl bg-emerald-600 text-white font-bold flex items-center gap-2 hover:bg-emerald-700 transition-colors shadow-sm">
+                    <Send className="w-4 h-4" />{t('output.openInEmailClient')}
+                  </button>
+                  <button onClick={() => { setCopiedEmail(true); navigator.clipboard.writeText(emailBodies[emailTab]); setTimeout(() => setCopiedEmail(false), 2000) }} className="text-[13px] px-6 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-semibold flex items-center gap-2 hover:bg-slate-50 transition-colors">
+                    {copiedEmail ? <><CheckCircle2 className="w-4 h-4 text-emerald-500" />Copied!</> : <><Copy className="w-4 h-4" />Copy email body</>}
                   </button>
                 </div>
-              )}
+              </div>
             </div>
           )}
-          {regenError && <p className="text-[13px] text-red-700 bg-red-50 border-2 border-red-200 rounded-xl p-3.5 font-medium mt-3">{regenError}</p>}
         </div>
       </div>
 
@@ -605,7 +799,9 @@ export function DealScrollView(props: DealScrollViewProps) {
                     <div className="w-9 h-9 rounded-full bg-emerald-500 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">R{round.round_number}</div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-semibold text-slate-900">Round {round.round_number}{round.round_number === 1 ? ' — Initial analysis' : ''}</p>
-                      <p className="text-[12px] text-emerald-500 mt-0.5">{new Date(round.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}</p>
+                      {round.created_at && !isNaN(new Date(round.created_at).getTime()) && (
+                        <p className="text-[12px] text-emerald-500 mt-0.5">{new Date(round.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}</p>
+                      )}
                     </div>
                     {rFlags > 0 && <span className="text-[12px] font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-md flex-shrink-0">{rFlags} flags</span>}
                     {rTotal && <span className="text-[13px] font-bold text-slate-700 flex-shrink-0">{normalizeAmount(rTotal)}</span>}

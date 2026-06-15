@@ -1,3 +1,5 @@
+import type { Deduction } from '@/lib/scoring'
+
 // Database types
 export type Database = {
   public: {
@@ -214,16 +216,31 @@ export type DealOutput = {
     recommendation: string
     category: 'cash_flow' | 'risk'
   }>
+  /** Minor notes that failed the red flag bar — rendered as the "Worth noting" card. */
+  watchItems?: Array<{ description: string; category?: string }>
   score?: number
   score_label?: string
+  // Two shapes coexist:
+  //  - legacy deals: pricing_fairness/terms_protections/leverage_position (0-50 / 0-30 / 0-20)
+  //  - new deals: pricing/terms/leverage (each 0-100) + a flat `deductions` array
   score_breakdown?: {
-    pricing_fairness: number
-    terms_protections: number
-    leverage_position: number
+    // legacy
+    pricing_fairness?: number
+    terms_protections?: number
+    leverage_position?: number
     pricing_deductions?: Array<{ points: number; reason: string }>
     terms_deductions?: Array<{ points: number; reason: string }>
     leverage_deductions?: Array<{ points: number; reason: string }>
+    // new (extract-then-compute)
+    pricing?: number
+    terms?: number
+    leverage?: number
+    deductions?: Deduction[]
   }
+  /** New deterministic pipeline only: flat deduction list (also nested in score_breakdown). */
+  deductions?: Deduction[]
+  /** New deterministic pipeline only: the structured facts the score was computed from. */
+  extraction?: Record<string, unknown>
   score_rationale?: string
   email_drafts: {
     neutral: EmailDraft
