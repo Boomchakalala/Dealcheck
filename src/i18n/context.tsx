@@ -2,7 +2,6 @@
 
 import { createContext, useContext, type ReactNode } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
-import { useRouter } from 'next/navigation'
 
 export type Locale = 'en' | 'fr'
 
@@ -21,17 +20,20 @@ const I18nContext = createContext<I18nContextType>({
 export function I18nProvider({ children }: { children: ReactNode }) {
   const intlT = useTranslations()
   const intlLocale = useLocale() as Locale
-  const router = useRouter()
 
   const setLocale = (newLocale: Locale) => {
     document.cookie = `termlift_lang=${newLocale};path=/;max-age=31536000`
-    // Also persist to Supabase profile
+    // Persist to Supabase profile (fire-and-forget)
     fetch('/api/user/locale', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ locale: newLocale }),
     }).catch(() => {})
-    router.refresh()
+    // router.refresh() only re-fetches page segments — the root layout
+    // (which holds NextIntlClientProvider + the messages) is cached and
+    // not re-rendered, so the locale never visibly changes. A hard reload
+    // is the only reliable way to pick up the new cookie in the layout.
+    window.location.reload()
   }
 
   const t = (key: string, vars?: Record<string, string | number>): string => {
