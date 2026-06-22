@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 import { TrendingUp, Zap, FileText } from 'lucide-react'
 import { demoDeals, demoDashboard } from '@/lib/demo-data'

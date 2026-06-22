@@ -7,6 +7,8 @@ import {
   bdoExample,
 } from '@/lib/examples'
 import { type DealOutput } from '@/types'
+export type { DemoProfile } from '@/lib/demo-profile'
+export { DEMO_USER_EMAIL, demoProfile } from '@/lib/demo-profile'
 
 export interface DemoDeal {
   id: string
@@ -25,40 +27,6 @@ export interface DemoDeal {
     status: string
     created_at: string
   }>
-}
-
-export interface DemoProfile {
-  first_name: string
-  last_name: string
-  email: string
-  plan: 'starter' | 'essentials' | 'pro'
-  usage_count: number
-  is_admin: false
-  base_currency: 'EUR'
-  member_since: string
-  negotiation_preferences: {
-    payment_terms: 'net_30' | 'net_60' | 'net_90' | 'no_preference'
-    top_priority: 'lowest_price' | 'best_terms' | 'max_flexibility'
-    auto_renewal: 'fine' | 'prefer_opt_in'
-  }
-}
-
-export const DEMO_USER_EMAIL = 'demo@termlift.com'
-
-export const demoProfile: DemoProfile = {
-  first_name: 'Sample',
-  last_name: 'Account',
-  email: DEMO_USER_EMAIL,
-  plan: 'pro',
-  usage_count: 6,
-  is_admin: false,
-  base_currency: 'EUR',
-  member_since: '2026-02-14',
-  negotiation_preferences: {
-    payment_terms: 'net_60',
-    top_priority: 'best_terms',
-    auto_renewal: 'prefer_opt_in',
-  },
 }
 
 // 6 demo deals — mix of closed wins + active deals

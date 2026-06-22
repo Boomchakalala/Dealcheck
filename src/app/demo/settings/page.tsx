@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { Heart, Scale, Swords, Zap, Sparkles, Send, Shield, Building2, Target, Mail, Handshake, ArrowRight } from 'lucide-react'
-import { demoProfile } from '@/lib/demo-data'
+import { demoProfile } from '@/lib/demo-profile'
 
 type TopPriority = 'lowest_price' | 'best_terms' | 'max_flexibility'
 type Tone = 'friendly' | 'direct' | 'firm'
