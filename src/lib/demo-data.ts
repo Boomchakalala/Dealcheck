@@ -123,12 +123,12 @@ export const demoDeals: DemoDeal[] = [
     id: 'demo-bdo',
     vendor: 'BDO',
     title: 'BDO · Advisory Retainer · Annual',
-    status: 'in_progress',
+    status: 'closed_won',
     category: 'Professional Services',
-    savings_amount: null,
+    savings_amount: 3612,
     created_at: '2026-05-12T14:00:00Z',
     updated_at: '2026-05-18T10:15:00Z',
-    closed_at: null,
+    closed_at: '2026-05-18T10:15:00Z',
     rounds: [
       { id: 'r1', output_json: bdoExample, round_number: 1, status: 'analysed', created_at: '2026-05-12T14:00:00Z' },
     ],
@@ -156,11 +156,11 @@ export function getDemoDeal(id: string): DemoDeal | undefined {
 // Pre-aggregated dashboard data (computed from demoDeals above)
 export const demoDashboard = {
   totalSpend: 194280, // sum of all 6 deals' total_commitment
-  savingsAchieved: 37056, // sum of savings_amount on closed_won (7800 + 9504 + 12552 + 7200)
-  savingsIdentified: 4296, // potential across active deals (BDO 3612 + M365 684)
-  activeCount: 2,
-  wonCount: 4,
-  winRate: 100, // 4 of 4 closed = 100% (no closed_lost)
+  savingsAchieved: 40668, // sum of savings_amount on closed_won (7800 + 9504 + 12552 + 7200 + 3612)
+  savingsIdentified: 684, // potential across active deals (M365 only — BDO now closed_won)
+  activeCount: 1,
+  wonCount: 5,
+  winRate: 100, // 5 of 5 closed = 100% (no closed_lost)
   totalDeals: 6,
   totalRedFlags: 14, // 2 + 2 + 3 + 3 + 3 + 1 across the 6 deals
   averageScore: 58, // (62 + 48 + 35 + 44 + 72 + 84) / 6
@@ -168,7 +168,7 @@ export const demoDashboard = {
     { name: 'SaaS & Software', spend: 82800, count: 3, savings: 17304 }, // DocuSign 7800 + Salesforce 9504
     { name: 'Logistics & Delivery', spend: 51960, count: 1, savings: 12552 },
     { name: 'Office & Facilities', spend: 35370, count: 1, savings: 7200 },
-    { name: 'Professional Services', spend: 24150, count: 1, savings: 0 },
+    { name: 'Professional Services', spend: 24150, count: 1, savings: 3612 },
   ],
   upcomingRenewals: [
     { id: 'demo-docusign', vendor: 'DocuSign', renewDate: new Date('2027-04-01'), daysOut: 316, finalTotal: 16200, savedAmount: 7800 },

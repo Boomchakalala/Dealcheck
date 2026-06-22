@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
+import { SHOWCASE_CARDS, SHOWCASE_COUNT, SHOWCASE_TOTAL_EUR } from '@/lib/demo-showcase'
 
 const sora = "'Sora', sans-serif"
 const mono = "'JetBrains Mono', monospace"
@@ -449,7 +450,8 @@ export default function LandingV2() {
           <div className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-[12px] mb-3 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>Real wins</p>
             <h2 className="text-slate-900 mb-4" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(34px, 4.5vw, 52px)', lineHeight: 1.04, letterSpacing: '-0.025em' }}>
-              Five quotes. <span style={{ color: green }}>Thirty-five grand back in pocket.</span>
+              {SHOWCASE_COUNT} quotes.{' '}
+              <span style={{ color: green }}>€{Math.round(SHOWCASE_TOTAL_EUR / 1000)}K back in pocket.</span>
             </h2>
             <p className="text-[17px] text-slate-500 leading-relaxed">
               Click into any of these to see the full analysis &mdash; every red flag, every ask, the exact email that closed it.
@@ -457,14 +459,8 @@ export default function LandingV2() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-5">
-            {[
-              { vendor: 'DocuSign', cat: 'SaaS', original: '€24,000', final: '€17,100', saved: '€6,900', pct: '29%', tags: ['Seats right-sized', 'Loyalty discount'] },
-              { vendor: 'Salesforce', cat: 'CRM', original: '€36,000', final: '€27,360', saved: '€8,640', pct: '24%', tags: ['Multi-year disc.', 'Price locked'] },
-              { vendor: 'FedEx', cat: 'Shipping', original: '€48,600', final: '€38,400', saved: '€10,200', pct: '21%', tags: ['Base rate cut', 'Fuel capped'] },
-              { vendor: 'Konica Minolta', cat: 'Lease', original: '€35,370', final: '€29,610', saved: '€5,760', pct: '16%', tags: ['Lease reduced', 'Exit clause'] },
-              { vendor: 'BDO', cat: 'Advisory', original: '€24,150', final: '€20,650', saved: '€3,500', pct: '14.5%', tags: ['Hourly cut', 'Hours capped'] },
-            ].map(d => (
-              <Link key={d.vendor} href="/demo" className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-emerald-300 hover:shadow-2xl hover:-translate-y-1 transition-all no-underline w-full sm:w-[calc(50%-10px)] lg:w-[calc(33.333%-14px)]">
+            {SHOWCASE_CARDS.map(d => (
+              <Link key={d.vendor} href={`/demo/deal/${d.id}`} className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-emerald-300 hover:shadow-2xl hover:-translate-y-1 transition-all no-underline w-full sm:w-[calc(50%-10px)] lg:w-[calc(33.333%-14px)]">
                 {/* Won banner */}
                 <div className="px-5 py-3 flex items-center justify-between border-b border-slate-100" style={{ background: `linear-gradient(90deg, ${green} 0%, ${greenDark} 100%)` }}>
                   <div className="flex items-center gap-2">
