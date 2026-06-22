@@ -9,10 +9,10 @@ interface ExchangeRates {
   time_last_update_unix: number
 }
 
-// Cache rates for 24 hours
+// Module-level cache (warm within the same serverless instance)
 let ratesCache: ExchangeRates | null = null
 let cacheTimestamp = 0
-const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours
+const CACHE_DURATION = 24 * 60 * 60 * 1000
 
 export const SUPPORTED_CURRENCIES = ['EUR', 'USD', 'GBP', 'CAD', 'AUD', 'CHF', 'JPY'] as const
 export type Currency = typeof SUPPORTED_CURRENCIES[number]
@@ -60,7 +60,8 @@ export async function fetchRates(): Promise<ExchangeRates> {
   }
 
   try {
-    const response = await fetch(`${EXCHANGE_API_URL}/USD`)
+    // next.revalidate persists the response in Next.js Data Cache across serverless cold starts
+    const response = await fetch(`${EXCHANGE_API_URL}/USD`, { next: { revalidate: 3600 } })
     if (!response.ok) {
       throw new Error('Failed to fetch exchange rates')
     }

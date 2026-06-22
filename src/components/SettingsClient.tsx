@@ -158,12 +158,27 @@ export function SettingsClient({
       {/* ── BODY ────────────────────────────────── */}
       <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
 
-        {/* LEFT NAV — vertical sidebar on desktop, horizontal scroll row on mobile */}
-        <div className="w-full md:w-[220px] flex-shrink-0 bg-white px-3 py-3 md:py-5 flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-x-visible md:overflow-y-auto border-b md:border-b-0 md:border-r border-slate-200">
+        {/* Mobile nav — dropdown select (avoids clipped horizontal scroll) */}
+        <div className="flex-shrink-0 bg-white px-4 py-3 border-b border-slate-200 md:hidden">
+          <select
+            value={activeSection}
+            onChange={(e) => setActiveSection(e.target.value as Section)}
+            className="w-full px-3 py-2.5 text-[13px] border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
+          >
+            {navGroups.flatMap(group =>
+              group.items.map(item => (
+                <option key={item.key} value={item.key}>{item.name}</option>
+              ))
+            )}
+          </select>
+        </div>
+
+        {/* Desktop nav — vertical sidebar */}
+        <div className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 bg-white px-3 py-5 overflow-y-auto border-r border-slate-200">
           {navGroups.map((group) => (
-            <div key={group.label} className="flex-shrink-0">
-              <p className="hidden md:block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2 pt-2">{group.label}</p>
-              <nav className="flex flex-row md:flex-col gap-1.5 md:gap-0 md:space-y-0.5">
+            <div key={group.label}>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2 pt-2">{group.label}</p>
+              <nav className="flex flex-col space-y-0.5">
                 {group.items.map((item) => {
                   const isDanger = (item as any).isDanger
                   const isActive = activeSection === item.key
@@ -172,7 +187,7 @@ export function SettingsClient({
                     <button
                       key={item.key}
                       onClick={() => setActiveSection(item.key)}
-                      className={`flex items-center gap-2.5 w-auto md:w-full flex-shrink-0 whitespace-nowrap px-3 py-2 rounded-xl text-[13px] font-medium transition-all text-left ${
+                      className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-[13px] font-medium transition-all text-left ${
                         isDanger
                           ? isActive
                             ? 'bg-red-50 text-red-700'
@@ -234,7 +249,7 @@ export function SettingsClient({
                 </div>
 
                 {/* Name fields */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-[12px] font-medium text-slate-500 mb-1.5 block">{t('settingsClient.firstName')}</label>
                     <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder={t('settingsClient.firstName')} className="w-full px-4 py-3 text-[13px] border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all" />
@@ -416,7 +431,7 @@ export function SettingsClient({
                 {/* Top priority */}
                 <div>
                   <p className="text-[12px] font-medium text-slate-500 mb-3">{t('settingsClient.topPriority')}</p>
-                  <div className="grid grid-cols-3 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     {[
                       { val: 'lowest_price', label: t('settingsClient.lowestPrice'), icon: Zap },
                       { val: 'best_terms', label: t('settingsClient.bestTerms'), icon: Scale },
@@ -442,7 +457,7 @@ export function SettingsClient({
                     <p className="text-[12px] font-medium text-slate-500">Default email tone</p>
                     <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">NEW</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     {[
                       { val: 'friendly' as const, label: 'Friendly', desc: 'Warm and collaborative, relationship-first', icon: Heart },
                       { val: 'direct' as const, label: 'Direct', desc: 'Clear and concise, gets to the point', icon: Send },
@@ -459,7 +474,7 @@ export function SettingsClient({
                     <p className="text-[12px] font-medium text-slate-500">Negotiation style</p>
                     <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">NEW</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     {[
                       { val: 'collaborative' as const, label: 'Collaborative', desc: 'Build long-term relationships', icon: Heart },
                       { val: 'balanced' as const, label: 'Balanced', desc: 'Fair but firm', icon: Scale },
@@ -687,9 +702,9 @@ function ToggleRow({ label, description, value, onChange }: { label: string; des
       </div>
       <button
         onClick={() => onChange(!value)}
-        className={`relative flex-shrink-0 w-9 h-5 rounded-full transition-colors ${value ? 'bg-emerald-500' : 'bg-slate-300'}`}
+        className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors ${value ? 'bg-emerald-500' : 'bg-slate-300'}`}
       >
-        <span className={`absolute top-[3px] inline-block w-3.5 h-3.5 rounded-full bg-white shadow transition-transform ${value ? 'translate-x-[18px]' : 'translate-x-[3px]'}`} />
+        <span className={`absolute top-[3px] inline-block w-[18px] h-[18px] rounded-full bg-white shadow-md transition-transform ${value ? 'translate-x-[23px]' : 'translate-x-[3px]'}`} />
       </button>
     </div>
   )

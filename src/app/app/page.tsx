@@ -46,10 +46,10 @@ export default function AppHomePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'closed'>('all')
 
-  const supabase = createBrowserClient(
+  const [supabase] = useState(() => createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  ))
 
   useEffect(() => {
     async function load() {
@@ -107,8 +107,38 @@ export default function AppHomePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+      <div className="-mx-5 sm:-mx-8 -mt-8 animate-pulse">
+        {/* Header + stats skeleton */}
+        <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-7">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-6">
+            <div className="h-8 w-36 bg-slate-200 rounded-lg" />
+            <div className="h-10 w-full md:w-36 bg-slate-200 rounded-xl" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="bg-slate-100 rounded-xl h-20" />
+            <div className="bg-slate-100 rounded-xl h-20" />
+            <div className="bg-slate-100 rounded-xl h-20" />
+          </div>
+        </div>
+        {/* Filter bar */}
+        <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-3 flex gap-3">
+          <div className="h-9 w-44 bg-slate-100 rounded-lg" />
+          <div className="h-9 w-14 bg-slate-100 rounded-lg" />
+          <div className="h-9 w-16 bg-slate-100 rounded-lg" />
+        </div>
+        {/* Deal card skeletons */}
+        <div className="px-5 sm:px-8 pt-5 space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-slate-100 px-5 py-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 flex-shrink-0" />
+              <div className="flex-1">
+                <div className="h-4 w-40 bg-slate-200 rounded mb-2" />
+                <div className="h-3 w-28 bg-slate-100 rounded" />
+              </div>
+              <div className="h-8 w-16 bg-slate-100 rounded-lg" />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -245,9 +275,9 @@ export default function AppHomePage() {
     <div className="-mx-5 sm:-mx-8 -mt-8 bg-slate-50">
       {/* ── HEADER + STATS ─────────────────────────────────────── */}
       <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-7">
-        <div className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between md:gap-0 mb-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-0 mb-6">
           <h1 className="text-[26px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{locale === 'fr' ? 'Vos contrats' : 'Your deals'}</h1>
-          <PrimaryButton href="/app/new" size="md">
+          <PrimaryButton href="/app/new" size="md" className="w-full md:w-auto justify-center">
             <Plus className="w-4 h-4" />
             {t('app.newAnalysis')}
           </PrimaryButton>

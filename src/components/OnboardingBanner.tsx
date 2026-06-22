@@ -147,7 +147,40 @@ export function OnboardingBanner({ userEmail, hasDeals }: OnboardingBannerProps)
     )
   }
 
-  // Step 3 is handled post-analysis, so just mark complete
+  // Step 3 — encourage first close
+  if (step === 3) {
+    return (
+      <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 relative">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <FileText className="w-4 h-4 text-emerald-600" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-bold text-emerald-700">{t('onboarding.tip')}</span>
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3].map((s) => (
+                    <div key={s} className={`w-1.5 h-1.5 rounded-full ${s <= step ? 'bg-emerald-500' : 'bg-slate-200'}`} />
+                  ))}
+                </div>
+              </div>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                {t('onboarding.tip3') || 'Once you agree a price with your vendor, close the deal to track your actual savings.'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleDismiss}
+            className="p-1 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   markComplete()
   return null
 }

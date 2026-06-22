@@ -57,12 +57,15 @@ export default function AppHelpPage() {
   const toggleItem = (key: string) => setOpenItems(prev => ({ ...prev, [key]: !prev[key] }))
 
   const currentCat = categories.find(c => c.key === activeCategory)!
-  const currentFaqs = faqData[activeCategory]
 
-  // Filter by search
-  const filteredFaqs = search.trim()
-    ? currentFaqs.filter(f => f.q.toLowerCase().includes(search.toLowerCase()) || f.a.toLowerCase().includes(search.toLowerCase()))
-    : currentFaqs
+  // When searching, scan all categories and tag results with their source
+  const allFaqs = Object.entries(faqData).flatMap(([catKey, items]) =>
+    items.map(f => ({ ...f, catKey: catKey as Category }))
+  )
+  const isSearching = search.trim().length > 0
+  const filteredFaqs = isSearching
+    ? allFaqs.filter(f => f.q.toLowerCase().includes(search.toLowerCase()) || f.a.toLowerCase().includes(search.toLowerCase()))
+    : faqData[activeCategory].map(f => ({ ...f, catKey: activeCategory }))
 
   return (
     <div className="-mx-5 sm:-mx-8 -mt-8 -mb-8 md:-mb-8 flex flex-col min-h-screen bg-slate-50">
@@ -89,7 +92,7 @@ export default function AppHelpPage() {
             {categories.map(cat => (
               <button
                 key={cat.key}
-                onClick={() => { setActiveCategory(cat.key); setSearch('') }}
+                onClick={() => { setActiveCategory(cat.key as Category); setSearch('') }}
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all text-left ${
                   activeCategory === cat.key
                     ? 'bg-emerald-50 text-emerald-700'
@@ -107,21 +110,34 @@ export default function AppHelpPage() {
         <div className="flex-1 overflow-y-auto px-10 py-8">
           <div className="max-w-3xl">
             {/* Category header */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
-                {currentCat.icon}
+            {!isSearching && (
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+                  {currentCat.icon}
+                </div>
+                <div>
+                  <h2 className="text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{currentCat.name}</h2>
+                  <p className="text-[13px] text-slate-500">{currentCat.sub}</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{currentCat.name}</h2>
-                <p className="text-[13px] text-slate-500">{currentCat.sub}</p>
+            )}
+            {isSearching && (
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-[14px] font-semibold text-slate-700">
+                  {filteredFaqs.length} result{filteredFaqs.length !== 1 ? 's' : ''} for &ldquo;{search}&rdquo;
+                </p>
+                <button onClick={() => setSearch('')} className="text-[13px] text-emerald-600 font-medium hover:underline">
+                  Clear
+                </button>
               </div>
-            </div>
+            )}
 
             {/* FAQ items */}
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
               {filteredFaqs.length > 0 ? filteredFaqs.map((item, i) => {
-                const key = `${activeCategory}-${i}`
+                const key = `${item.catKey}-${item.q}`
                 const isOpen = !!openItems[key]
+                const itemCat = categories.find(c => c.key === item.catKey)
                 return (
                   <div
                     key={key}
@@ -131,7 +147,12 @@ export default function AppHelpPage() {
                       onClick={() => toggleItem(key)}
                       className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
                     >
-                      <span className="text-[14px] font-semibold text-slate-900 pr-4">{item.q}</span>
+                      <div className="pr-4">
+                        {isSearching && itemCat && (
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{itemCat.name}</span>
+                        )}
+                        <span className="text-[14px] font-semibold text-slate-900">{item.q}</span>
+                      </div>
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${isOpen ? 'bg-emerald-100' : 'bg-slate-100'}`}>
                         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180 text-emerald-600' : 'text-slate-400'}`} />
                       </div>
@@ -145,7 +166,7 @@ export default function AppHelpPage() {
                 )
               }) : (
                 <div className="px-6 py-12 text-center">
-                  <p className="text-[14px] text-slate-400">No results for &ldquo;{search}&rdquo; in this category</p>
+                  <p className="text-[14px] text-slate-400">No results for &ldquo;{search}&rdquo;</p>
                   <button onClick={() => setSearch('')} className="text-[13px] text-emerald-600 font-medium mt-2 hover:underline">Clear search</button>
                 </div>
               )}

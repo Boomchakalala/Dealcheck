@@ -50,6 +50,34 @@ body {
   animation: hero-card-enter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
 }
 
+/* Hero product card float */
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-hero-float {
+  animation: hero-float 6s ease-in-out infinite;
+}
+
+/* Marketing marquee scroll */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 38s linear infinite;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-float,
+  .animate-marquee {
+    animation-play-state: paused;
+  }
+}
+
 /* Step number ring pulse animation */
 @keyframes ring-pulse {
   0%, 100% {
@@ -62,6 +90,15 @@ body {
 
 .animate-ring-pulse {
   animation: ring-pulse 2.5s infinite;
+}
+
+/* Eliminate 300ms tap delay and give instant visual feedback on touch */
+a, button, [role="button"] {
+  touch-action: manipulation;
+}
+
+a:active, button:active, [role="button"]:active {
+  opacity: 0.72;
 }
 
 /* Better touch targets on mobile */

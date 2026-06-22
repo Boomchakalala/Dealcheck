@@ -252,9 +252,9 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, l
         </div>
       </aside>
 
-      {/* Mobile bottom bar */}
+      {/* Mobile bottom bar — workspace nav only; Account slot replaces sign-out */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 flex items-center justify-around px-2 py-1.5 safe-area-pb">
-        {[...workspaceNav, ...accountNav.slice(0, 1)].map((item) => {
+        {workspaceNav.map((item) => {
           const active = isActive(item.href)
           return (
             <Link
@@ -275,12 +275,13 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, l
             <span className="text-[10px] font-semibold">Sign up</span>
           </Link>
         ) : (
-          <form action="/auth/signout" method="post">
-            <button type="submit" className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-slate-400">
-              <LogOut className="w-5 h-5" />
-              <span className="text-[10px] font-medium">{t('nav.signOut')}</span>
-            </button>
-          </form>
+          <Link
+            href={`${linkBase}/settings`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg ${isActive(`${linkBase}/settings`) ? 'text-emerald-500' : 'text-slate-400'}`}
+          >
+            <User className="w-5 h-5" />
+            <span className="text-[10px] font-medium">Account</span>
+          </Link>
         )}
       </nav>
     </>

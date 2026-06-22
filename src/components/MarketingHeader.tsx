@@ -41,9 +41,10 @@ export function MarketingHeader() {
 
         {/* Desktop links + CTA */}
         <div className="hidden md:flex items-center gap-8 text-[14px]">
-          {/* <Link href="/pricing" className={navLinkClass}>{t('nav.pricing')}</Link> */}
+          <Link href="/pricing" className={navLinkClass}>{t('nav.pricing')}</Link>
           <Link href="/demo" className={navLinkClass}>{t('nav.examples')}</Link>
           <Link href="/security" className={navLinkClass}>{t('nav.security') || 'Security'}</Link>
+          <Link href="/about" className={navLinkClass}>{t('nav.about') || 'About'}</Link>
           <Link href="/login" className={navLinkClass}>{t('nav.signIn')}</Link>
           {ctaButton}
         </div>
@@ -61,7 +62,7 @@ export function MarketingHeader() {
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden border-t border-slate-100 py-3 pb-5 bg-white/95 backdrop-blur-md px-6 space-y-1">
-          {/* <Link href="/pricing" className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors" onClick={close}>{t('nav.pricing')}</Link> */}
+          <Link href="/pricing" className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors" onClick={close}>{t('nav.pricing')}</Link>
           <Link href="/demo" className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors" onClick={close}>{t('nav.examples')}</Link>
           <Link href="/security" className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors" onClick={close}>{t('nav.security') || 'Security'}</Link>
           <Link href="/about" className="block py-3 px-3 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors" onClick={close}>{t('nav.about') || 'About'}</Link>

@@ -37,7 +37,7 @@ function ScoreRing({ score, size = 92 }: { score: number; size?: number }) {
   const r = (size - stroke - 2) / 2
   const circ = 2 * Math.PI * r
   const offset = circ - (score / 100) * circ
-  const color = score >= 70 ? '#10b981' : score >= 50 ? '#f59e0b' : '#ef4444'
+  const color = score >= 60 ? '#1DB954' : score >= 40 ? '#f59e0b' : '#ef4444'
   const showSubLabel = size >= 80
   return (
     <svg width={size} height={size} className="block">
@@ -60,7 +60,7 @@ function HeroAnalysisCard() {
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600" style={{ fontFamily: mono }}>RENEWAL</span>
-            <span className="text-[11px] text-slate-400" style={{ fontFamily: mono }}>DocuSign &middot; Business Pro</span>
+            <span className="text-[11px] text-slate-400" style={{ fontFamily: mono }}>CloudStore &middot; Enterprise Plan</span>
           </div>
           <p className="text-[20px] font-bold text-slate-900 leading-tight" style={{ fontFamily: sora }}>Push harder</p>
           <p className="text-[12.5px] text-slate-500 mt-0.5">Good base terms but savings on the table</p>
@@ -87,7 +87,7 @@ function HeroAnalysisCard() {
 
       <div className="mt-4 flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-slate-100" style={{ fontFamily: mono }}>
         <span>3 flags &middot; 3 asks &middot; 3 email drafts</span>
-        <span className="inline-flex items-center gap-1.5"><Zap className="w-3 h-3" style={{ color: green }} />Analysed in 47s</span>
+        <span className="inline-flex items-center gap-1.5"><Zap className="w-3 h-3" style={{ color: green }} />Analysed in ~2 min</span>
       </div>
     </div>
   )
@@ -118,12 +118,12 @@ export default function LandingV2() {
         <div className="relative max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 lg:gap-14 items-center">
           {/* Left: copy */}
           <div>
-            <div className="inline-flex items-center gap-2.5 mb-7 px-3.5 py-1.5 rounded-full border border-emerald-200/80 bg-white shadow-sm">
-              <span className="relative flex w-2 h-2">
+            <div className="inline-flex items-center gap-2.5 mb-7 px-3.5 py-1.5 rounded-full border border-emerald-200/80 bg-white shadow-sm max-w-full overflow-hidden">
+              <span className="relative flex w-2 h-2 flex-shrink-0">
                 <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping" style={{ background: green }} />
                 <span className="relative inline-flex w-2 h-2 rounded-full" style={{ background: green }} />
               </span>
-              <span className="text-[11.5px] text-slate-700 font-semibold tracking-wide" style={{ fontFamily: mono }}>THE PROCUREMENT EXPERT YOUR BUSINESS NEVER HAD</span>
+              <span className="text-[11.5px] text-slate-700 font-semibold tracking-wide whitespace-nowrap truncate" style={{ fontFamily: mono }}>THE PROCUREMENT EXPERT YOUR BUSINESS NEVER HAD</span>
             </div>
 
             <h1 className="text-slate-900 mb-6" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(44px, 5.8vw, 72px)', lineHeight: 0.98, letterSpacing: '-0.032em' }}>
@@ -186,7 +186,7 @@ export default function LandingV2() {
           MARQUEE — what we catch
          ═══════════════════════════════════════════════════ */}
       <div className="overflow-hidden whitespace-nowrap py-5 bg-slate-900 border-y border-slate-800/50">
-        <div className="inline-block" style={{ animation: 'marquee 38s linear infinite', fontFamily: sora, fontStyle: 'italic', fontSize: 'clamp(20px, 3.5vw, 32px)', fontWeight: 500 }}>
+        <div className="inline-block animate-marquee" style={{ fontFamily: sora, fontStyle: 'italic', fontSize: 'clamp(20px, 3.5vw, 32px)', fontWeight: 500 }}>
           {[
             'Auto-renewal traps', 'Hidden price hikes', 'Phantom seat fees', 'Vague SLAs',
             'Multi-year lock-ins', 'Missing loyalty discounts', 'Uncapped fuel surcharges',
@@ -449,23 +449,22 @@ export default function LandingV2() {
           <div className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-[12px] mb-3 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>Real wins</p>
             <h2 className="text-slate-900 mb-4" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(34px, 4.5vw, 52px)', lineHeight: 1.04, letterSpacing: '-0.025em' }}>
-              Six quotes. <span style={{ color: green }}>Forty grand back in pocket.</span>
+              Five quotes. <span style={{ color: green }}>Thirty-five grand back in pocket.</span>
             </h2>
             <p className="text-[17px] text-slate-500 leading-relaxed">
               Click into any of these to see the full analysis &mdash; every red flag, every ask, the exact email that closed it.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="flex flex-wrap justify-center gap-5">
             {[
               { vendor: 'DocuSign', cat: 'SaaS', original: '€24,000', final: '€17,100', saved: '€6,900', pct: '29%', tags: ['Seats right-sized', 'Loyalty discount'] },
               { vendor: 'Salesforce', cat: 'CRM', original: '€36,000', final: '€27,360', saved: '€8,640', pct: '24%', tags: ['Multi-year disc.', 'Price locked'] },
-              { vendor: 'FedEx', cat: 'Shipping', original: '$51,960', final: '$41,160', saved: '$10,800', pct: '21%', tags: ['Base rate cut', 'Fuel capped'] },
+              { vendor: 'FedEx', cat: 'Shipping', original: '€48,600', final: '€38,400', saved: '€10,200', pct: '21%', tags: ['Base rate cut', 'Fuel capped'] },
               { vendor: 'Konica Minolta', cat: 'Lease', original: '€35,370', final: '€29,610', saved: '€5,760', pct: '16%', tags: ['Lease reduced', 'Exit clause'] },
               { vendor: 'BDO', cat: 'Advisory', original: '€24,150', final: '€20,650', saved: '€3,500', pct: '14.5%', tags: ['Hourly cut', 'Hours capped'] },
-              { vendor: 'Microsoft 365', cat: 'SaaS', original: '€22,800', final: '€22,116', saved: '€684', pct: '3%', tags: ['Price locked'] },
             ].map(d => (
-              <Link key={d.vendor} href="/demo" className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-emerald-300 hover:shadow-2xl hover:-translate-y-1 transition-all no-underline">
+              <Link key={d.vendor} href="/demo" className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-emerald-300 hover:shadow-2xl hover:-translate-y-1 transition-all no-underline w-full sm:w-[calc(50%-10px)] lg:w-[calc(33.333%-14px)]">
                 {/* Won banner */}
                 <div className="px-5 py-3 flex items-center justify-between border-b border-slate-100" style={{ background: `linear-gradient(90deg, ${green} 0%, ${greenDark} 100%)` }}>
                   <div className="flex items-center gap-2">
@@ -496,7 +495,7 @@ export default function LandingV2() {
                     ))}
                   </div>
                   <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-[12px] text-slate-500 group-hover:text-emerald-700 transition-colors">
-                    <span className="font-semibold">Read the full analysis</span>
+                    <span className="font-semibold">See a live example</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
@@ -613,6 +612,51 @@ export default function LandingV2() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
+          SECURITY — privacy process flow
+         ═══════════════════════════════════════════════════ */}
+      <section className="relative px-6 py-20 bg-slate-950 text-slate-300 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, rgba(29,185,84,0.08) 0%, transparent 60%)' }} />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4" style={{ background: 'rgba(29,185,84,0.15)' }}>
+              <Shield className="w-5 h-5" style={{ color: green }} />
+            </div>
+            <p className="text-[12px] mb-3 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>Privacy first</p>
+            <h2 className="text-white" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(30px, 4.2vw, 44px)', lineHeight: 1.05, letterSpacing: '-0.025em' }}>
+              Your documents are <span style={{ color: green }}>safe.</span> Here&apos;s how.
+            </h2>
+          </div>
+
+          {/* Flow */}
+          <div className="relative">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-0 rounded-2xl overflow-hidden border border-slate-800">
+              {[
+                { icon: <Upload className="w-5 h-5" style={{ color: green }} />, label: 'You upload', sub: 'PDF, image, or paste text', step: '01' },
+                { icon: <Eye className="w-5 h-5" style={{ color: green }} />, label: 'AI reads it', sub: 'Text extracted in memory', step: '02' },
+                { icon: <Trash2 className="w-5 h-5" style={{ color: green }} />, label: 'File deleted', sub: 'Instantly. Permanently.', step: '03' },
+                { icon: <CheckCircle2 className="w-5 h-5" style={{ color: green }} />, label: 'You get results', sub: 'Score, flags, savings, email', step: '04' },
+              ].map((s, i) => (
+                <div key={s.label} className="py-10 px-6 text-center relative" style={{ background: '#0f172a', borderRight: i < 3 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+                  <div className="text-[10px] uppercase tracking-widest mb-4 font-bold" style={{ fontFamily: mono, color: green }}>{s.step}</div>
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    {s.icon}
+                  </div>
+                  <p className="text-[14px] font-bold text-white mb-1" style={{ fontFamily: sora }}>{s.label}</p>
+                  <p className="text-[12.5px] text-slate-400 leading-snug">{s.sub}</p>
+                  {/* Arrow between */}
+                  {i < 3 && (
+                    <ChevronRight className="hidden lg:block absolute top-1/2 -right-3 -translate-y-1/2 w-5 h-5 text-slate-700 z-10 bg-slate-950 rounded-full" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
           PULL QUOTE
          ═══════════════════════════════════════════════════ */}
       <section className="relative px-6 py-16 sm:py-28 bg-slate-900 text-white overflow-hidden border-y border-slate-800">
@@ -639,115 +683,6 @@ export default function LandingV2() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════
-          SECURITY — privacy process flow
-         ═══════════════════════════════════════════════════ */}
-      <section className="relative px-6 py-20 bg-slate-950 text-slate-300 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, rgba(29,185,84,0.08) 0%, transparent 60%)' }} />
-
-        <div className="relative max-w-6xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4" style={{ background: 'rgba(29,185,84,0.15)' }}>
-              <Shield className="w-5 h-5" style={{ color: green }} />
-            </div>
-            <p className="text-[12px] mb-3 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>Privacy first</p>
-            <h2 className="text-white" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(30px, 4.2vw, 44px)', lineHeight: 1.05, letterSpacing: '-0.025em' }}>
-              Your documents are <span style={{ color: green }}>safe.</span> Here&apos;s how.
-            </h2>
-          </div>
-
-          {/* Flow */}
-          <div className="relative">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-0 rounded-2xl overflow-hidden border border-slate-800">
-              {[
-                { icon: <Upload className="w-5 h-5" style={{ color: green }} />, label: 'You upload', sub: 'PDF, image, or paste text', step: '01' },
-                { icon: <Eye className="w-5 h-5" style={{ color: green }} />, label: 'AI reads it', sub: 'Text extracted in memory', step: '02' },
-                { icon: <Trash2 className="w-5 h-5 text-red-400" />, label: 'File deleted', sub: 'Instantly. Permanently.', step: '03', destructive: true },
-                { icon: <CheckCircle2 className="w-5 h-5" style={{ color: green }} />, label: 'You get results', sub: 'Score, flags, savings, email', step: '04' },
-              ].map((s, i) => (
-                <div key={s.label} className="py-10 px-6 text-center relative" style={{ background: s.destructive ? 'rgba(239,68,68,0.05)' : '#0f172a', borderRight: i < 3 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
-                  <div className="text-[10px] uppercase tracking-widest mb-4 font-bold" style={{ fontFamily: mono, color: s.destructive ? '#fca5a5' : green }}>{s.step}</div>
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: s.destructive ? 'rgba(239,68,68,0.1)' : 'rgba(255,255,255,0.05)' }}>
-                    {s.icon}
-                  </div>
-                  <p className="text-[14px] font-bold text-white mb-1" style={{ fontFamily: sora }}>{s.label}</p>
-                  <p className="text-[12.5px] text-slate-400 leading-snug">{s.sub}</p>
-                  {/* Arrow between */}
-                  {i < 3 && (
-                    <ChevronRight className="hidden lg:block absolute top-1/2 -right-3 -translate-y-1/2 w-5 h-5 text-slate-700 z-10 bg-slate-950 rounded-full" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          PRICING — HIDDEN. Reactivate by removing the {false && wrapper.
-         ═══════════════════════════════════════════════════ */}
-      {false && (
-      <section id="pricing" className="relative px-6 py-16 sm:py-28 overflow-hidden">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, rgba(29,185,84,0.08) 0%, transparent 60%)' }} />
-
-        <div className="relative max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-[12px] mb-3 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>Pricing</p>
-            <h2 className="text-slate-900 mb-3" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(34px, 4.5vw, 52px)', lineHeight: 1.04, letterSpacing: '-0.025em' }}>
-              One quote can pay for <span style={{ color: green }}>a year of Pro.</span>
-            </h2>
-            <p className="text-[16px] text-slate-500">Start free. Upgrade when it pays for itself.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              { tier: 'Starter', price: '€0', per: '', tagline: 'No card. Just try it.', features: ['1 free analysis, no signup', '3 more after account', 'Red flags + strategy'], cta: 'Try free', href: '/try', featured: false },
-              { tier: 'Essentials', price: '€15', per: '/mo', tagline: 'Steady stream of quotes.', features: ['10 analyses / month', 'Save and revisit deals', '2 negotiation rounds', '30-day deal history'], cta: 'Get Essentials', href: '/login?from=pricing', featured: true },
-              { tier: 'Pro', price: '€39', per: '/mo', tagline: 'Running everything.', features: ['Unlimited analyses', 'Unlimited rounds', 'Full spend dashboard', 'PDF export & history'], cta: 'Get Pro', href: '/login?from=pricing', featured: false },
-            ].map(p => (
-              <div
-                key={p.tier}
-                className={`relative rounded-2xl p-7 border transition-all hover:-translate-y-1 ${p.featured ? 'text-white border-transparent md:-translate-y-2 md:hover:-translate-y-3' : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-xl'}`}
-                style={{ background: p.featured ? 'linear-gradient(160deg, #0f172a 0%, #1e293b 100%)' : undefined, boxShadow: p.featured ? '0 24px 60px -12px rgba(15,23,42,0.4)' : undefined }}
-              >
-                {p.featured && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md" style={{ background: green, color: '#0f172a', fontFamily: mono }}>
-                    Most popular
-                  </div>
-                )}
-                <p className="text-[11px] uppercase tracking-widest font-bold mb-1" style={{ fontFamily: mono, color: p.featured ? '#94a3b8' : '#94a3b8' }}>{p.tier}</p>
-                <div className="mb-1" style={{ fontFamily: sora, fontSize: 46, fontWeight: 800, lineHeight: 1, color: p.featured ? green : '#0f172a' }}>
-                  {p.price}<span className="text-[15px] font-normal opacity-50" style={{ color: p.featured ? '#94a3b8' : '#64748b' }}>{p.per}</span>
-                </div>
-                <p className="text-[13px] mb-5" style={{ color: p.featured ? '#94a3b8' : '#64748b' }}>{p.tagline}</p>
-                <ul className="list-none p-0 mb-6 space-y-2.5">
-                  {p.features.map(f => (
-                    <li key={f} className="flex items-start gap-2.5 text-[13.5px]" style={{ color: p.featured ? '#cbd5e1' : '#334155' }}>
-                      <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: green }} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={p.href}
-                  className={`block text-center py-3 rounded-xl no-underline text-[14px] font-bold transition-all hover:shadow-md ${p.featured ? 'text-slate-900' : 'text-white hover:bg-slate-800'}`}
-                  style={{ background: p.featured ? green : '#0f172a' }}
-                >
-                  {p.cta}
-                </Link>
-              </div>
-            ))}
-          </div>
-          <p className="text-center mt-10">
-            <Link href="/pricing" className="text-[13.5px] text-slate-500 hover:text-slate-900 no-underline inline-flex items-center gap-1.5 font-semibold">
-              See full pricing details <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </p>
-        </div>
-      </section>
-      )}
-
       {/* ─── FINAL CTA — quiet white band ─── */}
       <section className="px-6 py-20 bg-white border-t border-slate-200 text-center">
         <div className="max-w-2xl mx-auto">
@@ -771,11 +706,6 @@ export default function LandingV2() {
          ═══════════════════════════════════════════════════ */}
       <MarketingFooter />
 
-      <style>{`
-        @keyframes hero-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .animate-hero-float { animation: hero-float 6s ease-in-out infinite; }
-        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-      `}</style>
     </div>
   )
 }

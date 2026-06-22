@@ -255,7 +255,7 @@ export function DealScrollView(props: DealScrollViewProps) {
             </div>
 
             {/* Score breakdown — right col */}
-            <div className="col-span-2 border-l border-slate-200 pl-6">
+            <div className="col-span-2 lg:border-l border-slate-200 lg:pl-6 pt-4 lg:pt-0">
               <div className="flex items-center gap-2.5 mb-5">
                 <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center">
                   <Target className="w-5 h-5 text-slate-600" />
@@ -348,7 +348,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                 <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${showSolid ? 'rotate-180' : ''}`} />
               </button>
               {showSolid && (
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {o.quick_read.whats_solid.map((item: string, i: number) => (
                     <div key={i} className="flex items-start gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
                       <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
@@ -402,14 +402,18 @@ export function DealScrollView(props: DealScrollViewProps) {
                     {/* Collapsed row */}
                     <button
                       onClick={() => toggleFlag(idx)}
-                      className="w-full flex items-center gap-3 px-4 sm:px-5 py-3.5 text-left hover:bg-red-50/40 transition-colors"
+                      className="w-full flex items-start gap-3 px-4 sm:px-5 py-3.5 text-left hover:bg-red-50/40 transition-colors"
                       aria-expanded={open}
                     >
-                      <div className={`w-7 h-7 rounded-full ${numBg} text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0`} style={{ fontFamily: 'Sora, sans-serif' }}>{displayPos + 1}</div>
-                      <span className="flex-1 min-w-0 text-[14px] font-bold text-slate-900 truncate">{flag.issue}</span>
-                      {money && <span className="text-[12px] font-bold text-slate-700 flex-shrink-0" style={{ fontFamily: 'Sora, sans-serif' }}>{money}</span>}
-                      <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full text-white flex-shrink-0 ${sevBg}`}>{severity}</span>
-                      <ChevronDown className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+                      <div className={`w-7 h-7 rounded-full ${numBg} text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5`} style={{ fontFamily: 'Sora, sans-serif' }}>{displayPos + 1}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white flex-shrink-0 ${sevBg}`}>{severity}</span>
+                          {money && <span className="text-[12px] font-bold text-slate-700 flex-shrink-0" style={{ fontFamily: 'Sora, sans-serif' }}>{money}</span>}
+                        </div>
+                        <span className="text-[14px] font-bold text-slate-900 leading-snug line-clamp-2">{flag.issue}</span>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform mt-1 ${open ? 'rotate-180' : ''}`} />
                     </button>
                     {/* Expanded content — animated height */}
                     <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: open ? '1fr' : '0fr' }}>

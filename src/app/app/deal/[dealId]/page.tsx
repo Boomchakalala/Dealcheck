@@ -123,7 +123,7 @@ export default async function DealPage({
       {/* ── STATUS BANNER ──────────────────────── */}
       {isClosedAny ? (
         isWon ? (
-          <div className="px-6 py-5 bg-emerald-600 flex items-center justify-between">
+          <div className="px-6 py-5 bg-emerald-600 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <div className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center">
                 <CheckCircle2 className="w-6 h-6 text-white" />
@@ -168,9 +168,9 @@ export default async function DealPage({
       <div className={`bg-gradient-to-br ${heroScoreBg} border-b-2 ${heroScoreBorder}`}>
         <div className="px-5 sm:px-8 py-6 sm:py-8">
           <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
-            {/* Score ring */}
+            {/* Score ring — below name on mobile (order-2), left on desktop (sm:order-1) */}
             {score != null && (
-              <div className="relative flex-shrink-0 mx-auto sm:mx-0" style={{ width: 96, height: 96 }}>
+              <div className="relative flex-shrink-0 mx-auto sm:mx-0 order-2 sm:order-1" style={{ width: 96, height: 96 }}>
                 <svg width={96} height={96} viewBox="0 0 120 120" className="-rotate-90">
                   <circle cx={60} cy={60} r={ringR} fill="none" stroke={scoreTrackColor} strokeWidth={7} />
                   <circle cx={60} cy={60} r={ringR} fill="none" stroke={scoreRingColor} strokeWidth={7} strokeDasharray={ringCirc} strokeDashoffset={ringOffset} strokeLinecap="round" />
@@ -181,8 +181,9 @@ export default async function DealPage({
                 </div>
               </div>
             )}
-            <div className="flex-1 min-w-0">
-              <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900 mb-1 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
+            {/* Vendor info — first on mobile (order-1), right on desktop (sm:order-2) */}
+            <div className="flex-1 min-w-0 order-1 sm:order-2">
+              <h1 className="text-2xl sm:text-[26px] font-bold text-slate-900 mb-1 leading-tight" style={{ fontFamily: 'Sora, sans-serif' }}>
                 {shortVendorName}
               </h1>
               <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -208,7 +209,7 @@ export default async function DealPage({
 
           {/* Stat cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-            <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
+            <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <DollarSign className="w-4 h-4 text-slate-400" />
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{isWon ? 'Original' : 'Total'}</span>
@@ -217,7 +218,7 @@ export default async function DealPage({
               <p className="text-[11px] text-slate-400 mt-0.5">{term || ''}</p>
             </div>
             {isWon ? (
-              <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
+              <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <DollarSign className="w-4 h-4 text-emerald-500" />
                   <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">Final price</span>
@@ -230,7 +231,7 @@ export default async function DealPage({
                 <p className="text-[11px] text-emerald-500 mt-0.5">{deal.savings_percent != null ? `${deal.savings_percent.toFixed(1)}% less` : ''}</p>
               </div>
             ) : (
-              <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-red-200/50 shadow-sm">
+              <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-red-200/50 shadow-sm">
                 <div className="flex items-center gap-2 mb-1.5">
                   <AlertTriangle className="w-4 h-4 text-red-500" />
                   <span className="text-[11px] font-semibold text-red-400 uppercase tracking-wider">{t('output.redFlags')}</span>
@@ -240,7 +241,7 @@ export default async function DealPage({
                 {watchCount > 0 && <p className="text-[10px] text-slate-400 mt-0.5">+{watchCount} minor item{watchCount === 1 ? '' : 's'}</p>}
               </div>
             )}
-            <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
+            <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <TrendingUp className="w-4 h-4 text-emerald-500" />
                 <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">{isWon ? 'Saved' : 'Savings'}</span>
@@ -252,7 +253,7 @@ export default async function DealPage({
               </p>
               <p className="text-[11px] text-emerald-500 mt-0.5">{isWon ? 'achieved' : 'potential'}</p>
             </div>
-            <div className="bg-white/80 backdrop-blur rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
+            <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
                 <Calendar className="w-4 h-4 text-slate-400" />
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{isWon ? 'Closed' : 'Started'}</span>

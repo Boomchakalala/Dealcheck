@@ -313,9 +313,9 @@ export default async function DashboardPage() {
             <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif', letterSpacing: '-0.02em' }}>Dashboard</h1>
             <p className="text-[13px] text-slate-500 mt-0.5">{enrichedDeals.length} deals tracked &middot; {fmtCompact(totalSpend, sym)} spend analyzed</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <DashboardDatePicker />
-            <PrimaryButton href="/app/new" size="md">
+            <PrimaryButton href="/app/new" size="md" className="w-full sm:w-auto justify-center">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               New analysis
             </PrimaryButton>

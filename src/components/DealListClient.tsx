@@ -264,11 +264,20 @@ export function DealListClient({ deals: initialDeals, onDealDeleted, linkBase = 
 
                 {/* Vendor + meta */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className={`min-w-0 text-[15px] font-semibold truncate ${isWon ? 'text-emerald-900' : isClosed ? 'text-slate-500' : 'text-slate-900'}`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <span className={`text-[15px] font-semibold leading-snug line-clamp-2 ${isWon ? 'text-emerald-900' : isClosed ? 'text-slate-500' : 'text-slate-900'}`}>
                       {vendorName}
                     </span>
-                    <span className={`hidden sm:inline-flex flex-shrink-0 items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${status.badge}`}>
+                    <div className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                      <DealMenu
+                        dealId={deal.id} isClosed={isClosed} totalCommitment={totalCommitment}
+                        roundCount={roundCount} hasSavings={achievedSavings > 0}
+                        onClose={handleClose} onDelete={handleDelete} t={t}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <span className={`inline-flex flex-shrink-0 items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${status.badge}`}>
                       {status.icon}
                       {status.label}
                     </span>
@@ -278,13 +287,6 @@ export function DealListClient({ deals: initialDeals, onDealDeleted, linkBase = 
                         {redFlagCount} {redFlagCount === 1 ? 'flag' : 'flags'}
                       </span>
                     )}
-                    <div className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                      <DealMenu
-                        dealId={deal.id} isClosed={isClosed} totalCommitment={totalCommitment}
-                        roundCount={roundCount} hasSavings={achievedSavings > 0}
-                        onClose={handleClose} onDelete={handleDelete} t={t}
-                      />
-                    </div>
                   </div>
                   <p className="text-[12px] text-slate-400 mt-0.5">
                     {category && <>{category} &middot; </>}{getTimeAgo(deal.updated_at, t, locale)}
