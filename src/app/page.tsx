@@ -123,7 +123,7 @@ export default function LandingV2() {
                 <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping" style={{ background: green }} />
                 <span className="relative inline-flex w-2 h-2 rounded-full" style={{ background: green }} />
               </span>
-              <span className="text-[11.5px] text-slate-700 font-semibold tracking-wide whitespace-nowrap truncate" style={{ fontFamily: mono }}>THE PROCUREMENT EXPERT YOUR BUSINESS NEVER HAD</span>
+              <span className="text-[9.5px] sm:text-[11.5px] text-slate-700 font-semibold tracking-wide whitespace-nowrap" style={{ fontFamily: mono }}>THE PROCUREMENT EXPERT YOUR BUSINESS NEVER HAD</span>
             </div>
 
             <h1 className="text-slate-900 mb-6" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(44px, 5.8vw, 72px)', lineHeight: 0.98, letterSpacing: '-0.032em' }}>

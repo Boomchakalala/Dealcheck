@@ -265,7 +265,7 @@ export function DealListClient({ deals: initialDeals, onDealDeleted, linkBase = 
                 {/* Vendor + meta */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <span className={`text-[15px] font-semibold leading-snug line-clamp-2 ${isWon ? 'text-emerald-900' : isClosed ? 'text-slate-500' : 'text-slate-900'}`}>
+                    <span className={`min-w-0 text-[15px] font-semibold leading-snug line-clamp-2 ${isWon ? 'text-emerald-900' : isClosed ? 'text-slate-500' : 'text-slate-900'}`}>
                       {vendorName}
                     </span>
                     <div className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">

@@ -178,10 +178,10 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
                 <div key={i} className="px-5 py-3.5 flex items-start gap-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13.5px] text-slate-800 font-medium leading-snug">{c.description}</p>
-                    <p className="text-[12px] text-slate-400 mt-0.5">{c.dealName}{c.date ? `, ${fmtMonthYear(c.date)}` : ''}</p>
+                    <p className="text-[13.5px] text-slate-800 font-medium leading-snug break-words">{c.description}</p>
+                    <p className="text-[12px] text-slate-400 mt-0.5 break-words">{c.dealName}{c.date ? `, ${fmtMonthYear(c.date)}` : ''}</p>
                   </div>
-                  {c.impact && <span className="text-[12.5px] font-bold text-emerald-700 flex-shrink-0" style={{ fontFamily: sora }}>{c.impact}</span>}
+                  {c.impact && <span className="text-[12.5px] font-bold text-emerald-700 flex-shrink-0 max-w-[40%] text-right" style={{ fontFamily: sora }}>{c.impact}</span>}
                 </div>
               ))}
             </div>
