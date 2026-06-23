@@ -77,7 +77,7 @@ export async function POST(
       if (plan === 'free') {
         if (profile.usage_count >= FREE_ANALYSIS_LIMIT) {
           return NextResponse.json(
-            { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (\u20AC15/mo) or Pro (\u20AC39/mo) for more.` },
+            { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (\u20AC39/mo) or Pro (\u20AC129/mo) for more.` },
             { status: 403 }
           )
         }
@@ -93,7 +93,7 @@ export async function POST(
           .gte('created_at', startOfMonth.toISOString())
         if ((monthlyCount || 0) >= ESSENTIALS_MONTHLY_LIMIT) {
           return NextResponse.json(
-            { error: `Essentials plan limited to ${ESSENTIALS_MONTHLY_LIMIT} analyses per month. Upgrade to Pro (\u20AC39/mo) for unlimited.` },
+            { error: `Essentials plan limited to ${ESSENTIALS_MONTHLY_LIMIT} analyses per month. Upgrade to Pro (\u20AC129/mo) for unlimited.` },
             { status: 403 }
           )
         }
@@ -130,7 +130,7 @@ export async function POST(
     // Enforce multi-round limit for Essentials
     if (!profile.is_admin && profile.plan === 'essentials' && nextRoundNumber > ESSENTIALS_MAX_ROUNDS) {
       return NextResponse.json(
-        { error: `Essentials plan limited to ${ESSENTIALS_MAX_ROUNDS} rounds per deal. Upgrade to Pro (\u20AC39/mo) for unlimited rounds.` },
+        { error: `Essentials plan limited to ${ESSENTIALS_MAX_ROUNDS} rounds per deal. Upgrade to Pro (\u20AC129/mo) for unlimited rounds.` },
         { status: 403 }
       )
     }

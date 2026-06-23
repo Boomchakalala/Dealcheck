@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { renderMarkdown } from '@/lib/render-markdown'
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       if (plan === 'free') {
         if (profile.usage_count >= FREE_ANALYSIS_LIMIT) {
           return NextResponse.json(
-            { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (\u20AC15/mo) or Pro (\u20AC39/mo) for more.` },
+            { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (\u20AC39/mo) or Pro (\u20AC129/mo) for more.` },
             { status: 403 }
           )
         }
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
           .gte('created_at', startOfMonth.toISOString())
         if ((monthlyCount || 0) >= ESSENTIALS_MONTHLY_LIMIT) {
           return NextResponse.json(
-            { error: `Essentials plan limited to ${ESSENTIALS_MONTHLY_LIMIT} analyses per month. Upgrade to Pro (\u20AC39/mo) for unlimited.` },
+            { error: `Essentials plan limited to ${ESSENTIALS_MONTHLY_LIMIT} analyses per month. Upgrade to Pro (€129/mo) for unlimited.` },
             { status: 403 }
           )
         }
@@ -127,3 +127,4 @@ export async function POST(request: Request) {
     }, { status: 500 })
   }
 }
+

@@ -101,7 +101,7 @@ FORMATTING:
 - Short paragraphs. Vary paragraph length.
 - No em dashes or en dashes — use commas, colons, or plain hyphens.
 - Subject line: plain and specific. Vendor name + plain reference ("Re: Salesforce renewal", "Konica Minolta — follow-up on proposal"). Nothing clever.
-- Sign off: "Best regards," then "Kevin" on a new line.
+- Sign off: "Best regards," then the sender name on a new line. Use the SENDER NAME provided in the deal context. If none is provided, write "[Your Name]". Never hardcode a real name.
 - Length: aim for 120–180 words. Never over 220. Cut adjectives and recaps, never cut figures or justifications.
 `
 
@@ -125,6 +125,7 @@ export async function generateEmailDrafts(
     quick_read?: { conclusion: string }
   },
   userLocale?: string,
+  senderName?: string,
 ): Promise<{
   neutral: { subject: string; body: string }
   firm: { subject: string; body: string }
@@ -149,11 +150,12 @@ Situation: ${analysisOutput.verdict}
 
 CRITICAL: Use ONLY the product/service name shown above. Never invent or guess a different product name.
 ${analysisOutput.contact_name ? `The contact's first name is "${analysisOutput.contact_name}". Use "Hi ${analysisOutput.contact_name}," as the greeting in every email.` : ''}
+SENDER NAME: ${senderName || '[Your Name]'}
 
 THE ASKS TO RAISE (these are the pre-selected priority points — raise ALL of them, in this order, first ask gets the most space):
-${selectedAsks.map((a) => `- ${a}`).join('\n') || '- (none — write a short, friendly note that Kevin is happy with the proposal and ready to proceed once any final admin is confirmed)'}
+${selectedAsks.map((a) => `- ${a}`).join('\n') || '- (none — write a short, friendly note that the buyer is happy with the proposal and ready to proceed once any final admin is confirmed)'}
 
-WHAT KEVIN CAN OFFER IN RETURN (trade these against the asks where they fit naturally):
+WHAT THE BUYER CAN OFFER IN RETURN (trade these against the asks where they fit naturally):
 ${canOffer.map((c) => `- ${c}`).join('\n') || '- fast signature once the points above are settled'}
 
 Return ONLY JSON with this structure:
@@ -200,6 +202,7 @@ export async function regenerateEmailDrafts(
   extractedText: string,
   currentOutput: DealOutput,
   userLocale?: string,
+  senderName?: string,
 ): Promise<DealOutputType['email_drafts']> {
   const prompt = `Write 3 supplier-facing email variations in Kevin's style.
 
@@ -210,6 +213,7 @@ Vendor: ${currentOutput.vendor || currentOutput.snapshot.vendor_product}
 Total Commitment: ${currentOutput.snapshot.total_commitment}
 Term: ${currentOutput.snapshot.term}
 Situation: ${currentOutput.verdict}
+SENDER NAME: ${senderName || '[Your Name]'}
 
 Must-Have Asks:
 ${currentOutput.what_to_ask_for?.must_have?.join('\n') || 'None'}
@@ -217,10 +221,10 @@ ${currentOutput.what_to_ask_for?.must_have?.join('\n') || 'None'}
 Nice-to-Have Asks:
 ${currentOutput.what_to_ask_for?.nice_to_have?.join('\n') || 'None'}
 
-Red Flags (for context — do not dump all of these into the email, select what Kevin would actually raise):
+Red Flags (for context — select only what the buyer would actually raise):
 ${currentOutput.red_flags?.map(f => `- ${f.issue}`).join('\n') || 'None'}
 
-Kevin's Leverage (what he can trade or offer):
+Buyer's Leverage (what they can trade or offer):
 ${currentOutput.negotiation_plan?.leverage_you_have?.join('\n') || 'None'}
 ${currentOutput.negotiation_plan?.trades_you_can_offer?.join('\n') || ''}
 

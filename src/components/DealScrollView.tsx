@@ -193,11 +193,8 @@ export function DealScrollView(props: DealScrollViewProps) {
   }, [o?.red_flags])
 
   // ── red flag accordion state (HIGH + MEDIUM open by default, LOW collapsed) ──
-  const [openFlags, setOpenFlags] = useState<Record<number, boolean>>(() => {
-    const init: Record<number, boolean> = {}
-    sortedFlags.forEach(({ idx, severity }: any) => { if (severity === 'HIGH' || severity === 'MEDIUM') init[idx] = true })
-    return init
-  })
+  const [openFlags, setOpenFlags] = useState<Record<number, boolean>>({})
+  const [showFlagsSection, setShowFlagsSection] = useState(false)
   const [showWatch, setShowWatch] = useState(false)
   const allFlagsOpen = sortedFlags.length > 0 && sortedFlags.every(({ idx }: any) => openFlags[idx])
   const toggleFlag = (idx: number) => setOpenFlags((p) => ({ ...p, [idx]: !p[idx] }))
@@ -364,9 +361,12 @@ export function DealScrollView(props: DealScrollViewProps) {
 
       {/* ═══ SECTION 2: RED FLAGS (red-tinted bg) ═══ */}
       <div className="bg-red-50/40 border-b border-red-200">
-        <div className="p-5 sm:p-8">
-          {/* Section header */}
-          <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+        <div className={showFlagsSection ? 'p-5 sm:p-8' : 'px-5 sm:px-8 py-4'}>
+          {/* Section header — always visible, acts as toggle */}
+          <button
+            onClick={() => setShowFlagsSection(!showFlagsSection)}
+            className="w-full flex items-center justify-between gap-3 text-left group"
+          >
             <div className="flex items-center gap-4 min-w-0">
               <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center shadow-md flex-shrink-0">
                 <AlertTriangle className="w-6 h-6 text-white" />
@@ -380,12 +380,20 @@ export function DealScrollView(props: DealScrollViewProps) {
                 </p>
               </div>
             </div>
-            {sortedFlags.length > 1 && (
-              <button onClick={toggleAllFlags} className="text-[12px] font-semibold text-slate-500 hover:text-slate-700 transition-colors flex-shrink-0">
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold border transition-all flex-shrink-0 ${showFlagsSection ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-red-100 text-red-700 border-red-200 group-hover:bg-red-200'}`}>
+              {showFlagsSection ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              {showFlagsSection ? (locale === 'fr' ? 'Réduire' : 'Collapse') : (locale === 'fr' ? 'Voir les problèmes' : 'Expand issues')}
+            </span>
+          </button>
+
+          {showFlagsSection && <div className="mt-4 sm:mt-6">
+          {sortedFlags.length > 1 && (
+            <div className="flex justify-end mb-3">
+              <button onClick={toggleAllFlags} className="text-[12px] font-semibold text-slate-500 hover:text-slate-700 transition-colors">
                 {allFlagsOpen ? (locale === 'fr' ? 'Tout réduire' : 'Collapse all') : (locale === 'fr' ? 'Tout afficher' : 'Expand all')}
               </button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Accordion — one bordered group, flat rows */}
           {sortedFlags.length > 0 ? (
@@ -474,6 +482,7 @@ export function DealScrollView(props: DealScrollViewProps) {
               </div>
             </div>
           )}
+          </div>}
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { Search, Rocket, Upload, BarChart3, FolderOpen, Shield, CreditCard, ChevronDown, Mail } from 'lucide-react'
@@ -43,8 +43,8 @@ const faqData: Record<Category, { q: string; a: string }[]> = {
   ],
   'billing': [
     { q: "What\u2019s the free plan?", a: "The Starter plan gives you 4 free analyses \u2014 no credit card required. You get the full analysis package (score, flags, savings, emails) for each one. Create an account to track your deals and access your history." },
-    { q: 'What does Essentials include?', a: 'Essentials (€15/month) gives you 10 analyses a month, saved deals, up to 2 negotiation rounds per deal, full deal history, and PDF export. A good fit if you negotiate a few contracts a month.' },
-    { q: 'What does Pro include?', a: 'Pro (€39/month) gives you unlimited analyses, unlimited negotiation rounds, a full spend dashboard with savings tracking, and email regeneration. It\u2019s designed for individuals or small teams who negotiate regularly.' },
+    { q: 'What does Essentials include?', a: 'Essentials (â‚¬15/month) gives you 10 analyses a month, saved deals, up to 2 negotiation rounds per deal, full deal history, and PDF export. A good fit if you negotiate a few contracts a month.' },
+    { q: 'What does Pro include?', a: 'Pro (â‚¬39/month) gives you unlimited analyses, unlimited negotiation rounds, a full spend dashboard with savings tracking, and email regeneration. It\u2019s designed for individuals or small teams who negotiate regularly.' },
     { q: 'Can I cancel anytime?', a: "Yes. You can cancel your subscription at any time from Settings \u2192 Subscription \u2192 Manage subscription. You\u2019ll keep access until the end of your current billing period. No cancellation fees, no questions asked." },
   ],
 }
@@ -191,3 +191,4 @@ export default function AppHelpPage() {
     </div>
   )
 }
+

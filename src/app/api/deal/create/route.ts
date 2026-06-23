@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { CreateDealSchema } from '@/lib/schemas'
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
         // Free: lifetime limit
         if (profile.usage_count >= FREE_ANALYSIS_LIMIT) {
           return NextResponse.json(
-            { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (\u20AC15/mo) or Pro (\u20AC39/mo) for more.` },
+            { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (\u20AC39/mo) or Pro (\u20AC129/mo) for more.` },
             { status: 403 }
           )
         }
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
           .gte('created_at', startOfMonth.toISOString())
         if ((monthlyCount || 0) >= ESSENTIALS_MONTHLY_LIMIT) {
           return NextResponse.json(
-            { error: `Essentials plan limited to ${ESSENTIALS_MONTHLY_LIMIT} analyses per month. Upgrade to Pro (\u20AC39/mo) for unlimited.` },
+            { error: `Essentials plan limited to ${ESSENTIALS_MONTHLY_LIMIT} analyses per month. Upgrade to Pro (€129/mo) for unlimited.` },
             { status: 403 }
           )
         }
@@ -110,7 +110,7 @@ export async function POST(request: Request) {
       ? { base64: validated.pdfData.base64, mimeType: validated.pdfData.mimeType }
       : undefined
 
-    // Analyze with V1 (full text analysis — auto-retry on transient failures)
+    // Analyze with V1 (full text analysis â€” auto-retry on transient failures)
     const output = await withRetry(() => analyzeDeal(
       validated.extractedText || '',
       validated.dealType,
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         vendor,
-        title: `${vendor} · ${validated.dealType === 'New' ? 'New Purchase' : 'Renewal'} · ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
+        title: `${vendor} Â· ${validated.dealType === 'New' ? 'New Purchase' : 'Renewal'} Â· ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
         deal_type: validated.dealType,
         goal: validated.goal,
       })
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
       throw new Error('Failed to create deal')
     }
 
-    // Link to a vendor entity (best-effort — never blocks deal creation).
+    // Link to a vendor entity (best-effort â€” never blocks deal creation).
     try {
       const vendorId = await resolveVendorForDeal(supabase, user.id, vendor)
       if (vendorId) await supabase.from('deals').update({ vendor_id: vendorId }).eq('id', deal.id)
@@ -199,3 +199,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: hint }, { status: 500 })
   }
 }
+

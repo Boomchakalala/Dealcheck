@@ -62,8 +62,8 @@ const faqData: Record<Section, { title: string; sub: string; items: { q: string;
     sub: 'Plans, pricing, and account management',
     items: [
       { q: "What's the free plan?", a: 'You get 1 free analysis with no signup required. Create an account and you get 3 more — 4 total on the Starter plan. No credit card needed.' },
-      { q: 'What does Essentials cost?', a: '€15/month for 10 analyses a month, saved deals, up to 2 negotiation rounds per deal, full deal history, and PDF export. Cancel anytime.' },
-      { q: 'What does Pro cost?', a: '€39/month for unlimited analyses, unlimited negotiation rounds, a full spend dashboard, and savings tracking. Cancel anytime.' },
+      { q: 'What does Essentials cost?', a: '€39/month for 15 analyses a month, saved deals, up to 3 negotiation rounds per deal, full deal history, and PDF export. Cancel anytime.' },
+      { q: 'What does Pro cost?', a: '€129/month for unlimited analyses, unlimited negotiation rounds, a full spend dashboard, and savings tracking. Cancel anytime.' },
       { q: 'Can I delete my account?', a: "Yes. Go to your profile settings and choose 'Delete account.' All your data — saved deals, analysis history, account info — is permanently removed. This cannot be undone." },
     ],
   },

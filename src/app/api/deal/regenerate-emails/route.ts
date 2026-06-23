@@ -18,11 +18,14 @@ export async function POST(request: Request) {
     // Get user plan for regen limit
     const { data: profile } = await supabase
       .from('profiles')
-      .select('plan, is_admin')
+      .select('plan, is_admin, first_name, last_name')
       .eq('id', user.id)
       .single()
 
     const plan = (profile?.plan || 'free') as Plan
+    const senderName = profile?.first_name
+      ? [profile.first_name, profile.last_name].filter(Boolean).join(' ')
+      : undefined
     const maxRegens = profile?.is_admin ? 99 : getMaxEmailRegens(plan)
 
     if (maxRegens === 0) {
@@ -88,11 +91,12 @@ Currency: ${currency || 'match the source quote'}
 Situation: ${conclusion || 'Negotiation in progress'}
 
 ${contactName ? `The contact's first name is "${contactName}". Use "Hi ${contactName}," as the greeting in every email.` : ''}
+SENDER NAME: ${senderName || '[Your Name]'}
 
 THE ASKS TO RAISE (use ALL of these, in this order — first ask gets the most space):
-${selected.map((a: string) => `- ${a}`).join('\n') || '- (none selected — write a short, friendly note that Kevin is happy with the quote and ready to proceed)'}
+${selected.map((a: string) => `- ${a}`).join('\n') || '- (none selected — write a short, friendly note that the buyer is happy with the quote and ready to proceed)'}
 
-WHAT KEVIN CAN OFFER IN RETURN (trade these against the asks where they fit naturally):
+WHAT THE BUYER CAN OFFER IN RETURN (trade these against the asks where they fit naturally):
 ${offers.map((c: string) => `- ${c}`).join('\n') || '- fast signature once the points above are settled'}
 
 ${customPrompt ? `USER'S CUSTOM REQUEST (honor this):\n${customPrompt}\n` : ''}

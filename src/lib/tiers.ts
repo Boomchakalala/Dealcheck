@@ -21,8 +21,8 @@ export type FeatureId =
   | 'unlimited_analyses'
 
 export const FREE_ANALYSIS_LIMIT = 4
-export const ESSENTIALS_MONTHLY_LIMIT = 10
-export const ESSENTIALS_MAX_ROUNDS = 2
+export const ESSENTIALS_MONTHLY_LIMIT = 15
+export const ESSENTIALS_MAX_ROUNDS = 3
 export const ESSENTIALS_EMAIL_REGENS = 1
 export const PRO_EMAIL_REGENS = 3
 
@@ -45,7 +45,7 @@ export const TIERS: Record<Plan, TierConfig> = {
   essentials: {
     plan: 'essentials',
     label: 'Essentials',
-    price: '\u20AC15/mo',
+    price: '\u20AC39/mo',
     features: [
       'save_deals',
       'deal_history',
@@ -59,7 +59,7 @@ export const TIERS: Record<Plan, TierConfig> = {
   pro: {
     plan: 'pro',
     label: 'Pro',
-    price: '\u20AC39/mo',
+    price: '\u20AC129/mo',
     features: [
       'unlimited_analyses',
       'save_deals',

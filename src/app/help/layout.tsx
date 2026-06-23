@@ -17,7 +17,7 @@ const faqItems = [
   { q: "What do I get back from an analysis?", a: "You get a complete negotiation package: a verdict summary, red flags with suggested mitigations, a negotiation plan split into must-have and nice-to-have asks, estimated potential savings, and ready-to-send email drafts in three different tones." },
   { q: "Is my data private?", a: "Yes. Uploaded files are deleted immediately after text extraction. Your text is not stored unless you explicitly save the deal to your account. All data is encrypted in transit and at rest. Your documents are never used for AI training." },
   { q: "What's the free plan?", a: "You get 1 free analysis with no signup required. Create an account and you get 3 more — 4 total on the Starter plan. No credit card needed." },
-  { q: "How much is Pro?", a: "€39/month for unlimited analyses, plus features like saved deals and analysis history." },
+  { q: "How much is Pro?", a: "€129/month for unlimited analyses, unlimited negotiation rounds, a full spend dashboard, and savings tracking." },
 ]
 
 export default function Layout({ children }: { children: React.ReactNode }) {
