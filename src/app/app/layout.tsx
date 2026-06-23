@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { AppSidebar } from '@/components/AppSidebar'
-import { FeedbackWidget } from '@/components/FeedbackWidget'
 
 export default async function AppLayout({
   children,
@@ -41,10 +40,6 @@ export default async function AppLayout({
           {children}
         </div>
       </main>
-      {/* Floating feedback widget overlaps content on small screens — desktop only */}
-      <div className="hidden md:block">
-        <FeedbackWidget />
-      </div>
     </div>
   )
 }
