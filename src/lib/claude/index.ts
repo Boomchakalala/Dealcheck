@@ -16,7 +16,7 @@ export { CLAUDE_MODEL_ID, getLanguageInstruction, type ClaudeUserContent } from 
 export { classifyQuote } from './classify'
 export { extractFinancialFacts, type ExtractedFacts } from './extract'
 export { analyzeDealFacts, type AnalysisOutput } from './analyze'
-export { generateEmailDrafts, regenerateEmailDrafts, generateEmailV2, EMAIL_PROMPT } from './emails'
+export { generateEmailDrafts, regenerateEmailDrafts, generateEmailV2, KEVIN_SYSTEM_PROMPT, EMAIL_RULES } from './emails'
 export { calculateQuoteScore, parseMoneyAmount } from './score'
 export { validateTotalCommitment } from './validate-total'
 export { extractRigid, generateDocumentHash, rigidToLegacyFacts, type RigidExtraction } from './extract-rigid'

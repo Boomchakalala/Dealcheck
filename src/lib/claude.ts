@@ -47,7 +47,7 @@ export async function getClaudeResponse(params: {
 }
 
 // Re-export email functions used by routes
-export { regenerateEmailDrafts, generateEmailV2, EMAIL_PROMPT } from './claude/emails'
+export { regenerateEmailDrafts, generateEmailV2, KEVIN_SYSTEM_PROMPT, EMAIL_RULES } from './claude/emails'
 
 // Re-export score utilities
 export { calculateQuoteScore, parseMoneyAmount } from './claude/score'

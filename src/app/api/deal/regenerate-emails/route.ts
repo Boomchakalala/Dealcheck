@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { getClaudeResponse, getLanguageInstruction, EMAIL_PROMPT } from '@/lib/claude'
+import { getClaudeResponse, getLanguageInstruction, KEVIN_SYSTEM_PROMPT, EMAIL_RULES } from '@/lib/claude'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
@@ -75,23 +75,25 @@ export async function POST(request: Request) {
     const selected: string[] = (Array.isArray(selectedAsks) && selectedAsks.length ? selectedAsks : (mustHaveAsks || [])).filter(Boolean)
     const offers: string[] = Array.isArray(canOffer) ? canOffer : []
 
-    const basePrompt = `You are TermLift's email generation engine. Write 3 supplier-facing email variations.
+    const basePrompt = `Write 3 supplier-facing email variations in Kevin's style.
 
-${EMAIL_PROMPT}
+${EMAIL_RULES}
 
 DEAL CONTEXT:
 Vendor: ${vendor || 'the vendor'}
-Contact Name: ${contactName || 'NOT AVAILABLE, use "Hi," as greeting'}
+Contact Name: ${contactName || 'NOT AVAILABLE — use "Hi," as greeting'}
 Total Commitment: ${totalCommitment || 'not specified'}
 Term: ${term || 'not specified'}
 Currency: ${currency || 'match the source quote'}
 Situation: ${conclusion || 'Negotiation in progress'}
 
-THE ASKS TO PUSH ON (use ALL of these, in this priority order — the first gets the lead position and the most space):
-${selected.map((a: string) => `- ${a}`).join('\n') || '- (none selected — write a short, friendly note that the buyer is happy with the quote and ready to proceed)'}
+${contactName ? `The contact's first name is "${contactName}". Use "Hi ${contactName}," as the greeting in every email.` : ''}
 
-WHAT THE BUYER CAN OFFER IN RETURN (trade these against the asks where they fit, in the same breath):
-${offers.map((c: string) => `- ${c}`).join('\n') || '- a fast signature once the points above are settled'}
+THE ASKS TO RAISE (use ALL of these, in this order — first ask gets the most space):
+${selected.map((a: string) => `- ${a}`).join('\n') || '- (none selected — write a short, friendly note that Kevin is happy with the quote and ready to proceed)'}
+
+WHAT KEVIN CAN OFFER IN RETURN (trade these against the asks where they fit naturally):
+${offers.map((c: string) => `- ${c}`).join('\n') || '- fast signature once the points above are settled'}
 
 ${customPrompt ? `USER'S CUSTOM REQUEST (honor this):\n${customPrompt}\n` : ''}
 Return ONLY valid JSON (no markdown, no code fences):
@@ -108,7 +110,7 @@ Return ONLY valid JSON (no markdown, no code fences):
     const langInstruction = getLanguageInstruction(locale)
 
     const raw = (await getClaudeResponse({
-      system: 'You are a procurement negotiation expert. Write professional, effective emails. Return only valid JSON.' + langInstruction,
+      system: KEVIN_SYSTEM_PROMPT + '\n' + langInstruction,
       userContent: basePrompt,
       temperature: 0.7,
       max_tokens: 2000,

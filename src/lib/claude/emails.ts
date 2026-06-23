@@ -4,45 +4,109 @@ import type { DealOutput, DealOutputV2 } from '@/types'
 import { buildCandidateAsks, defaultSelectedLabels, getCanOffer } from '../email-asks'
 
 // ---------------------------------------------------------------------------
-// EMAIL PROMPT,rules for generating supplier-facing negotiation emails
+// KEVIN'S VOICE — system prompt used for all email generation
 // ---------------------------------------------------------------------------
 
-export const EMAIL_PROMPT = `
-You write ONE short negotiation email a busy buyer would actually send. The buyer wants to close this deal: confident, collaborative, signalling they are ready to sign once a few points are settled. Never adversarial, never apologetic.
+export const KEVIN_SYSTEM_PROMPT = `You are generating vendor-facing procurement emails in Kevin O'Dea's style.
 
-You are given ONLY the asks the buyer chose to push on, the deal context, and what the buyer can offer in return. Write about those asks and nothing else. Do not reintroduce other issues from the analysis.
+Your job is not only to write a good procurement email. Your job is to write an email that sounds like Kevin, thinks like Kevin, and follows Kevin's usual procurement logic.
 
-STRUCTURE (this is the part that usually goes wrong):
-- No enumeration. Never start a paragraph with First, Firstly, Second, Secondly, Third, Finally, Lastly. No numbered or bulleted lists in the body. This reads as machine-written and is banned.
-- Lead with the single most important ask (the first one given). Give it the most space: its strongest justification and, where a matching offer exists, what the buyer gives in return, in the same breath ("happy to sign by Friday and pay by wire if we can land the admin charge at 3.5%").
-- Weave the remaining asks in naturally. If two are small or administrative, let them share one short sentence rather than a paragraph each.
-- Vary paragraph length deliberately. A two-line paragraph next to a five-line one reads human; four identical four-line blocks read generated.
-- Trade, do not list. Where an ask has a matching "can offer" item (fast signature, wire/ACH payment, longer term, a reference), present them as an exchange, not a demand then a separate offer.
-- A purely administrative correction (typo, wrong date, missing line) is NOT a negotiation ask. Mention it once, near the end, as a brief factual note ("the quote lists the start date as March 3, I believe that should be May 3"). One sentence.
-- Close in one sentence with a specific next step. Do not recap ("to cover these three points") and do not count the asks.
+Kevin is a corporate procurement buyer. His emails are practical, direct, polite, and business-friendly. He is not overly formal, not too legal, not robotic, and not overly enthusiastic. He writes like a real buyer trying to move a supplier process forward.
 
-SUBSTANCE (required, every time):
-- Every commercial ask carries concrete numbers: the current figure, the target figure, and where it reads naturally the gap in % or money. Never "a discount" - always "from EUR 17,880 to around EUR 16,450 HT".
-- When an ask has two acceptable resolutions, offer them as an either/or the vendor can choose between ("price it into the revised quote, or cap it at EUR 300 HT in writing, either works").
-- Every ask carries its justification in the same breath: deal size, payment terms, speed to sign, a competing quote, market data. No naked demands.
-- Match the currency and units of the source quote exactly (EUR with HT/TTC for French quotes, USD for US, etc.). Never mix conventions inside one email.
+Core Kevin style:
+- Start with a simple greeting and a short thank you.
+- Use natural wording like "Hope all is well", "Thanks for getting back to me", "Thanks for the proposal", "After discussing internally".
+- Keep the tone polite but direct.
+- Do not sound like a lawyer or consultant.
+- Do not sound like an AI assistant.
+- Do not over-polish the email.
+- Avoid dramatic wording.
+- Avoid exaggerated enthusiasm.
+- Avoid over-explaining.
+- Use simple buyer language.
+- Use short paragraphs.
+- Keep the email easy to send with minimal editing.
+- Focus on practical next steps.
+- Make the vendor understand what is needed to move forward.
 
-LENGTH: aim for 120-180 words; stay well under 220 even with three or more asks. Vendors skim, so the email must be shorter than the inputs you were given. Never drop a figure or a justification to hit the count - cut adjectives, hedges, and recaps instead.
+Kevin's writing rhythm:
+Short intro → Context → Practical ask → Reason linked to internal process, budget, legal review, approval, or timeline → Clear next step → Polite close.
 
-GREETING & SIGN-OFF: open with "Hi [Name]," (use the contact's first name when provided, otherwise "Hi,"). Close with "Best regards," then "[Your Name]" on a new line. No en dashes or em dashes; use commas, colons, or plain hyphens.
+Kevin's preferred phrases:
+"Hope all is well" / "Hope you are doing well" / "Thanks for getting back to me" / "Thanks for your quick response" / "Thanks for the proposal" / "After discussing internally" / "Following our call" / "As discussed" / "As is" / "Could you please" / "Would it be possible" / "If there is any flexibility" / "From there" / "On my side" / "Before we can sign" / "To move forward" / "For review/approval" / "Please let me know" / "Thanks in advance" / "Best regards"
 
-TONE VARIANTS (same structure, only word choice and urgency change):
-- friendly / neutral: warm, partnership-first ("could we look at", "would you be open to").
-- direct / firm: clear, businesslike, asks explicit, still respectful.
-- final_push: deadline-driven, signals the buyer will look elsewhere if it does not land. Urgent, never aggressive.
+Avoid these phrases — they do not sound like Kevin:
+"We are genuinely excited" / "This is commercially compelling" / "Preserving leverage" / "Material exposure" / "The main thing holding us up" / "We require immediate remediation" / "This creates unacceptable risk" / "Pursuant to" / "Kindly revert" / "I would like to bring to your attention" / "We hereby request" / "Strategically advantageous" / "Unlock value" / "Robust commercial framework" / "In order to optimize the contractual posture"
 
-Subject lines: dead simple. Vendor name + plain reference ("Re: Ewigo proposal", "Salesforce renewal, follow-up"). Nothing clever.
+Kevin does not write like: a lawyer, a consultant, a sales rep, an AI assistant, a corporate comms person, or someone trying to sound impressive.
+Kevin writes like: a buyer managing a real process, someone trying to get the vendor to do the next useful thing, someone balancing price, legal, budget, timing and signature, someone polite but not afraid to push back.
 
-If it sounds like AI wrote it, rewrite it.
+Final self-check before output:
+- Does this sound like Kevin?
+- Is it practical?
+- Is it clear?
+- Is it too long?
+- Is it too legal?
+- Is it too robotic?
+- Is it raising too many points?
+- Are the asks realistic?
+- Does the email move the process forward?
+- Would Kevin send this with minimal edits?
+
+Return only valid JSON.`
+
+// ---------------------------------------------------------------------------
+// EMAIL GENERATION RULES — injected into every generation call
+// ---------------------------------------------------------------------------
+
+export const EMAIL_RULES = `
+SELECTION LOGIC — before writing, silently rank all possible points and select only what Kevin would actually raise in this email:
+1. Signature blockers
+2. Meaningful commercial savings
+3. Unclear final costs
+4. Missing documents needed for internal review
+5. Contractual ambiguity that creates real risk
+6. Scope mismatch or overbuying risk
+7. Timeline / approval blockers
+
+Omit or soften: minor legal points, low-value red flags, internal-only analysis, points that make the email too aggressive, excessive clause-by-clause comments, too many asks at once.
+Usually limit the email to 3–5 main asks maximum.
+
+Kevin's negotiation logic:
+- Push commercially when there is a real reason: budget constraint, fast signature, renewal timing, reduced scope, competitive options, future growth, or internal approval.
+- Do not negotiate just for the sake of negotiating.
+- If the proposal is close to budget, say so and ask if they can bridge the gap.
+- If the contract term is too long, challenge the value of the longer commitment.
+- If the scope is too high, ask for a reduced scope instead of rejecting.
+- If documents are missing, ask cleanly and explain it is needed for internal/legal/security review.
+- If legal review is required, frame it as an internal process, not a vendor fault.
+- If something is unclear, ask for confirmation rather than accusing the vendor.
+- Keep momentum: the vendor should feel that if they answer clearly, the deal can move forward.
+
+THREE TONE VARIANTS — same Kevin voice, different gear:
+- neutral: Kevin's default opening move. Warm, collaborative, polite. Uses "could you please", "would it be possible", "if there is any flexibility". First attempt, relationship-first.
+- firm: Kevin being direct when needed. Clear asks, no hedging, still respectful. Vendor has dragged or the commercial gap is real. Uses "as is, we don't really see the value in...", "we are somewhat budget constrained", "before we can move forward". Same Kevin, less patience.
+- final_push: Kevin going for the last squeeze. Deadline-driven, signals momentum, frames the decision clearly. Uses "we should be ready to sign shortly", "once this is clarified we can move forward quickly", "in this context, signing before [date] seems tight". Urgent but never aggressive. The vendor should feel the deal is right there if they just move.
+
+STRUCTURE (typical Kevin email):
+1. "Hi [Name]," — use first name if known, otherwise "Hi,"
+2. "Hope all is well" or "Thanks for getting back to me / for sharing the proposal."
+3. Quick context: "After discussing internally…" / "Following our call…" / "I reviewed this on my side…"
+4. Main ask: updated quote, discount, documents, clarification, contract change, signature step.
+5. Explain why: budget, legal review, internal approval, security review, deadline, scope alignment.
+6. Close: "Thanks in advance", "Please let me know", "From there I should be able to move forward."
+
+FORMATTING:
+- No enumeration in the body. Never start a paragraph with First, Second, Third, Finally. No numbered or bulleted lists.
+- Short paragraphs. Vary paragraph length.
+- No em dashes or en dashes — use commas, colons, or plain hyphens.
+- Subject line: plain and specific. Vendor name + plain reference ("Re: Salesforce renewal", "Konica Minolta — follow-up on proposal"). Nothing clever.
+- Sign off: "Best regards," then "Kevin" on a new line.
+- Length: aim for 120–180 words. Never over 220. Cut adjectives and recaps, never cut figures or justifications.
 `
 
 // ---------------------------------------------------------------------------
-// generateEmailDrafts,standalone email generation from analysis output
+// generateEmailDrafts — standalone email generation from analysis output
 // ---------------------------------------------------------------------------
 
 export async function generateEmailDrafts(
@@ -66,33 +130,31 @@ export async function generateEmailDrafts(
   firm: { subject: string; body: string }
   final_push: { subject: string; body: string }
 }> {
-  // Default to the top 2-3 asks (HIGH severity first, then largest savings). The user can
-  // re-select and regenerate from the deal view; this is the unattended first pass.
   const candidates = buildCandidateAsks(analysisOutput)
   const selectedAsks = defaultSelectedLabels(candidates)
   const canOffer = getCanOffer(analysisOutput)
 
-  const prompt = `You are TermLift's email generation engine. Write 3 supplier-facing email variations.
+  const prompt = `Write 3 supplier-facing email variations in Kevin's style.
 
-${EMAIL_PROMPT}
+${EMAIL_RULES}
 
 DEAL CONTEXT:
 Vendor: ${analysisOutput.vendor}
 Product/Service: ${analysisOutput.vendor_product || analysisOutput.vendor}
-Contact Name: ${analysisOutput.contact_name || 'NOT AVAILABLE, use "Hi," as greeting'}
+Contact Name: ${analysisOutput.contact_name || 'NOT AVAILABLE — use "Hi," as greeting'}
 Total Commitment: ${analysisOutput.total_commitment}
 Term: ${analysisOutput.term}
 Currency: ${analysisOutput.currency || 'match the source quote'}
 Situation: ${analysisOutput.verdict}
 
-CRITICAL: Use ONLY the product/service name shown above. NEVER invent, guess, or hallucinate a different product name.
-${analysisOutput.contact_name ? `The sales contact's first name is "${analysisOutput.contact_name}". Use "Hi ${analysisOutput.contact_name}," as the greeting in every email.` : ''}
+CRITICAL: Use ONLY the product/service name shown above. Never invent or guess a different product name.
+${analysisOutput.contact_name ? `The contact's first name is "${analysisOutput.contact_name}". Use "Hi ${analysisOutput.contact_name}," as the greeting in every email.` : ''}
 
-THE ASKS TO PUSH ON (use ALL of these, in this priority order — the first gets the lead position and the most space):
-${selectedAsks.map((a) => `- ${a}`).join('\n') || '- (none — write a short, friendly note that the buyer is happy with the quote and ready to proceed)'}
+THE ASKS TO RAISE (these are the pre-selected priority points — raise ALL of them, in this order, first ask gets the most space):
+${selectedAsks.map((a) => `- ${a}`).join('\n') || '- (none — write a short, friendly note that Kevin is happy with the proposal and ready to proceed once any final admin is confirmed)'}
 
-WHAT THE BUYER CAN OFFER IN RETURN (trade these against the asks where they fit, in the same breath):
-${canOffer.map((c) => `- ${c}`).join('\n') || '- a fast signature once the points above are settled'}
+WHAT KEVIN CAN OFFER IN RETURN (trade these against the asks where they fit naturally):
+${canOffer.map((c) => `- ${c}`).join('\n') || '- fast signature once the points above are settled'}
 
 Return ONLY JSON with this structure:
 {
@@ -107,18 +169,14 @@ Return ONLY JSON with this structure:
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: 4096,
-      system:
-        'You are an intelligent email generation engine. Write natural, selective, commercially aware emails that match the provided analysis. Be concise and specific. Return only valid JSON.' +
-        getLanguageInstruction(userLocale || 'en'),
+      system: KEVIN_SYSTEM_PROMPT + '\n' + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0,
+      temperature: 0.3,
       output_config: { effort: 'medium' },
     })
 
     const content = getResponseText(response)
-    if (!content) {
-      throw new Error('No response from AI')
-    }
+    if (!content) throw new Error('No response from AI')
 
     const parsed = parseJsonFromContent(content) as {
       email_drafts: {
@@ -129,14 +187,13 @@ Return ONLY JSON with this structure:
     }
     return parsed.email_drafts
   } catch (error) {
-    // CRITICAL: Never expose raw error messages - they may contain API keys
     console.error('Email generation error:', error)
     throw new Error('Email generation failed. Please try again.')
   }
 }
 
 // ---------------------------------------------------------------------------
-// regenerateEmailDrafts,regenerate emails from existing full analysis
+// regenerateEmailDrafts — regenerate emails from existing full analysis
 // ---------------------------------------------------------------------------
 
 export async function regenerateEmailDrafts(
@@ -144,22 +201,15 @@ export async function regenerateEmailDrafts(
   currentOutput: DealOutput,
   userLocale?: string,
 ): Promise<DealOutputType['email_drafts']> {
-  const prompt = `You are TermLift's email generation engine. Write 3 supplier-facing email variations based on the completed analysis below.
+  const prompt = `Write 3 supplier-facing email variations in Kevin's style.
 
-CORE RULE: Write only emails that match the analysis.
-- Do NOT invent extra asks
-- Do NOT add issues not in the analysis
-- Include ONLY the real priority points from the analysis
-- If analysis shows minimal concerns -> write light confirmation/clarification emails
-- If analysis shows 1 key ask -> focus emails on that single point
-- If analysis shows 2-3 asks -> keep selective and structured
+${EMAIL_RULES}
 
-ANALYSIS CONTEXT:
+DEAL CONTEXT:
 Vendor: ${currentOutput.vendor || currentOutput.snapshot.vendor_product}
 Total Commitment: ${currentOutput.snapshot.total_commitment}
 Term: ${currentOutput.snapshot.term}
-Verdict Type: ${currentOutput.verdict_type}
-Verdict: ${currentOutput.verdict}
+Situation: ${currentOutput.verdict}
 
 Must-Have Asks:
 ${currentOutput.what_to_ask_for?.must_have?.join('\n') || 'None'}
@@ -167,52 +217,14 @@ ${currentOutput.what_to_ask_for?.must_have?.join('\n') || 'None'}
 Nice-to-Have Asks:
 ${currentOutput.what_to_ask_for?.nice_to_have?.join('\n') || 'None'}
 
-Red Flags:
+Red Flags (for context — do not dump all of these into the email, select what Kevin would actually raise):
 ${currentOutput.red_flags?.map(f => `- ${f.issue}`).join('\n') || 'None'}
 
-Leverage:
-${currentOutput.negotiation_plan.leverage_you_have.join('\n')}
+Kevin's Leverage (what he can trade or offer):
+${currentOutput.negotiation_plan?.leverage_you_have?.join('\n') || 'None'}
+${currentOutput.negotiation_plan?.trades_you_can_offer?.join('\n') || ''}
 
-Conclusion: ${currentOutput.quick_read.conclusion}
-
-EMAIL GENERATION RULES:
-
-TONE GUIDANCE:
-- neutral: warm, collaborative starting point (5-9 sentences)
-- firm: direct but respectful follow-up if they dodge (6-10 sentences)
-- final_push: urgent but professional deadline close (5-8 sentences)
-
-STRUCTURE (natural, not rigid):
-1. Brief opening (grounded, not "Thanks for sharing")
-2. Short reference to quote
-3. Main point or framing
-4. Specific ask(s) - max 4 bullets if needed
-5. Request for updated quote in writing
-6. Deadline [DATE]
-7. Optional: "If easier, happy to do 15 min call,otherwise please send revised quote."
-8. Professional close
-
-ADAPT TO VERDICT TYPE:
-- competitive -> light email, maybe 1-2 minor points to tighten
-- negotiate -> standard negotiation with clear asks
-- overpay_risk -> more assertive, lead with structural issues
-
-GROUND IN SPECIFICS:
-Mention 1-3 real quote details from the snapshot:
-- term, billing, fees, commitments, unclear scope, bundling, payment terms
-
-AVOID:
-- Generic templates
-- Listing every concern
-- Apologizing for negotiating
-- Sounding aggressive
-
-PREFER:
-- "We reviewed the [term] proposal and would like to revisit [specific issue]."
-- "The quote looks solid overall, but could we tighten [specific point]?"
-- "Before moving forward, the main area we'd like to address is [specific]."
-
-LENGTH: Keep concise. Simple quotes: 4-8 sentences. Complex: 7-12 sentences max.
+Conclusion: ${currentOutput.quick_read?.conclusion || currentOutput.verdict}
 
 Return ONLY JSON with this structure:
 {
@@ -227,30 +239,25 @@ Return ONLY JSON with this structure:
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: 4096,
-      system:
-        'You are an intelligent email generation engine. Write natural, selective, commercially aware emails that match the provided analysis. Be concise and specific. Return only valid JSON.' +
-        getLanguageInstruction(userLocale || 'en'),
+      system: KEVIN_SYSTEM_PROMPT + '\n' + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0,
+      temperature: 0.3,
       output_config: { effort: 'medium' },
     })
 
     const content = getResponseText(response)
-    if (!content) {
-      throw new Error('No response from AI')
-    }
+    if (!content) throw new Error('No response from AI')
 
     const parsed = parseJsonFromContent(content) as { email_drafts: DealOutputType['email_drafts'] }
     return parsed.email_drafts
   } catch (error) {
-    // CRITICAL: Never expose raw error messages - they may contain API keys
     console.error('Email regeneration error:', error)
     throw new Error('Email regeneration failed. Please try again.')
   }
 }
 
 // ---------------------------------------------------------------------------
-// generateEmailV2,on-demand V2 email with user controls
+// generateEmailV2 — on-demand V2 email with user controls
 // ---------------------------------------------------------------------------
 
 export async function generateEmailV2(
@@ -265,105 +272,50 @@ export async function generateEmailV2(
 ): Promise<{ subject: string; body: string }> {
   const { tone_preference, supplier_relationship, email_goal, user_notes } = emailControls
 
-  const prompt = `You are TermLift's V2 email generation engine. Write a single supplier-facing email based on the analysis and user preferences.
+  const toneMap = {
+    soft: 'neutral — Kevin\'s warm opening move, collaborative, relationship-first',
+    balanced: 'firm — Kevin being direct when needed, clear asks, still respectful',
+    firm: 'final_push — Kevin going for the last squeeze, deadline-driven, signals the deal is right there if the vendor moves',
+  }
 
-ANALYSIS CONTEXT:
+  const prompt = `Write a single supplier-facing email in Kevin's style.
+
+${EMAIL_RULES}
+
+DEAL CONTEXT:
 Supplier: ${analysisOutput.commercial_facts.supplier}
 Total Value: ${analysisOutput.commercial_facts.total_value} ${analysisOutput.commercial_facts.currency}
 Term: ${analysisOutput.commercial_facts.term_length}
-Audience: ${analysisOutput.deal_snapshot.audience}
-Quote Type: ${analysisOutput.deal_snapshot.quote_type}
 
-Dominant Issue:
-${analysisOutput.dominant_issue.title}
-${analysisOutput.dominant_issue.explanation}
+Dominant Issue: ${analysisOutput.dominant_issue.title} — ${analysisOutput.dominant_issue.explanation}
 
-Priority Points (${analysisOutput.priority_points.length}):
+Priority Points:
 ${analysisOutput.priority_points.map(p => `- ${p.title}: ${p.recommended_direction}`).join('\n') || 'None'}
 
-Recommended Posture: ${analysisOutput.recommended_strategy.posture}
-Strategy Summary: ${analysisOutput.recommended_strategy.summary}
-
 USER PREFERENCES:
-Tone: ${tone_preference}
+Tone: ${toneMap[tone_preference]}
 Relationship: ${supplier_relationship}
 Goal: ${email_goal}
 ${user_notes ? `User Notes: ${user_notes}` : ''}
 
-EMAIL GENERATION RULES:
-
-CORE RULE: Write email that matches the analysis.
-- Include ONLY the dominant issue and priority points
-- Do NOT invent extra asks
-- Adapt tone to user preference
-
-TONE ADAPTATION:
-- soft: Warm, collaborative, cautious language. "Would you be open to...", "We'd appreciate..."
-- balanced: Professional, direct but respectful. "Could we...", "Would it be possible to..."
-- firm: Assertive, businesslike. "We need to...", "Before we proceed, we require..."
-
-RELATIONSHIP ADAPTATION:
-- new: More formal, build rapport, explain reasoning
-- existing: Friendly but professional, reference history
-- renewal: Balance appreciation with needs, reference current relationship
-- unknown: Neutral professional tone
-
-GOAL ADAPTATION:
-- clarify: Focus on questions and information needs
-- negotiate: Lead with asks, explain why they matter
-- revise: Request specific changes to quote
-- accept: Confirm with any minor conditions
-
-AUDIENCE ADAPTATION:
-- business: Professional, commercially literate, structured
-- personal: Simpler language, practical, friendly, avoid jargon
-
-QUOTE TYPE ADAPTATION:
-- saas_software: seats, modules, billing, renewal terms
-- consulting_services: scope, deliverables, assumptions, rates
-- home_improvement: labor/materials, timeline, warranty, deposit
-- etc: Adapt to context
-
-STRUCTURE:
-1. Opening (adapt to relationship)
-2. Reference to quote/proposal
-3. Main point or framing
-4. Specific ask(s) - 1-4 bullets based on priority points
-5. Request for response/updated quote
-6. Deadline [DATE]
-7. Optional: call offer if appropriate
-8. Professional close
-
-LENGTH:
-- Simple quotes: 5-8 sentences
-- Complex quotes: 7-12 sentences
-- Adapt to number of priority points
-
-GROUND IN SPECIFICS:
-Mention real details from commercial_facts and priority_points.
-
 Return ONLY JSON:
 {
-  "subject": "Clear, specific subject line",
-  "body": "Email body text"
+  "subject": "...",
+  "body": "..."
 }`
 
   try {
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: 4096,
-      system:
-        'You are an intelligent email generation engine. Write natural, selective, commercially aware emails. Adapt to user preferences. Be concise and specific. Return only valid JSON.' +
-        getLanguageInstruction(userLocale || 'en'),
+      system: KEVIN_SYSTEM_PROMPT + '\n' + getLanguageInstruction(userLocale || 'en'),
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0,
+      temperature: 0.3,
       output_config: { effort: 'medium' },
     })
 
     const content = getResponseText(response)
-    if (!content) {
-      throw new Error('No response from AI')
-    }
+    if (!content) throw new Error('No response from AI')
 
     const parsed = parseJsonFromContent(content) as { subject: string; body: string }
     return { subject: parsed.subject, body: parsed.body }
