@@ -18,13 +18,10 @@ interface OutputDisplayProps {
 
 export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }: OutputDisplayProps) {
   const { locale } = useI18n()
-  const [expandedFlags, setExpandedFlags] = useState<number[]>(
-    // Expand all flags by default
-    Array.from({ length: output.red_flags?.length || 0 }, (_, i) => i)
-  )
+  const [expandedFlags, setExpandedFlags] = useState<number[]>([]) // all cards collapsed on load
   const [showAssumptions, setShowAssumptions] = useState(true)
   const [showSolid, setShowSolid] = useState(true)
-  const [showRedFlags, setShowRedFlags] = useState(true) // Always visible by default
+  const [showRedFlags, setShowRedFlags] = useState(true)
   const [showStrategy, setShowStrategy] = useState(true)
   const [showSavings, setShowSavings] = useState(true)
   const [showEmails, setShowEmails] = useState(true)
@@ -32,6 +29,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
   const [selectedFlagTab, setSelectedFlagTab] = useState<Record<number, 'ask' | 'fallback'>>({})
   const [addressedFlags, setAddressedFlags] = useState<number[]>([])
   const [showAllFlags, setShowAllFlags] = useState(false)
+  const [showStrategyDetail, setShowStrategyDetail] = useState(false)
   const [copiedAsk, setCopiedAsk] = useState<number | null>(null)
   const [copiedCol, setCopiedCol] = useState<string | null>(null)
   const t = useT()
@@ -601,9 +599,12 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
       {/* ══════════════════════════════════════════════════════════════ */}
       {(!activeTab || activeTab === 'redflags') && output.red_flags && output.red_flags.length > 0 && (
         <div className="bg-white rounded-xl border-2 border-slate-200 p-6 shadow-sm mb-8">
-          <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => setShowRedFlags(!showRedFlags)}
+            className="w-full flex items-center justify-between mb-6 text-left group"
+          >
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
               </div>
               <div>
@@ -613,17 +614,11 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setShowRedFlags(!showRedFlags)}
-              className="text-slate-400 hover:text-slate-600 transition-colors"
-            >
-              {showRedFlags ? (
-                <ChevronUp className="w-5 h-5" />
-              ) : (
-                <ChevronDown className="w-5 h-5" />
-              )}
-            </button>
-          </div>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold border transition-all flex-shrink-0 ${showRedFlags ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-red-50 text-red-700 border-red-200 group-hover:bg-red-100'}`}>
+              {showRedFlags ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              {showRedFlags ? 'Collapse' : 'Expand issues'}
+            </span>
+          </button>
 
           {showRedFlags && (() => {
             // Sort flags by severity: HIGH first, then MEDIUM, then LOW
@@ -637,8 +632,10 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
               return { flag, originalIdx, severity, maxAmount, severityOrder }
             }).sort((a, b) => a.severityOrder - b.severityOrder)
 
-            const visibleFlags = showAllFlags ? flagsWithSeverity : flagsWithSeverity.slice(0, 5)
-            const hiddenCount = flagsWithSeverity.length - 5
+            // First 2 always visible; rest behind showAllFlags
+            const ALWAYS_VISIBLE = 2
+            const visibleFlags = showAllFlags ? flagsWithSeverity : flagsWithSeverity.slice(0, ALWAYS_VISIBLE)
+            const hiddenCount = flagsWithSeverity.length - ALWAYS_VISIBLE
 
             return (
             <div className="space-y-4">
@@ -791,9 +788,20 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
               {!showAllFlags && hiddenCount > 0 && (
                 <button
                   onClick={() => setShowAllFlags(true)}
-                  className="w-full py-3 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 transition-all"
+                  className="w-full py-3.5 flex items-center justify-center gap-2 text-[13px] font-semibold text-red-700 bg-red-50 hover:bg-red-100 rounded-xl border-2 border-red-200 hover:border-red-300 transition-all"
                 >
+                  <AlertTriangle className="w-4 h-4" />
                   {locale === 'fr' ? `Voir ${hiddenCount} problème${hiddenCount > 1 ? 's' : ''} de plus` : `Show ${hiddenCount} more issue${hiddenCount !== 1 ? 's' : ''}`}
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              )}
+              {showAllFlags && flagsWithSeverity.length > ALWAYS_VISIBLE && (
+                <button
+                  onClick={() => setShowAllFlags(false)}
+                  className="w-full py-3 flex items-center justify-center gap-1.5 text-[12px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <ChevronUp className="w-3.5 h-3.5" />
+                  {locale === 'fr' ? 'Réduire' : 'Collapse'}
                 </button>
               )}
             </div>
@@ -825,7 +833,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
-            {/* Push For - LEFT */}
+            {/* Push For - always visible */}
             <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5 flex flex-col">
               <div className="flex items-start justify-between mb-1">
                 <div className="flex items-center gap-2.5">
@@ -871,72 +879,91 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
               </div>
             </div>
 
-            {/* Your Leverage - MIDDLE */}
-            <div className="bg-emerald-50/40 border-2 border-emerald-200 rounded-xl p-5 flex flex-col">
-              <div className="flex items-start justify-between mb-1">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                    <Zap className="w-4 h-4 text-white" />
+            {/* Your Leverage + Can Offer — collapsed by default */}
+            {showStrategyDetail && (
+              <>
+                <div className="bg-emerald-50/40 border-2 border-emerald-200 rounded-xl p-5 flex flex-col">
+                  <div className="flex items-start justify-between mb-1">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                        <Zap className="w-4 h-4 text-white" />
+                      </div>
+                      <h4 className="text-base font-bold text-slate-900">{t('output.yourLeverage')}</h4>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const items = output.negotiation_plan?.leverage_you_have || []
+                        navigator.clipboard.writeText(items.map(i => `• ${i}`).join('\n'))
+                        setCopiedCol('leverage')
+                        setTimeout(() => setCopiedCol(null), 2000)
+                      }}
+                      className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-emerald-100"
+                    >
+                      {copiedCol === 'leverage' ? t('output.copied') : t('output.copyAll')}
+                    </button>
                   </div>
-                  <h4 className="text-base font-bold text-slate-900">{t('output.yourLeverage')}</h4>
+                  <p className="text-[11px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whyTheyShouldSayYes')}</p>
+                  <ul className="space-y-2.5 flex-1">
+                    {output.negotiation_plan?.leverage_you_have?.map((item, idx) => (
+                      <li key={idx} className="bg-white border-l-[3px] border-l-emerald-400 border border-emerald-200 rounded-lg p-3 flex items-start gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <button
-                  onClick={() => {
-                    const items = output.negotiation_plan?.leverage_you_have || []
-                    navigator.clipboard.writeText(items.map(i => `• ${i}`).join('\n'))
-                    setCopiedCol('leverage')
-                    setTimeout(() => setCopiedCol(null), 2000)
-                  }}
-                  className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-emerald-100"
-                >
-                  {copiedCol === 'leverage' ? t('output.copied') : t('output.copyAll')}
-                </button>
-              </div>
-              <p className="text-[11px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whyTheyShouldSayYes')}</p>
-              <ul className="space-y-2.5 flex-1">
-                {output.negotiation_plan?.leverage_you_have?.map((item, idx) => (
-                  <li key={idx} className="bg-white border-l-[3px] border-l-emerald-400 border border-emerald-200 rounded-lg p-3 flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
 
-            {/* Can Offer - RIGHT */}
-            <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5 flex flex-col">
-              <div className="flex items-start justify-between mb-1">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-                    <Layers className="w-4 h-4 text-white" />
+                <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-5 flex flex-col">
+                  <div className="flex items-start justify-between mb-1">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
+                        <Layers className="w-4 h-4 text-white" />
+                      </div>
+                      <h4 className="text-base font-bold text-slate-900">{t('output.canOffer')}</h4>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const items = output.negotiation_plan?.trades_you_can_offer || []
+                        navigator.clipboard.writeText(items.map(i => `• ${i}`).join('\n'))
+                        setCopiedCol('offer')
+                        setTimeout(() => setCopiedCol(null), 2000)
+                      }}
+                      className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-slate-100"
+                    >
+                      {copiedCol === 'offer' ? t('output.copied') : t('output.copyAll')}
+                    </button>
                   </div>
-                  <h4 className="text-base font-bold text-slate-900">{t('output.canOffer')}</h4>
+                  <p className="text-[11px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whatYouCanGiveToGetWhatYouWant')}</p>
+                  <ul className="space-y-2.5 flex-1">
+                    {output.negotiation_plan?.trades_you_can_offer?.map((item, idx) => (
+                      <li key={idx} className="bg-white border border-slate-200 rounded-lg p-3 flex items-start gap-2.5">
+                        <svg className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                        </svg>
+                        <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <button
-                  onClick={() => {
-                    const items = output.negotiation_plan?.trades_you_can_offer || []
-                    navigator.clipboard.writeText(items.map(i => `• ${i}`).join('\n'))
-                    setCopiedCol('offer')
-                    setTimeout(() => setCopiedCol(null), 2000)
-                  }}
-                  className="text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-slate-100"
-                >
-                  {copiedCol === 'offer' ? t('output.copied') : t('output.copyAll')}
-                </button>
-              </div>
-              <p className="text-[11px] text-slate-500 mb-3 ml-0 sm:ml-[42px]">{t('output.whatYouCanGiveToGetWhatYouWant')}</p>
-              <ul className="space-y-2.5 flex-1">
-                {output.negotiation_plan?.trades_you_can_offer?.map((item, idx) => (
-                  <li key={idx} className="bg-white border border-slate-200 rounded-lg p-3 flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                    </svg>
-                    <span className="text-sm text-slate-800 leading-relaxed font-medium">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+              </>
+            )}
           </div>
+
+          {/* Strategy detail toggle — sits below the grid, outside the grid columns */}
+          <button
+            onClick={() => setShowStrategyDetail(!showStrategyDetail)}
+            className={`mt-4 w-full py-3 flex items-center justify-center gap-2 text-[13px] font-semibold rounded-xl border-2 transition-all ${
+              showStrategyDetail
+                ? 'text-slate-500 border-slate-200 bg-slate-50 hover:bg-slate-100'
+                : 'text-emerald-700 border-emerald-200 bg-emerald-50 hover:bg-emerald-100'
+            }`}
+          >
+            {showStrategyDetail ? (
+              <><ChevronUp className="w-4 h-4" /> Hide leverage &amp; trades</>
+            ) : (
+              <><ChevronDown className="w-4 h-4" /> See your leverage &amp; what to offer ({(output.negotiation_plan?.leverage_you_have?.length || 0) + (output.negotiation_plan?.trades_you_can_offer?.length || 0)} points)</>
+            )}
+          </button>
         </div>
       </div>}
 
