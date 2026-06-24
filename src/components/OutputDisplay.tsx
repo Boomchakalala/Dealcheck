@@ -21,7 +21,6 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
   const [expandedFlags, setExpandedFlags] = useState<number[]>([]) // all cards collapsed on load
   const [showAssumptions, setShowAssumptions] = useState(true)
   const [showSolid, setShowSolid] = useState(true)
-  const [showRedFlags, setShowRedFlags] = useState(true)
   const [showStrategy, setShowStrategy] = useState(true)
   const [showSavings, setShowSavings] = useState(true)
   const [showEmails, setShowEmails] = useState(true)
@@ -598,11 +597,8 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
       {/* RED FLAGS — REDFLAGS tab */}
       {/* ══════════════════════════════════════════════════════════════ */}
       {(!activeTab || activeTab === 'redflags') && output.red_flags && output.red_flags.length > 0 && (
-        <div className={`bg-white rounded-xl border-2 border-slate-200 shadow-sm mb-8 ${showRedFlags ? 'p-6' : 'p-4'}`}>
-          <button
-            onClick={() => setShowRedFlags(!showRedFlags)}
-            className={`w-full flex items-center justify-between text-left group ${showRedFlags ? 'mb-6' : ''}`}
-          >
+        <div className="bg-white rounded-xl border-2 border-slate-200 shadow-sm mb-8 p-6">
+          <div className="flex items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
@@ -614,13 +610,9 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
                 </p>
               </div>
             </div>
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold border transition-all flex-shrink-0 ${showRedFlags ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-red-50 text-red-700 border-red-200 group-hover:bg-red-100'}`}>
-              {showRedFlags ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-              {showRedFlags ? 'Collapse' : 'Expand issues'}
-            </span>
-          </button>
+          </div>
 
-          {showRedFlags && (() => {
+          {(() => {
             // Sort flags by severity: HIGH first, then MEDIUM, then LOW
             const flagsWithSeverity = output.red_flags.map((flag, originalIdx) => {
               const amountMatch = flag.why_it_matters?.match(/[\$€£]([\d,]+)/g)
@@ -649,7 +641,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
             return (
             <div className="space-y-4">
               {flagsWithSeverity.length > 1 && (
-                <div className="flex justify-end">
+                <div className="flex justify-end -mt-2 mb-2">
                   <button
                     onClick={toggleAllDetails}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
