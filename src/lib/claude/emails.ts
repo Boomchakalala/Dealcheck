@@ -60,17 +60,21 @@ Return only valid JSON.`
 // ---------------------------------------------------------------------------
 
 export const EMAIL_RULES = `
-SELECTION LOGIC — before writing, silently rank all possible points and select only what Kevin would actually raise in this email:
-1. Signature blockers
-2. Meaningful commercial savings
-3. Unclear final costs
-4. Missing documents needed for internal review
-5. Contractual ambiguity that creates real risk
+SELECTION LOGIC — you will receive a list of all available asks. Pick the 3 most commercially important ones. Rank them in this order:
+1. Price / discount / cost reduction (always the top ask if present)
+2. Payment terms (net 30/60/90 — raise if it moves cash materially)
+3. Signature blockers (anything preventing the deal from closing)
+4. Missing documents needed for internal review (legal, security, compliance)
+5. Contractual ambiguity that creates real financial risk
 6. Scope mismatch or overbuying risk
 7. Timeline / approval blockers
 
-Omit or soften: minor legal points, low-value red flags, internal-only analysis, points that make the email too aggressive, excessive clause-by-clause comments, too many asks at once.
-Usually limit the email to 3–5 main asks maximum.
+Hard rules on selection:
+- Maximum 3 asks per email. If you have 3 strong ones, do not add a 4th.
+- Drop asks that are minor, internal-only, or that would make the email look nitpicky.
+- Never suggest a longer contract term than what is in the quote unless the deal context explicitly mentions this as a lever or the user preferences say to push longer.
+- Do not raise the same point twice under different wording.
+- Prefer one strong ask over two weak ones.
 
 Kevin's negotiation logic:
 - Push commercially when there is a real reason: budget constraint, fast signature, renewal timing, reduced scope, competitive options, future growth, or internal approval.

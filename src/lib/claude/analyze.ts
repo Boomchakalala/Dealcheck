@@ -354,7 +354,7 @@ export async function analyzeDealFacts(
   return parsed
 }
 
-function buildPreferencesDirective(prefs?: { payment_terms?: string; top_priority?: string; auto_renewal?: string }): string {
+function buildPreferencesDirective(prefs?: { payment_terms?: string; top_priority?: string; auto_renewal?: string; contract_term_strategy?: string }): string {
   if (!prefs) return ''
 
   const parts: string[] = []
@@ -378,6 +378,12 @@ function buildPreferencesDirective(prefs?: { payment_terms?: string; top_priorit
     parts.push(`- AUTO-RENEWAL: User is fine with auto-renewal. Do not flag it unless the notice window, escalation right, or lock-in effect is commercially aggressive.`)
   } else if (prefs.auto_renewal === 'prefer_opt_in') {
     parts.push(`- AUTO-RENEWAL: User prefers opt-in renewal. Flag supplier-friendly auto-renewal and recommend a tighter structure.`)
+  }
+
+  if (prefs.contract_term_strategy === 'match_quote') {
+    parts.push(`- CONTRACT TERM: Do NOT suggest extending the contract term beyond what is in the quote. Stick to the quoted term. Only flag term-related issues if the term creates unusual lock-in or risk, not as a negotiation angle.`)
+  } else if (prefs.contract_term_strategy === 'push_longer') {
+    parts.push(`- CONTRACT TERM: If committing to a longer term could unlock meaningful savings or better conditions, flag it as a leverage option.`)
   }
 
   if (parts.length === 0) return ''

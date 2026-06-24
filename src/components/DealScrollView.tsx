@@ -7,7 +7,7 @@ import { normalizeAmount, formatCurrency, parseMoney, detectCurrency } from '@/l
 import type { DealOutput, DealOutputV2 } from '@/types'
 import type { Plan } from '@/lib/tiers'
 import { FeatureGate } from '@/components/FeatureGate'
-import { buildCandidateAsks, defaultSelectedLabels, getCanOffer } from '@/lib/email-asks'
+import { getCanOffer } from '@/lib/email-asks'
 
 interface DealScrollViewProps {
   latestOutput: any
@@ -123,25 +123,8 @@ export function DealScrollView(props: DealScrollViewProps) {
   const [remainingRegens, setRemainingRegens] = useState(3)
   const [copiedEmail, setCopiedEmail] = useState(false)
 
-  // ── ask selection (pre-generation) ────────
-  const askCandidates = useMemo(() => buildCandidateAsks(o), [o])
-  const askStorageKey = `termlift_email_asks_${dealId}`
-  const [selectedAsks, setSelectedAsks] = useState<Set<string>>(() => {
-    try {
-      const saved = typeof window !== 'undefined' ? localStorage.getItem(askStorageKey) : null
-      if (saved) { const arr = JSON.parse(saved); if (Array.isArray(arr) && arr.length) return new Set<string>(arr) }
-    } catch {}
-    return new Set(defaultSelectedLabels(askCandidates))
-  })
-  const persistAsks = (set: Set<string>) => { try { localStorage.setItem(askStorageKey, JSON.stringify([...set])) } catch {} }
-  const toggleAsk = (label: string) => setSelectedAsks((prev) => {
-    const next = new Set(prev)
-    if (next.has(label)) next.delete(label); else next.add(label)
-    persistAsks(next)
-    return next
-  })
   const hasEmail = !!(o?.email_drafts?.neutral?.body)
-  const [emailMode, setEmailMode] = useState<'select' | 'generated'>(hasEmail ? 'generated' : 'select')
+  const [showGeneratePanel, setShowGeneratePanel] = useState(false)
 
   const handleGenerate = async () => {
     if (demoMode || !latestRoundId || remainingRegens <= 0) return
@@ -157,7 +140,9 @@ export function DealScrollView(props: DealScrollViewProps) {
           totalCommitment: o?.snapshot?.total_commitment,
           term: o?.snapshot?.term,
           currency: dealCurrency,
-          selectedAsks: [...selectedAsks],
+          mustHaveAsks: o?.what_to_ask_for?.must_have || [],
+          niceToHaveAsks: o?.what_to_ask_for?.nice_to_have || [],
+          redFlagAsks: (o?.red_flags || []).map((f: any) => f.what_to_ask_for).filter(Boolean),
           canOffer: getCanOffer(o),
           conclusion: o?.quick_read?.conclusion,
         }),
@@ -168,7 +153,7 @@ export function DealScrollView(props: DealScrollViewProps) {
       setEmailBodies(data.emails.map((e: any) => e.body))
       setRemainingRegens(data.remainingRegenerations)
       setCustomPrompt('')
-      setEmailMode('generated')
+      setShowGeneratePanel(false)
     } catch (err) { setRegenError(err instanceof Error ? err.message : 'Failed') }
     finally { setRegenerating(false) }
   }
@@ -662,22 +647,13 @@ export function DealScrollView(props: DealScrollViewProps) {
               </div>
               <div className="min-w-0">
                 <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
-                  {emailMode === 'select'
-                    ? (locale === 'fr' ? 'Sur quoi voulez-vous insister ?' : 'What do you want to push on?')
-                    : (locale === 'fr' ? 'Email de négociation prêt à envoyer' : 'Ready-to-send negotiation email')}
+                  {locale === 'fr' ? 'Email de négociation prêt à envoyer' : 'Ready-to-send negotiation email'}
                 </h2>
                 <p className="text-[13px] text-slate-500">
-                  {emailMode === 'select'
-                    ? (locale === 'fr' ? 'Choisissez vos demandes et un ton, puis générez' : 'Pick the asks and a tone, then generate')
-                    : (locale === 'fr' ? 'Choisissez un ton, personnalisez, et envoyez' : 'Pick a tone, customize if needed, and send it')}
+                  {locale === 'fr' ? 'Choisissez un ton, personnalisez, et envoyez' : 'Pick a tone, customize if needed, and send it'}
                 </p>
               </div>
             </div>
-            {emailMode === 'generated' && (
-              <button onClick={() => setEmailMode('select')} className="text-[12px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1 flex-shrink-0 mt-1">
-                <Sparkles className="w-3.5 h-3.5" />{locale === 'fr' ? 'Modifier les demandes' : 'Edit asks'}
-              </button>
-            )}
           </div>
 
           {/* Tone selector — present in both states */}
@@ -696,61 +672,8 @@ export function DealScrollView(props: DealScrollViewProps) {
             })}
           </div>
 
-          {emailMode === 'select' ? (
-            /* ───────── (a) SELECTION STATE ───────── */
-            <div className="space-y-4">
-              <div className="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                <p className="px-4 sm:px-5 pt-3.5 pb-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">{locale === 'fr' ? 'Vos demandes' : 'Your asks'}</p>
-                <div className="divide-y divide-slate-100 border-t border-slate-100">
-                  {askCandidates.length === 0 ? (
-                    <p className="px-4 sm:px-5 py-4 text-[13px] text-slate-500">{locale === 'fr' ? 'Aucune demande — ce devis est propre. Générez un court email de confirmation.' : 'No asks to push on — this quote looks clean. Generate a short confirmation instead.'}</p>
-                  ) : askCandidates.map((c, i) => {
-                    const checked = selectedAsks.has(c.label)
-                    return (
-                      <label key={i} className="flex items-start gap-3 px-4 sm:px-5 py-3 cursor-pointer hover:bg-slate-50 transition-colors">
-                        <input type="checkbox" checked={checked} onChange={() => toggleAsk(c.label)} className="mt-0.5 w-4 h-4 accent-emerald-600 flex-shrink-0" />
-                        <span className="flex-1 min-w-0 text-[13px] text-slate-800 leading-snug">{c.label}</span>
-                        {(c.severity === 'high' || c.severity === 'medium' || (c.savings != null && c.savings > 0)) && (
-                          <span className="flex items-center gap-1.5 flex-shrink-0">
-                            {c.savings != null && c.savings > 0 && <span className="text-[11px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtSav(c.savings)}</span>}
-                            {c.severity === 'high' && <span className="text-[9px] font-bold text-white bg-red-600 px-1.5 py-0.5 rounded">HIGH</span>}
-                            {c.severity === 'medium' && <span className="text-[9px] font-bold text-white bg-amber-500 px-1.5 py-0.5 rounded">MED</span>}
-                          </span>
-                        )}
-                      </label>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Non-blocking >4 asks hint */}
-              {selectedAsks.size > 4 && (
-                <p className="text-[12px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3.5 py-2.5">
-                  {locale === 'fr' ? 'Les meilleurs emails se concentrent sur 2-3 demandes. Plus de demandes = réponses plus faibles.' : 'Strong negotiation emails focus on 2-3 asks. More asks = weaker responses.'}
-                </p>
-              )}
-
-              {/* Optional custom instructions */}
-              <textarea value={customPrompt} onChange={(e) => setCustomPrompt(e.target.value)} rows={2} className="w-full px-4 py-3 text-[13px] border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-300 resize-none" placeholder={locale === 'fr' ? 'Optionnel : instructions personnalisées...' : "Optional: custom instructions (e.g. 'mention we have budget approval')..."} />
-
-              {/* Generate */}
-              {demoMode ? (
-                <Link href="/login?from=demo" className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5" style={{ background: '#1DB954', boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}>
-                  {locale === 'fr' ? 'Inscrivez-vous pour générer' : 'Sign up to generate'}<ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              ) : (
-                <>
-                  <button onClick={handleGenerate} disabled={regenerating || remainingRegens <= 0} className={`w-full px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-[13.5px] font-bold transition-colors ${regenerating || remainingRegens <= 0 ? 'bg-slate-100 text-slate-400' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'}`}>
-                    {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{locale === 'fr' ? 'Génération...' : 'Generating...'}</> : <><Sparkles className="w-4 h-4" />{locale === 'fr' ? "Générer l'email" : 'Generate email'}{remainingRegens > 0 && remainingRegens < 3 ? ` (${remainingRegens} left)` : ''}</>}
-                  </button>
-                  {remainingRegens <= 0 && <p className="text-[12px] text-slate-400 text-center">{locale === 'fr' ? 'Limite de régénération atteinte pour ce round.' : 'Regeneration limit reached for this round.'}</p>}
-                  {hasEmail && <button onClick={() => setEmailMode('generated')} className="w-full text-[12px] text-slate-400 hover:text-slate-600 transition-colors">{locale === 'fr' ? 'Annuler' : 'Cancel'}</button>}
-                </>
-              )}
-              {regenError && <p className="text-[13px] text-red-700 bg-red-50 border-2 border-red-200 rounded-xl p-3.5 font-medium">{regenError}</p>}
-            </div>
-          ) : (
-            /* ───────── (b) GENERATED STATE ───────── */
+          {/* ───────── EMAIL DISPLAY ───────── */}
+          {hasEmail && (
             <div className="border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
               <div className="px-5 sm:px-6 py-3.5 flex items-center gap-3 border-b border-slate-200">
                 <Mail className="w-4 h-4 text-slate-400" />
@@ -781,6 +704,49 @@ export function DealScrollView(props: DealScrollViewProps) {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* ───────── GENERATE / REGENERATE PANEL ───────── */}
+          {!demoMode && (
+            <div className="space-y-3">
+              {!showGeneratePanel ? (
+                <button
+                  onClick={() => setShowGeneratePanel(true)}
+                  disabled={remainingRegens <= 0}
+                  className={`w-full px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-[13.5px] font-bold transition-colors ${remainingRegens <= 0 ? 'bg-slate-100 text-slate-400' : hasEmail ? 'bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'}`}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {hasEmail
+                    ? (locale === 'fr' ? 'Regénérer les emails' : `Regenerate emails${remainingRegens > 0 && remainingRegens < 3 ? ` (${remainingRegens} left)` : ''}`)
+                    : (locale === 'fr' ? "Générer l'email" : 'Generate email')}
+                </button>
+              ) : (
+                <div className="space-y-3 bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5">
+                  <textarea
+                    value={customPrompt}
+                    onChange={(e) => setCustomPrompt(e.target.value)}
+                    rows={2}
+                    className="w-full px-4 py-3 text-[13px] border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-300 resize-none"
+                    placeholder={locale === 'fr' ? 'Optionnel : instructions personnalisées...' : "Optional: custom instructions (e.g. 'mention we have budget approval')..."}
+                  />
+                  <div className="flex gap-2">
+                    <button onClick={handleGenerate} disabled={regenerating || remainingRegens <= 0} className={`flex-1 px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-[13.5px] font-bold transition-colors ${regenerating || remainingRegens <= 0 ? 'bg-slate-100 text-slate-400' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'}`}>
+                      {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{locale === 'fr' ? 'Génération...' : 'Generating...'}</> : <><Sparkles className="w-4 h-4" />{locale === 'fr' ? "Générer" : 'Generate'}</>}
+                    </button>
+                    <button onClick={() => { setShowGeneratePanel(false); setCustomPrompt('') }} className="px-4 py-3 rounded-xl border-2 border-slate-200 text-[13px] font-medium text-slate-500 hover:bg-slate-50 transition-colors">
+                      {locale === 'fr' ? 'Annuler' : 'Cancel'}
+                    </button>
+                  </div>
+                  {remainingRegens <= 0 && <p className="text-[12px] text-slate-400 text-center">{locale === 'fr' ? 'Limite de régénération atteinte.' : 'Regeneration limit reached.'}</p>}
+                </div>
+              )}
+              {regenError && <p className="text-[13px] text-red-700 bg-red-50 border-2 border-red-200 rounded-xl p-3.5 font-medium">{regenError}</p>}
+            </div>
+          )}
+          {demoMode && !hasEmail && (
+            <Link href="/login?from=demo" className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5" style={{ background: '#1DB954', boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}>
+              {locale === 'fr' ? 'Inscrivez-vous pour générer' : 'Sign up to generate'}<ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           )}
         </div>
       </div>

@@ -41,9 +41,10 @@ export async function POST(request: Request) {
       totalCommitment,
       term,
       currency,
-      selectedAsks,
-      canOffer,
       mustHaveAsks,
+      niceToHaveAsks,
+      redFlagAsks,
+      canOffer,
       conclusion,
     } = body
 
@@ -73,9 +74,11 @@ export async function POST(request: Request) {
       }, { status: 429 })
     }
 
-    // The user's checkbox selection drives generation. Fall back to the old must-have list
-    // for any client that hasn't been updated yet.
-    const selected: string[] = (Array.isArray(selectedAsks) && selectedAsks.length ? selectedAsks : (mustHaveAsks || [])).filter(Boolean)
+    const allAsks: string[] = [
+      ...(Array.isArray(mustHaveAsks) ? mustHaveAsks : []),
+      ...(Array.isArray(niceToHaveAsks) ? niceToHaveAsks : []),
+      ...(Array.isArray(redFlagAsks) ? redFlagAsks : []),
+    ].filter(Boolean)
     const offers: string[] = Array.isArray(canOffer) ? canOffer : []
 
     const basePrompt = `Write 3 supplier-facing email variations in Kevin's style.
@@ -93,13 +96,13 @@ Situation: ${conclusion || 'Negotiation in progress'}
 ${contactName ? `The contact's first name is "${contactName}". Use "Hi ${contactName}," as the greeting in every email.` : ''}
 SENDER NAME: ${senderName || '[Your Name]'}
 
-THE ASKS TO RAISE (use ALL of these, in this order — first ask gets the most space):
-${selected.map((a: string) => `- ${a}`).join('\n') || '- (none selected — write a short, friendly note that the buyer is happy with the quote and ready to proceed)'}
+ALL AVAILABLE ASKS (apply the selection logic above — pick the 3-4 most commercially important ones, in order of priority):
+${allAsks.map((a: string) => `- ${a}`).join('\n') || '- (none — write a short, friendly note that the buyer is happy with the quote and ready to proceed)'}
 
 WHAT THE BUYER CAN OFFER IN RETURN (trade these against the asks where they fit naturally):
 ${offers.map((c: string) => `- ${c}`).join('\n') || '- fast signature once the points above are settled'}
 
-${customPrompt ? `USER'S CUSTOM REQUEST (honor this):\n${customPrompt}\n` : ''}
+${customPrompt ? `USER'S CUSTOM REQUEST (honor this above all else):\n${customPrompt}\n` : ''}
 Return ONLY valid JSON (no markdown, no code fences):
 {
   "emails": [

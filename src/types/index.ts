@@ -338,6 +338,7 @@ export type NegotiationPreferences = {
   payment_terms: 'net_30' | 'net_60' | 'net_90' | 'no_preference'
   top_priority: 'lowest_price' | 'best_terms' | 'max_flexibility'
   auto_renewal: 'fine' | 'prefer_opt_in'
+  contract_term_strategy: 'match_quote' | 'push_longer' | 'no_preference'
 }
 
 // UI types

@@ -47,7 +47,7 @@ export async function analyzeDeal(
   allPages?: Array<{ base64: string; mimeType: string }>,
   userLocale?: string,
   pdfData?: { base64: string; mimeType: string },
-  userPreferences?: { payment_terms?: string; top_priority?: string; auto_renewal?: string }
+  userPreferences?: { payment_terms?: string; top_priority?: string; auto_renewal?: string; contract_term_strategy?: string }
 ): Promise<DealOutputType> {
   try {
     // ─── Steps 0+1: Classify + extract in parallel ───

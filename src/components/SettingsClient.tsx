@@ -17,6 +17,7 @@ interface NegotiationPrefs {
   payment_terms: 'net_30' | 'net_60' | 'net_90' | 'no_preference'
   top_priority: 'lowest_price' | 'best_terms' | 'max_flexibility'
   auto_renewal: 'fine' | 'prefer_opt_in'
+  contract_term_strategy: 'match_quote' | 'push_longer' | 'no_preference'
 }
 
 interface SettingsClientProps {
@@ -51,7 +52,7 @@ export function SettingsClient({
   const [currencySaving, setCurrencySaving] = useState(false)
   const [saveExtractedText, setSaveExtractedText] = useState(false)
   const [productEmails, setProductEmails] = useState(true)
-  const defaultPrefs: NegotiationPrefs = { payment_terms: 'no_preference', top_priority: 'lowest_price', auto_renewal: 'prefer_opt_in' }
+  const defaultPrefs: NegotiationPrefs = { payment_terms: 'no_preference', top_priority: 'lowest_price', auto_renewal: 'prefer_opt_in', contract_term_strategy: 'match_quote' }
   const [negPrefs, setNegPrefs] = useState<NegotiationPrefs>(initPrefs || defaultPrefs)
   const [prefsSaving, setPrefsSaving] = useState(false)
   const [prefsSaved, setPrefsSaved] = useState(false)
@@ -476,6 +477,32 @@ export function SettingsClient({
                   <div className="grid grid-cols-2 gap-2.5">
                     <SelectCard selected={negPrefs.auto_renewal === 'fine'} onClick={() => setNegPrefs({ ...negPrefs, auto_renewal: 'fine' })} title={t('settingsClient.autoRenewalFine')} desc="No issue with auto-renewal clauses" />
                     <SelectCard selected={negPrefs.auto_renewal === 'prefer_opt_in'} onClick={() => setNegPrefs({ ...negPrefs, auto_renewal: 'prefer_opt_in' })} title={t('settingsClient.autoRenewalOptIn')} desc="Want manual renewal control" />
+                  </div>
+                </div>
+
+                {/* Contract term strategy */}
+                <div>
+                  <p className="text-[12px] font-medium text-slate-500 mb-1">Contract term strategy</p>
+                  <p className="text-[11px] text-slate-400 mb-3">Controls whether the AI suggests extending the quoted contract term as a negotiation lever.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <SelectCard
+                      selected={negPrefs.contract_term_strategy === 'match_quote'}
+                      onClick={() => setNegPrefs({ ...negPrefs, contract_term_strategy: 'match_quote' })}
+                      title="Match the quote"
+                      desc="Don't suggest a longer term than what's quoted"
+                    />
+                    <SelectCard
+                      selected={negPrefs.contract_term_strategy === 'push_longer'}
+                      onClick={() => setNegPrefs({ ...negPrefs, contract_term_strategy: 'push_longer' })}
+                      title="Push longer if it saves"
+                      desc="Flag extended term as leverage if it unlocks savings"
+                    />
+                    <SelectCard
+                      selected={negPrefs.contract_term_strategy === 'no_preference'}
+                      onClick={() => setNegPrefs({ ...negPrefs, contract_term_strategy: 'no_preference' })}
+                      title="No preference"
+                      desc="AI decides based on context"
+                    />
                   </div>
                 </div>
 
