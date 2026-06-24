@@ -598,7 +598,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
       {/* RED FLAGS — REDFLAGS tab */}
       {/* ══════════════════════════════════════════════════════════════ */}
       {(!activeTab || activeTab === 'redflags') && output.red_flags && output.red_flags.length > 0 && (
-        <div className={`bg-white rounded-xl border-2 border-slate-200 shadow-sm mb-8 ${showRedFlags ? 'p-6' : 'p-4'}`}>
+        <div className={`bg-white rounded-xl border-2 shadow-sm mb-8 transition-colors ${showRedFlags ? 'p-6 border-green-500' : 'p-4 border-slate-200'}`}>
           <button
             onClick={() => setShowRedFlags(!showRedFlags)}
             className={`w-full flex items-center justify-between text-left group ${showRedFlags ? 'mb-6' : ''}`}
@@ -636,9 +636,29 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
             const ALWAYS_VISIBLE = 2
             const visibleFlags = showAllFlags ? flagsWithSeverity : flagsWithSeverity.slice(0, ALWAYS_VISIBLE)
             const hiddenCount = flagsWithSeverity.length - ALWAYS_VISIBLE
+            const visibleIndices = visibleFlags.map(f => f.originalIdx)
+            const allDetailsExpanded = visibleIndices.length > 0 && visibleIndices.every(i => expandedFlags.includes(i))
+            const toggleAllDetails = () => {
+              if (allDetailsExpanded) {
+                setExpandedFlags(prev => prev.filter(i => !visibleIndices.includes(i)))
+              } else {
+                setExpandedFlags(prev => [...new Set([...prev, ...visibleIndices])])
+              }
+            }
 
             return (
             <div className="space-y-4">
+              {flagsWithSeverity.length > 1 && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={toggleAllDetails}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
+                  >
+                    {allDetailsExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    {allDetailsExpanded ? 'Collapse all details' : 'Expand all details'}
+                  </button>
+                </div>
+              )}
               {visibleFlags.map(({ flag, originalIdx: idx, severity, maxAmount }) => {
                 const isExpanded = expandedFlags.includes(idx)
                 const activeTab = selectedFlagTab[idx] || 'ask'

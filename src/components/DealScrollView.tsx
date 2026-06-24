@@ -359,8 +359,8 @@ export function DealScrollView(props: DealScrollViewProps) {
         </div>
       </div>
 
-      {/* ═══ SECTION 2: RED FLAGS (red-tinted bg) ═══ */}
-      <div className="bg-red-50/40 border-b border-red-200">
+      {/* ═══ SECTION 2: RED FLAGS ═══ */}
+      <div className={`border-b transition-colors ${showFlagsSection ? 'bg-white border-green-500 border-2' : 'bg-red-50/40 border-red-200'}`}>
         <div className={showFlagsSection ? 'p-5 sm:p-8' : 'px-5 sm:px-8 py-4'}>
           {/* Section header — always visible, acts as toggle */}
           <button
@@ -389,8 +389,14 @@ export function DealScrollView(props: DealScrollViewProps) {
           {showFlagsSection && <div className="mt-4 sm:mt-6">
           {sortedFlags.length > 1 && (
             <div className="flex justify-end mb-3">
-              <button onClick={toggleAllFlags} className="text-[12px] font-semibold text-slate-500 hover:text-slate-700 transition-colors">
-                {allFlagsOpen ? (locale === 'fr' ? 'Tout réduire' : 'Collapse all') : (locale === 'fr' ? 'Tout afficher' : 'Expand all')}
+              <button
+                onClick={toggleAllFlags}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
+              >
+                {allFlagsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                {allFlagsOpen
+                  ? (locale === 'fr' ? 'Réduire tous les détails' : 'Collapse all details')
+                  : (locale === 'fr' ? 'Afficher tous les détails' : 'Expand all details')}
               </button>
             </div>
           )}
