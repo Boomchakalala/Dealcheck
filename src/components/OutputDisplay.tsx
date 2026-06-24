@@ -21,7 +21,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
   const [expandedFlags, setExpandedFlags] = useState<number[]>([]) // all cards collapsed on load
   const [showAssumptions, setShowAssumptions] = useState(true)
   const [showSolid, setShowSolid] = useState(true)
-  const [showRedFlags, setShowRedFlags] = useState(false) // section collapsed by default
+  const [showRedFlags, setShowRedFlags] = useState(true)
   const [showStrategy, setShowStrategy] = useState(true)
   const [showSavings, setShowSavings] = useState(true)
   const [showEmails, setShowEmails] = useState(true)
@@ -598,7 +598,7 @@ export function OutputDisplay({ output, roundId, hideHeader = false, activeTab }
       {/* RED FLAGS — REDFLAGS tab */}
       {/* ══════════════════════════════════════════════════════════════ */}
       {(!activeTab || activeTab === 'redflags') && output.red_flags && output.red_flags.length > 0 && (
-        <div className={`bg-white rounded-xl border-2 shadow-sm mb-8 transition-colors ${showRedFlags ? 'p-6 border-green-500' : 'p-4 border-slate-200'}`}>
+        <div className={`bg-white rounded-xl border-2 border-slate-200 shadow-sm mb-8 ${showRedFlags ? 'p-6' : 'p-4'}`}>
           <button
             onClick={() => setShowRedFlags(!showRedFlags)}
             className={`w-full flex items-center justify-between text-left group ${showRedFlags ? 'mb-6' : ''}`}

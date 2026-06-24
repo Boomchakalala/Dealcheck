@@ -194,7 +194,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
   // ── red flag accordion state (HIGH + MEDIUM open by default, LOW collapsed) ──
   const [openFlags, setOpenFlags] = useState<Record<number, boolean>>({})
-  const [showFlagsSection, setShowFlagsSection] = useState(false)
+  const [showFlagsSection, setShowFlagsSection] = useState(true)
   const [showWatch, setShowWatch] = useState(false)
   const allFlagsOpen = sortedFlags.length > 0 && sortedFlags.every(({ idx }: any) => openFlags[idx])
   const toggleFlag = (idx: number) => setOpenFlags((p) => ({ ...p, [idx]: !p[idx] }))
@@ -360,7 +360,7 @@ export function DealScrollView(props: DealScrollViewProps) {
       </div>
 
       {/* ═══ SECTION 2: RED FLAGS ═══ */}
-      <div className={`border-b transition-colors ${showFlagsSection ? 'bg-white border-green-500 border-2' : 'bg-red-50/40 border-red-200'}`}>
+      <div className={`border-b transition-colors ${showFlagsSection ? 'bg-white border-slate-200' : 'bg-red-50/40 border-red-200'}`}>
         <div className={showFlagsSection ? 'p-5 sm:p-8' : 'px-5 sm:px-8 py-4'}>
           {/* Section header — always visible, acts as toggle */}
           <button
