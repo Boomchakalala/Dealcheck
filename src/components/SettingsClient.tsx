@@ -4,13 +4,15 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import {
-  User, CreditCard, Globe, Shield, AlertTriangle, Bell,
+  User, Globe, Shield, AlertTriangle, Bell,
   Briefcase, Check, Loader2, Mail, Target, Zap, ChevronDown,
   Heart, Scale, Swords, Send, Sparkles, FileText, BarChart3,
   TrendingUp, CheckCircle2, Monitor, MessageSquare, Palette, Handshake,
 } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
-import { ManageSubscriptionButton } from '@/components/UpgradeButton'
+import { AppPage, PageHeader } from '@/components/system'
+import { FREE_ANALYSIS_LIMIT } from '@/lib/tiers'
+import { NEGOTIATION_FEE_PERCENT } from '@/lib/pricing'
 
 interface NegotiationPrefs {
   payment_terms: 'net_30' | 'net_60' | 'net_90' | 'no_preference'
@@ -26,10 +28,10 @@ interface SettingsClientProps {
   locale: string; negotiationPreferences?: NegotiationPrefs | null
 }
 
-type Section = 'profile' | 'subscription' | 'display' | 'negotiation' | 'notifications' | 'privacy' | 'danger'
+type Section = 'profile' | 'display' | 'negotiation' | 'notifications' | 'privacy' | 'danger'
 
 export function SettingsClient({
-  email, firstName: initFirst, lastName: initLast, plan, planLabel,
+  email, firstName: initFirst, lastName: initLast,
   usageCount, dealCount, activeDeals, closedDeals, roundCount,
   isAdmin, baseCurrency: initCurrency, totalSavings, memberSince, joinedAgo,
   negotiationPreferences: initPrefs,
@@ -72,8 +74,7 @@ export function SettingsClient({
   const [dealAlerts, setDealAlerts] = useState(true)
   const [notifProductUpdates, setNotifProductUpdates] = useState(true)
 
-  const isPaid = plan === 'essentials' || plan === 'pro' || plan === 'business'
-  const remaining = Math.max(0, 4 - usageCount)
+  const remaining = Math.max(0, FREE_ANALYSIS_LIMIT - usageCount)
   const avatarInitial = firstName ? firstName[0].toUpperCase() : email[0].toUpperCase()
 
   // ── handlers (unchanged) ───────────────────
@@ -111,7 +112,6 @@ export function SettingsClient({
   const navGroups = [
     { label: 'Account', items: [
       { key: 'profile' as Section, name: t('settingsClient.profile'), icon: User },
-      { key: 'subscription' as Section, name: t('settingsClient.subscription'), icon: CreditCard },
     ]},
     { label: locale === 'fr' ? 'Preferences' : 'Preferences', items: [
       { key: 'display' as Section, name: locale === 'fr' ? 'Affichage' : 'Display', icon: Palette },
@@ -132,7 +132,6 @@ export function SettingsClient({
   // ── section header/icon color maps ─────────
   const sectionMeta: Record<Section, { icon: any; title: string; color: string }> = {
     profile: { icon: User, title: t('settingsClient.profile'), color: 'emerald' },
-    subscription: { icon: CreditCard, title: t('settingsClient.subscription'), color: 'blue' },
     display: { icon: Palette, title: locale === 'fr' ? 'Affichage' : 'Display', color: 'purple' },
     negotiation: { icon: Handshake, title: locale === 'fr' ? 'Pr\u00e9f\u00e9rences de n\u00e9gociation' : 'Negotiation preferences', color: 'amber' },
     notifications: { icon: Bell, title: 'Notifications', color: 'blue' },
@@ -153,14 +152,11 @@ export function SettingsClient({
 
   // ═══════════════════════════════════════════
   return (
-    <div className="flex flex-col h-[calc(100vh)]">
-      {/* ── TOPBAR ──────────────────────────────── */}
-      <div className="h-14 px-5 sm:px-8 bg-white flex items-center flex-shrink-0 border-b border-slate-200">
-        <span className="text-[18px] font-bold text-slate-900 tracking-tight" style={{ fontFamily: 'Sora, sans-serif' }}>Settings</span>
-      </div>
+    <AppPage>
+      <PageHeader title={t('settingsPage.title')} sub={t('settingsPage.sub')} />
 
       {/* ── BODY ────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
 
         {/* Mobile nav — dropdown select (avoids clipped horizontal scroll) */}
         <div className="flex-shrink-0 bg-white px-4 py-3 border-b border-slate-200 md:hidden">
@@ -191,7 +187,7 @@ export function SettingsClient({
         </div>
 
         {/* Desktop nav — vertical sidebar */}
-        <div className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 bg-white px-3 py-5 overflow-y-auto border-r border-slate-200 justify-between">
+        <div className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 bg-surface px-3 py-4 border-r border-line justify-between">
           <div>{navGroups.map((group) => (
             <div key={group.label}>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2 pt-2">{group.label}</p>
@@ -204,20 +200,20 @@ export function SettingsClient({
                     <button
                       key={item.key}
                       onClick={() => setActiveSection(item.key)}
-                      className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-[13px] font-medium transition-all text-left ${
+                      className={`flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg text-[13px] font-medium transition-colors text-left ${
                         isDanger
                           ? isActive
-                            ? 'bg-red-50 text-red-700'
-                            : 'text-red-500 hover:bg-red-50'
+                            ? 'bg-risk-soft text-risk'
+                            : 'text-risk hover:bg-risk-soft'
                           : isActive
-                          ? 'bg-emerald-500/10 text-emerald-700'
-                          : 'text-slate-600 hover:bg-slate-100'
+                          ? 'bg-green-soft text-green-deep font-semibold'
+                          : 'text-ink-2 hover:bg-ground hover:text-ink'
                       }`}
                     >
                       <item.icon className={`w-4 h-4 flex-shrink-0 ${
                         isDanger
-                          ? 'text-red-500'
-                          : isActive ? 'text-emerald-500' : 'text-slate-400'
+                          ? 'text-risk'
+                          : isActive ? 'text-green-deep' : 'text-ink-3'
                       }`} />
                       {item.name}
                       {badge && (
@@ -245,8 +241,8 @@ export function SettingsClient({
         </div>
 
         {/* CONTENT */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50">
-          <div className={`bg-white border ${activeSection === 'danger' ? 'border-red-300 ring-1 ring-red-100' : 'border-slate-200'} rounded-2xl p-5 sm:p-6 shadow-sm`}>
+        <div className="flex-1 p-4 md:p-6 bg-ground pb-24 md:pb-10">
+          <div className={`bg-surface border ${activeSection === 'danger' ? 'border-risk-line' : 'border-line'} rounded-[14px] p-4 sm:p-5 max-w-[860px]`}>
             {/* Section header */}
             <div className="flex items-center gap-3 mb-5">
               <div className={`w-9 h-9 rounded-xl ${bgColorMap[current.color]} flex items-center justify-center`}>
@@ -269,8 +265,7 @@ export function SettingsClient({
                     </h4>
                     <p className="text-[12px] text-slate-500 mt-0.5">{email}</p>
                     <div className="flex items-center gap-2 mt-2">
-                      {isPaid && <span className="text-[11px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">{planLabel}</span>}
-                      {!isPaid && !isAdmin && <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">{planLabel}</span>}
+                      {isAdmin && <span className="text-[11px] font-bold text-white bg-ink px-2 py-0.5 rounded-full">Admin</span>}
                       <span className="text-[11px] text-slate-400">{t('settingsClient.memberSince', { date: memberSince })}</span>
                     </div>
                   </div>
@@ -349,34 +344,18 @@ export function SettingsClient({
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* ═══ SUBSCRIPTION ═══ */}
-            {activeSection === 'subscription' && (
-              <div className="space-y-5">
-                {isPaid ? (
-                  <>
-                    <div className="flex items-center justify-between p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                          <CreditCard className="w-5 h-5 text-emerald-500" />
-                        </div>
-                        <div>
-                          <p className="text-[14px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>{planLabel} Plan</p>
-                          <p className="text-[12px] text-emerald-600/70">Unlimited analyses &middot; All features</p>
-                        </div>
-                      </div>
-                      <span className="text-[11px] font-bold text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full">Active</span>
-                    </div>
-                    <ManageSubscriptionButton label={locale === 'fr' ? 'Gerer l\'abonnement' : 'Manage subscription'} />
-                  </>
-                ) : (
-                  <div>
-                    <p className="text-[13px] font-medium text-slate-900 mb-0.5">Analyzing is free</p>
-                    <p className="text-[11px] text-slate-400">{remaining} free {remaining === 1 ? 'analysis' : 'analyses'} remaining. Full Analysis unlocks the negotiation workspace for a deal once you start it.</p>
+                {/* Usage — replaces the dormant Subscription section. No plan model to manage. */}
+                <div className="rounded-[14px] border border-line bg-surface-2 px-4 py-3.5">
+                  <p className="tl-h3 text-ink mb-2.5">{t('settingsPage.usage')}</p>
+                  <div className="flex items-center justify-between text-[13px] mb-1.5">
+                    <b>{t('settingsPage.usageQuick')}</b>
+                    <span className="text-ink-2 tl-num">{t('settingsPage.usageUsed', { used: Math.min(usageCount, FREE_ANALYSIS_LIMIT), limit: FREE_ANALYSIS_LIMIT })}</span>
                   </div>
-                )}
+                  <div className="h-1.5 rounded-full bg-line-2 overflow-hidden"><div className="h-full rounded-full bg-green" style={{ width: `${Math.min(100, (usageCount / FREE_ANALYSIS_LIMIT) * 100)}%` }} /></div>
+                  <p className="text-[12px] text-ink-3 mt-2.5">{t('settingsPage.usageNote', { pct: NEGOTIATION_FEE_PERCENT })}</p>
+                  {remaining === 0 && <a href="mailto:hello@termlift.com" className="inline-block mt-2 text-[12.5px] font-semibold text-green-deep hover:underline">{t('settingsPage.usageContact')}</a>}
+                </div>
               </div>
             )}
 
@@ -685,7 +664,7 @@ export function SettingsClient({
           </div>
         </div>
       )}
-    </div>
+    </AppPage>
   )
 }
 

@@ -59,7 +59,7 @@ export default async function SettingsPage() {
   const locale = (await cookies()).get('termlift_lang')?.value === 'fr' ? 'fr-FR' : 'en-US'
 
   return (
-    <div className="-mx-5 sm:-mx-8 -mt-8 -mb-8 md:-mb-8">
+    <>
       <SettingsClient
         email={user.email || ''}
         firstName={profile?.first_name || ''}
@@ -79,6 +79,6 @@ export default async function SettingsPage() {
         locale={profile?.locale || 'en'}
         negotiationPreferences={(profile as any)?.negotiation_preferences || null}
       />
-    </div>
+    </>
   )
 }

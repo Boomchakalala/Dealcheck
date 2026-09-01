@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Search, Rocket, Upload, BarChart3, FolderOpen, Shield, CreditCard, ChevronDown, Mail } from 'lucide-react'
+import { AppPage, PageHeader } from '@/components/system'
 
 type Category = 'getting-started' | 'uploading' | 'output' | 'deals' | 'privacy' | 'billing'
 
@@ -68,38 +69,39 @@ export default function AppHelpPage() {
     : faqData[activeCategory].map(f => ({ ...f, catKey: activeCategory }))
 
   return (
-    <div className="-mx-5 sm:-mx-8 -mt-8 -mb-8 md:-mb-8 flex flex-col min-h-screen bg-slate-50">
-      {/* Topbar */}
-      <div className="h-14 px-6 bg-white border-b border-slate-200 flex items-center justify-between sticky top-0 z-10">
-        <h1 className="text-[18px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Help Center</h1>
-        <div className="relative w-[260px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search help articles..."
-            className="w-full pl-9 pr-3 py-2 text-[13px] bg-slate-50 border border-slate-200 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-      </div>
+    <AppPage>
+      <PageHeader
+        title="Help Center"
+        actions={
+          <label className="relative block w-full sm:w-[260px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-3" />
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search help articles…"
+              className="w-full h-9 pl-9 pr-3 text-[13px] bg-surface border border-line rounded-lg placeholder:text-ink-3 focus:outline-none focus:border-green focus:ring-[3px] focus:ring-green/15"
+            />
+          </label>
+        }
+      />
 
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
         {/* Left nav */}
-        <div className="w-[220px] flex-shrink-0 bg-white border-r border-slate-200 px-3 py-6">
-          <p className="px-3 mb-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Topics</p>
+        <div className="md:w-[220px] flex-shrink-0 bg-surface border-b md:border-b-0 md:border-r border-line px-3 py-4">
+          <p className="px-2.5 mb-2 tl-label text-ink-3 text-[10px]">Topics</p>
           <nav className="space-y-0.5">
             {categories.map(cat => (
               <button
                 key={cat.key}
                 onClick={() => { setActiveCategory(cat.key as Category); setSearch('') }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all text-left ${
+                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-colors text-left ${
                   activeCategory === cat.key
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-green-soft text-green-deep font-semibold'
+                    : 'text-ink-2 hover:bg-ground hover:text-ink'
                 }`}
               >
-                <span className={`flex-shrink-0 ${activeCategory === cat.key ? 'text-emerald-500' : 'text-slate-400'}`}>{cat.icon}</span>
+                <span className={`flex-shrink-0 ${activeCategory === cat.key ? 'text-green-deep' : 'text-ink-3'}`}>{cat.icon}</span>
                 {cat.name}
               </button>
             ))}
@@ -107,7 +109,7 @@ export default function AppHelpPage() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-10 py-8">
+        <div className="flex-1 px-4 sm:px-6 py-5 bg-ground pb-24 md:pb-10">
           <div className="max-w-3xl">
             {/* Category header */}
             {!isSearching && (
@@ -133,7 +135,7 @@ export default function AppHelpPage() {
             )}
 
             {/* FAQ items */}
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-surface border border-line rounded-[14px] overflow-hidden">
               {filteredFaqs.length > 0 ? filteredFaqs.map((item, i) => {
                 const key = `${item.catKey}-${item.q}`
                 const isOpen = !!openItems[key]
@@ -173,7 +175,7 @@ export default function AppHelpPage() {
             </div>
 
             {/* Still have questions */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 mt-6 flex items-center justify-between shadow-sm">
+            <div className="bg-surface border border-line rounded-[14px] p-5 mt-4 flex flex-wrap gap-3 items-center justify-between">
               <div>
                 <p className="text-[15px] font-bold text-slate-900 mb-1">Still have questions?</p>
                 <p className="text-[13px] text-slate-500">We&apos;re here to help &mdash; reach out anytime</p>
@@ -188,7 +190,7 @@ export default function AppHelpPage() {
           </div>
         </div>
       </div>
-    </div>
+    </AppPage>
   )
 }
 

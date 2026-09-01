@@ -1,101 +1,61 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import Link from 'next/link'
-import { Search, Building2, ChevronRight } from 'lucide-react'
+import { Search, Building2 } from 'lucide-react'
+import { useI18n } from '@/i18n/context'
 import { formatTotals, type VendorRow } from '@/lib/vendor-aggregate'
-import { ScoreGradientBar } from '@/components/ScoreGradientBar'
+import { AppPage, PageHeader, PageBody, Table, TableHead, TableRow, HideM, NameCell, ScoreRing } from '@/components/system'
 
-const sora = "'Sora', sans-serif"
-function fmtDate(d: string | null) {
-  if (!d) return '—'
-  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
+const COLS = 'minmax(0,2.4fr) 0.6fr 1.1fr 0.8fr 1.1fr 1fr'
 
 export function VendorsListClient({ rows }: { rows: VendorRow[] }) {
+  const { t, locale } = useI18n()
   const [q, setQ] = useState('')
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase()
     if (!term) return rows
     return rows.filter((r) => r.name.toLowerCase().includes(term) || r.aliases.some((a) => a.toLowerCase().includes(term)))
   }, [rows, q])
+  const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—')
 
   return (
-    <div className="-mx-5 sm:-mx-8 -mt-8 bg-slate-50 min-h-screen">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-7">
-        <div className="flex items-center justify-between gap-4 mb-5">
-          <div>
-            <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900" style={{ fontFamily: sora }}>Vendors</h1>
-            <p className="text-[13px] text-slate-500 mt-0.5">{rows.length} {rows.length === 1 ? 'vendor' : 'vendors'} across your deals</p>
-          </div>
-        </div>
-        {rows.length > 0 && (
-          <div className="relative max-w-sm">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search vendors"
-              className="w-full pl-9 pr-3 py-2 text-[13.5px] bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:bg-white transition-colors"
-            />
-          </div>
-        )}
-      </div>
-
-      <div className="px-5 sm:px-8 py-6">
+    <AppPage>
+      <PageHeader
+        title={t('vendorsPage.title')}
+        sub={t('vendorsPage.sub', { n: rows.length })}
+        actions={rows.length > 0 ? (
+          <label className="relative block w-full sm:w-[240px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-3" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('vendorsPage.search')} className="w-full h-9 pl-9 pr-3 rounded-lg border border-line bg-surface text-[13px] placeholder:text-ink-3 focus:outline-none focus:border-green focus:ring-[3px] focus:ring-green/15" />
+          </label>
+        ) : undefined}
+      />
+      <PageBody>
         {rows.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
-              <Building2 className="w-6 h-6 text-slate-400" />
-            </div>
-            <p className="text-[15px] text-slate-600 font-semibold mb-1">No vendors yet</p>
-            <p className="text-[13px] text-slate-400">Analyze a quote and the vendor will show up here, grouping all your deals with them.</p>
+          <div className="py-16 text-center border border-dashed border-line rounded-[14px] bg-surface">
+            <span className="w-11 h-11 rounded-xl bg-ground grid place-items-center mx-auto mb-3"><Building2 className="w-5 h-5 text-ink-3" /></span>
+            <p className="text-[15px] font-semibold text-ink">{t('vendorsPage.emptyTitle')}</p>
+            <p className="text-[13px] text-ink-2 mt-1 max-w-[46ch] mx-auto">{t('vendorsPage.emptyBody')}</p>
           </div>
         ) : (
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-            {/* column header (desktop) */}
-            <div className="hidden md:grid grid-cols-[2.4fr_0.7fr_1.1fr_0.8fr_1.1fr_1fr_auto] gap-4 px-5 py-2.5 border-b border-slate-100 bg-slate-50/60 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-              <span>Vendor</span>
-              <span className="text-right">Deals</span>
-              <span className="text-right">Total value</span>
-              <span className="text-right">Avg score</span>
-              <span className="text-right">Saved</span>
-              <span className="text-right">Last activity</span>
-              <span className="w-4" />
-            </div>
-
-            <div className="divide-y divide-slate-100">
-              {filtered.map((v) => (
-                <Link key={v.id} href={`/app/vendors/${v.id}`} className="block group">
-                  <div className="md:grid md:grid-cols-[2.4fr_0.7fr_1.1fr_0.8fr_1.1fr_1fr_auto] md:items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors">
-                    <div className="min-w-0">
-                      <p className="text-[14.5px] font-semibold text-slate-900 truncate group-hover:text-emerald-700 transition-colors">{v.name}</p>
-                      {v.aliases.length > 0 && <p className="text-[11.5px] text-slate-400 truncate">also: {v.aliases.join(', ')}</p>}
-                      {/* mobile meta */}
-                      <p className="md:hidden text-[12px] text-slate-400 mt-1">
-                        {v.dealCount} {v.dealCount === 1 ? 'deal' : 'deals'} · {formatTotals(v.totalsByCurrency)} · {fmtDate(v.lastActivity)}
-                      </p>
-                    </div>
-                    <span className="hidden md:block text-right text-[13.5px] text-slate-700 tabular-nums">{v.dealCount}</span>
-                    <span className="hidden md:block text-right text-[13.5px] font-semibold text-slate-900" style={{ fontFamily: sora }}>{formatTotals(v.totalsByCurrency)}</span>
-                    <span className="hidden md:flex justify-end">
-                      {v.avgScore != null && <ScoreGradientBar score={v.avgScore} width={44} height={6} />}
-                    </span>
-                    <span className="hidden md:block text-right text-[13.5px] font-semibold text-emerald-700" style={{ fontFamily: sora }}>{formatTotals(v.savingsByCurrency)}</span>
-                    <span className="hidden md:block text-right text-[12.5px] text-slate-400">{fmtDate(v.lastActivity)}</span>
-                    <ChevronRight className="hidden md:block w-4 h-4 text-slate-300 group-hover:text-emerald-500 transition-colors" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {filtered.length === 0 && (
-              <p className="text-center text-[13.5px] text-slate-400 py-10">No vendors match &ldquo;{q}&rdquo;.</p>
-            )}
-          </div>
+          <Table>
+            <TableHead cols={COLS}>
+              <span>{t('vendorsPage.colVendor')}</span><span className="text-right">{t('vendorsPage.colDeals')}</span><span className="text-right">{t('vendorsPage.colTotal')}</span><span className="text-right">{t('vendorsPage.colScore')}</span><span className="text-right">{t('vendorsPage.colSaved')}</span><span className="text-right">{t('vendorsPage.colLast')}</span>
+            </TableHead>
+            {filtered.map((v) => (
+              <TableRow key={v.id} cols={COLS} href={`/app/vendors/${v.id}`}>
+                <NameCell name={v.name} sub={v.aliases.length > 0 ? t('vendorsPage.alsoKnown', { names: v.aliases.join(', ') }) : `${v.dealCount} · ${formatTotals(v.totalsByCurrency)}`} />
+                <HideM className="text-right tl-num text-ink-2">{v.dealCount}</HideM>
+                <HideM className="text-right tl-num font-semibold font-display">{formatTotals(v.totalsByCurrency)}</HideM>
+                <HideM className="flex justify-end">{v.avgScore != null ? <ScoreRing score={v.avgScore} size={28} stroke={3} /> : <span className="text-ink-3">—</span>}</HideM>
+                <HideM className="text-right tl-num font-semibold text-green-deep">{formatTotals(v.savingsByCurrency)}</HideM>
+                <HideM className="text-right text-[12.5px] text-ink-3">{fmtDate(v.lastActivity)}</HideM>
+              </TableRow>
+            ))}
+            {filtered.length === 0 && <p className="text-center text-[13px] text-ink-3 py-8">{t('vendorsPage.noMatch', { q })}</p>}
+          </Table>
         )}
-      </div>
-    </div>
+      </PageBody>
+    </AppPage>
   )
 }
