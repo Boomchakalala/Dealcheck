@@ -1,0 +1,298 @@
+'use client'
+
+import Link from 'next/link'
+import type { ReactNode } from 'react'
+import { useI18n } from '@/i18n/context'
+import { cn } from '@/lib/utils'
+import type { Plan } from '@/lib/tiers'
+import type { DealOutput } from '@/types'
+import { DealScrollView } from '@/components/DealScrollView'
+import { DealHeaderClient } from '@/components/DealHeaderClient'
+import { HeroVerdict } from '@/components/HeroVerdict'
+import { AppPage, Btn, Card, Chip, GateCard, PageBody, ScoreRing, StageRail, StatRow, StatTile } from '@/components/system'
+import { deriveDealStage, STAGE_LABEL_KEY, stageTone, type DealStage } from '@/lib/deal-stage'
+import { hasDeepContent, deepAnalysisIsRunning } from '@/lib/deep-analysis-status'
+import { shortenVendorDisplayName } from '@/lib/vendor-normalize'
+import { NEGOTIATION_FEE_PERCENT } from '@/lib/pricing'
+import {
+  type DealLike, getCategory, getDealCurrency, getDealType, getLatestRound, getPotentialSavings, getRedFlagCount,
+  getRenewalDate, getSavingsRange, getScore, getTotalCommitment, getVendorName, isClosed as dealIsClosed, isWon as dealIsWon, fmtMoney,
+} from '@/lib/deal-metrics'
+import { normalizeAmount, parseMoney } from '@/lib/currency'
+
+export interface DealWorkspaceDeal extends DealLike {
+  close_summary?: string | null
+  what_changed?: string[] | null
+}
+
+export interface NegotiationRequestLite {
+  id: string
+  status: string
+  negotiation_objective?: string | null
+  walk_away_notes?: string | null
+  competitor_context?: string | null
+}
+
+interface DealWorkspaceProps {
+  deal: DealWorkspaceDeal
+  /** app = signed-in real deal · demo = sample deal in the demo shell · trial = anonymous /try result (no shell) */
+  mode: 'app' | 'demo' | 'trial'
+  /** Flat message dictionaries DealScrollView still reads from (src/i18n/*.json). */
+  messages: Record<string, Record<string, string>>
+  userPlan: Plan
+  isAdmin: boolean
+  showFullPlaybook: boolean
+  negotiationRequest?: NegotiationRequestLite | null
+  addRoundForm?: ReactNode
+  inferredDealType?: 'renewal' | 'new_purchase' | 'expansion' | 'unknown'
+  /** Already-redacted output when the playbook is hidden (server decides). */
+  latestOutputOverride?: unknown
+}
+
+/**
+ * The stage-based deal workspace: sticky header (one primary action that
+ * changes with the stage), stage rail, verdict, stat tiles, then the existing
+ * analysis sections, then the hand-off gate. Shared by /app, /demo and /try.
+ */
+export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFullPlaybook, negotiationRequest, addRoundForm, inferredDealType, latestOutputOverride }: DealWorkspaceProps) {
+  const { t, locale } = useI18n()
+  const isTrial = mode === 'trial'
+  const isDemo = mode === 'demo'
+  const linkBase = isDemo ? '/demo' : '/app'
+
+  const sortedRounds = [...(deal.rounds || [])].sort((a, b) => b.round_number - a.round_number)
+  const latestRound = getLatestRound(deal)
+  const latestOutput = (latestOutputOverride ?? latestRound?.output_json) as DealOutput | undefined
+  const firstOutput = sortedRounds[sortedRounds.length - 1]?.output_json as DealOutput | undefined
+  if (!latestRound || !latestOutput) return null
+
+  const openRequest = negotiationRequest && !negotiationRequest.status.startsWith('closed_') ? negotiationRequest : null
+  const stage: DealStage = isTrial ? 'quick' : deriveDealStage({ status: deal.status, rounds: deal.rounds, negotiationRequestStatus: openRequest?.status })
+  const closed = dealIsClosed(deal)
+  const won = dealIsWon(deal)
+  const waitingOnClient = openRequest?.status === 'waiting_for_client_info'
+  const deepDone = hasDeepContent(latestOutput)
+  const deepRunning = deepAnalysisIsRunning(latestOutput)
+
+  const vendor = shortenVendorDisplayName(getVendorName(deal))
+  const category = getCategory(deal)
+  const dealType = getDealType(deal)
+  const currency = getDealCurrency(deal)
+  const totalCommitment = getTotalCommitment(deal)
+  const originalTotal = firstOutput?.snapshot?.total_commitment
+  const term = latestOutput.snapshot?.term
+  const flags = getRedFlagCount(deal)
+  const watchCount = latestOutput.watchItems?.length || 0
+  const potential = getPotentialSavings(deal)
+  const range = getSavingsRange(deal)
+  const score = getScore(deal)
+  const scoreLabel = latestOutput.score_label
+  const scoreRationale = latestOutput.score_rationale
+  const verdict = latestOutput.verdict
+  const targetRange = (latestOutput as unknown as { target_price_range?: { low: number; high: number } | null }).target_price_range
+  const renewal = getRenewalDate(deal)
+  const achieved = deal.savings_amount && deal.savings_amount > 0 ? deal.savings_amount : 0
+  const savingsPct = deal.savings_percent ?? (achieved && totalCommitment ? (achieved / parseMoney(totalCommitment).amount) * 100 : null)
+
+  const dLocale = locale === 'fr' ? 'fr-FR' : 'en-US'
+  const dateShort = (d: string | Date) => new Date(d).toLocaleDateString(dLocale, { month: 'short', day: 'numeric' })
+  const dateFull = (d: string | Date) => new Date(d).toLocaleDateString(dLocale, { month: 'short', day: 'numeric', year: 'numeric' })
+
+  const negotiateHref = isTrial ? '/negotiate' : isDemo ? '/negotiate' : `/app/deal/${deal.id}/negotiate`
+  const negotiationPageHref = openRequest && !isDemo ? `/app/negotiations/${openRequest.id}` : negotiateHref
+
+  // ── the one primary action, by stage ─────────────────────────
+  let primary: ReactNode = null
+  if (isTrial) primary = <Btn href="/login?from=trial" variant="primary">{t('dealPage.trialCta')}</Btn>
+  else if (closed) primary = null
+  else if (stage === 'termlift') primary = <Btn href={negotiationPageHref} variant={waitingOnClient ? 'primary' : 'ink'}>{t('dealPage.primaryOpenNegotiation')}</Btn>
+  else if (stage === 'quick') primary = <Btn href="#deep-analysis" variant="primary" disabled={deepRunning}>{deepRunning ? t('dealPage.primaryRunning') : t('dealPage.primaryRunFull')}</Btn>
+  else if (stage === 'full') primary = <Btn href="#email-section" variant="primary">{t('dealPage.primaryEmail')}</Btn>
+  else primary = <Btn href="#add-round" variant="primary">{t('dealPage.primaryUploadReply')}</Btn>
+  const secondary = !isTrial && !closed && stage !== 'termlift' ? <Btn href={negotiateHref} variant="ghost">{t('dealPage.secondaryNegotiate')}</Btn> : null
+
+  const railHrefs: Partial<Record<DealStage, string>> | undefined = isTrial ? undefined : {
+    quick: '#overview',
+    full: deepDone ? '#playbook' : '#deep-analysis',
+    self: '#email-section',
+    termlift: openRequest ? negotiationPageHref : '#rounds',
+    closed: '#rounds',
+  }
+
+  // ── verdict copy ─────────────────────────────────────────────
+  let eyebrow: ReactNode
+  let title: ReactNode
+  let body: ReactNode
+  if (won) {
+    eyebrow = t('dealPage.verdictWonEyebrow', { date: deal.closed_at ? dateShort(deal.closed_at) : '' })
+    title = achieved > 0 ? t('dealPage.verdictWonTitle', { v: fmtMoney(achieved, currency), pct: (savingsPct ?? 0).toFixed(1) }) : t('dealPage.verdictWonTitleNoAmount')
+    body = deal.close_summary || scoreRationale || ''
+  } else if (closed) {
+    eyebrow = t('dealPage.verdictClosedEyebrow')
+    title = scoreLabel || ''
+    body = scoreRationale || ''
+  } else if (stage === 'termlift') {
+    eyebrow = t('dealPage.verdictTermliftEyebrow')
+    title = waitingOnClient ? t('dealPage.verdictTermliftWaiting') : scoreLabel || ''
+    body = waitingOnClient ? t('dealPage.verdictTermliftBody') : verdict || scoreRationale || ''
+  } else {
+    eyebrow = score != null ? t(STAGE_LABEL_KEY[stage]) : ''
+    title = scoreLabel || ''
+    body = verdict || scoreRationale || ''
+  }
+
+  const stageChipLabel = closed && !won ? t('dealList.noChange') : t(STAGE_LABEL_KEY[stage])
+
+  return (
+    <AppPage className={isTrial ? '!mx-0 !my-0 min-h-0 rounded-[14px] border border-line overflow-hidden' : undefined}>
+      {/* ── Sticky header ─────────────────────────────────────── */}
+      <div className={cn('bg-surface border-b border-line z-30', !isTrial && 'sticky', isDemo ? 'top-[44px]' : 'top-0')}>
+        <div className="px-4 sm:px-6 pt-2.5 flex items-center gap-3 min-h-[34px]">
+          {isTrial ? (
+            <span className="text-[12.5px] text-ink-3">{t('dealPage.trialNotSaved')}</span>
+          ) : (
+            <nav className="flex items-center gap-1.5 text-[12.5px] text-ink-3 min-w-0" aria-label="Breadcrumb">
+              <Link href={linkBase} className="hover:text-ink-2 no-underline">{t('dealPage.crumbDeals')}</Link>
+              <span aria-hidden>›</span>
+              <span className="text-ink font-semibold truncate">{vendor}</span>
+            </nav>
+          )}
+          <div className="ml-auto flex items-center gap-2">
+            {isDemo && <span className="tl-label text-ink-3 hidden sm:inline">{t('dealPage.demoSample')}</span>}
+            {mode === 'app' && (
+              <DealHeaderClient
+                dealId={deal.id}
+                dealStatus={deal.status || 'in_progress'}
+                closeSummary={deal.close_summary}
+                savingsAmount={deal.savings_amount}
+                savingsPercent={deal.savings_percent}
+                closedAt={deal.closed_at}
+                currentTotal={totalCommitment}
+                originalTotal={originalTotal}
+                roundCount={sortedRounds.length}
+                whatChanged={deal.what_changed ?? null}
+                userPlan={userPlan}
+                isAdmin={isAdmin}
+              />
+            )}
+          </div>
+        </div>
+        <div className="px-4 sm:px-6 pt-1.5 pb-2.5 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 className="font-display font-bold text-[20px] tracking-[-0.02em] text-ink leading-tight truncate max-w-full">{vendor}</h1>
+          <div className="flex flex-wrap gap-1.5">
+            {category && category !== 'Other' && <Chip>{category}</Chip>}
+            {dealType && <Chip>{dealType}</Chip>}
+            <Chip tone={stageTone(stage, { won, waitingOnClient })}>{stageChipLabel}</Chip>
+            {sortedRounds.length > 1 && <Chip>{t('dealPage.rounds', { n: sortedRounds.length })}</Chip>}
+          </div>
+          {(primary || secondary) && (
+            <div className="flex gap-2 w-full sm:w-auto sm:ml-auto [&>*]:flex-1 sm:[&>*]:flex-none">
+              {secondary}
+              {primary}
+            </div>
+          )}
+        </div>
+        <div className="px-4 sm:px-6 pb-2.5"><StageRail current={stage} hrefs={railHrefs} compact /></div>
+      </div>
+
+      <PageBody className={cn(isTrial && 'pb-4')}>
+        {/* ── Verdict ─────────────────────────────────────────── */}
+        <div className={cn('rounded-[14px] border px-4 py-4 sm:px-5 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-4 sm:gap-5 items-center', won ? 'bg-green-soft border-green-line' : waitingOnClient ? 'bg-warn-soft border-warn-line' : 'bg-surface border-line')}>
+          {score != null && <ScoreRing score={score} size={84} muted={closed && !won} className="mx-auto sm:mx-0" />}
+          <div className="min-w-0 text-center sm:text-left">
+            {eyebrow && <p className={cn('tl-label', waitingOnClient ? 'text-warn' : 'text-green-deep')}>{eyebrow}</p>}
+            {title && <p className="font-display font-bold text-[16px] text-ink mt-1 leading-snug">{title}</p>}
+            {body && <HeroVerdict text={String(body)} className="text-[13px] text-ink-2 mt-1 leading-relaxed max-w-[72ch] sm:mx-0 mx-auto" />}
+          </div>
+        </div>
+
+        {/* ── Stats ───────────────────────────────────────────── */}
+        <StatRow>
+          <StatTile
+            tone="money" hi={won}
+            label={won ? t('dealPage.statSaved') : t('dealPage.statSavings')}
+            value={won && achieved > 0 ? fmtMoney(achieved, currency) : potential > 0 ? fmtMoney(potential, currency) : '—'}
+            sub={won && savingsPct != null ? t('dealPage.statAchieved', { pct: savingsPct.toFixed(1) }) : range ? t('dealPage.statRange', { low: fmtMoney(range.low, currency), high: fmtMoney(range.high, currency) }) : t('dealPage.statPotential')}
+          />
+          {won ? (
+            <StatTile tone="money" label={t('dealPage.statFinal')} value={achieved > 0 && totalCommitment ? fmtMoney(parseMoney(totalCommitment).amount - achieved, currency) : '—'} sub={totalCommitment ? t('dealPage.statWas', { v: normalizeAmount(totalCommitment) }) : undefined} />
+          ) : (
+            <StatTile tone={flags > 0 ? 'risk' : 'neutral'} label={t('dealPage.statFlags')} value={flags} sub={`${t('dealPage.statFlagsSub', { n: flags })}${watchCount > 0 ? ` · ${t('dealPage.statFlagsMinor', { n: watchCount })}` : ''}`} />
+          )}
+          {!won && targetRange ? (
+            <StatTile label={t('dealPage.statTarget')} value={`${fmtMoney(targetRange.low, currency)}–${fmtMoney(targetRange.high, currency)}`} sub={totalCommitment ? t('dealPage.statVsQuoted', { v: normalizeAmount(totalCommitment) }) : undefined} />
+          ) : (
+            <StatTile label={t('dealPage.statTotal')} value={totalCommitment ? normalizeAmount(totalCommitment) : '—'} sub={term || undefined} />
+          )}
+          {won && deal.closed_at ? (
+            <StatTile label={t('dealPage.statClosed')} value={dateShort(deal.closed_at)} sub={dateFull(deal.closed_at)} />
+          ) : renewal ? (
+            <StatTile label={t('dealPage.statRenewal')} value={dateShort(renewal)} sub={dateFull(renewal)} />
+          ) : (
+            <StatTile label={t('dealPage.statStarted')} value={dateShort(deal.created_at)} sub={dateFull(deal.created_at)} />
+          )}
+        </StatRow>
+
+        {isTrial && (
+          <GateCard tone="green" eyebrow={t('dealPage.trialEyebrow')} title={t('dealPage.trialTitle')} body={t('dealPage.trialBody')} action={<Btn href="/login?from=trial" variant="primary">{t('dealPage.trialCta')}</Btn>} />
+        )}
+
+        {/* ── Analysis sections (existing renderer) ───────────── */}
+        <Card pad={false} className="overflow-hidden">
+          <DealScrollView
+            latestOutput={latestOutput}
+            latestRoundId={latestRound.id as string}
+            inferredDealType={inferredDealType}
+            hasNegotiationRequest={!!openRequest}
+            savedNegotiationContext={openRequest ? { objective: openRequest.negotiation_objective || undefined, walkAwayNotes: openRequest.walk_away_notes || undefined, competitorContext: openRequest.competitor_context || undefined } : undefined}
+            isV2={(latestRound as { schema_version?: string }).schema_version === 'v2'}
+            schemaVersion={(latestRound as { schema_version?: string }).schema_version || 'v1'}
+            score={score}
+            scoreLabel={scoreLabel}
+            scoreRationale={scoreRationale}
+            totalCommitment={totalCommitment || undefined}
+            term={term}
+            redFlagCount={flags}
+            potentialSavings={potential}
+            formatSavingsStr={potential > 0 ? fmtMoney(potential, currency) : undefined}
+            dealCurrency={currency}
+            sortedRounds={sortedRounds}
+            dealId={isTrial ? 'trial' : deal.id}
+            dealStatus={deal.status || 'in_progress'}
+            locale={locale}
+            closeSummary={deal.close_summary ?? null}
+            savingsAmount={deal.savings_amount ?? null}
+            savingsPercent={deal.savings_percent ?? null}
+            closedAt={deal.closed_at ?? null}
+            whatChanged={deal.what_changed ?? null}
+            originalTotal={originalTotal}
+            userPlan={userPlan}
+            isAdmin={isAdmin}
+            showFullPlaybook={showFullPlaybook}
+            negotiateHref={negotiateHref}
+            addRoundForm={addRoundForm ?? null}
+            messages={messages}
+            demoMode={isDemo}
+            hideNextStep
+          />
+        </Card>
+
+        {/* ── Hand-off ────────────────────────────────────────── */}
+        {!isTrial && !closed && (
+          openRequest ? (
+            waitingOnClient ? (
+              <GateCard tone="warn" eyebrow={t('dealPage.handoffWaitingEyebrow')} title={t('dealPage.handoffWaitingTitle')} body={t('dealPage.handoffWaitingBody')} action={<Btn href={negotiationPageHref} variant="ink">{t('dealPage.handoffOpen')}</Btn>} />
+            ) : (
+              <GateCard tone="neutral" eyebrow={t('dealPage.handoffWaitingEyebrow')} title={t('dealPage.handoffActiveTitle')} body={t('dealPage.handoffActiveBody')} action={<Btn href={negotiationPageHref} variant="ghost">{t('dealPage.handoffOpen')}</Btn>} />
+            )
+          ) : (
+            <GateCard tone="neutral" eyebrow={t('dealPage.handoffEyebrow')} title={t('dealPage.handoffTitle')} body={t('dealPage.handoffBody', { vendor, pct: NEGOTIATION_FEE_PERCENT })} action={<Btn href={negotiateHref} variant="ink">{t('dealPage.handoffCta')}</Btn>} />
+          )
+        )}
+        {isTrial && (
+          <GateCard tone="green" title={t('dealPage.trialKeepTitle')} body={t('dealPage.trialKeepBody')} action={<Btn href="/login?from=trial" variant="primary">{t('dealPage.trialCta')}</Btn>} />
+        )}
+      </PageBody>
+    </AppPage>
+  )
+}

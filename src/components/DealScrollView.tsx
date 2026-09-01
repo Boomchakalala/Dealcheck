@@ -60,6 +60,8 @@ interface DealScrollViewProps {
     walkAwayNotes?: string
     competitorContext?: string
   }
+  /** Redesign: the workspace header owns the primary CTA, so the trailing "Next step" card is redundant. */
+  hideNextStep?: boolean
 }
 
 // ─── helpers ──────────────────────────────────────────────
@@ -84,6 +86,7 @@ export function DealScrollView(props: DealScrollViewProps) {
     negotiateHref = `/app/deal/${dealId}/negotiate`,
     hasNegotiationRequest = false,
     savedNegotiationContext,
+    hideNextStep = false,
   } = props
 
   const o = latestOutput as DealOutput
@@ -305,7 +308,7 @@ export function DealScrollView(props: DealScrollViewProps) {
     <div className="flex flex-col flex-1">
 
       {/* ═══ SECTION 1: OVERVIEW (white bg) ═══ */}
-      <div className="bg-white border-b border-slate-200">
+      <div id="overview" className="bg-white border-b border-slate-200 scroll-mt-40">
         <div className="p-5 sm:p-8">
           {/* Deal snapshot + Score breakdown side by side */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
@@ -445,7 +448,7 @@ export function DealScrollView(props: DealScrollViewProps) {
       </div>
 
       {/* ═══ SECTION 2: RED FLAGS ═══ */}
-      <div className="bg-red-50/40 border-b border-red-200">
+      <div id="flags" className="bg-red-50/40 border-b border-red-200 scroll-mt-40">
         <div className="p-5 sm:p-8">
           {/* Section header */}
           <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
@@ -622,7 +625,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           this synthesized playbook view too, empty ("Can offer" had nothing to
           show), would be duplicate + broken UI, not "concise and complete." */}
       {(!showFullPlaybook || hasDeepContent) && (
-      <div className="bg-emerald-50/40 border-b border-emerald-200">
+      <div id="playbook" className="bg-emerald-50/40 border-b border-emerald-200 scroll-mt-40">
         <div className="p-5 sm:p-8">
           {!showFullPlaybook ? (
             <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={<Zap className="w-6 h-6 text-white" />} iconBg="bg-emerald-600" />
@@ -1000,7 +1003,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           No empty section: renders only if there's real activity to show, or
           real assumptions content — never a blank white band. */}
       {(hasNegotiationActivity || ((o?.assumptions?.length ?? 0) > 0)) && (
-      <div className="bg-white">
+      <div id="rounds" className="bg-white scroll-mt-40">
         <div className="p-5 sm:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
             {/* Rounds timeline — left col. An analysis is not a negotiation round —
@@ -1115,7 +1118,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           Same action-hierarchy rules as the hero: fast-only points at the
           strategy step first, deep-complete reveals the two execution paths.
           Kept as one small card, not a full-bleed dark section. */}
-      {showFullPlaybook && !isClosed && (
+      {showFullPlaybook && !isClosed && !hideNextStep && (
         <div className="bg-white border-t border-slate-200">
           <div className="p-5 sm:p-8">
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5">

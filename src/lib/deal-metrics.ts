@@ -23,6 +23,7 @@ interface SavingsObject { must_have?: SavingsItem[]; total?: unknown; optimistic
 
 // Loose input types — deals arrive from several Supabase selects with different shapes.
 export interface RoundLike {
+  id?: string
   round_number: number
   output_json?: unknown
   status?: string
