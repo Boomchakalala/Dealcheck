@@ -1,0 +1,53 @@
+import { cn } from '@/lib/utils'
+
+/** Single source of truth for score → colour. ≥60 green · 40–59 amber · <40 red. */
+export function scoreColor(score: number): string {
+  if (score >= 60) return 'var(--tl-green)'
+  if (score >= 40) return 'var(--tl-warn)'
+  return 'var(--tl-risk)'
+}
+
+export function scoreTextClass(score: number): string {
+  if (score >= 60) return 'text-green-deep'
+  if (score >= 40) return 'text-warn'
+  return 'text-risk'
+}
+
+interface ScoreRingProps {
+  score: number
+  size?: number
+  stroke?: number
+  className?: string
+  /** Grey ring for deals where the score is no longer the signal (closed without a win). */
+  muted?: boolean
+}
+
+/**
+ * The only score visual in the product. Same ring on landing, /try, the deal
+ * page, Home rows and Vendors — the old app mixed a ring, a gradient bar and a
+ * mini bar depending on the page.
+ */
+export function ScoreRing({ score, size = 88, stroke, className, muted }: ScoreRingProps) {
+  const s = Math.max(0, Math.min(100, Math.round(score)))
+  const sw = stroke ?? Math.max(3, Math.round(size * 0.08))
+  const r = (size - sw) / 2
+  const c = 2 * Math.PI * r
+  const off = c * (1 - s / 100)
+  const showDenominator = size >= 64
+  return (
+    <span className={cn('relative inline-grid place-items-center shrink-0', className)} style={{ width: size, height: size }} aria-label={`Score ${s} out of 100`} role="img">
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--tl-line-2)" strokeWidth={sw} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={muted ? 'var(--tl-ink-3)' : scoreColor(s)} strokeWidth={sw} strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" />
+      </svg>
+      <span className="absolute font-display font-extrabold tracking-[-0.03em] leading-none text-ink tl-num" style={{ fontSize: size * 0.34, marginTop: showDenominator ? -size * 0.06 : 0 }}>
+        {s}
+      </span>
+      {showDenominator && (
+        <span className="absolute tl-label text-ink-3" style={{ fontSize: Math.max(8, size * 0.1), marginTop: size * 0.28 }}>
+          /100
+        </span>
+      )}
+    </span>
+  )
+}

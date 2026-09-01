@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Sora, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { NextIntlClientProvider } from "next-intl";
@@ -16,6 +16,21 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Redesign type system: Sora for display, JetBrains Mono for tiny labels only.
+// Loaded through next/font (self-hosted, no layout shift) instead of the old
+// Google Fonts <link>, which also pulled DM Sans that nothing uses any more.
+const sora = Sora({
+  variable: "--font-sora",
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+});
+
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -63,9 +78,6 @@ export default async function RootLayout({
     <html lang={locale}>
       <head>
         <meta name="google-site-verification" content="VFAqvJkNGlWXSZLe4dtSN8benH7O0vTRBDzrrOyCX5E" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -99,7 +111,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${sora.variable} ${jetbrains.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
           <I18nProvider>

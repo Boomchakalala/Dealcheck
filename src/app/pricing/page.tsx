@@ -1,196 +1,114 @@
-import Link from 'next/link'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
-import { ArrowRight, Zap, Handshake, Search, Microscope } from 'lucide-react'
-import { NEGOTIATION_FEE_PERCENT, FULL_ANALYSIS_PRICE } from '@/lib/pricing'
+import { Btn, StageRail } from '@/components/system'
+import { NEGOTIATION_FEE_PERCENT, FULL_ANALYSIS_PRICE, FULL_ANALYSIS_EMAIL_REGEN_LIMIT } from '@/lib/pricing'
+import { FREE_ANALYSIS_LIMIT } from '@/lib/tiers'
 
 export const metadata: Metadata = {
   title: 'Pricing',
-  description: `Analyze a supplier quote free and see where you can negotiate. Unlock Full Analysis for a deal, then negotiate yourself or have TermLift negotiate for a ${NEGOTIATION_FEE_PERCENT}% success fee — nothing if we don't save you money.`,
+  description: `Analyse a supplier quote free. Unlock Full Analysis per deal. Or have TermLift negotiate for a ${NEGOTIATION_FEE_PERCENT}% success fee — nothing if we don't save you money.`,
   alternates: { canonical: 'https://www.termlift.com/pricing' },
 }
 
-const green = '#1DB954'
-const sora = "'Sora', sans-serif"
-const mono = "'JetBrains Mono', monospace"
-
-// Full Analysis has no confirmed price yet (see lib/pricing.ts) — never show
-// an invented number here. Once FULL_ANALYSIS_PRICE.amount is set, this
-// renders it automatically; until then it shows neutral "to be confirmed"
-// copy instead of a dollar figure.
-const fullAnalysisPriceLabel = FULL_ANALYSIS_PRICE.needsConfirmation || FULL_ANALYSIS_PRICE.amount == null
-  ? 'Pricing to be confirmed'
-  : `${FULL_ANALYSIS_PRICE.currency === 'EUR' ? '€' : ''}${FULL_ANALYSIS_PRICE.amount}${FULL_ANALYSIS_PRICE.currency !== 'EUR' ? ` ${FULL_ANALYSIS_PRICE.currency}` : ''} per deal`
-
-const choices = [
-  {
-    tag: 'Free',
-    icon: <Search className="w-5 h-5" />,
-    title: 'Analyze your quote',
-    price: '€0',
-    body: 'Upload a supplier quote and see your negotiation opportunity — deal value, savings range, commercial red flags, and high-level negotiation levers.',
-    cta: 'Analyze a quote',
-    href: '/try',
-    featured: false,
-  },
-  {
-    tag: 'One-time · per deal',
-    icon: <Microscope className="w-5 h-5" />,
-    title: 'Unlock Full Analysis',
-    price: fullAnalysisPriceLabel,
-    body: 'Unlock the complete negotiation strategy for this deal — deeper commercial analysis, negotiation levers, recommended asks, strategy, and Round 1 preparation.',
-    cta: 'Start with a free analysis',
-    href: '/try',
-    featured: true,
-  },
-  {
-    tag: 'Success-based',
-    icon: <Handshake className="w-5 h-5" />,
-    title: 'Have TermLift negotiate it',
-    price: `${NEGOTIATION_FEE_PERCENT}% of savings`,
-    body: "TermLift handles or supports the supplier negotiation for you. The fee is based on verified savings — nothing if we don't achieve measurable savings.",
-    cta: 'Get a deal negotiated',
-    href: '/negotiate',
-    featured: false,
-  },
-]
-
-const faqs = [
-  {
-    q: 'Does analyzing a quote require a credit card?',
-    a: 'No. Analyze your first quote free, with no card and no signup required.',
-  },
-  {
-    q: 'What is Full Analysis?',
-    a: "The deeper negotiation strategy for a specific deal — commercial analysis, negotiation levers, recommended asks, strategy, and Round 1 preparation, on top of the free initial assessment.",
-  },
-  {
-    q: 'How much does Full Analysis cost?',
-    a: "We haven't finalized Full Analysis pricing yet. For now it's included once you've started an analysis — we'll be upfront here before that changes.",
-  },
-  {
-    q: 'What is a negotiation round?',
-    a: "A negotiation round is a follow-up analysis. After Full Analysis is unlocked for a deal, you can upload the vendor's counter-offer and TermLift re-analyses the updated terms — tracking what changed and adjusting your strategy. Rounds belong to the deal, not to a subscription.",
-  },
-  {
-    q: 'How does TermLift Negotiate pricing work?',
-    a: `It's a success-based fee: you pay ${NEGOTIATION_FEE_PERCENT}% of the verified savings once a deal closes — nothing if we don't save you money. That's calculated on the documented difference between the original quote and the final signed terms.`,
-  },
-]
-
-export default function PricingPage() {
+function Feature({ children, off }: { children: React.ReactNode; off?: boolean }) {
   return (
-    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
+    <li className={`flex gap-2 items-start text-[13px] ${off ? 'text-ink-3' : ''}`}>
+      <span className={`w-4 h-4 rounded-full shrink-0 mt-px border grid place-items-center ${off ? 'bg-line-2 border-line' : 'bg-green-soft border-green-line'}`}>
+        {!off && <svg width="10" height="10" viewBox="0 0 16 16" aria-hidden><path d="M4 8.5l2.5 2.5L12 5.5" fill="none" stroke="var(--tl-green-deep)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+      </span>
+      {children}
+    </li>
+  )
+}
+
+export default async function PricingPage() {
+  const t = await getTranslations('pricingPage')
+  const pct = NEGOTIATION_FEE_PERCENT
+
+  // Never show an invented Full Analysis price (see lib/pricing.ts).
+  const fullPrice = FULL_ANALYSIS_PRICE.needsConfirmation || FULL_ANALYSIS_PRICE.amount == null
+    ? null
+    : `${FULL_ANALYSIS_PRICE.currency === 'EUR' ? '€' : ''}${FULL_ANALYSIS_PRICE.amount}`
+
+  // Dynamic keys — next-intl's typed `t` can't infer them, so go through a loose signature.
+  const tt = t as unknown as (key: string, values?: Record<string, string | number>) => string
+  const faqs = [1, 2, 3, 4, 5].map((i) => ({ q: tt(`faq${i}q`), a: tt(`faq${i}a`, { pct }) }))
+
+  const card = 'bg-surface border border-line rounded-[16px] p-5 flex flex-col gap-3 text-left'
+
+  return (
+    <div className="min-h-screen bg-white text-ink flex flex-col">
       <MarketingHeader />
-
       <main className="flex-1">
+        <section className="max-w-[1120px] mx-auto px-5 sm:px-7 pt-10 pb-12 sm:pb-14 text-center">
+          <p className="tl-label text-green-deep text-[11px]">{t('eyebrow')}</p>
+          <h1 className="font-display font-extrabold text-[30px] sm:text-[34px] leading-[1.05] tracking-[-0.03em] mt-2.5">{t('title')}</h1>
+          <p className="text-[15px] text-ink-2 max-w-[52ch] mx-auto mt-2.5 leading-[1.5]">{t('lead')}</p>
+          <div className="max-w-[720px] mx-auto mt-5"><StageRail current="full" /></div>
 
-        {/* ─── HERO ─── */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 800px 400px at 80% 20%, rgba(29,185,84,0.14) 0%, transparent 70%), radial-gradient(ellipse 600px 400px at 20% 60%, rgba(16,185,129,0.08) 0%, transparent 70%)' }} />
-          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-          <div className="relative max-w-6xl mx-auto px-6 pt-20 sm:pt-28 pb-16 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-emerald-200/80 shadow-sm mb-6">
-              <Zap className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-[12px] font-semibold text-emerald-700 tracking-wide" style={{ fontFamily: mono }}>Pricing aligned with the value we create</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mt-7">
+            {/* Step 1 */}
+            <div className={card}>
+              <span className="tl-label text-ink-3">{t('step1')}</span>
+              <h3 className="font-display font-bold text-[19px]">{t('quick.title')}</h3>
+              <div className="font-display font-extrabold text-[30px] tracking-[-0.03em] tl-num">{t('quick.price')}</div>
+              <ul className="m-0 p-0 list-none flex flex-col gap-2">
+                <Feature>{t('quick.f1')}</Feature><Feature>{t('quick.f2')}</Feature><Feature>{t('quick.f3')}</Feature><Feature>{t('quick.f4')}</Feature>
+                <Feature off>{t('quick.off1')}</Feature><Feature off>{t('quick.off2')}</Feature>
+              </ul>
+              <Btn href="/try" variant="ghost" block className="mt-auto">{t('quick.cta')}</Btn>
             </div>
-            <h1 className="text-slate-900 mb-4" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(2rem, 5vw, 3.25rem)', lineHeight: 1.04, letterSpacing: '-0.025em' }}>
-              Pricing aligned with the value we create
-            </h1>
-            <p className="text-[17px] text-slate-500 leading-relaxed max-w-xl mx-auto">
-              Start free. Pay for the negotiation intelligence you need. Or let TermLift negotiate and pay based on savings.
-            </p>
-          </div>
-        </section>
-
-        {/* ─── THE THREE CHOICES ─── */}
-        <section className="max-w-5xl mx-auto px-6 pb-16 sm:pb-24">
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-7">
-            {choices.map((c) => (
-              <div
-                key={c.title}
-                className={`relative rounded-2xl p-7 sm:p-8 flex flex-col transition-all duration-300 ${
-                  c.featured
-                    ? 'border-2 border-emerald-500/60 bg-gradient-to-b from-emerald-50/50 to-white shadow-xl shadow-emerald-100/60 hover:shadow-2xl hover:-translate-y-1'
-                    : 'border-2 border-slate-200/80 bg-white shadow-sm hover:shadow-xl hover:border-slate-300 hover:-translate-y-0.5'
-                }`}
-              >
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">{c.icon}</div>
-                <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-3" style={{ fontFamily: mono }}>{c.tag}</p>
-                <p className="text-[20px] font-bold text-slate-900 mb-2" style={{ fontFamily: sora }}>{c.title}</p>
-                <p className={`font-bold mb-3 ${c.price.includes('confirmed') ? 'text-[15px] text-slate-400' : 'text-[22px] text-slate-900'}`} style={{ fontFamily: sora }}>{c.price}</p>
-                <p className="text-[13.5px] text-slate-500 mb-7 leading-relaxed flex-1">{c.body}</p>
-
-                <Link
-                  href={c.href}
-                  className={`block text-center py-3 px-5 rounded-xl text-[14px] font-bold no-underline transition-all ${
-                    c.featured
-                      ? 'text-white hover:-translate-y-0.5 hover:shadow-lg'
-                      : 'border-2 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
-                  }`}
-                  style={c.featured ? { background: green, boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' } : {}}
-                >
-                  {c.cta}
-                </Link>
+            {/* Step 2 + 3 */}
+            <div className={`${card} border-green shadow-[0_20px_50px_-30px_rgba(29,185,84,0.5)]`}>
+              <span className="tl-label text-green-deep">{t('step23')}</span>
+              <h3 className="font-display font-bold text-[19px]">{t('full.title')}</h3>
+              <div className="font-display font-extrabold text-[30px] tracking-[-0.03em] tl-num">
+                {fullPrice ?? <span className="text-[22px] text-ink-2">—</span>}
+                <span className="font-sans text-[13px] font-medium text-ink-2 tracking-normal ml-2">{t('full.unit')}</span>
               </div>
-            ))}
+              {!fullPrice && <p className="text-[12px] text-ink-3 italic -mt-1">{t('full.tbc')}</p>}
+              <ul className="m-0 p-0 list-none flex flex-col gap-2">
+                <Feature>{t('full.f1')}</Feature><Feature>{t('full.f2')}</Feature><Feature>{t('full.f3')}</Feature>
+                <Feature>{t('full.f4', { n: FULL_ANALYSIS_EMAIL_REGEN_LIMIT })}</Feature><Feature>{t('full.f5')}</Feature>
+              </ul>
+              <Btn href="/try" variant="primary" block className="mt-auto">{t('full.cta')}</Btn>
+            </div>
+            {/* Step 4 */}
+            <div className={card}>
+              <span className="tl-label text-ink-3">{t('step4')}</span>
+              <h3 className="font-display font-bold text-[19px]">{t('neg.title')}</h3>
+              <div className="font-display font-extrabold text-[30px] tracking-[-0.03em] tl-num">
+                {pct}%<span className="font-sans text-[13px] font-medium text-ink-2 tracking-normal ml-2">{t('neg.unit')}</span>
+              </div>
+              <ul className="m-0 p-0 list-none flex flex-col gap-2">
+                <Feature>{t('neg.f1')}</Feature><Feature>{t('neg.f2')}</Feature><Feature>{t('neg.f3')}</Feature><Feature>{t('neg.f4')}</Feature>
+              </ul>
+              <Btn href="/negotiate" variant="ink" block className="mt-auto">{t('neg.cta')}</Btn>
+            </div>
           </div>
-
-          <p className="text-center mt-8 text-[13px] text-slate-400">
-            All processing is encrypted and GDPR-compliant.{' '}
-            <Link href="/security" className="text-emerald-600 hover:underline">Learn more</Link>
-          </p>
+          <p className="text-[12.5px] text-ink-3 mt-5">{t('foot', { n: FREE_ANALYSIS_LIMIT })}</p>
         </section>
 
-        {/* ─── FAQ ─── */}
-        <section className="max-w-3xl mx-auto px-6 py-8 sm:py-16 pb-24">
-          <div className="text-center mb-12">
-            <p className="text-[12px] font-bold tracking-widest uppercase mb-3" style={{ fontFamily: mono, color: green }}>Common questions</p>
-            <h2 className="text-slate-900" style={{ fontFamily: sora, fontWeight: 700, fontSize: 'clamp(1.6rem, 3.5vw, 2.25rem)', lineHeight: 1.1, letterSpacing: '-0.022em' }}>
-              Pricing FAQ
-            </h2>
+        <section className="max-w-[720px] mx-auto px-5 sm:px-7 pb-14">
+          <div className="text-center mb-7">
+            <p className="tl-label text-green-deep text-[11px]">{t('faqEyebrow')}</p>
+            <h2 className="font-display font-bold text-[24px] sm:text-[28px] tracking-[-0.025em] mt-2">{t('faqTitle')}</h2>
           </div>
-          <div className="border-t border-slate-200/60">
-            {faqs.map((item, i) => (
-              <details key={i} className="group border-b border-slate-200/60">
-                <summary className="flex items-center justify-between cursor-pointer py-5 text-left">
-                  <span className="text-[14px] font-semibold text-slate-900 pr-8 leading-snug">{item.q}</span>
-                  <span className="w-7 h-7 rounded-full bg-slate-100 group-open:bg-emerald-100 text-slate-400 group-open:text-emerald-600 flex items-center justify-center group-open:rotate-45 transition-all duration-200 text-lg leading-none flex-shrink-0">+</span>
+          <div className="border-t border-line">
+            {faqs.map((f) => (
+              <details key={f.q} className="group border-b border-line">
+                <summary className="flex items-center justify-between cursor-pointer py-4 text-left list-none">
+                  <span className="text-[14px] font-semibold text-ink pr-6 leading-snug">{f.q}</span>
+                  <span className="w-6 h-6 rounded-full bg-ground group-open:bg-green-soft text-ink-3 group-open:text-green-deep grid place-items-center group-open:rotate-45 transition-all text-lg leading-none shrink-0">+</span>
                 </summary>
-                <p className="pb-5 text-[14px] text-slate-500 leading-relaxed -mt-1 max-w-2xl">{item.a}</p>
+                <p className="pb-4 text-[13.5px] text-ink-2 leading-relaxed">{f.a}</p>
               </details>
             ))}
           </div>
         </section>
-
-        {/* ─── BOTTOM CTA ─── */}
-        <section className="bg-slate-950 px-6 py-20 text-center">
-          <div className="max-w-2xl mx-auto">
-            <p className="text-[12px] font-bold tracking-widest uppercase mb-4" style={{ fontFamily: mono, color: green }}>No credit card needed</p>
-            <h2 className="text-white mb-4" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(1.8rem, 4vw, 2.75rem)', lineHeight: 1.08, letterSpacing: '-0.025em' }}>
-              See where you can negotiate. Free to start.
-            </h2>
-            <p className="text-[16px] text-slate-400 mb-8 leading-relaxed max-w-lg mx-auto">
-              Analyze free, no card needed. Go deeper — or have TermLift negotiate — when you&apos;re ready.
-            </p>
-            <Link
-              href="/try"
-              className="inline-flex items-center gap-2 px-7 py-4 rounded-xl text-[15px] font-bold text-slate-900 no-underline transition-all hover:-translate-y-0.5"
-              style={{ background: green, boxShadow: '0 8px 28px -6px rgba(29,185,84,0.5)' }}
-            >
-              <Zap className="w-4 h-4" />
-              Analyze my quote — free
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <p className="text-[12px] text-slate-500 mt-5 uppercase tracking-widest" style={{ fontFamily: mono }}>
-              ~2 min &middot; No signup &middot; No card
-            </p>
-          </div>
-        </section>
-
       </main>
-
       <MarketingFooter />
     </div>
   )

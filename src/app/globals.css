@@ -4,6 +4,31 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* ── TermLift design tokens (redesign 2026-09) ──────────────────────
+     Rule: green means money or the primary action. Nothing else.
+     Semantic colours (warn / risk / info) are separate from the brand. */
+  --tl-green: #1DB954;
+  --tl-green-deep: #0F8A3C;   /* green as text on light ground */
+  --tl-green-soft: #E7F7EC;
+  --tl-green-line: #B9E8C9;
+  --tl-ink: #101A17;          /* near-black with a green bias */
+  --tl-ink-2: #556560;        /* secondary text */
+  --tl-ink-3: #8A9891;        /* tertiary text, labels */
+  --tl-line: #E1E8E4;
+  --tl-line-2: #EEF2F0;
+  --tl-ground: #F5F8F6;       /* app page ground */
+  --tl-surface: #FFFFFF;
+  --tl-surface-2: #FAFCFB;
+  --tl-warn: #C77A05;
+  --tl-warn-soft: #FFF4DF;
+  --tl-warn-line: #F5D79A;
+  --tl-risk: #C8352B;
+  --tl-risk-soft: #FDECEA;
+  --tl-risk-line: #F3B9B3;
+  --tl-info: #2457C5;
+  --tl-info-soft: #E8EFFC;
+  --tl-info-line: #C5D5F5;
 }
 
 @theme inline {
@@ -11,6 +36,31 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-sora);
+  --font-label: var(--font-jetbrains);
+
+  /* Token utilities: text-ink, bg-ground, border-line, text-green-deep, bg-warn-soft … */
+  --color-green: var(--tl-green);
+  --color-green-deep: var(--tl-green-deep);
+  --color-green-soft: var(--tl-green-soft);
+  --color-green-line: var(--tl-green-line);
+  --color-ink: var(--tl-ink);
+  --color-ink-2: var(--tl-ink-2);
+  --color-ink-3: var(--tl-ink-3);
+  --color-line: var(--tl-line);
+  --color-line-2: var(--tl-line-2);
+  --color-ground: var(--tl-ground);
+  --color-surface: var(--tl-surface);
+  --color-surface-2: var(--tl-surface-2);
+  --color-warn: var(--tl-warn);
+  --color-warn-soft: var(--tl-warn-soft);
+  --color-warn-line: var(--tl-warn-line);
+  --color-risk: var(--tl-risk);
+  --color-risk-soft: var(--tl-risk-soft);
+  --color-risk-line: var(--tl-risk-line);
+  --color-info: var(--tl-info);
+  --color-info-soft: var(--tl-info-soft);
+  --color-info-line: var(--tl-info-line);
 
   /* Brand: Spotify green #1DB954 — overrides Tailwind's default emerald scale
      so every emerald-* utility across the app becomes brand green automatically. */
@@ -113,6 +163,26 @@ a:active, button:active, [role="button"]:active {
     overflow-x: hidden;
   }
 }
+
+/* ── Redesign type utilities ─────────────────────────────────────────── */
+/* Tiny uppercase label — the only place the mono face is used. */
+.tl-label {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+/* Section heading inside a page: caps, Sora, small. */
+.tl-h3 {
+  font-family: var(--font-sora), system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.tl-num { font-variant-numeric: tabular-nums; }
+h1, h2, h3, h4 { text-wrap: balance; }
 
 /* Focus styles for accessibility */
 a:focus-visible,
