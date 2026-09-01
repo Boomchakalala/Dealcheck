@@ -5,7 +5,9 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/app'
+  // Only same-site paths — "//evil.com" would otherwise become an open redirect
+  const nextRaw = searchParams.get('next')
+  const next = nextRaw && /^\/(?!\/)/.test(nextRaw) ? nextRaw : '/app'
 
   // On Vercel, request.url origin is an internal URL — use the forwarded host
   // so post-auth redirects go to the real domain, not an internal Vercel URL.

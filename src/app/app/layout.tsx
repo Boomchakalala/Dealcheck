@@ -25,6 +25,13 @@ export default async function AppLayout({
   const isAdmin = profile?.is_admin || false
   const usageCount = profile?.usage_count || 0
 
+  const { data: notifications } = await supabase
+    .from('notifications')
+    .select('id, type, title, body, link, read_at, created_at')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(30)
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-25 to-white">
       <AppSidebar
@@ -33,6 +40,7 @@ export default async function AppLayout({
         usageCount={usageCount}
         isAdmin={isAdmin}
         plan={profile?.plan || 'free'}
+        notifications={notifications || []}
       />
       {/* Main content — offset by sidebar on desktop, full-width on mobile */}
       <main className="min-h-screen overflow-x-hidden transition-all duration-200 md:ml-[var(--sidebar-width,210px)]">

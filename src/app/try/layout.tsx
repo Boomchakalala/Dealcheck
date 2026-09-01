@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Try Free — TermLift',
-  description: 'Drop in any vendor quote and get back red flags, savings opportunities, and a ready-to-send negotiation email in minutes.',
+  title: 'Analyze a Supplier Quote',
+  description: 'Drop in a vendor quote and see your negotiation opportunity — red flags, savings, and where you have leverage.',
   openGraph: {
-    title: 'Try Free — TermLift',
-    description: 'Drop in any vendor quote and get back red flags, savings opportunities, and a ready-to-send negotiation email in minutes.',
+    title: 'Analyze a Supplier Quote — TermLift',
+    description: 'Drop in a vendor quote and see your negotiation opportunity — red flags, savings, and where you have leverage.',
   },
 }
 

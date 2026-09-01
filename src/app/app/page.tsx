@@ -1,14 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { Plus, FileText, TrendingUp, Zap, BarChart3, Lock, AlertTriangle, Search } from 'lucide-react'
-import { LockedDealCard } from '@/components/FeatureGate'
 import { useRouter } from 'next/navigation'
 import { DealListClient } from '@/components/DealListClient'
 import { trackEvent } from '@/lib/analytics'
-import { UpgradeButton } from '@/components/UpgradeButton'
 import { PrimaryButton } from '@/components/PrimaryButton'
 import { useI18n } from '@/i18n/context'
 
@@ -46,10 +44,7 @@ export default function AppHomePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'closed'>('all')
 
-  const [supabase] = useState(() => createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  ))
+  const [supabase] = useState(() => createClient())
 
   useEffect(() => {
     async function load() {
@@ -369,29 +364,28 @@ export default function AppHomePage() {
       {/* ── CONTENT AREA ───────────────────────────────────────── */}
       <div className="px-5 sm:px-8 pt-5 pb-8 space-y-5">
 
-        {/* Usage banner */}
+        {/* Usage banner — informational only, no subscription upsell */}
         {!isPaid && !isAdmin && (
-          <div className={`rounded-xl p-5 flex items-center justify-between ${
+          <div className={`rounded-xl p-5 flex items-center gap-3 ${
             isAtLimit
               ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200'
               : 'bg-gradient-to-r from-emerald-50/50 to-teal-50/30 border border-emerald-200/60'
           }`}>
-            <div className="flex items-center gap-3">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isAtLimit ? 'bg-amber-100' : 'bg-emerald-100'}`}>
-                {isAtLimit ? <Lock className="w-4.5 h-4.5 text-amber-600" /> : <Zap className="w-4.5 h-4.5 text-emerald-600" />}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-900">{isAtLimit ? t('app.starterLimitReached') : t('app.remaining', { remaining })}</p>
-                <p className="text-xs text-slate-500">{isAtLimit ? t('app.upgradeToProUnlimited') : t('app.starterPlan')}</p>
-              </div>
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${isAtLimit ? 'bg-amber-100' : 'bg-emerald-100'}`}>
+              {isAtLimit ? <Lock className="w-4.5 h-4.5 text-amber-600" /> : <Zap className="w-4.5 h-4.5 text-emerald-600" />}
             </div>
-            {isAtLimit ? (
-              <UpgradeButton plan="pro" label={t('app.upgradeToPro')} className="flex-shrink-0 px-4 py-2 text-xs font-semibold rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-all" />
-            ) : (
-              <Link href="/pricing" className="flex-shrink-0 px-4 py-2 text-xs font-semibold rounded-lg text-emerald-700 hover:bg-emerald-100 transition-all">
-                {t('app.viewPlans')}
-              </Link>
-            )}
+            <div>
+              <p className="text-sm font-semibold text-slate-900">
+                {isAtLimit
+                  ? (locale === 'fr' ? 'Analyses gratuites épuisées' : "You've used your free analyses")
+                  : t('app.remaining', { remaining })}
+              </p>
+              <p className="text-xs text-slate-500">
+                {isAtLimit
+                  ? (locale === 'fr' ? 'Contactez-nous si vous devez analyser d’autres devis.' : 'Contact us if you need to analyze more deals.')
+                  : (locale === 'fr' ? 'Analyser un devis reste gratuit.' : 'Analyzing a quote is free.')}
+              </p>
+            </div>
           </div>
         )}
 
@@ -415,29 +409,6 @@ export default function AppHomePage() {
               </div>
             )}
           </>
-        )}
-        {isAtLimit && deals.length >= 4 && <LockedDealCard />}
-
-        {/* Pro teaser for free users */}
-        {!isPaid && !isAdmin && (
-          <div className="relative rounded-2xl border border-slate-200 overflow-hidden">
-            <div className="filter blur-[5px] pointer-events-none select-none p-5 bg-white">
-              <div className="grid grid-cols-3 gap-3">
-                <div className="bg-slate-50 rounded-lg p-3"><div className="h-2 bg-slate-200 rounded w-20 mb-2" /><div className="h-6 bg-slate-200 rounded w-16" /></div>
-                <div className="bg-slate-50 rounded-lg p-3"><div className="h-2 bg-slate-200 rounded w-24 mb-2" /><div className="h-6 bg-emerald-200 rounded w-20" /></div>
-                <div className="bg-slate-50 rounded-lg p-3"><div className="h-2 bg-slate-200 rounded w-16 mb-2" /><div className="h-6 bg-slate-200 rounded w-12" /></div>
-              </div>
-            </div>
-            <div className="absolute inset-0 flex items-center justify-center bg-white/50">
-              <div className="text-center px-6">
-                <BarChart3 className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-slate-900 mb-1">{t('app.spendTracking')}</p>
-                <Link href="/pricing" className="text-xs font-medium text-emerald-600 hover:text-emerald-700">
-                  {t('app.unlockWithPro')} &rarr;
-                </Link>
-              </div>
-            </div>
-          </div>
         )}
       </div>
     </div>

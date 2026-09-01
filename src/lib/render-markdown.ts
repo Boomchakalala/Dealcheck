@@ -27,7 +27,11 @@ export function renderMarkdownToHtml(md: string): string {
     .replace(/<\/blockquote>\s*<blockquote>/g, '')
 }
 
-// Shared helper to render markdown from deal output JSON
+// Shared helper to render markdown from deal output JSON. email_drafts and
+// disclaimer are legacy fields the current fast pipeline (see
+// lib/claude/index.ts) deliberately no longer produces — email generation
+// moved to the on-demand /api/deal/regenerate-emails endpoint. Both sections
+// are omitted cleanly when absent rather than assumed present.
 export function renderMarkdown(output: any): string {
   const verdictLabel = output.verdict_type === 'competitive'
     ? 'Competitive deal'
@@ -87,7 +91,7 @@ ${(output.what_to_ask_for?.nice_to_have || []).map((a: string) => `- ${a}`).join
 
 **Trades You Can Offer:**
 ${(output.negotiation_plan?.trades_you_can_offer || []).map((t: string) => `- ${t}`).join('\n')}
-
+${output.email_drafts ? `
 ## Email Drafts
 
 ### Friendly
@@ -104,11 +108,11 @@ ${output.email_drafts.firm.body}
 **Subject:** ${output.email_drafts.final_push.subject}
 
 ${output.email_drafts.final_push.body}
-
+` : ''}
 ## Assumptions
 ${(output.assumptions || []).map((a: string) => `- ${a}`).join('\n')}
-
+${output.disclaimer ? `
 ## Disclaimer
 ${output.disclaimer}
-`
+` : ''}`
 }

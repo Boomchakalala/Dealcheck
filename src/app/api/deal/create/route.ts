@@ -2,10 +2,14 @@
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { CreateDealSchema } from '@/lib/schemas'
-import { analyzeDeal } from '@/lib/claude'
+import { analyzeDeal, type ExtractedFacts } from '@/lib/claude'
+import type { QuoteClassificationType } from '@/lib/schemas'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { FREE_ANALYSIS_LIMIT, ESSENTIALS_MONTHLY_LIMIT } from '@/lib/tiers'
 import { resolveVendorForDeal } from '@/lib/vendor-resolve'
+import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
+import { runWithAiContext } from '@/lib/ai-telemetry'
+import type { DealOutput, DealOutputV2 } from '@/types'
 
 // Allow up to 120s for classification + analysis with retries (Vercel Pro plan)
 export const maxDuration = 120
@@ -38,6 +42,7 @@ async function withRetry<T>(
 }
 
 export async function POST(request: Request) {
+  const requestStart = Date.now()
   try {
     const supabase = await createClient()
 
@@ -74,7 +79,7 @@ export async function POST(request: Request) {
         // Free: lifetime limit
         if (profile.usage_count >= FREE_ANALYSIS_LIMIT) {
           return NextResponse.json(
-            { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (\u20AC39/mo) or Pro (\u20AC129/mo) for more.` },
+            { error: `You've used all ${FREE_ANALYSIS_LIMIT} of your free analyses. Contact us if you need to analyze more deals.` },
             { status: 403 }
           )
         }
@@ -110,8 +115,26 @@ export async function POST(request: Request) {
       ? { base64: validated.pdfData.base64, mimeType: validated.pdfData.mimeType }
       : undefined
 
+    // If the client already ran /api/deal/extract-preview for this quote,
+    // reuse that result instead of re-deriving it (avoids doubling the
+    // classify+extract LLM calls). Trust boundary is the same as
+    // extractedText/goal/notes below — it only affects the requesting
+    // user's own deal, and a malformed value just fails the same way a
+    // bad AI response already does (caught below, 500 with a retry hint).
+    const precomputed = validated.precomputedClassification && validated.precomputedFacts
+      ? {
+          classification: validated.precomputedClassification as QuoteClassificationType,
+          rawFacts: validated.precomputedFacts as ExtractedFacts,
+        }
+      : undefined
+
     // Analyze with V1 (full text analysis â€” auto-retry on transient failures)
-    const output = await withRetry(() => analyzeDeal(
+    const analysisStart = Date.now()
+    // Pre-generate the deal's id so the analysis call below — which runs
+    // before the deal row exists — can still be tagged with the real
+    // deal_id in ai_usage_events, instead of leaving it null.
+    const dealId = crypto.randomUUID()
+    const output = await runWithAiContext({ userId: user.id, dealId }, () => withRetry(() => analyzeDeal(
       validated.extractedText || '',
       validated.dealType,
       validated.goal || undefined,
@@ -121,16 +144,22 @@ export async function POST(request: Request) {
       (body as any).allPages || undefined,
       locale,
       validPdfData,
-      (profile as any)?.negotiation_preferences || undefined
-    ))
+      (profile as any)?.negotiation_preferences || undefined,
+      precomputed
+    )))
+    console.log(`[TermLift timing] analyzeDeal() total: ${Date.now() - analysisStart}ms`)
 
     // Auto-detect vendor
     const vendor = validated.vendor || output.vendor
 
-    // Create deal
+    const dbStart = Date.now()
+
+    // Create deal — using the id pre-generated above so it matches what
+    // was already recorded against the analysis call's ai_usage_events rows.
     const { data: deal, error: dealError } = await supabase
       .from('deals')
       .insert({
+        id: dealId,
         user_id: user.id,
         vendor,
         title: `${vendor} Â· ${validated.dealType === 'New' ? 'New Purchase' : 'Renewal'} Â· ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
@@ -160,7 +189,11 @@ export async function POST(request: Request) {
         user_id: user.id,
         round_number: 1,
         note: validated.notes,
-        extracted_text: validated.saveExtractedText ? validated.extractedText : null,
+        // Always persisted now (previously gated on saveExtractedText) — deep
+        // analysis (on-demand, triggered later from the deal page) needs the
+        // original quote text and can't rely on it still being in the
+        // browser's memory. Extracted text only, never the original file.
+        extracted_text: validated.extractedText || null,
         output_json: output,
         output_markdown: '', // V1 doesn't need markdown
         status: 'done',
@@ -182,10 +215,17 @@ export async function POST(request: Request) {
         .eq('id', user.id)
     }
 
+    const responseOutput = profile.is_admin || SHOW_FULL_NEGOTIATION_PLAYBOOK
+      ? output
+      : stripAdvancedOutput(output as DealOutput | DealOutputV2)
+
+    console.log(`[TermLift timing] DB writes (deal+vendor+round+usage): ${Date.now() - dbStart}ms`)
+    console.log(`[TermLift timing] TOTAL request (auth+limits+analysis+DB): ${Date.now() - requestStart}ms`)
+
     return NextResponse.json({
       dealId: deal.id,
       roundId: round.id,
-      output,
+      output: responseOutput,
     })
   } catch (error) {
     console.error('Create deal error:', error)

@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       if (plan === 'free') {
         if (profile.usage_count >= FREE_ANALYSIS_LIMIT) {
           return NextResponse.json(
-            { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (\u20AC39/mo) or Pro (\u20AC129/mo) for more.` },
+            { error: `You've used all ${FREE_ANALYSIS_LIMIT} of your free analyses. Contact us if you need to analyze more deals.` },
             { status: 403 }
           )
         }

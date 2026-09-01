@@ -123,7 +123,7 @@ Les renouvellements SaaS ne sont pas à prendre ou à laisser. Chaque fournisseu
 
 La différence entre une bonne affaire et une mauvaise tient à ce que vous savez demander. C'est exactement ce que fait TermLift : collez votre devis de renouvellement, récupérez chaque signal d'alerte, chaque opportunité d'économie, et un e-mail prêt à envoyer en quelques minutes.
 
-**[Essayez gratuitement](/try)**
+**[Analysez votre devis](/try)**
 `,
   },
   {
@@ -222,7 +222,7 @@ Un professionnel des achats repérerait ces cinq points en quelques minutes. Mai
 
 C'est pourquoi nous avons créé TermLift. Collez votre devis et l'outil signale automatiquement chacun de ces pièges, avec des recommandations précises sur ce qu'il faut demander.
 
-**[Essayez gratuitement](/try)**
+**[Analysez votre devis](/try)**
 `,
   },
   {
@@ -351,7 +351,7 @@ Chaque devis contient de la marge. Chaque frais est négociable. Et chaque conce
 
 TermLift analyse les devis automobiles de la même manière que n'importe quel devis fournisseur : collez le devis, récupérez les signaux d'alerte, les opportunités d'économie et un e-mail prêt à envoyer.
 
-**[Essayez gratuitement](/try)**
+**[Analysez votre devis](/try)**
 `,
   },
   {
@@ -464,7 +464,7 @@ Les contrats de location de matériel sont des engagements de longue durée aux 
 
 TermLift détecte automatiquement tous ces problèmes. Collez votre devis de location et récupérez chaque signal d'alerte, chaque point à négocier et un e-mail prêt à envoyer.
 
-**[Essayez gratuitement](/try)**
+**[Analysez votre devis](/try)**
 `,
   },
   {
@@ -605,7 +605,7 @@ Ces 7 clauses couvrent 90 % de ce qui compte dans un contrat fournisseur. Un avo
 
 TermLift analyse votre devis fournisseur et signale automatiquement tous ces problèmes, avec des recommandations précises sur ce qu'il faut demander et un e-mail de négociation prêt à envoyer.
 
-**[Essayez gratuitement](/try)**
+**[Analysez votre devis](/try)**
 `,
   },
   {
@@ -725,7 +725,7 @@ Un fournisseur qui perd un client fidèle sur une hausse de 5 % fait une mauvais
 
 TermLift analyse votre devis fournisseur et identifie automatiquement les hausses, les écarts avec le marché, et les points de négociation. Collez votre devis et récupérez un e-mail de contestation prêt à envoyer.
 
-**[Essayez gratuitement](/try)**
+**[Analysez votre devis](/try)**
 `,
   },
   {
@@ -828,7 +828,7 @@ Ces 10 points prennent 15 minutes à vérifier et peuvent vous faire économiser
 
 TermLift automatise cette vérification. Collez votre devis de renouvellement SaaS et récupérez chaque signal d'alerte, chaque opportunité d'économie et un e-mail de négociation prêt à envoyer.
 
-**[Essayez gratuitement](/try)**
+**[Analysez votre devis](/try)**
 `,
   },
 ]

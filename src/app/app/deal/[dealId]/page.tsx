@@ -6,14 +6,18 @@ import { notFound, redirect } from 'next/navigation'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { DealScrollView } from '@/components/DealScrollView'
 import { HeroVerdict } from '@/components/HeroVerdict'
-import { FeatureGate } from '@/components/FeatureGate'
-import { ChevronRight, CheckCircle2, DollarSign, AlertTriangle, TrendingUp, Calendar } from 'lucide-react'
+import { ChevronRight, CheckCircle2, DollarSign, AlertTriangle, TrendingUp, Calendar, Microscope } from 'lucide-react'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { AddRoundForm } from './AddRoundForm'
 import type { Plan } from '@/lib/tiers'
 import type { DealOutput, DealOutputV2 } from '@/types'
 import { normalizeAmount, detectCurrency, formatCurrency, parseMoney as parseMoneyLib } from '@/lib/currency'
+import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
+import { hasDeepContent, deepAnalysisIsRunning } from '@/lib/deep-analysis-status'
+import { shortenVendorDisplayName } from '@/lib/vendor-normalize'
+import { ScoreGradientBar } from '@/components/ScoreGradientBar'
+import { inferDealType } from '@/lib/deal-type-inference'
 
 export default async function DealPage({
   params,
@@ -42,10 +46,24 @@ export default async function DealPage({
   const { data: deal } = await supabase.from('deals').select(`*, rounds (*)`).eq('id', dealId).eq('user_id', user.id).single()
   if (!deal) notFound()
 
+  // Whether a TermLift negotiation request already exists for this deal — one
+  // of the signals that real negotiation activity has started (see
+  // DealScrollView's hasNegotiationActivity). Existing table, no schema change.
+  const { data: negotiationRequest } = await supabase
+    .from('negotiation_requests')
+    .select('id, negotiation_objective, walk_away_notes, competitor_context')
+    .eq('deal_id', dealId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
   const sortedRounds = deal.rounds?.sort((a: any, b: any) => b.round_number - a.round_number) || []
   const latestRound = sortedRounds[0]
   const firstRound = sortedRounds[sortedRounds.length - 1]
-  const latestOutput = latestRound?.output_json
+  const rawLatestOutput = latestRound?.output_json
+  const showFullPlaybook = isAdmin || SHOW_FULL_NEGOTIATION_PLAYBOOK
+  const latestOutput = rawLatestOutput && !showFullPlaybook
+    ? stripAdvancedOutput(rawLatestOutput as DealOutput | DealOutputV2)
+    : rawLatestOutput
   const firstOutput = firstRound?.output_json
   const isV2 = (latestRound?.schema_version || 'v1') === 'v2'
 
@@ -72,11 +90,27 @@ export default async function DealPage({
   const snapshotDealType = (latestOutput as DealOutput)?.snapshot?.deal_type
   const effectiveDealType = snapshotDealType || (deal.deal_type === 'New' ? 'New purchase' : 'Renewal')
 
-  const shortVendorName = dealName.replace(/\s*(International|Inc\.?|LLC|Ltd\.?|Limited|Corp\.?|Corporation|GmbH|S\.?A\.?S?\.?|B\.?V\.?|PLC|AG|SE|\(.*?\))\s*/gi, ' ').replace(/\s+/g, ' ').trim()
+  const shortVendorName = shortenVendorDisplayName(dealName)
 
   const score = (latestOutput as any)?.score as number | undefined
   const scoreLabel = (latestOutput as any)?.score_label as string | undefined
   const scoreRationale = (latestOutput as any)?.score_rationale as string | undefined
+  const verdict = (latestOutput as DealOutput)?.verdict as string | undefined
+  const targetPriceRange = (latestOutput as any)?.target_price_range as { low: number; high: number } | null | undefined
+  const savingsLow = typeof ps?.low === 'number' ? ps.low : undefined
+  const savingsHigh = typeof ps?.high === 'number' ? ps.high : undefined
+  const topFlagIssues = ((latestOutput as DealOutput)?.red_flags || []).slice(0, 3).map((f: any) => f.issue).filter(Boolean)
+
+  // Deal-type inference — computed server-side from extracted_text (never sent
+  // to the client) plus the extraction's own read; only the small result
+  // (type + confidence) is passed down, for the email-generation request.
+  const dealTypeInference = inferDealType((latestOutput as DealOutput)?.snapshot?.deal_type, undefined, latestRound?.extracted_text)
+
+  // Action hierarchy: fast-only points at the strategy step first, and only
+  // reveals email generation once deep analysis has actually run — reuses
+  // the exact signal DealScrollView already trusts for the same decision.
+  const deepComplete = hasDeepContent(latestOutput)
+  const deepRunning = deepAnalysisIsRunning(latestOutput)
 
   const isWon = deal.status === 'closed_won'
   const isClosedAny = !!deal.status?.startsWith('closed_')
@@ -84,13 +118,8 @@ export default async function DealPage({
 
   const heroScoreBg = isWon ? 'from-emerald-50 to-teal-50' : score != null && score >= 60 ? 'from-amber-50 to-orange-50' : score != null && score >= 40 ? 'from-amber-50 to-yellow-50' : 'from-red-50 to-orange-50'
   const heroScoreBorder = isWon ? 'border-emerald-200' : score != null && score >= 60 ? 'border-amber-200' : 'border-red-200'
-  const scoreRingColor = score != null && score >= 60 ? '#059669' : score != null && score >= 40 ? '#D97706' : '#DC2626'
-  const scoreTrackColor = score != null && score >= 60 ? '#D1FAE5' : score != null && score >= 40 ? '#FEF3C7' : '#FECDC5'
   const scoreTextColor = score != null && score >= 60 ? '#065F46' : score != null && score >= 40 ? '#92400E' : '#991B1B'
   const sc = score ?? 0
-  const ringR = 49
-  const ringCirc = 2 * Math.PI * ringR
-  const ringOffset = ringCirc * (1 - sc / 100)
 
   return (
     <div className="-mx-5 sm:-mx-8 -mt-8 -mb-8 md:-mb-8 flex flex-col min-h-screen bg-slate-50">
@@ -168,16 +197,14 @@ export default async function DealPage({
       <div className={`bg-gradient-to-br ${heroScoreBg} border-b-2 ${heroScoreBorder}`}>
         <div className="px-5 sm:px-8 py-6 sm:py-8">
           <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
-            {/* Score ring — below name on mobile (order-2), left on desktop (sm:order-1) */}
+            {/* Score signal — below name on mobile (order-2), left on desktop (sm:order-1) */}
             {score != null && (
-              <div className="relative flex-shrink-0 mx-auto sm:mx-0 order-2 sm:order-1" style={{ width: 96, height: 96 }}>
-                <svg width={96} height={96} viewBox="0 0 120 120" className="-rotate-90">
-                  <circle cx={60} cy={60} r={ringR} fill="none" stroke={scoreTrackColor} strokeWidth={7} />
-                  <circle cx={60} cy={60} r={ringR} fill="none" stroke={scoreRingColor} strokeWidth={7} strokeDasharray={ringCirc} strokeDashoffset={ringOffset} strokeLinecap="round" />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[28px] sm:text-[34px] font-bold leading-none" style={{ color: scoreTextColor, fontFamily: 'Sora, sans-serif' }}>{sc}</span>
-                  <span className="text-[11px] text-slate-400 leading-none mt-1">/100</span>
+              <div className="flex-shrink-0 mx-auto sm:mx-0 order-2 sm:order-1 text-center sm:text-left" style={{ width: 140 }}>
+                <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-2">Opportunity</p>
+                <ScoreGradientBar score={sc} width={140} height={10} className="mx-auto sm:mx-0" />
+                <div className="flex items-center justify-between mt-1.5 text-[9.5px] text-slate-400 uppercase tracking-wider">
+                  <span>Push harder</span>
+                  <span>Solid deal</span>
                 </div>
               </div>
             )}
@@ -201,21 +228,35 @@ export default async function DealPage({
               ) : (
                 <>
                   {scoreLabel && <p className="text-[16px] font-semibold mb-1" style={{ color: scoreTextColor }}>{scoreLabel}</p>}
-                  {scoreRationale && <HeroVerdict text={scoreRationale} className="text-[13px] text-slate-600 leading-relaxed max-w-2xl" />}
+                  {/* Full verdict (what to do + why) — not just the diagnostic half — is the
+                      single most important sentence on this page: is this negotiable, what next. */}
+                  <HeroVerdict text={verdict || scoreRationale || ''} className="text-[13px] text-slate-600 leading-relaxed max-w-2xl" />
                 </>
               )}
             </div>
           </div>
 
-          {/* Stat cards */}
+          {/* Stat cards — ordered by commercial priority (savings, then red flags,
+              then total/context) rather than the previous total-first order. Target
+              price is folded into the savings card rather than added as a 5th card. */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-            <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
+            <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
-                <DollarSign className="w-4 h-4 text-slate-400" />
-                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{isWon ? 'Original' : 'Total'}</span>
+                <TrendingUp className="w-4 h-4 text-emerald-500" />
+                <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">{isWon ? 'Saved' : 'Savings'}</span>
               </div>
-              <p className={`text-[18px] sm:text-[22px] font-bold ${isWon ? 'text-slate-400 line-through' : 'text-slate-900'}`} style={{ fontFamily: 'Sora, sans-serif' }}>{totalCommitment ? normalizeAmount(totalCommitment) : '—'}</p>
-              <p className="text-[11px] text-slate-400 mt-0.5">{term || ''}</p>
+              <p className="text-[18px] sm:text-[22px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>
+                {isWon && (deal.savings_amount ?? 0) > 0 ? formatCurrency(Math.round(deal.savings_amount), dealCurrency)
+                  : potentialSavings > 0 ? formatCurrency(potentialSavings, dealCurrency)
+                  : '—'}
+              </p>
+              <p className="text-[11px] text-emerald-500 mt-0.5">
+                {isWon
+                  ? 'achieved'
+                  : savingsLow != null && savingsHigh != null
+                    ? `${formatCurrency(savingsLow, dealCurrency)}–${formatCurrency(savingsHigh, dealCurrency)} range`
+                    : 'potential'}
+              </p>
             </div>
             {isWon ? (
               <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
@@ -241,17 +282,24 @@ export default async function DealPage({
                 {watchCount > 0 && <p className="text-[10px] text-slate-400 mt-0.5">+{watchCount} minor item{watchCount === 1 ? '' : 's'}</p>}
               </div>
             )}
-            <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-emerald-200/50 shadow-sm">
+            <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
-                <TrendingUp className="w-4 h-4 text-emerald-500" />
-                <span className="text-[11px] font-semibold text-emerald-500 uppercase tracking-wider">{isWon ? 'Saved' : 'Savings'}</span>
+                <DollarSign className="w-4 h-4 text-slate-400" />
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{isWon ? 'Original' : !isWon && targetPriceRange ? 'Target' : 'Total'}</span>
               </div>
-              <p className="text-[18px] sm:text-[22px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>
-                {isWon && (deal.savings_amount ?? 0) > 0 ? formatCurrency(Math.round(deal.savings_amount), dealCurrency)
-                  : potentialSavings > 0 ? formatCurrency(potentialSavings, dealCurrency)
-                  : '—'}
-              </p>
-              <p className="text-[11px] text-emerald-500 mt-0.5">{isWon ? 'achieved' : 'potential'}</p>
+              {!isWon && targetPriceRange ? (
+                <>
+                  <p className="text-[16px] sm:text-[19px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
+                    {formatCurrency(targetPriceRange.low, dealCurrency)}–{formatCurrency(targetPriceRange.high, dealCurrency)}
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">vs {totalCommitment ? normalizeAmount(totalCommitment) : '—'} quoted</p>
+                </>
+              ) : (
+                <>
+                  <p className={`text-[18px] sm:text-[22px] font-bold ${isWon ? 'text-slate-400 line-through' : 'text-slate-900'}`} style={{ fontFamily: 'Sora, sans-serif' }}>{totalCommitment ? normalizeAmount(totalCommitment) : '—'}</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">{term || ''}</p>
+                </>
+              )}
             </div>
             <div className="bg-white rounded-xl p-2.5 sm:p-3 border border-slate-200/50 shadow-sm">
               <div className="flex items-center gap-2 mb-1.5">
@@ -263,6 +311,57 @@ export default async function DealPage({
               </p>
             </div>
           </div>
+
+          {/* Top reasons — the actual issues, not just a count, visible without scrolling to Section 2 */}
+          {!isClosedAny && topFlagIssues.length > 0 && (
+            <div className="mt-4 bg-white/70 border border-red-200/60 rounded-xl px-4 py-3">
+              <p className="text-[11px] font-semibold text-red-400 uppercase tracking-wider mb-2">Top {topFlagIssues.length === 1 ? 'reason' : 'reasons'} to push back</p>
+              <ul className="space-y-1.5">
+                {topFlagIssues.map((issue: string, i: number) => (
+                  <li key={i} className="text-[13px] text-slate-700 leading-snug flex gap-2">
+                    <span className="text-red-400 flex-shrink-0">•</span>{issue}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Action hierarchy: fast-only -> build the full strategy first (or
+              hand off immediately); deep-complete -> the two execution paths.
+              Both non-negotiate actions anchor-jump to the real trigger
+              further down the page rather than duplicating it here. */}
+          {!isClosedAny && showFullPlaybook && (
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {deepComplete ? (
+                <a
+                  href="#email-section"
+                  className="flex flex-col justify-center bg-white/80 border border-slate-200 rounded-xl px-4 py-3.5 hover:border-slate-300 hover:bg-white transition-colors no-underline"
+                >
+                  <span className="text-[13.5px] font-bold text-slate-900">Generate negotiation email →</span>
+                  <span className="text-[12px] text-slate-500 mt-0.5">Create a ready-to-send supplier email using your quote and analysis.</span>
+                </a>
+              ) : (
+                <a
+                  href="#deep-analysis"
+                  className="flex flex-col justify-center bg-white/80 border border-slate-200 rounded-xl px-4 py-3.5 hover:border-slate-300 hover:bg-white transition-colors no-underline"
+                >
+                  <span className="text-[13.5px] font-bold text-slate-900 inline-flex items-center gap-1.5">
+                    <Microscope className="w-3.5 h-3.5" />
+                    {deepRunning ? 'Building your strategy…' : 'Build full negotiation strategy →'}
+                  </span>
+                  <span className="text-[12px] text-slate-500 mt-0.5">Get the detailed savings opportunities, leverage, negotiation sequencing and fallback positions before taking action.</span>
+                </a>
+              )}
+              <Link
+                href={`/app/deal/${dealId}/negotiate`}
+                className="flex flex-col justify-center rounded-xl px-4 py-3.5 text-white transition-all hover:-translate-y-0.5 no-underline"
+                style={{ background: '#1DB954', boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}
+              >
+                <span className="text-[13.5px] font-bold">Let TermLift negotiate →</span>
+                <span className="text-[12px] text-emerald-50 mt-0.5">Share the final context and we&apos;ll handle the supplier negotiation with you.</span>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
@@ -271,6 +370,13 @@ export default async function DealPage({
         <DealScrollView
           latestOutput={latestOutput}
           latestRoundId={latestRound.id}
+          inferredDealType={dealTypeInference.type}
+          hasNegotiationRequest={!!negotiationRequest}
+          savedNegotiationContext={negotiationRequest ? {
+            objective: negotiationRequest.negotiation_objective || undefined,
+            walkAwayNotes: negotiationRequest.walk_away_notes || undefined,
+            competitorContext: negotiationRequest.competitor_context || undefined,
+          } : undefined}
           isV2={isV2}
           schemaVersion={latestRound?.schema_version || 'v1'}
           score={score}
@@ -294,10 +400,9 @@ export default async function DealPage({
           originalTotal={originalTotal}
           userPlan={userPlan}
           isAdmin={isAdmin}
+          showFullPlaybook={showFullPlaybook}
           addRoundForm={
-            <FeatureGate feature="multi_round" plan={userPlan} isAdmin={isAdmin}>
-              <AddRoundForm dealId={dealId} roundNumber={sortedRounds.length + 1} />
-            </FeatureGate>
+            deepComplete ? <AddRoundForm dealId={dealId} roundNumber={sortedRounds.length + 1} /> : null
           }
           messages={messages}
         />

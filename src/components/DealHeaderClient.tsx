@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { CloseDealModal } from '@/components/CloseDealModal'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Handshake } from 'lucide-react'
 import { toast } from 'sonner'
 import { trackEvent } from '@/lib/analytics'
 import { useT } from '@/i18n/context'
@@ -109,6 +110,14 @@ export function DealHeaderClient({
           </>
         ) : (
           <>
+            {/* Get it negotiated — secondary, always visible alongside the DIY flow */}
+            <Link
+              href={`/app/deal/${dealId}/negotiate`}
+              className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-md transition-colors border border-emerald-500 text-emerald-500 bg-white no-underline"
+            >
+              <Handshake className="w-3 h-3" />
+              Get it negotiated
+            </Link>
             {/* Add round — outline green */}
             <a
               href="#add-round"
@@ -117,7 +126,7 @@ export function DealHeaderClient({
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Add round
             </a>
-            {/* Mark as won — solid green */}
+            {/* Mark as won — solid green, primary action */}
             <button
               onClick={() => setShowCloseModal(true)}
               className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-md text-white border-none transition-colors bg-emerald-500"

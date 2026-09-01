@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { analyzeDeal } from '@/lib/claude'
+import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
+import { runWithAiContext } from '@/lib/ai-telemetry'
+import { createAdminClient } from '@/lib/supabase/server'
+import { TRIAL_MAX_PER_IP_PER_DAY } from '@/lib/ai-limits'
+import type { DealOutput, DealOutputV2 } from '@/types'
 
 // Allow up to 120s for classification + analysis with retries (Vercel Pro plan)
 export const maxDuration = 120
@@ -34,31 +39,48 @@ async function withRetry<T>(
 
 // Guest trial - no auth required, uses V1 schema (full text analysis)
 // 1 free analysis per IP without signup — then prompt to create account
-const trialCache = new Map<string, { count: number; resetAt: number }>()
 
 function getClientIP(request: Request): string {
+  // x-real-ip / x-vercel-forwarded-for are set by the platform proxy and can't be
+  // spoofed by the client. x-forwarded-for CAN be: a client-sent value ends up as
+  // the FIRST entry with the real IP appended after it — so take the LAST entry.
+  const real = request.headers.get('x-real-ip') || request.headers.get('x-vercel-forwarded-for')
+  if (real) return real.trim()
   const forwarded = request.headers.get('x-forwarded-for')
-  const ip = forwarded ? forwarded.split(',')[0] : 'unknown'
-  return ip
+  if (forwarded) {
+    const parts = forwarded.split(',')
+    return parts[parts.length - 1].trim()
+  }
+  return 'unknown'
 }
 
-function checkTrialRateLimit(ip: string): { allowed: boolean; remaining: number } {
-  const now = Date.now()
-  const cached = trialCache.get(ip)
-
-  // Reset daily (24 hours)
-  if (!cached || now > cached.resetAt) {
-    trialCache.set(ip, { count: 1, resetAt: now + 24 * 60 * 60 * 1000 })
-    return { allowed: true, remaining: 0 }
+// Backed by ai_usage_events (the same table cost telemetry writes to)
+// instead of an in-memory Map — a serverless function's memory doesn't
+// survive a cold start or span multiple instances, so the old in-memory
+// version reset far more often than "once per IP per day" in production.
+// Checking for a prior 'classify' event (always the first step of any
+// analysis) is a reliable proxy for "this IP already ran a trial analysis,"
+// whether or not that attempt ultimately succeeded.
+async function checkTrialRateLimit(ip: string): Promise<{ allowed: boolean }> {
+  if (ip === 'unknown') return { allowed: true } // can't track it; don't block genuine users over it
+  try {
+    const supabase = createAdminClient()
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    const { count } = await supabase
+      .from('ai_usage_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('ip_address', ip)
+      .eq('action', 'classify')
+      .is('user_id', null)
+      .gte('created_at', since)
+    return { allowed: (count || 0) < TRIAL_MAX_PER_IP_PER_DAY }
+  } catch (err) {
+    // Fail closed, not open — a DB hiccup should never turn into unlimited
+    // free anonymous AI calls, which is exactly what this check exists to
+    // prevent. A user hitting this gets a normal retry-able error instead.
+    console.error('[trial] Rate limit check failed, rejecting request:', err)
+    return { allowed: false }
   }
-
-  // Check limit (1 per IP for anonymous trial — sign up for more)
-  if (cached.count >= 1) {
-    return { allowed: false, remaining: 0 }
-  }
-
-  cached.count++
-  return { allowed: true, remaining: 1 - cached.count }
 }
 
 export async function POST(request: Request) {
@@ -71,26 +93,33 @@ export async function POST(request: Request) {
       )
     }
 
-    const body = await request.json()
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    }
     const { extractedText, dealType, goal, notes, imageData, allPages, pdfData, structuredQuote, locale } = body
 
-    // IP-based rate limiting for trial route
-    const clientIP = getClientIP(request)
-    const rateLimit = checkTrialRateLimit(clientIP)
-
-    if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { error: 'You\'ve used your free trial analysis. Sign up to unlock 3 more free analyses!' },
-        { status: 429 }
-      )
-    }
-
+    // Validate BEFORE consuming the rate limit — a rejected paste shouldn't
+    // burn the visitor's one free analysis.
     // Allow empty text when images or PDFs are provided
     const hasVisualInput = imageData?.base64 || (allPages && allPages.length > 0) || pdfData?.base64
     if (!hasVisualInput && (!extractedText || extractedText.length < 10)) {
       return NextResponse.json(
         { error: 'Please provide text to analyze' },
         { status: 400 }
+      )
+    }
+
+    // IP-based rate limiting for trial route
+    const clientIP = getClientIP(request)
+    const rateLimit = await checkTrialRateLimit(clientIP)
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'You\'ve used your free trial analysis. Sign up to unlock 3 more free analyses!' },
+        { status: 429 }
       )
     }
 
@@ -115,7 +144,7 @@ export async function POST(request: Request) {
     const resolvedLocale = (await cookies()).get('termlift_lang')?.value || locale || 'en'
 
     // Analyze with V1 (full text analysis — auto-retry on transient failures)
-    const output = await withRetry(() => analyzeDeal(
+    const output = await runWithAiContext({ ipAddress: clientIP }, () => withRetry(() => analyzeDeal(
       extractedText || '',
       dealType || 'New',
       goal,
@@ -125,11 +154,15 @@ export async function POST(request: Request) {
       validAllPages && validAllPages.length > 0 ? validAllPages : undefined,
       resolvedLocale,
       validPdfData
-    ))
+    )))
+
+    const responseOutput = SHOW_FULL_NEGOTIATION_PLAYBOOK
+      ? output
+      : stripAdvancedOutput(output as DealOutput | DealOutputV2)
 
     return NextResponse.json({
       success: true,
-      output,
+      output: responseOutput,
       message: 'Sign up to save your analysis and track negotiation rounds!'
     })
   } catch (error) {

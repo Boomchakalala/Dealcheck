@@ -16,6 +16,7 @@ export { CLAUDE_MODEL_ID, getLanguageInstruction, type ClaudeUserContent } from 
 export { classifyQuote } from './classify'
 export { extractFinancialFacts, type ExtractedFacts } from './extract'
 export { analyzeDealFacts, type AnalysisOutput } from './analyze'
+export { analyzeFastCore, type FastAnalysisOutput } from './fast-analyze'
 export { generateEmailDrafts, regenerateEmailDrafts, generateEmailV2, KEVIN_SYSTEM_PROMPT, EMAIL_RULES } from './emails'
 export { calculateQuoteScore, parseMoneyAmount } from './score'
 export { validateTotalCommitment } from './validate-total'
@@ -24,14 +25,15 @@ export { detectRedFlags, type CodeRedFlag } from './red-flags'
 export { calculateDeterministicScore } from './score-deterministic'
 
 import { classifyQuote } from './classify'
-import { extractFinancialFacts } from './extract'
-import { analyzeDealFacts } from './analyze'
-import { generateEmailDrafts } from './emails'
+import { extractFinancialFacts, type ExtractedFacts } from './extract'
+import { analyzeFastCore } from './fast-analyze'
 import { validateTotalCommitment } from './validate-total'
-import { DealOutputSchema, type DealOutputType } from '../schemas'
+import { DealOutputSchema, type DealOutputType, type QuoteClassificationType } from '../schemas'
 import { computeScores, normalizeExtraction, scoreLabel } from '../scoring'
 import { parseMoney, normalizeAmount } from '../currency'
 import type { DealOutput } from '@/types'
+import { ANALYSIS_PIPELINE_V3 } from '../analysis/flag'
+import { runFullAnalysisPipelineV3 } from '../analysis/full-pipeline'
 
 /**
  * Main analysis pipeline — v2 with deterministic extraction and scoring.
@@ -47,16 +49,39 @@ export async function analyzeDeal(
   allPages?: Array<{ base64: string; mimeType: string }>,
   userLocale?: string,
   pdfData?: { base64: string; mimeType: string },
-  userPreferences?: { payment_terms?: string; top_priority?: string; auto_renewal?: string; contract_term_strategy?: string }
+  userPreferences?: { payment_terms?: string; top_priority?: string; auto_renewal?: string; contract_term_strategy?: string },
+  // Optional result of an earlier /api/deal/extract-preview call — when
+  // present, Steps 0+1 reuse it instead of re-calling classifyQuote()/
+  // extractFinancialFacts(), so the two-request flow never doubles the
+  // LLM calls a single analysis makes.
+  precomputed?: { classification: QuoteClassificationType; rawFacts: ExtractedFacts }
 ): Promise<DealOutputType> {
+  if (ANALYSIS_PIPELINE_V3) {
+    return runFullAnalysisPipelineV3(
+      extractedText, dealType, goal, notes, previousRoundOutput,
+      imageData, allPages, userLocale, pdfData, userPreferences,
+    )
+  }
+
+  const pipelineStart = Date.now()
   try {
-    // ─── Steps 0+1: Classify + extract in parallel ───
+    // ─── Steps 0+1: Classify + extract in parallel (or reuse precomputed) ───
     // Both only read the quote — neither depends on the other, so run them together.
-    console.log('[TermLift] Steps 0+1: Classifying + extracting facts (parallel)...')
-    const [classification, rawFacts] = await Promise.all([
-      classifyQuote(extractedText, dealType, imageData, allPages, pdfData),
-      extractFinancialFacts(extractedText, dealType, imageData, allPages, pdfData),
-    ])
+    let classification: QuoteClassificationType
+    let rawFacts: ExtractedFacts
+    if (precomputed) {
+      console.log('[TermLift] Steps 0+1: Reusing precomputed classify+extract from extract-preview')
+      classification = precomputed.classification
+      rawFacts = precomputed.rawFacts
+    } else {
+      console.log('[TermLift] Steps 0+1: Classifying + extracting facts (parallel)...')
+      const stepsStart = Date.now()
+      ;[classification, rawFacts] = await Promise.all([
+        classifyQuote(extractedText, dealType, imageData, allPages, pdfData),
+        extractFinancialFacts(extractedText, dealType, imageData, allPages, pdfData),
+      ])
+      console.log(`[TermLift timing] Steps 0+1 (classify+extract, parallel): ${Date.now() - stepsStart}ms`)
+    }
     console.log('[TermLift] Steps 0+1 done:', classification.quote_type, classification.deal_size_bracket, '|', rawFacts.vendor, rawFacts.total_commitment)
 
     // ─── Step 1a: Normalize total_commitment ───
@@ -70,9 +95,16 @@ export async function analyzeDeal(
       console.log('[TermLift] Step 1b: Total overridden to:', validation.total)
     }
 
-    // ─── Step 2: AI analysis (Opus, free to judge) ───
-    console.log('[TermLift] Step 2: AI analysis...')
-    const analysis = await analyzeDealFacts(rawFacts, classification, extractedText, {
+    // ─── Step 2: FAST core analysis ───
+    // Deliberately trimmed sibling of analyzeDealFacts() (see fast-analyze.ts) —
+    // 3-5 highest-value red flags instead of up to 10, no full negotiation
+    // strategy, no cash-flow analysis, no watch items. analyzeDealFacts() and
+    // generateEmailDrafts() are untouched and still exported for later use
+    // (deeper analysis on demand, negotiation workflows) — just disconnected
+    // from this blocking path, not deleted.
+    console.log('[TermLift] Step 2: Fast core analysis...')
+    const fastStepStart = Date.now()
+    const analysis = await analyzeFastCore(rawFacts, classification, extractedText, {
       dealType,
       goal,
       notes,
@@ -83,6 +115,7 @@ export async function analyzeDeal(
       pdfData,
       userPreferences,
     })
+    console.log(`[TermLift timing] Step 2 (fast core analysis): ${Date.now() - fastStepStart}ms`)
     console.log('[TermLift] Step 2 done:', analysis.verdict_type, '|', analysis.red_flags?.length, 'flags | extraction:', analysis.extraction ? 'yes' : 'missing')
 
     // ─── Step 2b: Sanity check savings ───
@@ -97,48 +130,12 @@ export async function analyzeDeal(
       ps.total = savingsFromItems
     }
 
-    // ─── Step 3: Generate emails ───
-    console.log('[TermLift] Step 3: Generating emails...')
-    let emails
-    try {
-      emails = await generateEmailDrafts({
-        vendor: rawFacts.vendor,
-        vendor_product: rawFacts.vendor_product,
-        total_commitment: rawFacts.total_commitment,
-        term: rawFacts.term,
-        contact_name: rawFacts.contact_name,
-        currency: rawFacts.currency,
-        verdict: analysis.verdict,
-        red_flags: analysis.red_flags,
-        what_to_ask_for: analysis.what_to_ask_for,
-        potential_savings: analysis.potential_savings,
-        negotiation_plan: analysis.negotiation_plan,
-        quick_read: analysis.quick_read,
-      }, userLocale)
-    } catch (emailError) {
-      console.error('[TermLift] Email generation failed, using fallbacks:', emailError)
-      emails = {
-        neutral: { subject: `${rawFacts.vendor} — Questions Before We Sign`, body: 'Email generation failed. Please use the "Regenerate" button to try again.' },
-        firm: { subject: `${rawFacts.vendor} — Revised Terms Needed`, body: 'Email generation failed. Please use the "Regenerate" button to try again.' },
-        final_push: { subject: `${rawFacts.vendor} — Final Decision`, body: 'Email generation failed. Please use the "Regenerate" button to try again.' },
-      }
-    }
-    // Ensure all emails have sign-off
-    const ensureSignOff = (body: string): string => {
-      const signOff = userLocale === 'fr' ? '\n\nCordialement,\n[Votre nom]' : '\n\nBest regards,\n[Your Name]'
-      if (!body.includes('[Your Name]') && !body.includes('[Votre nom]')) {
-        return body.trimEnd() + signOff
-      }
-      return body
-    }
-    if (emails) {
-      for (const key of ['neutral', 'firm', 'final_push'] as const) {
-        if (emails[key]?.body) emails[key].body = ensureSignOff(emails[key].body)
-      }
-    }
-    console.log('[TermLift] Step 3 done')
-
-    // ─── Step 4: Assemble output ───
+    // ─── Step 3: Assemble output ───
+    // Email generation no longer happens here — it blocked initial display
+    // for ~20s to produce content most users don't read immediately.
+    // email_drafts is left absent; DealScrollView.tsx already renders a
+    // "Generate email" CTA when it's missing, wired to the existing
+    // /api/deal/regenerate-emails route (which needs no pre-existing draft).
     const assembled: any = {
       vendor: rawFacts.vendor,
       category: rawFacts.category,
@@ -163,15 +160,11 @@ export async function analyzeDeal(
       negotiation_plan: analysis.negotiation_plan,
       what_to_ask_for: analysis.what_to_ask_for,
       potential_savings: analysis.potential_savings,
-      cash_flow_improvements: analysis.cash_flow_improvements,
-      watchItems: analysis.watchItems,
       score_rationale: analysis.score_rationale,
       assumptions: analysis.assumptions,
-      disclaimer: analysis.disclaimer,
-      email_drafts: emails,
     }
 
-    // ─── Step 5: Validate, then compute deterministic scores ───
+    // ─── Step 4: Validate, then compute deterministic scores ───
     const validated = DealOutputSchema.parse(assembled)
 
     // Sanitize total_commitment
@@ -184,10 +177,14 @@ export async function analyzeDeal(
     const extraction = normalizeExtraction(analysis.extraction, contractTotal)
     const scores = computeScores(extraction)
 
-    console.log('[TermLift] Pipeline complete — score:', scores.overall, `(p${scores.pricing}/t${scores.terms}/l${scores.leverage})`)
-
+    const assembleStart = Date.now()
     // Persist the extraction + deductions alongside the computed scores so the deal
     // carries everything the breakdown UI needs. (No legacy `calculateQuoteScore`.)
+    // confidence/target_price_range are new fast-analysis-only fields, attached
+    // after validation the same way score/score_breakdown already are —
+    // DealOutputSchema is a plain z.object() (strips unknown keys on parse),
+    // so this is the existing pattern for adding fields the schema doesn't
+    // declare, not a new trick.
     const result: any = {
       ...validated,
       score: scores.overall,
@@ -201,7 +198,18 @@ export async function analyzeDeal(
       },
       extraction: analysis.extraction,
       deductions: scores.deductions,
+      confidence: analysis.confidence,
+      target_price_range: analysis.target_price_range,
+      // Persisted so deep analysis (triggered later, on demand) can reuse it
+      // instead of re-running classifyQuote() — same non-schema attach
+      // pattern as everything else above.
+      classification,
+      deep_analysis_status: 'idle' as const,
     }
+    console.log(`[TermLift timing] Step 4 (validate + score, in-process, no DB): ${Date.now() - assembleStart}ms`)
+    console.log(`[TermLift timing] TOTAL analyzeDeal() (excludes DB writes, done by the caller): ${Date.now() - pipelineStart}ms`)
+    console.log('[TermLift] Pipeline complete — score:', scores.overall, `(p${scores.pricing}/t${scores.terms}/l${scores.leverage})`)
+
     return result as DealOutputType
 
   } catch (error) {

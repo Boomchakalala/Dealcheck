@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import type { DealOutput, DealOutputV2 } from '@/types'
+import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
 
 export default async function RoundPage({
   params,
@@ -36,9 +37,15 @@ export default async function RoundPage({
     notFound()
   }
 
+  const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+  const showFullPlaybook = !!profile?.is_admin || SHOW_FULL_NEGOTIATION_PLAYBOOK
+
   const deal = Array.isArray(round.deals) ? round.deals[0] : round.deals
   const schemaVersion = round.schema_version || 'v1'
   const isV2 = schemaVersion === 'v2'
+  const output = round.output_json && !showFullPlaybook
+    ? stripAdvancedOutput(round.output_json as DealOutput | DealOutputV2)
+    : round.output_json
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -97,11 +104,11 @@ export default async function RoundPage({
       </div>
 
       {/* Analysis Output */}
-      {round.status === 'done' && round.output_json && (
+      {round.status === 'done' && output && (
         isV2 ? (
-          <OutputDisplayV2 output={round.output_json as DealOutputV2} roundId={roundId} />
+          <OutputDisplayV2 output={output as DealOutputV2} roundId={roundId} />
         ) : (
-          <OutputDisplay output={round.output_json as DealOutput} roundId={roundId} />
+          <OutputDisplay output={output as DealOutput} roundId={roundId} />
         )
       )}
 

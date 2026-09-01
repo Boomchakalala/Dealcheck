@@ -1,8 +1,47 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { recordAiUsage } from '@/lib/ai-telemetry'
 
 export const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
+
+/**
+ * Wraps anthropic.messages.create() with cost/usage telemetry. Every live
+ * call site should go through this (not the raw client) so ai_usage_events
+ * stays a complete record — see lib/ai-telemetry.ts and lib/ai-cost.ts.
+ * `action` identifies which step this is (e.g. 'classify', 'fast_analyze')
+ * for later per-deal/per-action cost breakdowns; deal/round/user context is
+ * read automatically from the ambient AsyncLocalStorage set by the calling
+ * API route via runWithAiContext() — callers don't need to pass it.
+ */
+export async function createTrackedMessage(
+  action: string,
+  params: Anthropic.MessageCreateParamsNonStreaming
+): Promise<Anthropic.Message> {
+  const start = Date.now()
+  try {
+    const response = await anthropic.messages.create(params)
+    // Awaited, not fire-and-forget — in a serverless function, an
+    // un-awaited write can be cut off the moment the response returns.
+    await recordAiUsage({
+      action,
+      model: params.model,
+      usage: response.usage,
+      success: true,
+      latencyMs: Date.now() - start,
+    })
+    return response
+  } catch (error) {
+    await recordAiUsage({
+      action,
+      model: params.model,
+      success: false,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      latencyMs: Date.now() - start,
+    })
+    throw error
+  }
+}
 
 // Per commit 8cde00f: analysis was reverted from Opus to Sonnet due to timeouts + JSON errors.
 // If you want to try Opus again, use 'claude-opus-4-7' (current Opus; 4.6 is also valid but

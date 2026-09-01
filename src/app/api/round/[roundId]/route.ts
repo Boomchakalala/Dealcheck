@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
+import type { DealOutput, DealOutputV2 } from '@/types'
 
 export async function GET(
   request: Request,
@@ -25,6 +27,11 @@ export async function GET(
 
     if (error || !round) {
       return NextResponse.json({ error: 'Round not found' }, { status: 404 })
+    }
+
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    if (round.output_json && !profile?.is_admin && !SHOW_FULL_NEGOTIATION_PLAYBOOK) {
+      round.output_json = stripAdvancedOutput(round.output_json as DealOutput | DealOutputV2)
     }
 
     return NextResponse.json({ round })

@@ -4,12 +4,9 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Search, Building2, ChevronRight } from 'lucide-react'
 import { formatTotals, type VendorRow } from '@/lib/vendor-aggregate'
+import { ScoreGradientBar } from '@/components/ScoreGradientBar'
 
 const sora = "'Sora', sans-serif"
-
-function scoreColor(s: number) {
-  return s >= 80 ? 'text-emerald-600' : s >= 60 ? 'text-amber-600' : 'text-red-600'
-}
 function fmtDate(d: string | null) {
   if (!d) return '—'
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -82,7 +79,9 @@ export function VendorsListClient({ rows }: { rows: VendorRow[] }) {
                     </div>
                     <span className="hidden md:block text-right text-[13.5px] text-slate-700 tabular-nums">{v.dealCount}</span>
                     <span className="hidden md:block text-right text-[13.5px] font-semibold text-slate-900" style={{ fontFamily: sora }}>{formatTotals(v.totalsByCurrency)}</span>
-                    <span className={`hidden md:block text-right text-[13.5px] font-bold ${v.avgScore == null ? 'text-slate-300' : scoreColor(v.avgScore)}`} style={{ fontFamily: sora }}>{v.avgScore ?? '—'}</span>
+                    <span className="hidden md:flex justify-end">
+                      {v.avgScore != null && <ScoreGradientBar score={v.avgScore} width={44} height={6} />}
+                    </span>
                     <span className="hidden md:block text-right text-[13.5px] font-semibold text-emerald-700" style={{ fontFamily: sora }}>{formatTotals(v.savingsByCurrency)}</span>
                     <span className="hidden md:block text-right text-[12.5px] text-slate-400">{fmtDate(v.lastActivity)}</span>
                     <ChevronRight className="hidden md:block w-4 h-4 text-slate-300 group-hover:text-emerald-500 transition-colors" />

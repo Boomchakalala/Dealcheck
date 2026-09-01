@@ -30,6 +30,34 @@ export function normalizeVendorName(name: string): string {
   return tokens.join(' ')
 }
 
+/** Trailing suffixes for shortenVendorDisplayName — matched as whole words only. */
+const DISPLAY_LEGAL_SUFFIXES = new Set([
+  'international', 'inc', 'llc', 'ltd', 'limited', 'corp', 'corporation', 'co',
+  'gmbh', 'sas', 'sarl', 'sa', 'bv', 'plc', 'ag', 'se',
+])
+
+/**
+ * Shortens a vendor/company display name for compact UI (deal header,
+ * breadcrumb) by stripping trailing legal-entity suffixes and parenthetical
+ * asides, e.g. "Docusign International (EMEA) Limited" -> "Docusign".
+ *
+ * Only pops whole trailing tokens (never a mid-word regex match), so it can't
+ * corrupt names that happen to contain a suffix as a substring — the earlier
+ * version's `S\.?A\.?S?\.?` alternative matched "Sa" inside "Salesforce" and
+ * turned it into "lesforce".
+ */
+export function shortenVendorDisplayName(name: string): string {
+  if (!name) return ''
+  const s = name.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim()
+  const tokens = s.split(' ')
+  while (tokens.length > 1) {
+    const last = tokens[tokens.length - 1].replace(/\.+$/, '').toLowerCase()
+    if (DISPLAY_LEGAL_SUFFIXES.has(last)) tokens.pop()
+    else break
+  }
+  return tokens.join(' ').trim() || name.trim()
+}
+
 function bigrams(s: string): Map<string, number> {
   const m = new Map<string, number>()
   for (let i = 0; i < s.length - 1; i++) {

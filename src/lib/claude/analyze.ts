@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { anthropic, CLAUDE_MODEL, getResponseText, parseJsonFromContent, getLanguageInstruction, buildImageContent, type ClaudeImageMediaType } from './client'
+import { createTrackedMessage, CLAUDE_MODEL, getResponseText, parseJsonFromContent, getLanguageInstruction, buildImageContent, type ClaudeImageMediaType } from './client'
 import { QUOTE_TYPE_OVERLAYS, buildSavingsDirective, buildClassificationContext } from './overlays'
 import type { QuoteClassificationType } from '../schemas'
 import type { DealOutput } from '@/types'
@@ -25,7 +25,7 @@ Look at the quote and react like a procurement expert would. Find what matters:
 - Is the price fair or inflated? Can it be challenged?
 - Are there fees, packs, bundles, or add-ons with margin in them?
 - Is the vendor a broker, reseller, dealer, or intermediary? If yes, their margin is negotiable. ALWAYS flag this as a "Source Insight" red flag. Every dealer, distributor, car broker, equipment dealer, or franchise selling another brand's product is an intermediary.
-- Are there unused seats, excess quantity, or scope waste?
+- Are there unused seats, excess quantity, or scope waste? A quote only ever states CONTRACTED counts, never actual usage/adoption — so unless the document itself explicitly states usage/adoption numbers, never assert a specific count of "unused" seats or capacity as fact. Phrase it as a question to raise with the supplier or a conditional hypothesis instead (e.g. "ask the supplier to confirm active-seat utilization" or "if adoption is below X, this is leverage" — not "16 seats are unused").
 - Are the terms supplier-friendly? (auto-renewal, short notice, escalation, no exit)
 - Is there leverage? (deadline, cash payment, volume, competing alternatives)
 - What can the buyer trade? (fast signature, longer commitment, referral)
@@ -38,7 +38,7 @@ Be selective with red flags. An item is a RED FLAG only if it passes BOTH tests:
 
 Pure observations are NOT red flags: "priced at the high end of market", "X is not visible in the document", "typical for this category", "worth reviewing Y". Anything worth noting that fails this test goes into watchItems instead — that is your outlet, so you never need to inflate flags to feel thorough.
 
-It is correct and expected to return only 2-4 red flags on a typical quote. Do NOT pad. A clean quote may have just 1-2 flags plus a few watch items. (Savings items and asks are still uncapped — this limit is about red flags only.)
+The count of red flags is NOT fixed and must NOT be anchored to any target number. Apply the test above item by item and report every item that passes — nothing more, nothing less. A clean, well-drafted quote may genuinely have only 1 flag, or even 0. A quote with many separate problems (stacked fees, one-sided cancellation terms, vague scope, auto-renewal traps, undisclosed intermediary margin) may genuinely have 8-10+ flags — report all of them if each individually passes the test. Do NOT pad a clean quote to look thorough, and do NOT compress a messy quote down to look tidy or "reasonable." (Savings items and asks are still uncapped — this is about red flags only.)
 
 ==================================================
 DOCUMENT ANALYSIS
@@ -68,7 +68,7 @@ Be aggressive. A good procurement lead would:
 - Include extras or accessories in the deal price
 - Right-size quantity to actual usage
 - Challenge intermediary/reseller/dealer margin
-- On equipment, vehicles, or high-value goods: dealers carry 10-25% margin. A cash buyer should push for 5-10% off minimum. "The price looks fair" is not a reason to stop pushing.
+- On equipment, vehicles, or high-value goods: dealers typically carry roughly 10-25% margin (a rough industry heuristic, not a verified figure for this specific vendor) — use it to judge whether a price looks negotiable, but phrase any reference to it in your output as an estimate, not a stated fact. A cash buyer should push for 5-10% off minimum. "The price looks fair" is not a reason to stop pushing.
 
 Payment term improvements are NOT savings. They go in cash_flow_improvements, not potential_savings.
 
@@ -319,7 +319,7 @@ export async function analyzeDealFacts(
     userContent = userPrompt
   }
 
-  const response = await anthropic.messages.create({
+  const response = await createTrackedMessage('full_analyze', {
     model: CLAUDE_MODEL,
     max_tokens: 8192,
     system: enhancedPrompt + getLanguageInstruction(options.userLocale || 'en'),
@@ -354,7 +354,7 @@ export async function analyzeDealFacts(
   return parsed
 }
 
-function buildPreferencesDirective(prefs?: { payment_terms?: string; top_priority?: string; auto_renewal?: string; contract_term_strategy?: string }): string {
+export function buildPreferencesDirective(prefs?: { payment_terms?: string; top_priority?: string; auto_renewal?: string; contract_term_strategy?: string }): string {
   if (!prefs) return ''
 
   const parts: string[] = []

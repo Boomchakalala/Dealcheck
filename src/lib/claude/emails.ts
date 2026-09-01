@@ -1,4 +1,4 @@
-import { anthropic, CLAUDE_MODEL, getResponseText, parseJsonFromContent, getLanguageInstruction } from './client'
+import { createTrackedMessage, CLAUDE_MODEL, getResponseText, parseJsonFromContent, getLanguageInstruction } from './client'
 import type { DealOutputType } from '../schemas'
 import type { DealOutput, DealOutputV2 } from '@/types'
 import { buildCandidateAsks, defaultSelectedLabels, getCanOffer } from '../email-asks'
@@ -100,6 +100,10 @@ STRUCTURE (typical Kevin email):
 5. Explain why: budget, legal review, internal approval, security review, deadline, scope alignment.
 6. Close: "Thanks in advance", "Please let me know", "From there I should be able to move forward."
 
+NEVER REVEAL INTERNAL ANALYSIS LANGUAGE:
+- Never mention TermLift, AI, "score", "red flag", "leverage level", or any internal analysis/scoring terminology to the supplier. Write only as the buyer, using the underlying facts (price, terms, timing) naturally — never as if quoting a report.
+- Do not invent facts, figures, or claims not present in the deal context provided (e.g. a competing quote, a budget figure, a deadline) unless it was explicitly supplied as real context.
+
 FORMATTING:
 - No enumeration in the body. Never start a paragraph with First, Second, Third, Finally. No numbered or bulleted lists.
 - Short paragraphs. Vary paragraph length.
@@ -172,7 +176,7 @@ Return ONLY JSON with this structure:
 }`
 
   try {
-    const response = await anthropic.messages.create({
+    const response = await createTrackedMessage('email_generate_v1', {
       model: CLAUDE_MODEL,
       max_tokens: 4096,
       system: KEVIN_SYSTEM_PROMPT + '\n' + getLanguageInstruction(userLocale || 'en'),
@@ -244,7 +248,7 @@ Return ONLY JSON with this structure:
 }`
 
   try {
-    const response = await anthropic.messages.create({
+    const response = await createTrackedMessage('email_regenerate_v1', {
       model: CLAUDE_MODEL,
       max_tokens: 4096,
       system: KEVIN_SYSTEM_PROMPT + '\n' + getLanguageInstruction(userLocale || 'en'),
@@ -313,7 +317,7 @@ Return ONLY JSON:
 }`
 
   try {
-    const response = await anthropic.messages.create({
+    const response = await createTrackedMessage('email_generate_v2', {
       model: CLAUDE_MODEL,
       max_tokens: 4096,
       system: KEVIN_SYSTEM_PROMPT + '\n' + getLanguageInstruction(userLocale || 'en'),

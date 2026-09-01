@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { getClaudeResponse, getLanguageInstruction } from '@/lib/claude'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { runWithAiContext } from '@/lib/ai-telemetry'
 
 export async function POST(
   request: Request,
@@ -14,6 +16,14 @@ export async function POST(
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { data: closeProfile } = await supabase.from('profiles').select('plan, is_admin').eq('id', user.id).single()
+    if (!closeProfile?.is_admin) {
+      const rateLimit = await checkRateLimit(user.id, (closeProfile?.plan || 'free') as string)
+      if (!rateLimit.allowed) {
+        return NextResponse.json({ error: rateLimit.message || 'Rate limit exceeded' }, { status: 429 })
+      }
     }
 
     // Parse optional body (finalDocumentText from uploaded doc, originalTotal override)
@@ -146,12 +156,13 @@ Return ONLY valid JSON (no markdown, no code fences):
     const locale = (await cookies()).get('termlift_lang')?.value || 'en'
     const langInstruction = getLanguageInstruction(locale)
 
-    const raw = (await getClaudeResponse({
+    const raw = (await runWithAiContext({ userId: user.id, dealId }, () => getClaudeResponse({
+      action: 'close_estimate',
       system: 'You are a procurement analyst. Return only valid JSON, no markdown formatting or code fences.' + langInstruction,
       userContent: prompt,
       temperature: 0.3,
       max_tokens: 500,
-    })).trim() || '{}'
+    }))).trim() || '{}'
 
     let result
     try {

@@ -6,14 +6,57 @@ import Tesseract from 'tesseract.js';
 export const runtime = 'nodejs';
 export const maxDuration = 60; // Allow up to 60 seconds for OCR
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB — matches the /try UI and /api/upload
+
+// Extraction (especially OCR) is unauthenticated and CPU-heavy — cap per-IP daily use.
+const extractCache = new Map<string, { count: number; resetAt: number }>();
+const MAX_EXTRACTS_PER_DAY = 20;
+
+function getClientIP(request: Request): string {
+  const real = request.headers.get('x-real-ip') || request.headers.get('x-vercel-forwarded-for');
+  if (real) return real.trim();
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) {
+    const parts = forwarded.split(',');
+    return parts[parts.length - 1].trim();
+  }
+  return 'unknown';
+}
+
+function checkExtractRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const cached = extractCache.get(ip);
+  if (!cached || now > cached.resetAt) {
+    extractCache.set(ip, { count: 1, resetAt: now + 24 * 60 * 60 * 1000 });
+    return true;
+  }
+  if (cached.count >= MAX_EXTRACTS_PER_DAY) return false;
+  cached.count++;
+  return true;
+}
+
 export async function POST(request: Request) {
   try {
+    if (!checkExtractRateLimit(getClientIP(request))) {
+      return NextResponse.json(
+        { error: 'Daily extraction limit reached. Sign up to keep going.' },
+        { status: 429 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
     if (!file) {
       return NextResponse.json(
         { error: 'No file provided' },
+        { status: 400 }
+      );
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: 'File too large (max 10MB)' },
         { status: 400 }
       );
     }

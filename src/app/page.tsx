@@ -6,7 +6,7 @@ import {
   ArrowRight, CheckCircle2, Mail, Send, Shield, Trash2,
   Upload, FileText, AlertTriangle, Sparkles, Zap, TrendingDown, TrendingUp,
   Heart, Scale, Swords, Target, BarChart3, Calendar, Building2, Eye,
-  ChevronRight,
+  ChevronRight, Handshake,
 } from 'lucide-react'
 import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
@@ -70,7 +70,7 @@ function HeroAnalysisCard() {
 
       <div className="mt-5 space-y-2.5">
         {[
-          { sev: 'HIGH', issue: '15 unused seats billed at full price', impact: '€6,000/yr' },
+          { sev: 'HIGH', issue: 'Uncapped 8% annual price escalator', impact: '€6,000/yr' },
           { sev: 'MED', issue: 'No loyalty discount after 2 years', impact: '€1,800/yr' },
         ].map((f, i) => (
           <div key={i} className="flex items-start gap-3 p-3 rounded-xl border" style={{ background: f.sev === 'HIGH' ? 'rgba(254,226,226,0.5)' : 'rgba(254,243,199,0.4)', borderColor: f.sev === 'HIGH' ? 'rgba(254,202,202,0.7)' : 'rgba(253,230,138,0.6)' }}>
@@ -87,7 +87,7 @@ function HeroAnalysisCard() {
       </div>
 
       <div className="mt-4 flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-slate-100" style={{ fontFamily: mono }}>
-        <span>3 flags &middot; 3 asks &middot; 3 email drafts</span>
+        <span>3 flags &middot; 3 asks</span>
         <span className="inline-flex items-center gap-1.5"><Zap className="w-3 h-3" style={{ color: green }} />Analysed in ~2 min</span>
       </div>
     </div>
@@ -135,7 +135,7 @@ export default function LandingV2() {
             </h1>
 
             <p className="text-[18px] text-slate-500 leading-relaxed max-w-[500px] mb-9">
-              You don&apos;t have a procurement team. The vendor does. <span className="text-slate-700 font-semibold">TermLift gives you the edge</span> &mdash; paste any quote and get the red flags, the savings number, and the email that gets you a better deal. In about two minutes.
+              You don&apos;t have a procurement team. The vendor does. <span className="text-slate-700 font-semibold">TermLift gives you the edge</span> &mdash; paste any quote and get the red flags, the savings number, and a plan to negotiate it &mdash; yourself or with our help. In about two minutes.
             </p>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 mb-6">
@@ -240,7 +240,7 @@ export default function LandingV2() {
                   </div>
                   <div className="space-y-1">
                     {[
-                      { sev: 'HIGH', text: '15 unused seats' },
+                      { sev: 'HIGH', text: 'Uncapped 8% price escalator' },
                       { sev: 'MED', text: 'Missing loyalty discount' },
                     ].map((f, i) => (
                       <div key={i} className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-white border border-slate-100">
@@ -273,7 +273,7 @@ export default function LandingV2() {
                     <div className="h-full rounded-full" style={{ width: '32.5%', background: green }} />
                   </div>
                   {[
-                    { ask: 'Right-size to 30 seats', amt: '€6,000' },
+                    { ask: 'Cap escalator at 3%', amt: '€6,000' },
                     { ask: '10% loyalty discount', amt: '€1,800' },
                   ].map((s, i) => (
                     <div key={i} className="flex items-center justify-between py-1 text-[10.5px]">
@@ -292,19 +292,18 @@ export default function LandingV2() {
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4" style={{ background: 'rgba(29,185,84,0.12)', color: green }}>
                   <Mail className="w-5 h-5" />
                 </div>
-                <p className="text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>03 &middot; Send</p>
-                <h3 className="text-[20px] font-bold text-slate-900 mb-2" style={{ fontFamily: sora }}>Email drafts</h3>
-                <p className="text-[13.5px] text-slate-500 leading-relaxed mb-5">Three tones &mdash; Warm, Direct, Firm. Every flag addressed, your numbers in. Copy and send.</p>
+                <p className="text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>03 &middot; Act</p>
+                <h3 className="text-[20px] font-bold text-slate-900 mb-2" style={{ fontFamily: sora }}>Negotiate, or hand it off</h3>
+                <p className="text-[13.5px] text-slate-500 leading-relaxed mb-5">Generate a ready-to-send email yourself &mdash; or have TermLift run the negotiation for you.</p>
                 {/* Mini surface */}
-                <div className="rounded-xl border border-slate-200 p-3 bg-slate-50/50">
-                  <div className="flex gap-1 mb-2">
-                    {['Warm', 'Direct', 'Firm'].map((t, i) => (
-                      <span key={t} className={`text-[9px] font-bold px-2 py-1 rounded`} style={{ background: i === 0 ? 'rgba(29,185,84,0.15)' : 'white', color: i === 0 ? '#047857' : '#64748b', border: i === 0 ? `1px solid ${green}` : '1px solid #e2e8f0', fontFamily: sora }}>{t}</span>
-                    ))}
+                <div className="rounded-xl border border-slate-200 p-3 bg-slate-50/50 space-y-2">
+                  <div className="flex items-center justify-between bg-white rounded-md border border-slate-100 px-3 py-2.5">
+                    <span className="text-[11px] font-semibold text-slate-700">Generate negotiation email</span>
+                    <Mail className="w-3.5 h-3.5 text-slate-400" />
                   </div>
-                  <div className="bg-white rounded-md border border-slate-100 p-2.5 text-[10.5px] leading-relaxed text-slate-600">
-                    Hi Sarah, thanks for the renewal&mdash;<br />
-                    we&apos;re only using 25 of 40 seats. <span className="bg-emerald-100/60 px-1 rounded">Could we right-size...</span>
+                  <div className="flex items-center justify-between rounded-md px-3 py-2.5" style={{ background: 'rgba(29,185,84,0.1)', border: `1px solid ${green}` }}>
+                    <span className="text-[11px] font-bold" style={{ color: '#047857' }}>Let TermLift negotiate</span>
+                    <ArrowRight className="w-3.5 h-3.5" style={{ color: green }} />
                   </div>
                 </div>
               </div>
@@ -497,6 +496,66 @@ export default function LandingV2() {
                 </div>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          TERMLIFT NEGOTIATE — we run it for you
+         ═══════════════════════════════════════════════════ */}
+      <section className="relative px-6 py-16 sm:py-28 bg-slate-950 text-white overflow-hidden">
+        <div className="absolute top-0 right-0 w-[700px] h-[500px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, rgba(29,185,84,0.12) 0%, transparent 60%)' }} />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left — the pitch */}
+            <div>
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-5" style={{ background: 'rgba(29,185,84,0.15)' }}>
+                <Handshake className="w-5 h-5" style={{ color: green }} />
+              </div>
+              <p className="text-[12px] mb-3 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>TermLift Negotiate</p>
+              <h2 className="text-white mb-5" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(30px, 4.2vw, 48px)', lineHeight: 1.05, letterSpacing: '-0.025em' }}>
+                Don&apos;t want to send the emails? <br /><span style={{ color: green }}>We&apos;ll run the whole negotiation.</span>
+              </h2>
+              <p className="text-[16px] text-slate-400 leading-relaxed mb-7 max-w-lg">
+                Hand us the deal and a negotiator takes it from there &mdash; strategy, vendor
+                back-and-forth, and the close. You approve the outcome, we only get paid when you save.
+              </p>
+              <div className="flex flex-wrap items-center gap-3 mb-8">
+                {['SaaS & software', 'IT & infrastructure', 'Marketing spend', 'Logistics & more'].map((c) => (
+                  <span key={c} className="text-[12.5px] font-semibold px-3.5 py-1.5 rounded-full border border-slate-700 text-slate-300">{c}</span>
+                ))}
+              </div>
+              <Link href="/negotiate" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[14.5px] font-bold text-white no-underline transition-all hover:shadow-lg hover:-translate-y-0.5" style={{ background: green, boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}>
+                Get a deal negotiated <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Right — the terms, plainly */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-7 sm:p-9">
+              <div className="pb-7 mb-7 border-b border-slate-800">
+                <div className="flex items-end gap-3 mb-2">
+                  <span style={{ fontFamily: sora, fontSize: 'clamp(48px, 7vw, 72px)', fontWeight: 800, lineHeight: 1, color: green }}>20%</span>
+                  <span className="text-[14px] text-slate-400 pb-2">of verified savings</span>
+                </div>
+                <p className="text-[14.5px] font-semibold text-white">No savings, no fee.</p>
+              </div>
+              <div className="space-y-5">
+                {[
+                  { t: 'You stay in control', d: 'Nothing is agreed with the vendor without your sign-off.' },
+                  { t: 'Verified before billed', d: 'The fee is calculated on the documented difference between the original quote and the closed deal.' },
+                  { t: 'Progress you can follow', d: 'Every request gets a status you can track from your dashboard.' },
+                ].map((item) => (
+                  <div key={item.t} className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: green }} />
+                    <div>
+                      <p className="text-[14px] font-bold text-white">{item.t}</p>
+                      <p className="text-[13px] text-slate-400 leading-relaxed">{item.d}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

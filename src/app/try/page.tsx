@@ -356,7 +356,7 @@ This quote expires in 14 days.`
 
           {/* Subtitle */}
           <p className="text-[15px] text-slate-500 dark:text-slate-400 max-w-[420px] mx-auto leading-relaxed">
-            Get red flags, savings opportunities, and a ready-to-send negotiation email &mdash; in about two minutes.
+            Get a deal score, red flags, and your savings opportunity &mdash; in about a minute.
           </p>
 
           {/* Feature pills */}
@@ -365,7 +365,7 @@ This quote expires in 14 days.`
               { icon: <BarChart3 className="w-3 h-3" />, label: 'Deal score 0–100' },
               { icon: <AlertTriangle className="w-3 h-3" />, label: 'Red flags' },
               { icon: <TrendingUp className="w-3 h-3" />, label: 'Savings breakdown' },
-              { icon: <Mail className="w-3 h-3" />, label: 'Negotiation email' },
+              { icon: <Mail className="w-3 h-3" />, label: 'Negotiate or hand it off' },
             ].map((p) => (
               <span
                 key={p.label}

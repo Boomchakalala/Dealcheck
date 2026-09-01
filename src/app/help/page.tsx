@@ -26,7 +26,7 @@ const faqData: Record<Section, { title: string; sub: string; items: { q: string;
     title: 'What TermLift does',
     sub: 'Understanding how TermLift works and what to expect',
     items: [
-      { q: 'What is TermLift?', a: 'TermLift is an AI-powered tool that helps you negotiate better vendor deals. Upload a quote or contract, and it finds red flags, estimates potential savings, builds a negotiation plan with specific asks, and drafts ready-to-send reply emails.' },
+      { q: 'What is TermLift?', a: "TermLift helps you negotiate better supplier deals. Upload a quote and you get a fast initial assessment — your deal score, red flags, and potential savings. From there, unlock the Full Analysis for deeper negotiation levers, recommended asks, and strategy — then negotiate the deal yourself, or have TermLift negotiate it for you." },
       { q: 'What TermLift is NOT', a: "TermLift is not legal advice, not a guarantee of savings, and not a replacement for reading your contracts. It's a starting point that gives you leverage and structure — but you should always review the outputs yourself and consult a professional for legal or financial decisions." },
       { q: 'How does the AI analysis work?', a: "Text is extracted from your document (PDF, image, or pasted text) and sent to Anthropic's Claude AI, which is prompted specifically for procurement analysis. It reads the full content, identifies risks, builds a negotiation strategy, and generates structured output." },
     ],
@@ -44,8 +44,8 @@ const faqData: Record<Section, { title: string; sub: string; items: { q: string;
     title: 'Analysis output',
     sub: 'What you get back and how to use it',
     items: [
-      { q: 'What do I get back from an analysis?', a: 'You get a complete negotiation package: a verdict summary, red flags with suggested mitigations, a negotiation plan split into must-have and nice-to-have asks, estimated potential savings, and ready-to-send email drafts in three different tones.' },
-      { q: 'What are the email drafts for?', a: "They're ready-to-copy replies you can send directly to your vendor. Each analysis generates three versions — Friendly (collaborative tone), Direct (professional and to the point), and Firm (assertive with clear expectations). Pick the one that fits your relationship with the vendor and copy it." },
+      { q: 'What do I get back from an analysis?', a: "First, a fast initial assessment — a deal score, red flags, and an estimate of potential savings, usually in under a minute. From there, the Full Analysis goes deeper: negotiation levers, recommended asks, priorities, and strategy. Once you have what you need, generate a ready-to-send email yourself or have TermLift negotiate the deal for you." },
+      { q: 'What are the email drafts for?', a: "They're ready-to-copy replies you can send directly to your supplier once you're ready to act on the analysis. Each one comes in three tones — Friendly, Direct, and Firm. Pick the one that fits your relationship with the supplier and copy it." },
       { q: 'Is the AI always accurate?', a: 'No. AI can miss details, misinterpret terms, or make errors. TermLift is a starting point for negotiation, not the final word. Always review the outputs against your original documents before acting on them. If something looks off, it probably is — trust your judgment.' },
     ],
   },
@@ -59,11 +59,11 @@ const faqData: Record<Section, { title: string; sub: string; items: { q: string;
   },
   billing: {
     title: 'Account & billing',
-    sub: 'Plans, pricing, and account management',
+    sub: 'Pricing and account management',
     items: [
-      { q: "What's the free plan?", a: 'You get 1 free analysis with no signup required. Create an account and you get 3 more — 4 total on the Starter plan. No credit card needed.' },
-      { q: 'What does Essentials cost?', a: '€39/month for 15 analyses a month, saved deals, up to 3 negotiation rounds per deal, full deal history, and PDF export. Cancel anytime.' },
-      { q: 'What does Pro cost?', a: '€129/month for unlimited analyses, unlimited negotiation rounds, a full spend dashboard, and savings tracking. Cancel anytime.' },
+      { q: "Is analyzing a quote free?", a: 'Yes — analyze a quote with no signup required, and no credit card. Create an account to save deals and keep going from there.' },
+      { q: 'How much does Full Analysis cost?', a: "We haven't finalized Full Analysis pricing yet. For now it's included once you've started an analysis on a deal — we'll be upfront here before that changes." },
+      { q: 'What does it cost to have TermLift negotiate for me?', a: "Nothing upfront. If you'd rather hand the negotiation over, our fee is a success-based percentage of the savings we help you achieve — no savings, no fee." },
       { q: 'Can I delete my account?', a: "Yes. Go to your profile settings and choose 'Delete account.' All your data — saved deals, analysis history, account info — is permanently removed. This cannot be undone." },
     ],
   },
@@ -162,7 +162,7 @@ export default function HelpPage() {
                   className="inline-flex items-center gap-1.5 text-[13px] font-bold px-4 py-2.5 rounded-xl text-white transition-all hover:-translate-y-0.5"
                   style={{ background: green, boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}
                 >
-                  Try free <ArrowRight className="w-3.5 h-3.5" />
+                  Analyze a quote <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>

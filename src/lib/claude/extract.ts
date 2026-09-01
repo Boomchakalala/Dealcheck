@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { anthropic, CLAUDE_MODEL, getResponseText, parseJsonFromContent, buildImageContent, SUPPORTED_IMAGE_MIME_TYPES, type ClaudeImageMediaType } from './client'
+import { createTrackedMessage, CLAUDE_MODEL, getResponseText, parseJsonFromContent, buildImageContent, SUPPORTED_IMAGE_MIME_TYPES, type ClaudeImageMediaType } from './client'
 
 const EXTRACTION_PROMPT = `You are a financial data extraction engine. Your ONLY job is to extract factual information from vendor quotes. Do NOT analyze, judge, or recommend — just extract.
 
@@ -93,7 +93,7 @@ export async function extractFinancialFacts(
     userContent = userPrompt
   }
 
-  const response = await anthropic.messages.create({
+  const response = await createTrackedMessage('extract', {
     model: CLAUDE_MODEL,
     max_tokens: 1024,
     // CRITICAL: Extraction is ALWAYS language-agnostic. Never inject language instructions here.

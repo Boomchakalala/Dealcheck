@@ -6,6 +6,7 @@ import { HeroVerdict } from '@/components/HeroVerdict'
 import { getDemoDeal, demoDeals } from '@/lib/demo-data'
 import { normalizeAmount, detectCurrency, formatCurrency, parseMoney as parseMoneyLib } from '@/lib/currency'
 import type { DealOutput } from '@/types'
+import { shortenVendorDisplayName } from '@/lib/vendor-normalize'
 
 export function generateStaticParams() {
   return demoDeals.map((d) => ({ dealId: d.id }))
@@ -57,7 +58,7 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
   const snapshotDealType = (latestOutput as DealOutput)?.snapshot?.deal_type
   const effectiveDealType = snapshotDealType || 'Renewal'
 
-  const shortVendorName = dealName.replace(/\s*(International|Inc\.?|LLC|Ltd\.?|Limited|Corp\.?|Corporation|GmbH|S\.?A\.?S?\.?|B\.?V\.?|PLC|AG|SE|\(.*?\))\s*/gi, ' ').replace(/\s+/g, ' ').trim()
+  const shortVendorName = shortenVendorDisplayName(dealName)
 
   const score = (latestOutput as any)?.score as number | undefined
   const scoreLabel = (latestOutput as any)?.score_label as string | undefined
@@ -271,6 +272,8 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
           addRoundForm={addRoundForm}
           messages={messages}
           demoMode={true}
+          showFullPlaybook={true}
+          negotiateHref="/negotiate"
         />
       )}
     </div>

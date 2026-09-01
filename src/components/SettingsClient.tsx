@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import {
   User, CreditCard, Globe, Shield, AlertTriangle, Bell,
   Briefcase, Check, Loader2, Mail, Target, Zap, ChevronDown,
@@ -373,16 +372,9 @@ export function SettingsClient({
                     <ManageSubscriptionButton label={locale === 'fr' ? 'Gerer l\'abonnement' : 'Manage subscription'} />
                   </>
                 ) : (
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-[13px] font-medium text-slate-900 mb-0.5">{planLabel} plan</p>
-                      <p className="text-[11px] text-slate-400">{remaining} analyses remaining</p>
-                    </div>
-                    {!isAdmin && (
-                      <Link href="/pricing" className="text-[12px] font-semibold px-5 py-2.5 rounded-xl text-white bg-emerald-600 hover:bg-emerald-700 transition-colors">
-                        {t('settingsClient.upgradePlan')}
-                      </Link>
-                    )}
+                  <div>
+                    <p className="text-[13px] font-medium text-slate-900 mb-0.5">Analyzing is free</p>
+                    <p className="text-[11px] text-slate-400">{remaining} free {remaining === 1 ? 'analysis' : 'analyses'} remaining. Full Analysis unlocks the negotiation workspace for a deal once you start it.</p>
                   </div>
                 )}
               </div>

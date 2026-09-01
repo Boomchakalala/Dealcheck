@@ -4,7 +4,12 @@ import { createClient } from '@/lib/supabase/server'
 import { AddRoundSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/claude'
 import { checkRateLimit } from '@/lib/rate-limit'
-import { FREE_ANALYSIS_LIMIT, ESSENTIALS_MONTHLY_LIMIT, ESSENTIALS_MAX_ROUNDS } from '@/lib/tiers'
+import { FREE_ANALYSIS_LIMIT, ESSENTIALS_MONTHLY_LIMIT } from '@/lib/tiers'
+import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
+import { MAX_ROUNDS_PER_DEAL } from '@/lib/ai-limits'
+import { runWithAiContext } from '@/lib/ai-telemetry'
+import { canAccessFullAnalysis } from '@/lib/deep-analysis-status'
+import type { DealOutput, DealOutputV2 } from '@/types'
 
 // Allow up to 120s for classification + analysis with retries (Vercel Pro plan)
 export const maxDuration = 120
@@ -77,7 +82,7 @@ export async function POST(
       if (plan === 'free') {
         if (profile.usage_count >= FREE_ANALYSIS_LIMIT) {
           return NextResponse.json(
-            { error: `Starter plan limited to ${FREE_ANALYSIS_LIMIT} analyses. Upgrade to Essentials (\u20AC39/mo) or Pro (\u20AC129/mo) for more.` },
+            { error: `You've used all ${FREE_ANALYSIS_LIMIT} of your free analyses. Contact us if you need to analyze more deals.` },
             { status: 403 }
           )
         }
@@ -127,11 +132,26 @@ export async function POST(
     const lastRound = previousRounds?.[0]
     const nextRoundNumber = lastRound ? lastRound.round_number + 1 : 1
 
-    // Enforce multi-round limit for Essentials
-    if (!profile.is_admin && profile.plan === 'essentials' && nextRoundNumber > ESSENTIALS_MAX_ROUNDS) {
+    // Round 2+ belongs to the deal's unlocked negotiation workspace \u2014 the
+    // UI already hides this action until Full Analysis is unlocked, but
+    // "frontend hiding does NOT count as protection": enforce it here too,
+    // since this endpoint is directly callable regardless of what the UI
+    // shows. Round 1 (nextRoundNumber === 1) has no prior output to check
+    // and is always allowed \u2014 it IS the deal's first analysis.
+    if (nextRoundNumber > 1 && !profile.is_admin && !canAccessFullAnalysis(lastRound?.output_json)) {
       return NextResponse.json(
-        { error: `Essentials plan limited to ${ESSENTIALS_MAX_ROUNDS} rounds per deal. Upgrade to Pro (\u20AC129/mo) for unlimited rounds.` },
+        { error: 'Unlock Full Analysis for this deal before adding another round.' },
         { status: 403 }
+      )
+    }
+
+    // Hard safety ceiling on rounds per deal \u2014 a fair-use safeguard against
+    // runaway model-call cost on one deal, not a marketed limit. Applies
+    // regardless of plan, admin included; see lib/ai-limits.ts.
+    if (nextRoundNumber > MAX_ROUNDS_PER_DEAL) {
+      return NextResponse.json(
+        { error: `This deal has reached the maximum of ${MAX_ROUNDS_PER_DEAL} negotiation rounds.` },
+        { status: 429 }
       )
     }
     const previousOutput = lastRound?.output_json
@@ -140,7 +160,7 @@ export async function POST(
     const locale = (await cookies()).get('termlift_lang')?.value || 'en'
 
     // Analyze with context from previous round (auto-retry on transient failures)
-    const output = await withRetry(() => analyzeDeal(
+    const output = await runWithAiContext({ userId: user.id, dealId }, () => withRetry(() => analyzeDeal(
       validated.extractedText,
       deal.deal_type,
       deal.goal || undefined,
@@ -151,7 +171,7 @@ export async function POST(
       locale,
       undefined,
       (profile as any)?.negotiation_preferences || undefined
-    ))
+    )))
 
     // Create new round
     const { data: round, error: roundError } = await supabase
@@ -188,9 +208,13 @@ export async function POST(
       .update({ updated_at: new Date().toISOString() })
       .eq('id', dealId)
 
+    const responseOutput = profile.is_admin || SHOW_FULL_NEGOTIATION_PLAYBOOK
+      ? output
+      : stripAdvancedOutput(output as DealOutput | DealOutputV2)
+
     return NextResponse.json({
       roundId: round.id,
-      output,
+      output: responseOutput,
     })
   } catch (error) {
     console.error('Add round error:', error)
@@ -200,8 +224,36 @@ export async function POST(
   }
 }
 
-// Helper to render markdown from output JSON
+// Helper to render markdown from output JSON. email_drafts and disclaimer
+// are legacy fields the current fast pipeline (see lib/claude/index.ts)
+// deliberately no longer produces — email generation moved to the on-demand
+// /api/deal/regenerate-emails endpoint. Both sections are omitted cleanly
+// when absent rather than assumed present.
 function renderMarkdown(output: any): string {
+  const emailDraftsSection = output.email_drafts ? `
+## Email Drafts
+
+### Neutral
+**Subject:** ${output.email_drafts.neutral.subject}
+
+${output.email_drafts.neutral.body}
+
+### Firm
+**Subject:** ${output.email_drafts.firm.subject}
+
+${output.email_drafts.firm.body}
+
+### Final Push
+**Subject:** ${output.email_drafts.final_push.subject}
+
+${output.email_drafts.final_push.body}
+` : ''
+
+  const disclaimerSection = output.disclaimer ? `
+## Disclaimer
+${output.disclaimer}
+` : ''
+
   return `# ${output.title}
 
 ## Snapshot
@@ -255,28 +307,8 @@ ${(output.what_to_ask_for?.must_have || []).map((ask: string) => `- ${ask}`).joi
 
 ### Nice-to-Have
 ${(output.what_to_ask_for?.nice_to_have || []).map((ask: string) => `- ${ask}`).join('\n')}
-
-## Email Drafts
-
-### Neutral
-**Subject:** ${output.email_drafts.neutral.subject}
-
-${output.email_drafts.neutral.body}
-
-### Firm
-**Subject:** ${output.email_drafts.firm.subject}
-
-${output.email_drafts.firm.body}
-
-### Final Push
-**Subject:** ${output.email_drafts.final_push.subject}
-
-${output.email_drafts.final_push.body}
-
+${emailDraftsSection}
 ## Assumptions
 ${(output.assumptions || []).map((a: string) => `- ${a}`).join('\n')}
-
-## Disclaimer
-${output.disclaimer}
-`
+${disclaimerSection}`
 }

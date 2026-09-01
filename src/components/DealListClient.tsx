@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { CloseDealModal } from '@/components/CloseDealModal'
-import { AlertTriangle, CheckCircle2, TrendingDown, Pause, Trash2, MoreHorizontal } from 'lucide-react'
+import { CheckCircle2, TrendingDown, Pause, Trash2, MoreHorizontal } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
 import { useI18n } from '@/i18n/context'
 import { normalizeAmount, detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
@@ -88,60 +88,6 @@ function getPotentialSavings(deal: any): number {
   return 0
 }
 
-// Score ring — exact spec: 36x36, r=14, circumference=87.96
-function ScoreRing({ score, isClosed, isWon }: { score: number; isClosed: boolean; isWon: boolean }) {
-  const size = 42
-  const r = 16
-  const circumference = 2 * Math.PI * r
-  const offset = circumference * (1 - score / 100)
-
-  let ringStroke: string
-  let numColor: string
-  let trackStroke: string
-
-  if (isWon) {
-    ringStroke = '#1DB954'
-    numColor = '#15803D'
-    trackStroke = '#c5e8d0'
-  } else if (isClosed) {
-    ringStroke = '#9CA3AF'
-    numColor = '#9CA3AF'
-    trackStroke = '#E4E6EA'
-  } else if (score >= 60) {
-    ringStroke = '#1DB954'
-    numColor = '#15803D'
-    trackStroke = '#D1FAE5'
-  } else if (score >= 40) {
-    ringStroke = '#F59E0B'
-    numColor = '#B45309'
-    trackStroke = '#FEF3C7'
-  } else {
-    ringStroke = '#EF4444'
-    numColor = '#DC2626'
-    trackStroke = '#FECDC5'
-  }
-
-  return (
-    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={trackStroke} strokeWidth={3.5} />
-        <circle
-          cx={size / 2} cy={size / 2} r={r} fill="none"
-          stroke={ringStroke} strokeWidth={3.5}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="font-bold leading-none" style={{ fontSize: 12, color: numColor }}>
-          {score}
-        </span>
-      </div>
-    </div>
-  )
-}
-
 function DealMenu({ dealId, isClosed, totalCommitment, roundCount, hasSavings, onClose, onDelete, t }: {
   dealId: string; isClosed: boolean; totalCommitment?: string; roundCount: number; hasSavings: boolean
   onClose: (dealId: string, total: string | undefined, roundCount: number) => void
@@ -216,127 +162,75 @@ export function DealListClient({ deals: initialDeals, onDealDeleted, linkBase = 
 
   return (
     <>
-      <div className="space-y-3">
-        {deals.map((deal) => {
-          const latestRound = getLatestRound(deal)
-          const latestOutput = latestRound?.output_json
-          const vendorName = deal.vendor || latestOutput?.vendor || deal.title
-          const rawCategory = latestOutput?.category || ''
-          const category = rawCategory ? normalizeCategory(rawCategory) : null
-          const quoteScore = latestOutput?.score as number | undefined
-          const isClosed = !!deal.status?.startsWith('closed_')
-          const isWon = deal.status === 'closed_won'
-          const totalCommitment = latestOutput?.snapshot?.total_commitment
-          const redFlagCount = latestOutput?.red_flags?.length || 0
-          const roundCount = deal.rounds?.length || 0
-          const status = getStatusConfig(deal, t)
-          const potentialSavings = getPotentialSavings(deal)
-          const achievedSavings = deal.savings_amount || 0
-          const savingsToShow = isClosed && achievedSavings > 0 ? achievedSavings : potentialSavings
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="hidden md:grid grid-cols-[2fr_1fr_0.7fr_1fr_1fr_1fr_auto] gap-4 px-5 py-2.5 border-b border-slate-100 bg-slate-50/60 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          <span>Vendor</span><span>Status</span><span>Flags</span><span>Total</span><span>Savings</span><span>Updated</span><span className="w-4" />
+        </div>
+        <div className="divide-y divide-slate-100">
+          {deals.map((deal) => {
+            const latestRound = getLatestRound(deal)
+            const latestOutput = latestRound?.output_json
+            const vendorName = deal.vendor || latestOutput?.vendor || deal.title
+            const rawCategory = latestOutput?.category || ''
+            const category = rawCategory ? normalizeCategory(rawCategory) : null
+            const isClosed = !!deal.status?.startsWith('closed_')
+            const isWon = deal.status === 'closed_won'
+            const totalCommitment = latestOutput?.snapshot?.total_commitment
+            const redFlagCount = latestOutput?.red_flags?.length || 0
+            const roundCount = deal.rounds?.length || 0
+            const status = getStatusConfig(deal, t)
+            const potentialSavings = getPotentialSavings(deal)
+            const achievedSavings = deal.savings_amount || 0
+            const savingsToShow = isClosed && achievedSavings > 0 ? achievedSavings : potentialSavings
+            const totalAmount = parseMoney(totalCommitment || '0').amount
+            const savingsPct = totalAmount > 0 ? Math.min((savingsToShow / totalAmount) * 100, 50) : 0
+            const isMeaningful = savingsToShow >= 100 && savingsPct >= 1
 
-          // Company initial for icon
-          const initial = (vendorName || 'D').charAt(0).toUpperCase()
+            let savingsLabel: string | null = null
+            if (isClosed && achievedSavings > 0) {
+              savingsLabel = `${formatSavingsStr(Math.round(savingsToShow), locale, totalCommitment)} ${locale === 'fr' ? 'économisés' : 'saved'}`
+            } else if (isMeaningful) {
+              savingsLabel = `${formatSavingsStr(Math.round(savingsToShow), locale, totalCommitment)} ${locale === 'fr' ? 'potentiel' : 'potential'}`
+            }
+            const isAchieved = isClosed && achievedSavings > 0
 
-          return (
-            <Link key={deal.id} href={`${linkBase}/deal/${deal.id}`}>
-              <div
-                className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all cursor-pointer group ${
-                  deletingId === deal.id ? 'opacity-50' : ''
-                } ${isWon
-                  ? 'bg-emerald-50 border-2 border-emerald-300 shadow-sm hover:shadow-md'
-                  : isClosed
-                  ? 'bg-slate-50 border border-slate-200 opacity-80 hover:opacity-100 hover:border-slate-300'
-                  : 'bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-sm'
-                }`}
-              >
-                {/* Icon */}
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                  isWon ? 'bg-emerald-500' : isClosed ? 'bg-slate-200' : 'bg-slate-100'
-                }`}>
-                  {isWon ? (
-                    <CheckCircle2 className="w-5 h-5 text-white" />
-                  ) : (
-                    <span className={`text-[14px] font-bold ${isClosed ? 'text-slate-400' : 'text-slate-600'}`}>
-                      {initial}
-                    </span>
-                  )}
-                </div>
-
-                {/* Vendor + meta */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className={`min-w-0 text-[15px] font-semibold leading-snug line-clamp-2 ${isWon ? 'text-emerald-900' : isClosed ? 'text-slate-500' : 'text-slate-900'}`}>
-                      {vendorName}
-                    </span>
-                    <div className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                      <DealMenu
-                        dealId={deal.id} isClosed={isClosed} totalCommitment={totalCommitment}
-                        roundCount={roundCount} hasSavings={achievedSavings > 0}
-                        onClose={handleClose} onDelete={handleDelete} t={t}
-                      />
+            return (
+              <div key={deal.id} className={`group relative ${deletingId === deal.id ? 'opacity-50' : ''}`}>
+                <Link href={`${linkBase}/deal/${deal.id}`} className="block">
+                  <div className="md:grid md:grid-cols-[2fr_1fr_0.7fr_1fr_1fr_1fr_auto] md:items-center gap-4 px-5 py-3.5 hover:bg-slate-50 transition-colors">
+                    <div className="min-w-0">
+                      <p className={`text-[14px] font-semibold truncate ${isWon ? 'text-emerald-900' : isClosed ? 'text-slate-500' : 'text-slate-900'} group-hover:text-emerald-700 transition-colors`}>{vendorName}</p>
+                      {category && <p className="text-[11.5px] text-slate-400 mt-0.5 md:hidden">{category}</p>}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className={`inline-flex flex-shrink-0 items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${status.badge}`}>
-                      {status.icon}
-                      {status.label}
-                    </span>
-                    {redFlagCount > 0 && !isClosed && (
-                      <span className="inline-flex flex-shrink-0 items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#FAECE7] text-[#993C1D]">
-                        <AlertTriangle className="w-3 h-3" />
-                        {redFlagCount} {redFlagCount === 1 ? 'flag' : 'flags'}
+                    <div className="mt-1.5 md:mt-0">
+                      <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md w-fit ${status.badge}`}>
+                        {status.icon}{status.label}
                       </span>
-                    )}
-                  </div>
-                  <p className="text-[12px] text-slate-400 mt-0.5">
-                    {category && <>{category} &middot; </>}{getTimeAgo(deal.updated_at, t, locale)}
-                  </p>
-                </div>
-
-                {/* Amount + savings */}
-                <div className="text-right flex-shrink-0">
-                  {totalCommitment ? (
-                    <p className={`text-[15px] font-bold ${isWon ? 'text-emerald-800' : isClosed ? 'text-slate-400' : 'text-slate-900'}`}>
-                      {formatAmount(totalCommitment)}
+                    </div>
+                    <p className="hidden md:block text-[13px] font-semibold" style={{ color: !isClosed && redFlagCount >= 3 ? '#dc2626' : !isClosed && redFlagCount > 0 ? '#f59e0b' : '#cbd5e1' }}>
+                      {!isClosed && redFlagCount > 0 ? redFlagCount : '—'}
                     </p>
-                  ) : (
-                    <p className="text-[15px] font-bold text-slate-300">—</p>
-                  )}
-                  {savingsToShow > 0 && (() => {
-                    const totalAmount = parseMoney(totalCommitment || '0').amount
-                    const savingsPct = totalAmount > 0 ? Math.min((savingsToShow / totalAmount) * 100, 50) : 0
-                    const isMeaningful = savingsToShow >= 100 && savingsPct >= 1
-
-                    if (isClosed && achievedSavings > 0) {
-                      return (
-                        <p className={`text-[12px] font-medium mt-0.5 ${isWon ? 'text-emerald-600' : 'text-slate-400'}`}>
-                          {formatSavingsStr(Math.round(savingsToShow), locale, totalCommitment)} {locale === 'fr' ? 'économisés' : 'saved'}
-                        </p>
-                      )
-                    }
-                    if (isMeaningful) {
-                      return (
-                        <p className="text-[12px] font-medium text-emerald-600 mt-0.5">
-                          {formatSavingsStr(Math.round(savingsToShow), locale, totalCommitment)} {locale === 'fr' ? 'potentiel' : 'potential'}
-                        </p>
-                      )
-                    }
-                    return null
-                  })()}
-                </div>
-
-                {/* Score ring */}
-                {quoteScore != null ? (
-                  <ScoreRing score={quoteScore} isClosed={isClosed} isWon={isWon} />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
-                    <span className="text-[11px] font-semibold text-slate-300">--</span>
+                    <p className="hidden md:block text-[13px] text-slate-600">{totalCommitment ? formatAmount(totalCommitment) : '—'}</p>
+                    <p className={
+                      !savingsLabel ? 'hidden md:block text-[13px] font-semibold text-slate-300'
+                      : isAchieved ? 'hidden md:block text-[13.5px] font-bold text-emerald-700'
+                      : 'hidden md:block text-[13px] font-semibold text-emerald-600'
+                    }>{savingsLabel || '—'}</p>
+                    <p className="hidden md:block text-[13px] text-slate-500">{getTimeAgo(deal.updated_at, t, locale)}</p>
+                    <span className="hidden md:block w-4" />
                   </div>
-                )}
+                </Link>
+                <div className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <DealMenu
+                    dealId={deal.id} isClosed={isClosed} totalCommitment={totalCommitment}
+                    roundCount={roundCount} hasSavings={achievedSavings > 0}
+                    onClose={handleClose} onDelete={handleDelete} t={t}
+                  />
+                </div>
               </div>
-            </Link>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
 
       {dealToClose && (

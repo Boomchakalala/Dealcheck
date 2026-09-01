@@ -25,16 +25,21 @@ export { CLAUDE_MODEL_ID } from './claude/client'
 
 // Re-export getClaudeResponse for routes that make their own AI calls
 // (regenerate-emails, estimate-close, close)
-import { anthropic, CLAUDE_MODEL, getResponseText, type ClaudeUserContent } from './claude/client'
+import { CLAUDE_MODEL, getResponseText, createTrackedMessage, type ClaudeUserContent } from './claude/client'
 
 export async function getClaudeResponse(params: {
+  // Identifies what this call is for in ai_usage_events (e.g.
+  // 'email_regenerate', 'close_estimate', 'close_summary') — required so
+  // every getClaudeResponse() call site is accounted for, not just the
+  // pipeline's own steps.
+  action: string
   system: string
   userContent: ClaudeUserContent
   max_tokens?: number
   temperature?: number
 }): Promise<string> {
-  const { system, userContent, max_tokens = 1024, temperature = 0 } = params
-  const response = await anthropic.messages.create({
+  const { action, system, userContent, max_tokens = 1024, temperature = 0 } = params
+  const response = await createTrackedMessage(action, {
     model: CLAUDE_MODEL,
     max_tokens,
     system,
@@ -54,3 +59,9 @@ export { calculateQuoteScore, parseMoneyAmount } from './claude/score'
 
 // Re-export classification
 export { classifyQuote } from './claude/classify'
+
+// Re-export extraction + total-commitment validation — used by
+// /api/deal/extract-preview (the lightweight classify+extract-only route)
+// and /api/deal/create (to type the precomputed result it forwards back in)
+export { extractFinancialFacts, type ExtractedFacts } from './claude/extract'
+export { validateTotalCommitment } from './claude/validate-total'

@@ -3,7 +3,7 @@
   "nav.howItWorks": "How it works",
   "nav.examples": "Examples",
   "nav.signIn": "Sign in",
-  "nav.tryFree": "Try free",
+  "nav.tryFree": "Analyze a quote",
   "nav.deals": "Deals",
   "nav.dashboard": "Dashboard",
   "nav.help": "Help",
@@ -19,7 +19,7 @@
   "hero.subtitle": "Drop in a vendor quote. Get back exactly where you're overpaying, what to push for, and a ready-to-send email.",
   "hero.cta": "Analyze a quote free",
   "hero.ctaSecondary": "See a real example",
-  "hero.noSignup": "No signup needed. Free to try.",
+  "hero.noSignup": "No signup needed to get started.",
 
   "hero.check1": "Spot hidden fees, inflated rates, and unfavorable clauses",
   "hero.check2": "Get a negotiation playbook with asks that move the needle",

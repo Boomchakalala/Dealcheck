@@ -5,7 +5,7 @@ import { VendorsListClient } from '@/components/VendorsListClient'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata = { title: 'Vendors — TermLift' }
+export const metadata = { title: 'Vendors' }
 
 export default async function VendorsPage() {
   const supabase = await createClient()

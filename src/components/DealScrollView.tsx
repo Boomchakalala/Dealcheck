@@ -1,17 +1,23 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Mail, Sparkles, Loader2, Target, DollarSign, Zap, TrendingUp, Shield, BookOpen, Send, Clock, Briefcase, Copy, ArrowRight } from 'lucide-react'
+import { useState, useMemo, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Mail, Sparkles, Loader2, Target, DollarSign, Zap, TrendingUp, Shield, BookOpen, Send, Clock, Briefcase, Copy, ArrowRight, Microscope, Plus, ThumbsDown, ThumbsUp, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { normalizeAmount, formatCurrency, parseMoney, detectCurrency } from '@/lib/currency'
 import type { DealOutput, DealOutputV2 } from '@/types'
 import type { Plan } from '@/lib/tiers'
-import { FeatureGate } from '@/components/FeatureGate'
 import { getCanOffer } from '@/lib/email-asks'
+import { hasDeepContent as computeHasDeepContent } from '@/lib/deep-analysis-status'
+import { TONE_LABELS, type EmailTone } from '@/lib/tone-recommend'
 
 interface DealScrollViewProps {
   latestOutput: any
   latestRoundId: string
+  /** Deal-type inference result (deterministic, computed server-side from
+   *  already-extracted data — see lib/deal-type-inference.ts). Threaded into
+   *  email generation so renewal vs. new-purchase framing is correct. */
+  inferredDealType?: 'renewal' | 'new_purchase' | 'expansion' | 'unknown'
   isV2: boolean
   schemaVersion: string
   score: number | undefined
@@ -39,6 +45,21 @@ interface DealScrollViewProps {
   messages: Record<string, Record<string, string>>
   /** Demo mode: the "Generate email" button becomes a signup prompt instead of hitting the API. */
   demoMode?: boolean
+  /** When false, the full DIY playbook (asks, leverage, email drafts) is replaced with a teaser + "Get this deal negotiated" CTA. */
+  showFullPlaybook: boolean
+  /** Where the teaser's CTA links. Defaults to `/app/deal/{dealId}/negotiate` — override when there's no real saved deal yet (e.g. the anonymous trial view). */
+  negotiateHref?: string
+  /** Whether a negotiation_requests row already exists for this deal — one of
+   *  the signals that real negotiation activity has started (see hasNegotiationActivity). */
+  hasNegotiationRequest?: boolean
+  /** Free-text context already saved on this deal's negotiation_requests row
+   *  (if one exists) — reused to prefill the email generator's optional
+   *  context fields rather than asking the user to re-type it. */
+  savedNegotiationContext?: {
+    objective?: string
+    walkAwayNotes?: string
+    competitorContext?: string
+  }
 }
 
 // ─── helpers ──────────────────────────────────────────────
@@ -54,18 +75,49 @@ function getNextBusinessDate(daysOut = 5) {
 // ─── component ────────────────────────────────────────────
 export function DealScrollView(props: DealScrollViewProps) {
   const {
-    latestOutput, latestRoundId, isV2,
+    latestOutput, latestRoundId, inferredDealType, isV2,
     score, scoreLabel, scoreRationale, totalCommitment, term,
     redFlagCount, potentialSavings, dealCurrency,
     sortedRounds, dealId, dealStatus, locale,
     closeSummary, savingsAmount, savingsPercent, closedAt, whatChanged, originalTotal,
-    userPlan, isAdmin, addRoundForm, messages, demoMode,
+    userPlan, isAdmin, addRoundForm, messages, demoMode, showFullPlaybook,
+    negotiateHref = `/app/deal/${dealId}/negotiate`,
+    hasNegotiationRequest = false,
+    savedNegotiationContext,
   } = props
 
   const o = latestOutput as DealOutput
   const isClosed = dealStatus?.startsWith('closed_')
   const latestRound = sortedRounds[0]
   const fmtSav = (n: number) => formatCurrency(n, dealCurrency as any)
+  const router = useRouter()
+
+  // ── deep analysis (on-demand enrichment) ──
+  const deepAnalysisStatus = (o as any)?.deep_analysis_status as 'idle' | 'running' | 'done' | undefined
+  // Shared with the server-rendered hero (page.tsx) so both branch on the
+  // exact same signal — see lib/deep-analysis-status.ts for the legacy-deal
+  // reasoning behind this formula.
+  const hasDeepContent = computeHasDeepContent(o)
+  // Seeded from server truth so a page load/refresh mid-run (another tab,
+  // or this one) shows the in-progress state immediately instead of the
+  // idle CTA — no polling added, so it won't self-clear if that other
+  // session's run finishes without this page refreshing again.
+  const [deepAnalysisLoading, setDeepAnalysisLoading] = useState(deepAnalysisStatus === 'running')
+  const [deepAnalysisError, setDeepAnalysisError] = useState<string | null>(null)
+  const handleDeepAnalysis = async () => {
+    if (deepAnalysisLoading || deepAnalysisStatus === 'done') return
+    setDeepAnalysisLoading(true); setDeepAnalysisError(null)
+    try {
+      const res = await fetch(`/api/deal/${dealId}/deep-analysis`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Deep analysis failed')
+      router.refresh()
+    } catch (err) {
+      setDeepAnalysisError(err instanceof Error ? err.message : 'Deep analysis failed')
+    } finally {
+      setDeepAnalysisLoading(false)
+    }
+  }
 
   const t = (key: string, vars?: Record<string, string | number>) => {
     let text = messages[locale]?.[key] || messages.en[key] || key
@@ -106,6 +158,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
   // ── email state ───────────────────────────
   const bizDate = getNextBusinessDate()
+  const toneOrder: EmailTone[] = ['neutral', 'firm', 'final_push']
   const [emailTab, setEmailTab] = useState(0)
   const [emailSubjects, setEmailSubjects] = useState([
     o?.email_drafts?.neutral?.subject?.replace(/\[DATE\]/gi, bizDate) || '',
@@ -117,19 +170,46 @@ export function DealScrollView(props: DealScrollViewProps) {
     o?.email_drafts?.firm?.body?.replace(/\[DATE\]/gi, bizDate) || '',
     o?.email_drafts?.final_push?.body?.replace(/\[DATE\]/gi, bizDate) || '',
   ])
+  // "Additional instructions" (Part 2, field 6) — same field that used to be
+  // the bare "custom instructions" box, just relabeled and moved into the
+  // context panel below.
   const [customPrompt, setCustomPrompt] = useState('')
   const [regenerating, setRegenerating] = useState(false)
   const [regenError, setRegenError] = useState<string | null>(null)
   const [remainingRegens, setRemainingRegens] = useState(3)
   const [copiedEmail, setCopiedEmail] = useState(false)
 
+  // Optional user-supplied negotiation context (Part 2) — everything the
+  // quote/analysis can't reliably know. Objective and competing-quote
+  // prefill from an existing negotiation_requests row for this deal where
+  // available (Part 6); nothing here is persisted anywhere new — see the
+  // "Needs decision" note in the report on why.
+  const [showEmailContext, setShowEmailContext] = useState(false)
+  const [negotiationObjective, setNegotiationObjective] = useState(savedNegotiationContext?.objective || '')
+  const [budgetCeiling, setBudgetCeiling] = useState('')
+  const [competingQuote, setCompetingQuote] = useState(savedNegotiationContext?.competitorContext || '')
+  const [walkAwayFlexibility, setWalkAwayFlexibility] = useState<'flexible' | 'prefer_stay' | 'can_walk' | ''>('')
+  const [internalDeadline, setInternalDeadline] = useState('')
+
   const hasEmail = !!(o?.email_drafts?.neutral?.body)
-  const [showGeneratePanel, setShowGeneratePanel] = useState(false)
+
+  // Real negotiation activity — an analysis by itself is not a negotiation
+  // round. sortedRounds.length > 1 means a genuine round 2+ (vendor response
+  // uploaded, counter-offer added) already exists.
+  const hasNegotiationActivity = sortedRounds.length > 1 || hasEmail || hasNegotiationRequest || isClosed
+  // Email section starts collapsed to a single entry CTA unless an email
+  // already exists (a prior visit already generated one) — the permanent
+  // "Ready-to-send negotiation email" section should not appear before the
+  // user chooses that path.
+  const [emailSectionOpened, setEmailSectionOpened] = useState(false)
+  const emailSectionVisible = emailSectionOpened || hasEmail
+  const openEmailSection = () => { setEmailSectionOpened(true) }
 
   const handleGenerate = async () => {
     if (demoMode || !latestRoundId || remainingRegens <= 0) return
     setRegenerating(true); setRegenError(null)
     try {
+      const highSeverityFlagCount = (o?.red_flags || []).filter((f: any) => String(f?.severity || '').toLowerCase() === 'high').length
       const res = await fetch('/api/deal/regenerate-emails', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -145,18 +225,44 @@ export function DealScrollView(props: DealScrollViewProps) {
           redFlagAsks: (o?.red_flags || []).map((f: any) => f.what_to_ask_for).filter(Boolean),
           canOffer: getCanOffer(o),
           conclusion: o?.quick_read?.conclusion,
+          dealType: inferredDealType && inferredDealType !== 'unknown' ? inferredDealType : undefined,
+          // Automatic context (Part 1) — pulled from the existing analysis,
+          // never re-asked of the user.
+          targetPriceLow: (o as any)?.target_price_range?.low,
+          targetPriceHigh: (o as any)?.target_price_range?.high,
+          potentialSavingsTotal: savingsData.total > 0 ? fmtSav(savingsData.total) : undefined,
+          leverageYouHave: o?.negotiation_plan?.leverage_you_have || [],
+          paymentTerms: o?.snapshot?.billing_payment,
+          pricingModel: o?.snapshot?.pricing_model,
+          leverageLevel: (o as any)?.classification?.leverage_level,
+          highSeverityFlagCount,
+          // Optional user context (Part 2) — omitted entirely when blank.
+          negotiationObjective: negotiationObjective.trim() || undefined,
+          budgetCeiling: budgetCeiling.trim() || undefined,
+          competingQuote: competingQuote.trim() || undefined,
+          walkAwayFlexibility: walkAwayFlexibility || undefined,
+          internalDeadline: internalDeadline.trim() || undefined,
         }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
       setEmailSubjects(data.emails.map((e: any) => e.subject))
       setEmailBodies(data.emails.map((e: any) => e.body))
+      const recIdx = toneOrder.indexOf(data.recommendedTone)
+      setEmailTab(recIdx >= 0 ? recIdx : 0)
       setRemainingRegens(data.remainingRegenerations)
       setCustomPrompt('')
-      setShowGeneratePanel(false)
+      setShowEmailContext(false)
     } catch (err) { setRegenError(err instanceof Error ? err.message : 'Failed') }
     finally { setRegenerating(false) }
   }
+
+  // Post-generation tone adjustment (Part 4) — switches between the 3
+  // variants already returned by the one generation call above; never
+  // triggers a new LLM call. neutral(0) -> firm(1) -> final_push(2) is a
+  // soft-to-firm spectrum, so this is just a clamped index shift.
+  const makeSofter = () => setEmailTab((t) => Math.max(0, t - 1))
+  const makeFirmer = () => setEmailTab((t) => Math.min(2, t + 1))
 
   // ── flag sorting ──────────────────────────
   const sortedFlags = useMemo(() => {
@@ -191,11 +297,6 @@ export function DealScrollView(props: DealScrollViewProps) {
   // ── score breakdown ───────────────────────
   const bd = o?.score_breakdown
 
-  const emailTones = [
-    { label: locale === 'fr' ? 'Amical' : 'Friendly', desc: locale === 'fr' ? 'Chaleureux' : 'Warm & collaborative' },
-    { label: 'Direct', desc: locale === 'fr' ? 'Clair' : 'Clear & focused' },
-    { label: locale === 'fr' ? 'Ferme' : 'Firm', desc: locale === 'fr' ? 'Urgent' : 'Urgent & deadline-driven' },
-  ]
 
   // ═══════════════════════════════════════════
   // RENDER — single scroll, no tabs
@@ -361,18 +462,63 @@ export function DealScrollView(props: DealScrollViewProps) {
                 </p>
               </div>
             </div>
-            {sortedFlags.length > 1 && (
-              <button
-                onClick={toggleAllFlags}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors flex-shrink-0"
-              >
-                {allFlagsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                {allFlagsOpen
-                  ? (locale === 'fr' ? 'Réduire tous les détails' : 'Collapse all details')
-                  : (locale === 'fr' ? 'Afficher tous les détails' : 'Expand all details')}
-              </button>
-            )}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {hasDeepContent && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  {locale === 'fr' ? 'Analyse détaillée prête' : 'Detailed analysis ready'}
+                </span>
+              )}
+              {sortedFlags.length > 1 && (
+                <button
+                  onClick={toggleAllFlags}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors flex-shrink-0"
+                >
+                  {allFlagsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  {allFlagsOpen
+                    ? (locale === 'fr' ? 'Réduire tous les détails' : 'Collapse all details')
+                    : (locale === 'fr' ? 'Afficher tous les détails' : 'Expand all details')}
+                </button>
+              )}
+            </div>
           </div>
+
+          {/* Deep analysis: optional deeper layer — its own card, not squeezed into
+              the header, so there's room for a supporting line and (while running)
+              a staged progress view. The fast analysis above/below stays fully
+              usable throughout; this never blocks the page. */}
+          {!demoMode && !hasDeepContent && (
+            <div id="deep-analysis" className="mb-5 sm:mb-6 scroll-mt-20">
+              {deepAnalysisLoading ? (
+                <DeepAnalysisProgress locale={locale} />
+              ) : (
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13.5px] font-bold text-slate-900">
+                      {locale === 'fr' ? 'Construire la stratégie de négociation complète' : 'Build full negotiation strategy'}
+                    </p>
+                    <p className="text-[12.5px] text-slate-500 mt-0.5">
+                      {locale === 'fr'
+                        ? "Obtenez les opportunités d'économies détaillées, le levier, la séquence de négociation et les positions de repli avant d'agir."
+                        : 'Get the detailed savings opportunities, leverage, negotiation sequencing and fallback positions before taking action.'}
+                    </p>
+                    {deepAnalysisError && (
+                      <p className="text-[12px] text-red-600 mt-1.5">{deepAnalysisError}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleDeepAnalysis}
+                    className="flex-shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-[13px] font-bold rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+                  >
+                    <Microscope className="w-4 h-4" />
+                    {deepAnalysisError
+                      ? (locale === 'fr' ? 'Réessayer' : 'Try again')
+                      : (locale === 'fr' ? 'Lancer' : 'Run deep analysis')}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           <div>
 
@@ -434,8 +580,10 @@ export function DealScrollView(props: DealScrollViewProps) {
             </div>
           )}
 
-          {/* Worth noting — minor items that didn't meet the red flag bar */}
-          {Array.isArray((o as any)?.watchItems) && (o as any).watchItems.length > 0 && (
+          {/* Worth noting — minor items that didn't meet the red flag bar. Deep-only
+              content — gated explicitly on hasDeepContent, not just array length,
+              per the "use explicit status, don't rely solely on emptiness" rule. */}
+          {hasDeepContent && Array.isArray((o as any)?.watchItems) && (o as any).watchItems.length > 0 && (
             <div className="mt-4 bg-white border border-slate-200 rounded-xl overflow-hidden">
               <button
                 onClick={() => setShowWatch(!showWatch)}
@@ -467,9 +615,19 @@ export function DealScrollView(props: DealScrollViewProps) {
         </div>
       </div>
 
-      {/* ═══ SECTION 3: STRATEGY (emerald-tinted bg) ═══ */}
+      {/* ═══ SECTION 3: STRATEGY (emerald-tinted bg) ═══
+          Deep-only: this whole section is deferred until hasDeepContent — the
+          fast pass's must_have asks and leverage points are already shown via
+          the hero's top-reasons block and each red flag's own ask, so showing
+          this synthesized playbook view too, empty ("Can offer" had nothing to
+          show), would be duplicate + broken UI, not "concise and complete." */}
+      {(!showFullPlaybook || hasDeepContent) && (
       <div className="bg-emerald-50/40 border-b border-emerald-200">
         <div className="p-5 sm:p-8">
+          {!showFullPlaybook ? (
+            <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={<Zap className="w-6 h-6 text-white" />} iconBg="bg-emerald-600" />
+          ) : (
+          <>
           {/* Section header */}
           <div className="flex items-center gap-4 mb-4 sm:mb-6">
             <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center shadow-md">
@@ -633,12 +791,52 @@ export function DealScrollView(props: DealScrollViewProps) {
               ))}
             </div>
           )}
+          </>
+          )}
         </div>
       </div>
+      )}
 
       {/* ═══ SECTION 4: EMAIL (slate bg) ═══ */}
-      <div className="bg-slate-100 border-b border-slate-200">
+      <div id="email-section" className="bg-slate-100 border-b border-slate-200">
         <div className="p-5 sm:p-8">
+          {!showFullPlaybook ? (
+            <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={<Mail className="w-6 h-6 text-white" />} iconBg="bg-slate-800" variant="email" />
+          ) : !hasDeepContent && !hasEmail ? (
+            /* Fast-only, nothing generated yet — email is a deep-complete action
+               (per the action-hierarchy rules), so point at the strategy step
+               instead of offering to generate an email prematurely. */
+            <a
+              href="#deep-analysis"
+              className="w-full flex items-center gap-4 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 text-left hover:border-slate-300 transition-colors no-underline"
+            >
+              <div className="w-12 h-12 rounded-xl bg-slate-300 flex items-center justify-center shadow-md flex-shrink-0">
+                <Mail className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14.5px] font-bold text-slate-900">{locale === 'fr' ? "D'abord, la stratégie complète" : 'First, build the full strategy'}</p>
+                <p className="text-[12.5px] text-slate-500 mt-0.5">{locale === 'fr' ? "L'email de négociation arrive une fois la stratégie complète prête." : "The negotiation email comes together once the full strategy is ready."}</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
+            </a>
+          ) : !emailSectionVisible && !demoMode ? (
+            /* Collapsed entry point — the permanent generator only appears once the
+               user actually chooses this path, matching the hero's own CTA text. */
+            <button
+              onClick={openEmailSection}
+              className="w-full flex items-center gap-4 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 text-left hover:border-slate-300 transition-colors"
+            >
+              <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center shadow-md flex-shrink-0">
+                <Mail className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14.5px] font-bold text-slate-900">{locale === 'fr' ? 'Générer un email de négociation' : 'Generate negotiation email'}</p>
+                <p className="text-[12.5px] text-slate-500 mt-0.5">{locale === 'fr' ? 'Créez un email prêt à envoyer à partir de votre devis et analyse.' : 'Create a ready-to-send supplier email using your quote and analysis.'}</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
+            </button>
+          ) : (
+          <>
           {/* Section header */}
           <div className="flex items-start justify-between gap-3 mb-4 sm:mb-6">
             <div className="flex items-center gap-4 min-w-0">
@@ -650,31 +848,15 @@ export function DealScrollView(props: DealScrollViewProps) {
                   {locale === 'fr' ? 'Email de négociation prêt à envoyer' : 'Ready-to-send negotiation email'}
                 </h2>
                 <p className="text-[13px] text-slate-500">
-                  {locale === 'fr' ? 'Choisissez un ton, personnalisez, et envoyez' : 'Pick a tone, customize if needed, and send it'}
+                  {locale === 'fr' ? "TermLift connaît déjà le devis et la stratégie de négociation. Ajoutez ce que le document ne peut pas nous dire." : "TermLift already knows the quote and negotiation strategy. Add any context the document can't tell us."}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Tone selector — present in both states */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-            {emailTones.map((tone, i) => {
-              const isActive = emailTab === i
-              return (
-                <button key={i} onClick={() => setEmailTab(i)} className={`px-5 py-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-3 ${isActive ? 'bg-emerald-50 border-emerald-300 shadow-md' : 'bg-white border-slate-200 hover:border-slate-300'}`}>
-                  {isActive && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
-                  <div className="text-left">
-                    <span className={`text-[14px] font-bold block ${isActive ? 'text-emerald-700' : 'text-slate-700'}`}>{tone.label}</span>
-                    <span className={`text-[11px] ${isActive ? 'text-emerald-500' : 'text-slate-400'}`}>{tone.desc}</span>
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-
           {/* ───────── EMAIL DISPLAY ───────── */}
           {hasEmail && (
-            <div className="border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
+            <div className="border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white mb-4">
               <div className="px-5 sm:px-6 py-3.5 flex items-center gap-3 border-b border-slate-200">
                 <Mail className="w-4 h-4 text-slate-400" />
                 <input
@@ -682,6 +864,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                   onChange={(e) => { const n = [...emailSubjects]; n[emailTab] = e.target.value; setEmailSubjects(n) }}
                   className="flex-1 text-[14px] font-normal text-slate-900 bg-transparent border-none focus:outline-none p-0 placeholder-slate-400"
                 />
+                <span className="text-[10.5px] font-semibold text-slate-400 uppercase tracking-wide flex-shrink-0">{TONE_LABELS[toneOrder[emailTab]][locale === 'fr' ? 'fr' : 'en']}</span>
               </div>
               <div className="p-4 sm:p-6">
                 <p className="text-[11px] text-slate-400 font-medium mb-3 flex items-center gap-1.5">
@@ -694,52 +877,112 @@ export function DealScrollView(props: DealScrollViewProps) {
                   rows={14}
                   className="w-full text-[13px] text-slate-800 leading-relaxed bg-white rounded-xl p-5 border-2 border-slate-200 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-300"
                 />
-                <div className="flex gap-3 mt-5">
+                <div className="flex flex-wrap items-center gap-3 mt-5">
                   <button onClick={() => { window.location.href = `mailto:?subject=${encodeURIComponent(emailSubjects[emailTab])}&body=${encodeURIComponent(emailBodies[emailTab])}` }} className="text-[13px] px-6 py-3 rounded-xl bg-emerald-600 text-white font-bold flex items-center gap-2 hover:bg-emerald-700 transition-colors shadow-sm">
                     <Send className="w-4 h-4" />{t('output.openInEmailClient')}
                   </button>
                   <button onClick={() => { setCopiedEmail(true); navigator.clipboard.writeText(emailBodies[emailTab]); setTimeout(() => setCopiedEmail(false), 2000) }} className="text-[13px] px-6 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-semibold flex items-center gap-2 hover:bg-slate-50 transition-colors">
                     {copiedEmail ? <><CheckCircle2 className="w-4 h-4 text-emerald-500" />Copied!</> : <><Copy className="w-4 h-4" />Copy email body</>}
                   </button>
+                  {/* Lightweight post-generation tone adjustment (Part 4) — switches
+                      between the 3 variants already generated, no new call. */}
+                  <div className="flex items-center gap-1.5 ml-auto">
+                    <button onClick={makeSofter} disabled={emailTab === 0} title="Make softer" className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors disabled:opacity-30 disabled:pointer-events-none">
+                      <ThumbsUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={makeFirmer} disabled={emailTab === 2} title="Make firmer" className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors disabled:opacity-30 disabled:pointer-events-none">
+                      <ThumbsDown className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* ───────── GENERATE / REGENERATE PANEL ───────── */}
+          {/* ───────── OPTIONAL NEGOTIATION CONTEXT (Part 2) ───────── */}
           {!demoMode && (
-            <div className="space-y-3">
-              {!showGeneratePanel ? (
-                <button
-                  onClick={() => setShowGeneratePanel(true)}
-                  disabled={remainingRegens <= 0}
-                  className={`w-full px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-[13.5px] font-bold transition-colors ${remainingRegens <= 0 ? 'bg-slate-100 text-slate-400' : hasEmail ? 'bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'}`}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  {hasEmail
-                    ? (locale === 'fr' ? 'Regénérer les emails' : `Regenerate emails${remainingRegens > 0 && remainingRegens < 3 ? ` (${remainingRegens} left)` : ''}`)
-                    : (locale === 'fr' ? "Générer l'email" : 'Generate email')}
-                </button>
-              ) : (
-                <div className="space-y-3 bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5">
-                  <textarea
-                    value={customPrompt}
-                    onChange={(e) => setCustomPrompt(e.target.value)}
-                    rows={2}
-                    className="w-full px-4 py-3 text-[13px] border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-300 resize-none"
-                    placeholder={locale === 'fr' ? 'Optionnel : instructions personnalisées...' : "Optional: custom instructions (e.g. 'mention we have budget approval')..."}
-                  />
-                  <div className="flex gap-2">
-                    <button onClick={handleGenerate} disabled={regenerating || remainingRegens <= 0} className={`flex-1 px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-[13.5px] font-bold transition-colors ${regenerating || remainingRegens <= 0 ? 'bg-slate-100 text-slate-400' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'}`}>
-                      {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{locale === 'fr' ? 'Génération...' : 'Generating...'}</> : <><Sparkles className="w-4 h-4" />{locale === 'fr' ? "Générer" : 'Generate'}</>}
-                    </button>
-                    <button onClick={() => { setShowGeneratePanel(false); setCustomPrompt('') }} className="px-4 py-3 rounded-xl border-2 border-slate-200 text-[13px] font-medium text-slate-500 hover:bg-slate-50 transition-colors">
-                      {locale === 'fr' ? 'Annuler' : 'Cancel'}
-                    </button>
+            <div className="mb-4">
+              <button
+                onClick={() => setShowEmailContext(!showEmailContext)}
+                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-slate-500 hover:text-emerald-700 transition-colors"
+              >
+                <Plus className={`w-3.5 h-3.5 transition-transform ${showEmailContext ? 'rotate-45' : ''}`} />
+                {locale === 'fr' ? 'Ajouter du contexte de négociation' : 'Add negotiation context'}
+                {!showEmailContext && <span className="text-[11px] font-normal text-slate-400">— {locale === 'fr' ? 'optionnel' : 'optional'}</span>}
+              </button>
+              {showEmailContext && (
+                <div className="mt-3 bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[11px] font-semibold text-slate-500 block mb-1">{locale === 'fr' ? 'Objectif de négociation' : 'Negotiation objective'}</label>
+                      <input type="text" value={negotiationObjective} onChange={(e) => setNegotiationObjective(e.target.value)}
+                        placeholder={locale === 'fr' ? 'ex. Obtenir 10% de réduction et supprimer le renouvellement auto' : 'e.g. Get 10% off and remove auto-renewal'}
+                        className="w-full px-3 py-2 text-[13px] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 placeholder:text-slate-300" />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-slate-500 block mb-1">{locale === 'fr' ? 'Budget / prix maximum' : 'Budget / maximum acceptable price'}</label>
+                      <input type="text" value={budgetCeiling} onChange={(e) => setBudgetCeiling(e.target.value)}
+                        placeholder={locale === 'fr' ? 'ex. Budget plafonné à 45 000 €' : 'e.g. Budget capped at €45,000'}
+                        className="w-full px-3 py-2 text-[13px] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 placeholder:text-slate-300" />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-slate-500 block mb-1">{locale === 'fr' ? 'Alternative / devis concurrent' : 'Alternatives / competing quote'}</label>
+                      <input type="text" value={competingQuote} onChange={(e) => setCompetingQuote(e.target.value)}
+                        placeholder={locale === 'fr' ? 'ex. Offre concurrente à 41 000 €' : 'e.g. We have a competing offer at €41,000'}
+                        className="w-full px-3 py-2 text-[13px] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 placeholder:text-slate-300" />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-slate-500 block mb-1">{locale === 'fr' ? 'Échéance interne' : 'Internal deadline'}</label>
+                      <input type="text" value={internalDeadline} onChange={(e) => setInternalDeadline(e.target.value)}
+                        placeholder={locale === 'fr' ? 'ex. Doit signer avant le 15 sept.' : 'e.g. Need to sign by Sept 15'}
+                        className="w-full px-3 py-2 text-[13px] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 placeholder:text-slate-300" />
+                    </div>
                   </div>
-                  {remainingRegens <= 0 && <p className="text-[12px] text-slate-400 text-center">{locale === 'fr' ? 'Limite de régénération atteinte.' : 'Regeneration limit reached.'}</p>}
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-500 block mb-1.5">{locale === 'fr' ? 'Marge de manœuvre' : 'Walk-away flexibility'}</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {([
+                        { v: 'flexible', l: locale === 'fr' ? 'Flexible' : 'Flexible' },
+                        { v: 'prefer_stay', l: locale === 'fr' ? 'Préfère rester' : 'Prefer to stay' },
+                        { v: 'can_walk', l: locale === 'fr' ? 'Peut partir' : 'Can walk away' },
+                      ] as const).map((opt) => (
+                        <button key={opt.v} type="button" onClick={() => setWalkAwayFlexibility(walkAwayFlexibility === opt.v ? '' : opt.v)}
+                          className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold border transition-colors ${walkAwayFlexibility === opt.v ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'}`}>
+                          {opt.l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-500 block mb-1">{locale === 'fr' ? 'Instructions supplémentaires' : 'Additional instructions'}</label>
+                    <textarea
+                      value={customPrompt}
+                      onChange={(e) => setCustomPrompt(e.target.value)}
+                      rows={2}
+                      className="w-full px-3 py-2 text-[13px] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 resize-none placeholder:text-slate-300"
+                      placeholder={locale === 'fr' ? "ex. Mentionner que nous pouvons signer cette semaine si le prix est approuvé" : "e.g. Mention that we can sign this week if pricing is approved"}
+                    />
+                  </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ───────── GENERATE / REGENERATE ───────── */}
+          {!demoMode && (
+            <div className="space-y-3">
+              <button
+                onClick={handleGenerate}
+                disabled={regenerating || remainingRegens <= 0}
+                className={`w-full px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-[13.5px] font-bold transition-colors ${regenerating || remainingRegens <= 0 ? 'bg-slate-100 text-slate-400' : hasEmail ? 'bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'}`}
+              >
+                {regenerating
+                  ? <><Loader2 className="w-4 h-4 animate-spin" />{locale === 'fr' ? 'Génération...' : 'Generating...'}</>
+                  : hasEmail
+                    ? <><RotateCcw className="w-4 h-4" />{locale === 'fr' ? 'Régénérer' : `Regenerate${remainingRegens > 0 && remainingRegens < 3 ? ` (${remainingRegens} left)` : ''}`}</>
+                    : <><Sparkles className="w-4 h-4" />{locale === 'fr' ? "Générer l'email recommandé" : 'Generate recommended email'}</>}
+              </button>
+              {remainingRegens <= 0 && <p className="text-[12px] text-slate-400 text-center">{locale === 'fr' ? 'Limite de régénération atteinte.' : 'Regeneration limit reached.'}</p>}
               {regenError && <p className="text-[13px] text-red-700 bg-red-50 border-2 border-red-200 rounded-xl p-3.5 font-medium">{regenError}</p>}
             </div>
           )}
@@ -748,14 +991,23 @@ export function DealScrollView(props: DealScrollViewProps) {
               {locale === 'fr' ? 'Inscrivez-vous pour générer' : 'Sign up to generate'}<ArrowRight className="w-3.5 h-3.5" />
             </Link>
           )}
+          </>
+          )}
         </div>
       </div>
 
-      {/* ═══ SECTION 5: ROUNDS + ASSUMPTIONS (white bg) ═══ */}
+      {/* ═══ SECTION 5: ROUNDS + ASSUMPTIONS (white bg) ═══
+          No empty section: renders only if there's real activity to show, or
+          real assumptions content — never a blank white band. */}
+      {(hasNegotiationActivity || ((o?.assumptions?.length ?? 0) > 0)) && (
       <div className="bg-white">
         <div className="p-5 sm:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
-            {/* Rounds timeline — left col */}
+            {/* Rounds timeline — left col. An analysis is not a negotiation round —
+                only render this once real activity exists: a genuine round 2+,
+                an email was generated, a TermLift negotiation request exists, or
+                the deal is closed. A fresh fast-analysis deal skips this entirely. */}
+            {hasNegotiationActivity && (
             <div className="col-span-3">
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center">
@@ -801,15 +1053,30 @@ export function DealScrollView(props: DealScrollViewProps) {
                 </div>
               )}
 
-              {/* Active: upload CTA */}
+              {/* Active: upload CTA — rounds belong to the deal's negotiation
+                  workspace, unlocked by Full Analysis, not a subscription
+                  tier. See lib/deep-analysis-status.ts's hasDeepContent(). */}
               {!isClosed && sortedRounds.length > 0 && (
-                <FeatureGate feature="multi_round" plan={userPlan} isAdmin={isAdmin}>
-                  <div id="add-round" className="border-2 border-dashed border-emerald-300 rounded-xl p-4 text-center cursor-pointer bg-emerald-50 hover:bg-emerald-100 transition-colors">
-                    <span className="text-[13px] font-semibold text-emerald-700 block mb-0.5">+ Upload vendor response</span>
-                    <span className="text-[12px] text-emerald-500 block">Add Round {sortedRounds.length + 1} to continue negotiating</span>
-                  </div>
-                  <div className="mt-2.5">{addRoundForm}</div>
-                </FeatureGate>
+                hasDeepContent ? (
+                  <>
+                    <div id="add-round" className="border-2 border-dashed border-emerald-300 rounded-xl p-4 text-center cursor-pointer bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                      <span className="text-[13px] font-semibold text-emerald-700 block mb-0.5">+ Upload vendor response</span>
+                      <span className="text-[12px] text-emerald-500 block">Add Round {sortedRounds.length + 1} to continue negotiating</span>
+                    </div>
+                    <div className="mt-2.5">{addRoundForm}</div>
+                  </>
+                ) : (
+                  <a
+                    id="add-round"
+                    href="#deep-analysis"
+                    className="flex items-center gap-3 border-2 border-dashed border-slate-200 rounded-xl p-4 hover:border-emerald-300 hover:bg-emerald-50/30 transition-colors no-underline"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[13px] font-semibold text-slate-700 block mb-0.5">Unlock Full Analysis to continue negotiating</span>
+                      <span className="text-[12px] text-slate-400 block">Round {sortedRounds.length + 1} opens up once this deal&apos;s negotiation workspace is unlocked</span>
+                    </div>
+                  </a>
+                )
               )}
 
               {/* Won: view outcome card */}
@@ -825,23 +1092,192 @@ export function DealScrollView(props: DealScrollViewProps) {
                 </div>
               )}
             </div>
+            )}
 
-            {/* Assumptions — right col */}
-            <div className="col-span-2 border-l border-slate-200 pl-6">
-              <p className="text-[12px] font-bold text-slate-400 uppercase tracking-wider mb-4">Assumptions</p>
-              {o?.assumptions && o.assumptions.length > 0 && (
-                <>
-                  {o.assumptions.map((a: string, i: number) => (
-                    <p key={i} className="text-[13px] text-slate-500 leading-relaxed mb-3 last:mb-0 flex items-start gap-2">
-                      <span className="text-slate-300 flex-shrink-0 mt-0.5">&bull;</span>{a}
-                    </p>
-                  ))}
-                  {o.disclaimer && <p className="mt-4 pt-4 border-t border-slate-100 text-[12px] text-slate-400 italic">{o.disclaimer}</p>}
-                </>
-              )}
+            {/* Assumptions — right col. No empty shell: only renders with real content. */}
+            {o?.assumptions && o.assumptions.length > 0 && (
+              <div className={hasNegotiationActivity ? 'col-span-2 border-l border-slate-200 pl-6' : 'col-span-5'}>
+                <p className="text-[12px] font-bold text-slate-400 uppercase tracking-wider mb-4">Assumptions</p>
+                {o.assumptions.map((a: string, i: number) => (
+                  <p key={i} className="text-[13px] text-slate-500 leading-relaxed mb-3 last:mb-0 flex items-start gap-2">
+                    <span className="text-slate-300 flex-shrink-0 mt-0.5">&bull;</span>{a}
+                  </p>
+                ))}
+                {o.disclaimer && <p className="mt-4 pt-4 border-t border-slate-100 text-[12px] text-slate-400 italic">{o.disclaimer}</p>}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      )}
+
+      {/* ═══ SECTION 6: NEXT STEP (compact — not a sales block) ═══
+          Same action-hierarchy rules as the hero: fast-only points at the
+          strategy step first, deep-complete reveals the two execution paths.
+          Kept as one small card, not a full-bleed dark section. */}
+      {showFullPlaybook && !isClosed && (
+        <div className="bg-white border-t border-slate-200">
+          <div className="p-5 sm:p-8">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5">
+              <p className="text-[13px] font-bold text-slate-900 mb-3">
+                {hasDeepContent
+                  ? (locale === 'fr' ? 'Prêt à négocier ?' : 'Ready to negotiate?')
+                  : (locale === 'fr' ? 'Aller plus loin sur ce deal' : 'Go deeper on this deal')}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {hasDeepContent ? (
+                  <a href="#email-section" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13px] font-bold text-slate-700 bg-white border border-slate-200 hover:border-slate-300 transition-colors no-underline">
+                    <Mail className="w-4 h-4" />
+                    {locale === 'fr' ? 'Générer un email de négociation' : 'Generate negotiation email'}
+                  </a>
+                ) : (
+                  <a href="#deep-analysis" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13px] font-bold text-slate-700 bg-white border border-slate-200 hover:border-slate-300 transition-colors no-underline">
+                    <Microscope className="w-4 h-4" />
+                    {deepAnalysisLoading
+                      ? (locale === 'fr' ? 'Construction en cours…' : 'Building your strategy…')
+                      : (locale === 'fr' ? 'Construire la stratégie complète' : 'Build full negotiation strategy')}
+                  </a>
+                )}
+                <Link
+                  href={negotiateHref}
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13px] font-bold text-white transition-all hover:-translate-y-0.5 no-underline"
+                  style={{ background: '#1DB954', boxShadow: '0 6px 18px -6px rgba(29,185,84,0.5)' }}
+                >
+                  <Zap className="w-4 h-4" />
+                  {locale === 'fr' ? 'Faire négocier par TermLift' : 'Let TermLift negotiate'}
+                </Link>
+              </div>
             </div>
           </div>
         </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Negotiation teaser — replaces the DIY playbook/email sections ─────────
+// Staged progress for the deep-analysis call (~100-120s, one long LLM call —
+// there's no intermediate backend event to key off, so this is a restrained
+// time-based progression, same approach as AnalysisProgress in
+// AnalysisUploader.tsx. The last stage holds with a spinner until the
+// request actually completes; nothing is ever claimed done early.
+function DeepAnalysisProgress({ locale }: { locale: 'en' | 'fr' }) {
+  const [elapsed, setElapsed] = useState(0)
+  useEffect(() => {
+    const start = Date.now()
+    const id = setInterval(() => setElapsed(Math.round((Date.now() - start) / 1000)), 500)
+    return () => clearInterval(id)
+  }, [])
+
+  const stages = locale === 'fr'
+    ? [
+        { label: 'Examen des conditions commerciales détaillées', at: 0 },
+        { label: "Développement des opportunités de tarification et d'économies", at: 20 },
+        { label: 'Construction de la stratégie de négociation', at: 45 },
+        { label: 'Identification des concessions et points de vigilance', at: 75 },
+        { label: "Finalisation de l'analyse détaillée", at: 95 },
+      ]
+    : [
+        { label: 'Reviewing detailed commercial terms', at: 0 },
+        { label: 'Expanding pricing & savings opportunities', at: 20 },
+        { label: 'Building negotiation strategy', at: 45 },
+        { label: 'Identifying concessions and watch-outs', at: 75 },
+        { label: 'Finalizing detailed analysis', at: 95 },
+      ]
+  const currentIdx = stages.reduce((acc, s, i) => (elapsed >= s.at ? i : acc), 0)
+
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-[13.5px] font-bold text-slate-900">
+          {locale === 'fr' ? 'Construction de la stratégie de négociation complète' : 'Building your full negotiation strategy'}
+        </p>
+        <span className="text-[11.5px] font-medium text-slate-400 tabular-nums" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{elapsed}s</span>
+      </div>
+      <div className="space-y-2.5">
+        {stages.map((s, i) => {
+          const done = i < currentIdx
+          const active = i === currentIdx
+          return (
+            <div key={i} className="flex items-center gap-2.5">
+              {done
+                ? <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                : active
+                  ? <Loader2 className="w-4 h-4 text-slate-500 animate-spin flex-shrink-0" />
+                  : <div className="w-4 h-4 rounded-full border-2 border-slate-200 flex-shrink-0" />}
+              <p className={`text-[12.5px] ${done ? 'text-slate-400' : active ? 'text-slate-900 font-semibold' : 'text-slate-400'}`}>{s.label}</p>
+            </div>
+          )
+        })}
+      </div>
+      <p className="text-[11.5px] text-slate-400 mt-4 pt-3 border-t border-slate-100 leading-relaxed">
+        {locale === 'fr'
+          ? "Cela prend généralement environ deux minutes. Vous pouvez continuer à consulter l'analyse ci-dessus pendant ce temps."
+          : "This usually takes about two minutes — feel free to keep reading the analysis above while it runs."}
+      </p>
+    </div>
+  )
+}
+
+function NegotiationTeaser({
+  negotiateHref, locale, redFlagCount, potentialSavings, fmtSav, icon, iconBg, variant = 'strategy',
+}: {
+  negotiateHref: string
+  locale: 'en' | 'fr'
+  redFlagCount: number
+  potentialSavings: number
+  fmtSav: (n: number) => string
+  icon: React.ReactNode
+  iconBg: string
+  variant?: 'strategy' | 'email'
+}) {
+  const heading = variant === 'email'
+    ? (locale === 'fr' ? 'Nous rédigeons et envoyons les emails' : 'We write and send the emails')
+    : (locale === 'fr' ? 'La stratégie complète' : 'The full negotiation strategy')
+  const body = variant === 'email'
+    ? (locale === 'fr'
+      ? "Une fois la négociation confiée à TermLift, l'envoi des emails fait partie du service."
+      : 'Once TermLift takes this on, drafting and sending the negotiation emails is part of the service.')
+    : (locale === 'fr'
+      ? "Ce qu'il faut demander, votre levier, et la séquence de négociation font partie de la négociation menée par TermLift."
+      : "What to ask for, your leverage, and the negotiation sequence are part of the negotiation TermLift runs on your behalf.")
+
+  return (
+    <div>
+      <div className="flex items-center gap-4 mb-5">
+        <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center shadow-md`}>{icon}</div>
+        <div>
+          <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{heading}</h2>
+          <p className="text-[13px] text-slate-500">{body}</p>
+        </div>
+      </div>
+
+      <div className="bg-white border-2 border-emerald-200 rounded-2xl p-5 sm:p-6">
+        <div className="flex flex-wrap items-center gap-4 mb-5">
+          {redFlagCount > 0 && (
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              <span className="text-[13.5px] font-semibold text-slate-800">
+                {redFlagCount} {locale === 'fr' ? (redFlagCount === 1 ? 'levier de négociation identifié' : 'leviers de négociation identifiés') : (redFlagCount === 1 ? 'negotiation lever identified' : 'negotiation levers identified')}
+              </span>
+            </div>
+          )}
+          {potentialSavings > 0 && (
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-emerald-600" />
+              <span className="text-[13.5px] font-semibold text-emerald-700">
+                {fmtSav(potentialSavings)} {locale === 'fr' ? "d'économies potentielles" : 'in potential savings'}
+              </span>
+            </div>
+          )}
+        </div>
+        <Link
+          href={negotiateHref}
+          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-[14px] font-bold text-white no-underline transition-all hover:shadow-lg hover:-translate-y-0.5"
+          style={{ background: '#1DB954', boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}
+        >
+          {locale === 'fr' ? 'Faire négocier ce deal' : 'Get this deal negotiated'} <ArrowRight className="w-4 h-4" />
+        </Link>
       </div>
     </div>
   )

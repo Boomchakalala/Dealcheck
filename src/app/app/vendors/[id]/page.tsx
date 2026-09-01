@@ -10,6 +10,7 @@ import { vendorKeySimilarity } from '@/lib/vendor-normalize'
 import { formatCurrency, normalizeAmount } from '@/lib/currency'
 import { VendorNotes } from '@/components/VendorNotes'
 import { VendorMerge } from '@/components/VendorMerge'
+import { ScoreGradientBar } from '@/components/ScoreGradientBar'
 
 const sora = "'Sora', sans-serif"
 export const dynamic = 'force-dynamic'
@@ -90,7 +91,14 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
           <Stat label="Deals" value={String(row.dealCount)} />
           <Stat label="Total value" value={formatTotals(row.totalsByCurrency)} />
           <Stat label="Saved" value={formatTotals(row.savingsByCurrency)} accent />
-          <Stat label="Avg score" value={row.avgScore == null ? '—' : String(row.avgScore)} />
+          <div>
+            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Opportunity</p>
+            {row.avgScore == null ? (
+              <p className="text-[18px] sm:text-[20px] font-bold text-slate-300" style={{ fontFamily: sora }}>—</p>
+            ) : (
+              <ScoreGradientBar score={row.avgScore} width={90} height={7} className="mt-1.5" />
+            )}
+          </div>
         </div>
       </div>
 
@@ -121,7 +129,7 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
                       {final && <p className="text-[11px] text-slate-400 line-through">{orig}</p>}
                     </div>
                     {typeof o?.score === 'number' && (
-                      <span className={`text-[13px] font-bold w-8 text-right ${o.score >= 80 ? 'text-emerald-600' : o.score >= 60 ? 'text-amber-600' : 'text-red-600'}`} style={{ fontFamily: sora }}>{o.score}</span>
+                      <ScoreGradientBar score={o.score} width={40} height={6} className="flex-shrink-0" />
                     )}
                     <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-emerald-500 transition-colors flex-shrink-0" />
                   </div>

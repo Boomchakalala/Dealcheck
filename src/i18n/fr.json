@@ -3,7 +3,7 @@
   "nav.howItWorks": "Comment ça marche",
   "nav.examples": "Exemples",
   "nav.signIn": "Connexion",
-  "nav.tryFree": "Essai gratuit",
+  "nav.tryFree": "Analyser un devis",
   "nav.deals": "Contrats",
   "nav.dashboard": "Tableau de bord",
   "nav.help": "Aide",
@@ -19,7 +19,7 @@
   "hero.subtitle": "Déposez un devis fournisseur. Découvrez où vous surpayez, quoi demander, et recevez un email prêt à envoyer.",
   "hero.cta": "Analyser un devis gratuitement",
   "hero.ctaSecondary": "Voir un exemple réel",
-  "hero.noSignup": "Sans inscription. Gratuit.",
+  "hero.noSignup": "Sans inscription pour commencer.",
 
   "hero.check1": "Repérez les frais cachés, les tarifs gonflés et les clauses défavorables",
   "hero.check2": "Obtenez un plan de négociation avec des demandes qui font la différence",

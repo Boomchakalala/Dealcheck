@@ -131,7 +131,7 @@ SaaS renewals are not take-it-or-leave-it. Every vendor has margin, every contra
 
 The difference between a good deal and a bad one is knowing what to ask for. That is exactly what TermLift does: paste your renewal quote, get back every red flag, savings opportunity, and a ready-to-send email in minutes.
 
-**[Try it free](/try)**
+**[Analyze your quote](/try)**
 `,
   },
   {
@@ -230,7 +230,7 @@ A procurement professional would catch all five in minutes. But most people sign
 
 That is why we built TermLift. Paste your quote, and it flags every one of these traps automatically, with specific recommendations for what to ask for.
 
-**[Try it free](/try)**
+**[Analyze your quote](/try)**
 `,
   },
   {
@@ -359,7 +359,7 @@ Every quote has margin. Every fee is negotiable. And every dealer would rather c
 
 TermLift analyzes car quotes the same way it handles any vendor deal: paste the quote, get back red flags, savings opportunities, and a ready-to-send email.
 
-**[Try it free](/try)**
+**[Analyze your quote](/try)**
 `,
   },
   {
@@ -472,7 +472,7 @@ Equipment leases are long commitments with real financial consequences. The mont
 
 TermLift catches all of these issues automatically. Paste your lease quote and get back every red flag, what to push for, and a ready-to-send email.
 
-**[Try it free](/try)**
+**[Analyze your quote](/try)**
 `,
   },
   {
@@ -613,7 +613,7 @@ These 7 clauses cover 90% of what matters in any vendor contract. A lawyer adds 
 
 TermLift reads your vendor quote and flags all of these issues automatically, with specific recommendations for what to ask for and a ready-to-send negotiation email.
 
-**[Try it free](/try)**
+**[Analyze your quote](/try)**
 `,
   },
   {
@@ -727,7 +727,7 @@ A price increase is not a crisis. It is a negotiation opportunity. The vendor se
 
 TermLift does this automatically. Paste the price increase notice, and it identifies the type of increase, calculates the impact, and generates a pushback email with specific asks.
 
-**[Try it free](/try)**
+**[Analyze your quote](/try)**
 `,
   },
   {
@@ -852,7 +852,7 @@ None of these checks take more than 2 minutes. Together, they take about 15 minu
 
 TermLift runs this entire analysis automatically. Paste your renewal quote, and it checks every item on this list, flags the risks, calculates the savings, and drafts the negotiation email for you.
 
-**[Try it free](/try)**
+**[Analyze your quote](/try)**
 `,
   },
 ]

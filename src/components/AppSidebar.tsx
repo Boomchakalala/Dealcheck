@@ -13,13 +13,15 @@ import {
   LogOut,
   HelpCircle,
   ChevronDown,
-  Crown,
-  Zap,
   Globe,
   PanelLeftClose,
   PanelLeftOpen,
+  Handshake,
+  Briefcase,
+  Gauge,
 } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { NotificationBell, type NotificationItem } from '@/components/NotificationBell'
 import { useT } from '@/i18n/context'
 
 interface AppSidebarProps {
@@ -32,9 +34,10 @@ interface AppSidebarProps {
   linkBase?: string
   /** If true, signs out / destructive actions become signup prompts (for demo mode). */
   demoMode?: boolean
+  notifications?: NotificationItem[]
 }
 
-export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, linkBase = '/app', demoMode = false }: AppSidebarProps) {
+export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, linkBase = '/app', demoMode = false, notifications = [] }: AppSidebarProps) {
   const pathname = usePathname()
   const t = useT()
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -62,11 +65,17 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, l
     return pathname.startsWith(href)
   }
 
+  const clientUnread = notifications.filter(n => !n.read_at && (n.type === 'negotiation_waiting_on_client' || n.type === 'negotiation_closed')).length
+  const adminUnread = notifications.filter(n => !n.read_at && n.type === 'negotiation_new_request').length
+
   const workspaceNav = [
     { href: linkBase, icon: FileText, label: t('nav.deals') },
     // Vendors is an authenticated /app feature; the demo has no /demo/vendors route yet.
     ...(demoMode ? [] : [{ href: `${linkBase}/vendors`, icon: Building2, label: t('nav.vendors') }]),
     { href: `${linkBase}/dashboard`, icon: BarChart3, label: t('nav.dashboard') },
+    ...(demoMode ? [] : [{ href: '/app/negotiations', icon: Handshake, label: 'My negotiations', badge: clientUnread }]),
+    ...(isAdmin && !demoMode ? [{ href: '/app/admin/negotiations', icon: Briefcase, label: 'Negotiations (admin)', badge: adminUnread }] : []),
+    ...(isAdmin && !demoMode ? [{ href: '/app/admin/ai-usage', icon: Gauge, label: 'AI usage (admin)' }] : []),
   ]
 
   const accountNav = [
@@ -74,14 +83,12 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, l
     { href: demoMode ? '/help' : `${linkBase}/help`, icon: HelpCircle, label: t('nav.help') },
   ]
 
-  const planLabel = plan === 'business' ? 'Business' : plan === 'pro' ? 'Pro' : plan === 'essentials' ? 'Essentials' : 'Starter'
-
   return (
     <>
       {/* Desktop sidebar */}
       <aside className={`hidden md:flex fixed top-0 left-0 bottom-0 flex-col bg-slate-50 border-r border-slate-200/80 z-40 transition-all duration-200 ${collapsed ? 'w-[60px]' : 'w-[210px]'}`}>
         {/* Logo */}
-        <div className={`pt-5 pb-4 ${collapsed ? 'px-3 flex justify-center' : 'px-5'}`}>
+        <div className={`pt-5 pb-4 flex items-center ${collapsed ? 'px-3 flex-col gap-3 justify-center' : 'px-5 justify-between'}`}>
           <Link href="/" className="flex items-center gap-2">
             <Image src="/logo-icon.png" alt="TermLift" width={28} height={28} priority />
             {!collapsed && (
@@ -91,6 +98,7 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, l
               </div>
             )}
           </Link>
+          {!demoMode && <NotificationBell initialNotifications={notifications} collapsed={collapsed} />}
         </div>
 
         {/* Workspace nav group */}
@@ -99,19 +107,32 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, l
           <nav className="space-y-0.5">
             {workspaceNav.map((item) => {
               const active = isActive(item.href)
+              const badge = ('badge' in item ? item.badge : 0) ?? 0
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   title={collapsed ? item.label : undefined}
-                  className={`flex items-center gap-2.5 py-2 rounded-lg text-sm font-medium transition-all ${collapsed ? 'px-0 justify-center' : 'px-2.5'} ${
+                  className={`relative flex items-center gap-2.5 py-2 rounded-lg text-sm font-medium transition-all ${collapsed ? 'px-0 justify-center' : 'px-2.5'} ${
                     active
                       ? 'bg-emerald-500/10 text-emerald-500'
                       : 'text-slate-600 hover:bg-slate-200/60 hover:text-slate-900'
                   }`}
                 >
                   <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-emerald-500' : 'text-slate-400'}`} />
-                  {!collapsed && item.label}
+                  {!collapsed && (
+                    <span className="flex-1 flex items-center justify-between min-w-0">
+                      {item.label}
+                      {badge > 0 && (
+                        <span className="ml-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                          {badge > 9 ? '9+' : badge}
+                        </span>
+                      )}
+                    </span>
+                  )}
+                  {collapsed && badge > 0 && (
+                    <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-red-500" />
+                  )}
                 </Link>
               )
             })}
@@ -142,26 +163,6 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, l
             })}
           </nav>
         </div>
-
-        {/* Plan badge */}
-        {!isAdmin && !collapsed && (
-          <div className="px-3 mt-6">
-            {isUpgraded ? (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                <Crown className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-xs font-bold text-emerald-500">{planLabel}</span>
-              </div>
-            ) : (
-              <Link href="/pricing" className="flex items-center justify-between px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200/80 transition-colors group">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-3.5 h-3.5 text-slate-500" />
-                  <span className="text-xs font-semibold text-slate-700">{usageCount}/4 used</span>
-                </div>
-                <span className="text-[10px] font-semibold text-emerald-500 group-hover:underline">Upgrade</span>
-              </Link>
-            )}
-          </div>
-        )}
 
         {/* Spacer */}
         <div className="flex-1" />
@@ -206,7 +207,6 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, plan, l
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-slate-900 truncate">{userEmail}</p>
-                  <p className="text-[10px] text-slate-400">{planLabel} plan</p>
                 </div>
                 <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
               </button>

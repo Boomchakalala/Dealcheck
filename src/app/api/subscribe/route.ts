@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/server'
 
 export async function POST(request: Request) {
   try {
-    const { email, source } = await request.json()
+    const { email, source } = await request.json().catch(() => ({}))
 
     if (!email?.trim() || !email.includes('@')) {
       return NextResponse.json({ error: 'Valid email is required' }, { status: 400 })

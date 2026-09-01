@@ -1,26 +1,45 @@
-## Instructions
+# TermLift
 
-You are a software development agent working inside a sandbox hosted in the cloud by Vibecode. This system forwards port 3000 to the web; it is the only port that can be exposed from the sandbox to the outside world. This means you should create the project in /home/vibecode/workspace.
+Procurement quote/contract negotiation copilot. See README.md for full product overview.
 
-## Tech stack instructions
+## Environment
 
-Read the /home/vibecode/workspace/STACK.md if it exists and apply the instructions.
+Local development on Windows (not a cloud sandbox). Project lives at `C:\Users\kevin\TermLift`.
 
-## Important instructions (do not forget)
+## Tech stack
 
----
-alwaysApply: true
----
+- Next.js 16 (App Router) + TypeScript, React 19
+- Tailwind CSS v4
+- Supabase (Auth + Postgres, via `@supabase/ssr`)
+- OpenAI API (GPT-4o) for analysis; `@anthropic-ai/sdk` also present
+- Stripe for billing, PostHog for analytics
+- File processing: pdf-parse, pdfjs-dist, mammoth, tesseract.js (OCR)
+- Tests: Vitest
 
-## Downloading image files
+## Running the app
 
-When the user provides an image URL, you should download it using curl and save it to the file system in /tmp and then read the image from the local file system.
+```bash
+npm run dev     # starts Next.js dev server via dev.sh (unsets stale OPENAI_API_KEY, runs `next dev`)
+npm run build
+npm run lint
+npm test         # vitest run
+```
 
-## Run the server
+Dev server runs on `http://localhost:3000` by default — no sandbox port-forwarding involved.
 
-When you build the project, run the server in the background on port 3000. Even if it supports hot reloading, you should still restart the server after making changes to the code just in case, unless the user tells you otherwise.
+## Environment variables
 
-## Disk usage
+Configured in `.env.local` (see README.md for the full list): Supabase URL/anon/service-role keys, OpenAI key, Stripe keys, PostHog key. Never commit this file or print its values.
 
-The only persistent storage is in /home/vibecode/workspace. The practical limit is about 1 GB. You should urgently instruct the user to reduce disk usage over 100 MB. Recommend storing large files in external services like AWS S3 or SoundCloud or Dropbox or Google Drive or other similar services if needed. The git repo itseslf should be under 100 MB ideally.
+## Tooling installed
 
+- Supabase Claude Code plugin (`supabase@claude-plugins-official`) — not yet connected; requires Supabase CLI login/access token separate from the app's runtime keys.
+- Playwright MCP server, scoped to this project.
+
+## Key files
+
+- `/src/lib/openai.ts` — AI analysis logic
+- `/src/lib/extract.ts` — file processing
+- `/src/lib/schemas.ts` — Zod validation
+- `/src/app/api/*` — API routes
+- `/src/components/OutputDisplay.tsx` — results renderer

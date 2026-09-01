@@ -1,14 +1,7 @@
-import type { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'Pricing — TermLift',
-  description: 'Start free, scale when ready. Essentials at €39/mo for 15 analyses. Pro at €129/mo for unlimited. One good negotiation pays for months.',
-  openGraph: {
-    title: 'Pricing — TermLift',
-    description: 'Start free, scale when ready. Essentials at €39/mo for 15 analyses. Pro at €129/mo for unlimited.',
-  },
-  alternates: { canonical: 'https://www.termlift.com/pricing' },
-}
+// Metadata for this route lives in page.tsx itself (a page-level `metadata`
+// export overrides a layout-level one for the same route), so it isn't
+// duplicated here — that duplication is exactly the kind of drift this
+// product-repositioning pass is meant to eliminate.
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children

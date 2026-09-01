@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     default: "TermLift — Turn Vendor Quotes Into Better Deals",
     template: "%s | TermLift",
   },
-  description: "Paste a vendor quote, get back red flags, savings, and a ready-to-send negotiation email. TermLift is the procurement expert your team never had. Free to try.",
+  description: "Analyze a supplier quote and find your negotiation opportunity — savings, leverage, and a full strategy. Negotiate it yourself, or have TermLift negotiate for you.",
   metadataBase: new URL("https://www.termlift.com"),
   icons: {
     icon: "/favicon.png",
@@ -33,14 +33,14 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "TermLift",
     title: "TermLift — Turn Vendor Quotes Into Better Deals",
-    description: "Paste a vendor quote, get back red flags, savings, and a ready-to-send negotiation email. Free to try.",
+    description: "Analyze a supplier quote and find your negotiation opportunity. Negotiate it yourself, or have TermLift negotiate for you.",
     url: "https://www.termlift.com",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "TermLift — Turn Vendor Quotes Into Better Deals",
-    description: "Paste a vendor quote, get back red flags, savings, and a ready-to-send negotiation email. Free to try.",
+    description: "Analyze a supplier quote and find your negotiation opportunity. Negotiate it yourself, or have TermLift negotiate for you.",
   },
   alternates: {
     canonical: "https://www.termlift.com",
@@ -75,7 +75,7 @@ export default async function RootLayout({
                 "@type": "SoftwareApplication",
                 name: "TermLift",
                 applicationCategory: "BusinessApplication",
-                description: "Stop overpaying vendors. Drop in any quote and get red flags, a negotiation playbook, and a ready-to-send email.",
+                description: "Stop overpaying vendors. Analyze a quote to find red flags and negotiation leverage, then negotiate it yourself or have TermLift negotiate it for you.",
                 url: "https://www.termlift.com",
                 offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
                 operatingSystem: "Web",
@@ -86,7 +86,7 @@ export default async function RootLayout({
                 name: "TermLift",
                 url: "https://www.termlift.com",
                 logo: "https://www.termlift.com/logo-icon.png",
-                description: "AI-powered vendor quote analysis. Get red flags, savings opportunities, and ready-to-send negotiation emails.",
+                description: "AI-powered vendor quote analysis and a done-for-you negotiation service — find your negotiation opportunity, then negotiate it yourself or have TermLift negotiate on your behalf.",
                 sameAs: [],
                 contactPoint: {
                   "@type": "ContactPoint",

@@ -22,12 +22,16 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const fromTrial = searchParams.get('from') === 'trial'
+  const fromNegotiate = searchParams.get('from') === 'negotiate'
+  // Post-auth destination — only same-site paths, never external URLs (open-redirect guard)
+  const nextRaw = searchParams.get('next')
+  const nextPath = nextRaw && /^\/(?!\/)/.test(nextRaw) ? nextRaw : '/app'
   const supabase = createClient()
 
-  // Auto-switch to signup if coming from trial
+  // Auto-switch to signup if coming from trial or the negotiate funnel — those visitors are almost always new
   useEffect(() => {
-    if (fromTrial) setIsSignUp(true)
-  }, [fromTrial])
+    if (fromTrial || fromNegotiate) setIsSignUp(true)
+  }, [fromTrial, fromNegotiate])
 
   useEffect(() => {
     if (isSignUp) {
@@ -44,7 +48,7 @@ function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -69,7 +73,7 @@ function LoginForm() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/app`,
+            emailRedirectTo: `${window.location.origin}${nextPath}`,
           },
         })
         if (error) throw error
@@ -95,7 +99,7 @@ function LoginForm() {
           identifyUser(data.user.id, { email })
         }
 
-        router.push('/app')
+        router.push(nextPath)
         router.refresh()
       }
     } catch (error) {

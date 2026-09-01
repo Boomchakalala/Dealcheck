@@ -174,6 +174,8 @@ export function AnalysisResultView({ output, locale = 'en' }: AnalysisResultView
         isAdmin={false}
         addRoundForm={addRoundForm}
         messages={messages}
+        showFullPlaybook={false}
+        negotiateHref="/negotiate"
       />
     </div>
   )

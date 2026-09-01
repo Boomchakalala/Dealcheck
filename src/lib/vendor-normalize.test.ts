@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { normalizeVendorName, vendorKeySimilarity, vendorNameSimilarity } from './vendor-normalize'
+import { normalizeVendorName, vendorKeySimilarity, vendorNameSimilarity, shortenVendorDisplayName } from './vendor-normalize'
 
 describe('normalizeVendorName', () => {
   it('strips legal suffix, punctuation, and case (spec example)', () => {
@@ -52,5 +52,30 @@ describe('vendorKeySimilarity', () => {
   it('identical keys score 1, and the measure is symmetric', () => {
     expect(vendorKeySimilarity('acme events', 'acme events')).toBe(1)
     expect(vendorKeySimilarity('acme events', 'acme event')).toBeCloseTo(vendorKeySimilarity('acme event', 'acme events'))
+  })
+})
+
+describe('shortenVendorDisplayName', () => {
+  it('strips trailing legal suffixes and a parenthetical aside', () => {
+    expect(shortenVendorDisplayName('Docusign International (EMEA) Limited')).toBe('Docusign')
+  })
+
+  // Regression: the old regex used `S\.?A\.?S?\.?` (no word boundary) to strip
+  // "S.A." suffixes, which also matched the "Sa" substring at the START of any
+  // word — turning "Salesforce" into "lesforce". This must never happen again.
+  it('does not corrupt names that merely CONTAIN a suffix as a substring', () => {
+    expect(shortenVendorDisplayName('Salesforce')).toBe('Salesforce')
+    expect(shortenVendorDisplayName('Sage')).toBe('Sage')
+    expect(shortenVendorDisplayName('Segment')).toBe('Segment')
+    expect(shortenVendorDisplayName('Agile Analytics')).toBe('Agile Analytics')
+  })
+
+  it('preserves display casing (unlike normalizeVendorName)', () => {
+    expect(shortenVendorDisplayName('Uni-Vert Paysages SARL')).toBe('Uni-Vert Paysages')
+  })
+
+  it('never strips down to nothing — stops at the last token even if it looks like a suffix', () => {
+    expect(shortenVendorDisplayName('Limited Inc')).toBe('Limited')
+    expect(shortenVendorDisplayName('Inc')).toBe('Inc')
   })
 })

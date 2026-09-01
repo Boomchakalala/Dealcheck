@@ -108,6 +108,11 @@ export const CreateDealSchema = z.object({
   }).optional(),
   saveExtractedText: z.boolean().default(false),
   isDemoText: z.boolean().default(false), // Flag for demo text (don't count against usage)
+  // Echoed back from an earlier /api/deal/extract-preview response so
+  // analyzeDeal() can reuse it instead of re-deriving. Untyped here — the
+  // client only ever forwards what our own preview endpoint just returned it.
+  precomputedClassification: z.unknown().optional(),
+  precomputedFacts: z.unknown().optional(),
 }).refine(
   (data) => (data.extractedText && data.extractedText.length >= 10) || data.imageData || data.pdfData,
   { message: 'Either extractedText (min 10 chars), imageData, or pdfData must be provided' }
@@ -231,3 +236,38 @@ export type DealOutputType = z.infer<typeof DealOutputSchema>
 export type DealOutputTypeV2 = z.infer<typeof DealOutputSchemaV2>
 export type CreateDealInput = z.infer<typeof CreateDealSchema>
 export type AddRoundInput = z.infer<typeof AddRoundSchema>
+
+// Negotiation request intake — both the post-analysis and direct entry paths
+// submit through this same shape.
+export const NegotiationRequestSchema = z.object({
+  source: z.enum(['post_analysis', 'direct']),
+  dealId: z.string().uuid().nullable().optional(),
+  roundId: z.string().uuid().nullable().optional(),
+  vendor: z.string().nullable().optional(),
+  category: z.string().nullable().optional(),
+  renewalDate: z.string().nullable().optional(), // ISO date string
+  currentTotal: z.string().nullable().optional(),
+  seatOrUsageNotes: z.string().nullable().optional(),
+  contactName: z.string().nullable().optional(),
+  contactPhone: z.string().nullable().optional(),
+  vendorContactName: z.string().nullable().optional(),
+  vendorContactEmail: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  documentConsent: z.boolean().default(false), // must be true if a document is attached
+  dealType: z.enum(['renewal', 'new_purchase', 'expansion', 'unknown']).nullable().optional(),
+  dealTypeConfidence: z.enum(['high', 'low']).nullable().optional(),
+  negotiationObjective: z.string().nullable().optional(),
+  walkAwayNotes: z.string().nullable().optional(),
+  competitorContext: z.string().nullable().optional(),
+  // Small normalized snapshot only — never the raw quote text.
+  analysisContext: z.object({
+    verdict: z.string().nullable().optional(),
+    targetPriceLow: z.number().nullable().optional(),
+    targetPriceHigh: z.number().nullable().optional(),
+    potentialSavings: z.number().nullable().optional(),
+    currency: z.string().nullable().optional(),
+    topRedFlags: z.array(z.string()).optional(),
+  }).nullable().optional(),
+})
+
+export type NegotiationRequestInput = z.infer<typeof NegotiationRequestSchema>

@@ -114,8 +114,11 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
         }
       })
 
-      // Redirect to the new round
-      router.push(`/app/round/${data.roundId}`)
+      // Redirect to the deal page (the current, actively-maintained rounds
+      // view with correct action-hierarchy gating) rather than the legacy
+      // /app/round/[roundId] page, which predates it and lacks the same
+      // full-analysis/negotiation gating logic.
+      router.push(`/app/deal/${dealId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {

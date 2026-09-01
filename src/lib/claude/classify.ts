@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { anthropic, CLAUDE_CLASSIFY_MODEL, getResponseText, parseJsonFromContent, SUPPORTED_IMAGE_MIME_TYPES, ClaudeImageMediaType } from './client'
+import { createTrackedMessage, CLAUDE_CLASSIFY_MODEL, getResponseText, parseJsonFromContent, SUPPORTED_IMAGE_MIME_TYPES, ClaudeImageMediaType } from './client'
 import { QuoteClassificationSchema, QuoteClassificationType } from '../schemas'
 
 export const CLASSIFICATION_PROMPT = `You are a quote classification engine. Read the quote and return a JSON classification.
@@ -116,7 +116,7 @@ export async function classifyQuote(
     userContent = userPrompt
   }
 
-  const response = await anthropic.messages.create({
+  const response = await createTrackedMessage('classify', {
     model: CLAUDE_CLASSIFY_MODEL,
     max_tokens: 500,
     system: CLASSIFICATION_PROMPT,

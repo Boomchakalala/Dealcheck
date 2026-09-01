@@ -3,7 +3,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import {
   Loader2, Upload, Zap, Target, AlertTriangle, TrendingUp, Mail,
-  MessageSquare, CheckCircle2, ChevronDown,
+  CheckCircle2, ChevronDown, Plus,
 } from 'lucide-react'
 
 export interface AnalysisUploaderProps {
@@ -39,6 +39,10 @@ export interface AnalysisUploaderProps {
   // Trust line below the CTA
   showTrustLine?: boolean
   trustLineText?: string
+
+  // Live findings + completion flash, forwarded to AnalysisProgress
+  liveFindings?: LiveFindings | null
+  completionFlash?: { opportunityCount: number } | null
 }
 
 function formatBytes(bytes: number) {
@@ -47,10 +51,31 @@ function formatBytes(bytes: number) {
   return (bytes / 1048576).toFixed(1) + ' MB'
 }
 
-// Staged progress shown while the analysis pipeline runs (~60-120s).
-// Stages are time-paced to the real pipeline (extract → analyse → emails);
-// the last stage holds with a spinner until the request actually returns.
-export function AnalysisProgress() {
+export interface LiveFindings {
+  total?: string
+  term?: string
+  billing?: string
+  dealType?: string
+}
+
+export interface AnalysisProgressProps {
+  // Real classify+extract result from /api/deal/extract-preview, once it
+  // resolves (~5-17s in) — rendered as chips. Never simulated: absent
+  // means nothing is shown, not a placeholder.
+  liveFindings?: LiveFindings | null
+  // Set only once the full analysis response has actually come back —
+  // a brief completion beat before the caller navigates away. Never
+  // shown before the count is real.
+  completionFlash?: { opportunityCount: number } | null
+}
+
+// Staged progress shown while the fast-analysis pipeline runs (~35-50s: a
+// short parallel classify+extract phase, then one longer analysis call).
+// Stages are time-paced to that real shape, not measured events — wiring
+// actual backend progress would need a streaming/SSE layer, which is a
+// bigger change than this warrants. The last stage holds with a spinner
+// until the request actually returns; it never claims to be done early.
+export function AnalysisProgress({ liveFindings, completionFlash }: AnalysisProgressProps = {}) {
   const [elapsed, setElapsed] = useState(0)
   useEffect(() => {
     const start = Date.now()
@@ -59,17 +84,26 @@ export function AnalysisProgress() {
   }, [])
 
   const stages = [
-    { label: 'Reading your quote', sub: 'Pulling out vendor, pricing and terms', at: 0 },
-    { label: 'Sizing up the market', sub: 'Weighing the deal against fair benchmarks', at: 16 },
-    { label: 'Finding red flags & savings', sub: 'Every clause stress-tested', at: 42 },
-    { label: 'Drafting your negotiation emails', sub: 'Three tones, ready to send', at: 80 },
+    { label: 'Reading the quote', sub: 'Pulling out vendor, pricing and terms', at: 0 },
+    { label: 'Extracting commercial terms', sub: 'Line items, fees, payment structure', at: 4 },
+    { label: 'Assessing negotiation leverage', sub: 'Deadlines, deal size, competitive position', at: 12 },
+    { label: 'Building your initial recommendation', sub: 'Initial score, findings, and key opportunities', at: 20 },
   ]
   const currentIdx = stages.reduce((acc, s, i) => (elapsed >= s.at ? i : acc), 0)
+
+  const findingChips = liveFindings
+    ? [
+        liveFindings.total,
+        liveFindings.term,
+        liveFindings.billing,
+        liveFindings.dealType,
+      ].filter((v): v is string => !!v)
+    : []
 
   return (
     <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 sm:p-6 flex-1">
       <div className="flex items-center justify-between mb-5">
-        <p className="text-[15px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Analysing your quote</p>
+        <p className="text-[15px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Analysing your deal</p>
         <span className="text-[12px] font-medium text-emerald-600 tabular-nums" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{elapsed}s</span>
       </div>
       <div className="space-y-3.5">
@@ -93,8 +127,33 @@ export function AnalysisProgress() {
           )
         })}
       </div>
+
+      {findingChips.length > 0 && (
+        <div className="mt-5 pt-4 border-t border-emerald-200/60">
+          <p className="text-[10.5px] font-bold text-emerald-700 uppercase tracking-wider mb-2.5">Live findings so far</p>
+          <div className="flex flex-wrap gap-1.5">
+            {findingChips.map((chip, i) => (
+              <span key={i} className="text-[12px] font-medium text-slate-700 bg-white border border-emerald-200 px-2.5 py-1 rounded-full">
+                {chip}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {completionFlash && (
+        <div className="mt-4 flex items-center gap-2.5 bg-emerald-100 border border-emerald-300 rounded-xl px-4 py-3">
+          <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600 flex-shrink-0" />
+          <p className="text-[13px] font-semibold text-emerald-800">
+            {completionFlash.opportunityCount > 0
+              ? `${completionFlash.opportunityCount} potential ${completionFlash.opportunityCount === 1 ? 'opportunity' : 'opportunities'} identified`
+              : 'Analysis ready'}
+          </p>
+        </div>
+      )}
+
       <p className="text-[12px] text-slate-400 mt-5 pt-4 border-t border-emerald-200/60 leading-relaxed">
-        A thorough analysis takes about two minutes — we&apos;re reading every line so you don&apos;t have to.
+        Usually ready in under a minute. You can leave this page while we finish.
       </p>
     </div>
   )
@@ -107,10 +166,12 @@ export function AnalysisUploader({
   onAnalyze, analyzeLabel = 'Analyse this quote',
   context, setContext, showContext = true,
   showValueProp = true,
-  valuePropHeadline = "In about two minutes, you'll know exactly where you stand.",
-  valuePropBody = 'Our AI reads every line of your quote and gives you a complete negotiation playbook — so you walk in prepared, not guessing.',
+  valuePropHeadline = "In under a minute, you'll know exactly where you stand.",
+  valuePropBody = "Our AI reads every line of your quote and gives you an instant score, every red flag, and the savings on the table — then you decide how to act on it.",
   showTrustLine = true,
-  trustLineText = 'Takes about two minutes · Files are deleted after extraction',
+  trustLineText = 'Ready in under a minute · Files are deleted after extraction',
+  liveFindings,
+  completionFlash,
 }: AnalysisUploaderProps) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
@@ -140,6 +201,22 @@ export function AnalysisUploader({
           <p className="text-[14px] sm:text-[15px] font-bold text-slate-900 uppercase tracking-wide">Your quote</p>
         </div>
 
+        {analyzing ? (
+          // Collapsed summary — the full dropzone/paste UI isn't actionable
+          // mid-analysis, so it steps back into a compact confirmation card.
+          <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-4">
+            <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[14px] font-semibold text-slate-900 truncate">{uploadedFileName || 'Pasted quote text'}</p>
+              <p className="text-[12px] text-slate-500">
+                {uploadedFileSize ? `${uploadedFileSize} · ` : ''}&#10003; Uploaded
+              </p>
+            </div>
+          </div>
+        ) : (
+        <>
         {/* Dropzone */}
         <div
           className={`rounded-2xl py-8 sm:py-10 px-4 sm:px-6 text-center cursor-pointer transition-all group border-2 border-dashed ${
@@ -218,91 +295,83 @@ export function AnalysisUploader({
             <span key={f} className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">{f}</span>
           ))}
         </div>
-      </div>
+        </>
+        )}
 
-      {/* ─── RIGHT — Context + CTA + Value prop (2 cols on desktop) ─── */}
-      <div className="lg:col-span-2 flex flex-col gap-4 sm:gap-5">
-        {/* Optional context */}
+        {/* Optional context — compact trigger, lives with the quote itself */}
         {canShowContext && (
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div className="mt-4">
             <button
               onClick={() => setShowContextField(!showContextField)}
-              className="w-full px-5 sm:px-6 py-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
+              disabled={analyzing}
+              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-slate-500 hover:text-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
-                  <MessageSquare className="w-5 h-5 text-slate-500" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[14px] font-semibold text-slate-900">Anything the AI should know?</p>
-                  <p className="text-[12px] text-slate-400">Optional — add context it can&apos;t see in the quote</p>
-                </div>
-              </div>
-              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${showContextField ? 'rotate-180' : ''}`} />
+              <Plus className={`w-3.5 h-3.5 transition-transform ${showContextField ? 'rotate-45' : ''}`} />
+              Add context
+              {!showContextField && <span className="text-[11px] font-normal text-slate-400">— optional, anything the AI can&apos;t see in the quote</span>}
             </button>
             {showContextField && (
-              <div className="px-5 sm:px-6 pb-5">
-                <textarea
-                  rows={3}
-                  value={context}
-                  onChange={(e) => setContext!(e.target.value)}
-                  placeholder="e.g. We're a 50-person startup, budget is tight this quarter, renewal deadline is June 30, we've been with this vendor 2 years..."
-                  className="w-full text-[13px] px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300 placeholder:text-slate-300 resize-none"
-                />
-              </div>
+              <textarea
+                rows={3}
+                value={context}
+                onChange={(e) => setContext!(e.target.value)}
+                disabled={analyzing}
+                placeholder="e.g. We're a 50-person startup, budget is tight this quarter, renewal deadline is June 30, we've been with this vendor 2 years..."
+                className="w-full mt-2.5 text-[13px] px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300 placeholder:text-slate-300 resize-none disabled:opacity-50"
+              />
             )}
           </div>
         )}
+      </div>
 
-        {/* Error */}
-        {error && (
-          <p className="text-[13px] text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 font-medium">
-            {error}
-          </p>
-        )}
-
-        {/* CTA */}
-        <button
-          onClick={onAnalyze}
-          disabled={analyzing || !hasContent}
-          className="w-full bg-emerald-500 text-white rounded-xl py-4 text-[15px] sm:text-[16px] font-bold flex items-center justify-center gap-2.5 hover:bg-emerald-600 hover:-translate-y-0.5 disabled:hover:translate-y-0 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_8px_24px_-6px_rgba(29,185,84,0.45)] hover:shadow-[0_12px_32px_-8px_rgba(29,185,84,0.55)]"
-        >
-          {analyzing ? (
-            <><Loader2 className="w-5 h-5 animate-spin" />Analysing your quote...</>
-          ) : (
-            <><Zap className="w-5 h-5" />{analyzeLabel}</>
-          )}
-        </button>
-
-        {showTrustLine && (
-          <p className="text-[12px] text-slate-400 text-center -mt-2">{trustLineText}</p>
-        )}
-
-        {/* Live progress while analysing — otherwise the value prop */}
+      {/* ─── RIGHT — CTA + value prop, or the live progress panel (2 cols on desktop) ─── */}
+      <div className="lg:col-span-2 flex flex-col gap-4 sm:gap-5">
         {analyzing ? (
-          <AnalysisProgress />
-        ) : showValueProp && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 sm:p-6 flex-1">
-            <p className="text-[16px] sm:text-[17px] font-bold text-slate-900 mb-3 leading-snug" style={{ fontFamily: 'Sora, sans-serif' }}>
-              {valuePropHeadline}
-            </p>
-            <p className="text-[13px] sm:text-[14px] text-slate-600 leading-relaxed mb-5">
-              {valuePropBody}
-            </p>
-            <div className="space-y-3">
-              {[
-                { icon: <Target className="w-4 h-4 text-emerald-600" />, text: "A 0–100 deal score so you know instantly if you're overpaying" },
-                { icon: <AlertTriangle className="w-4 h-4 text-emerald-600" />, text: 'Every red flag flagged — with what to ask for and a fallback' },
-                { icon: <TrendingUp className="w-4 h-4 text-emerald-600" />, text: 'Realistic savings — broken into must-haves and nice-to-haves' },
-                { icon: <Mail className="w-4 h-4 text-emerald-600" />, text: 'A ready-to-send negotiation email in 3 tones' },
-              ].map(c => (
-                <div key={c.text} className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">{c.icon}</div>
-                  <p className="text-[13px] text-slate-700 leading-snug">{c.text}</p>
+          <AnalysisProgress liveFindings={liveFindings} completionFlash={completionFlash} />
+        ) : (
+          <>
+            {error && (
+              <p className="text-[13px] text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 font-medium">
+                {error}
+              </p>
+            )}
+
+            <button
+              onClick={onAnalyze}
+              disabled={!hasContent}
+              className="w-full bg-emerald-500 text-white rounded-xl py-4 text-[15px] sm:text-[16px] font-bold flex items-center justify-center gap-2.5 hover:bg-emerald-600 hover:-translate-y-0.5 disabled:hover:translate-y-0 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_8px_24px_-6px_rgba(29,185,84,0.45)] hover:shadow-[0_12px_32px_-8px_rgba(29,185,84,0.55)]"
+            >
+              <Zap className="w-5 h-5" />{analyzeLabel}
+            </button>
+
+            {showTrustLine && (
+              <p className="text-[12px] text-slate-400 text-center -mt-2">{trustLineText}</p>
+            )}
+
+            {showValueProp && (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 sm:p-6 flex-1">
+                <p className="text-[16px] sm:text-[17px] font-bold text-slate-900 mb-3 leading-snug" style={{ fontFamily: 'Sora, sans-serif' }}>
+                  {valuePropHeadline}
+                </p>
+                <p className="text-[13px] sm:text-[14px] text-slate-600 leading-relaxed mb-5">
+                  {valuePropBody}
+                </p>
+                <div className="space-y-3">
+                  {[
+                    { icon: <Target className="w-4 h-4 text-emerald-600" />, text: "A 0–100 deal score so you know instantly if you're overpaying" },
+                    { icon: <AlertTriangle className="w-4 h-4 text-emerald-600" />, text: 'Every red flag flagged — with what to ask for and a fallback' },
+                    { icon: <TrendingUp className="w-4 h-4 text-emerald-600" />, text: 'Realistic savings — broken into must-haves and nice-to-haves' },
+                    { icon: <Mail className="w-4 h-4 text-emerald-600" />, text: 'Then generate a negotiation email — or let TermLift negotiate it for you' },
+                  ].map(c => (
+                    <div key={c.text} className="flex items-start gap-3">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">{c.icon}</div>
+                      <p className="text-[13px] text-slate-700 leading-snug">{c.text}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
