@@ -38,8 +38,18 @@ Configured in `.env.local` (see README.md for the full list): Supabase URL/anon/
 
 ## Key files
 
-- `/src/lib/openai.ts` — AI analysis logic
+- `/src/lib/claude.ts` + `/src/lib/claude/*` — AI analysis logic (Anthropic; the old `openai.ts` is gone)
 - `/src/lib/extract.ts` — file processing
 - `/src/lib/schemas.ts` — Zod validation
 - `/src/app/api/*` — API routes
-- `/src/components/OutputDisplay.tsx` — results renderer
+- `/src/components/DealScrollView.tsx` — analysis sections renderer, wrapped by `components/deal/DealWorkspace.tsx`
+
+## Design system (redesign, Sept 2026)
+
+- Tokens live in `src/app/globals.css` (`--tl-*` + `@theme` utilities: `text-ink`, `bg-ground`, `border-line`, `text-green-deep`, `bg-warn-soft`…). Rule: green = money or the primary action, nothing else.
+- Fonts via `next/font`: Sora (`font-display`) for headlines, Geist for body, JetBrains Mono (`.tl-label`) for tiny labels only.
+- Shared primitives in `src/components/system/` — `Btn`, `Chip`, `StatTile`, `ScoreRing`, `StageRail`, `GateCard`, `PageHeader`/`PageBody`/`AppPage`, `Table`, `SectionHeading`/`Card`, `ImageSlot`. Use these before writing new UI.
+- The product ladder (`src/lib/deal-stage.ts`): Quick analysis → Full Analysis → Negotiate → TermLift negotiates → Closed. Same five names everywhere (`ladder.*` i18n keys).
+- Deal numbers come from `src/lib/deal-metrics.ts` only; Home KPIs/insights from `src/lib/deal-insights.ts`.
+- i18n: live strings are `messages/{en,fr}.json` (nested). Add new copy in both via `scripts/i18n-merge.mjs <fragment> <locale>`. `src/i18n/*.json` is a stale flat copy still read by `DealScrollView` — don't add to it.
+- App pages wrap in `<AppPage>` (full-bleed) → `<PageHeader>` → `<PageBody>`. `/app/dashboard` and `/app/negotiations` redirect into Home tabs/filters.
