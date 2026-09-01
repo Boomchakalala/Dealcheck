@@ -55,6 +55,15 @@ export function PageHeader({ title, sub, crumbs, actions, children, className }:
   )
 }
 
+/**
+ * Full-bleed wrapper for redesigned app pages: escapes the app layout's legacy
+ * padding so PageHeader can run edge to edge. Remove (with the layout padding)
+ * once every page under /app uses it.
+ */
+export function AppPage({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cn('-mx-5 sm:-mx-8 -mt-8 -mb-24 md:-mb-8 min-h-screen flex flex-col bg-ground', className)}>{children}</div>
+}
+
 /** Page body: ground colour, consistent gutters and vertical rhythm. */
 export function PageBody({ children, className }: { children: ReactNode; className?: string }) {
   return <div className={cn('px-4 sm:px-6 py-4 pb-24 md:pb-12 flex flex-col gap-3.5 bg-ground min-h-full', className)}>{children}</div>
