@@ -384,10 +384,10 @@ export function DealScrollView(props: DealScrollViewProps) {
           ) : <p className="text-[13px] text-ink-3">—</p>}
           {o?.quick_read?.whats_solid && o.quick_read.whats_solid.length > 0 && (
             <div className="mt-5 pt-4 border-t border-line-2">
-              <p className="tl-label text-ink-3 mb-2.5">{t('output.whatsAlreadySolid')}</p>
-              <ul className="m-0 p-0 list-none flex flex-col gap-2">
+              <IconHeading icon={CheckCircle2} tone="green" title={t('output.whatsAlreadySolid')} />
+              <ul className="m-0 p-0 list-none flex flex-col gap-2.5">
                 {o.quick_read.whats_solid.map((item: string, i: number) => (
-                  <li key={i} className="flex items-start gap-2.5 text-[13px] text-ink-2 leading-snug"><CheckCircle2 className="w-4 h-4 text-green shrink-0 mt-px" />{item}</li>
+                  <li key={i} className="flex items-start gap-2.5 text-[13.5px] text-ink leading-snug"><CheckCircle2 className="w-4 h-4 text-green shrink-0 mt-px" />{item}</li>
                 ))}
               </ul>
             </div>
