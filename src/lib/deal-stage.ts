@@ -26,9 +26,15 @@ export function stageIndex(stage: DealStage): number {
 /** Minimal shape needed to derive a stage — works for deals rows joined with rounds. */
 export interface StageInput {
   status?: string | null
-  rounds?: Array<{ round_number: number; output_json?: unknown; email_generated_at?: string | null; generated_email?: unknown }> | null
+  rounds?: Array<{ round_number: number; output_json?: unknown }> | null
   /** Any open TermLift negotiation request on this deal (status not closed_*). */
   negotiationRequestStatus?: string | null
+}
+
+/** A generated email lives inside the round's output_json (no separate column) — same signal DealScrollView uses. */
+function hasGeneratedEmail(output: unknown): boolean {
+  const o = output as { email_drafts?: { neutral?: { body?: unknown } } } | null | undefined
+  return !!o?.email_drafts?.neutral?.body
 }
 
 /**
@@ -44,7 +50,7 @@ export function deriveDealStage(d: StageInput): DealStage {
   if (nr && !nr.startsWith('closed_')) return 'termlift'
   const rounds = [...(d.rounds || [])].sort((a, b) => b.round_number - a.round_number)
   const latest = rounds[0]
-  const emailed = rounds.some((r) => !!r.email_generated_at || !!r.generated_email)
+  const emailed = rounds.some((r) => hasGeneratedEmail(r.output_json))
   if (rounds.length >= 2 || emailed) return 'self'
   if (latest && hasDeepContent(latest.output_json)) return 'full'
   return 'quick'

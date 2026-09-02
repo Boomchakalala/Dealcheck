@@ -31,11 +31,15 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const t = await getTranslations('home')
   const locale = await getLocale()
 
-  const [{ data: profile }, { data: deals }, { data: requests }] = await Promise.all([
+  const [{ data: profile }, { data: deals, error: dealsError }, { data: requests, error: requestsError }] = await Promise.all([
     supabase.from('profiles').select('usage_count, plan, is_admin, base_currency').eq('id', user.id).single(),
-    supabase.from('deals').select('*, rounds (id, output_json, round_number, status, email_generated_at, created_at)').eq('user_id', user.id).order('updated_at', { ascending: false }),
+    supabase.from('deals').select('*, rounds (id, output_json, round_number, status, created_at)').eq('user_id', user.id).order('updated_at', { ascending: false }),
     supabase.from('negotiation_requests').select('deal_id, status').eq('user_id', user.id),
   ])
+
+  // A failed query must never masquerade as "no deals yet".
+  if (dealsError) throw new Error(`Home: deals query failed — ${dealsError.message}`)
+  if (requestsError) throw new Error(`Home: negotiation_requests query failed — ${requestsError.message}`)
 
   const allDeals = (deals || []) as unknown as DealLike[]
   const isPaid = ['essentials', 'pro', 'business'].includes(profile?.plan || '')

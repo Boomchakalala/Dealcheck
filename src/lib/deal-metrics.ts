@@ -27,8 +27,6 @@ export interface RoundLike {
   round_number: number
   output_json?: unknown
   status?: string
-  email_generated_at?: string | null
-  generated_email?: unknown
   created_at?: string
 }
 export interface DealLike {

@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     supabase.from('profiles').select('usage_count, plan, is_admin').eq('id', user.id).single(),
     supabase.from('notifications').select('id, type, title, body, link, read_at, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(30),
     // Just enough to derive "needs you" for the sidebar badge — Home re-fetches the full rows.
-    supabase.from('deals').select('id, status, rounds (round_number, output_json, email_generated_at)').eq('user_id', user.id),
+    supabase.from('deals').select('id, status, rounds (round_number, output_json)').eq('user_id', user.id),
     supabase.from('negotiation_requests').select('deal_id, status').eq('user_id', user.id),
   ])
 
@@ -21,7 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const reqByDeal = new Map<string, string>()
   for (const r of requests || []) if (r.deal_id) reqByDeal.set(r.deal_id, r.status)
-  type BadgeDeal = { id: string; status: string | null; rounds: Array<{ round_number: number; output_json: unknown; email_generated_at: string | null }> | null }
+  type BadgeDeal = { id: string; status: string | null; rounds: Array<{ round_number: number; output_json: unknown }> | null }
   const needsYou = ((deals || []) as unknown as BadgeDeal[]).reduce((n, d) => {
     const nr = reqByDeal.get(d.id)
     if (nr === 'waiting_for_client_info') return n + 1
