@@ -10,6 +10,7 @@ import type { Plan } from '@/lib/tiers'
 import { getCanOffer } from '@/lib/email-asks'
 import { hasDeepContent as computeHasDeepContent } from '@/lib/deep-analysis-status'
 import { TONE_LABELS, type EmailTone } from '@/lib/tone-recommend'
+import { getFlagSeverity } from '@/lib/deal-metrics'
 import { Btn, Card, Chip, GateCard, SectionHeading } from '@/components/system'
 import { cn } from '@/lib/utils'
 
@@ -272,17 +273,8 @@ export function DealScrollView(props: DealScrollViewProps) {
   const sortedFlags = useMemo(() => {
     if (!o?.red_flags) return []
     return o.red_flags.map((flag: any, i: number) => {
-      // Prefer the model-assigned severity (authoritative). Fall back to a
-      // dollar-amount heuristic only for older deals with no severity field.
-      const assigned = String(flag.severity || '').toLowerCase()
-      let sev: 'HIGH' | 'MEDIUM' | 'LOW'
-      if (assigned === 'high' || assigned === 'medium' || assigned === 'low') {
-        sev = assigned.toUpperCase() as 'HIGH' | 'MEDIUM' | 'LOW'
-      } else {
-        const amtMatch = flag.why_it_matters?.match(/[\$€£]([\d,]+)/g)
-        const maxAmt = amtMatch ? Math.max(...amtMatch.map((s: string) => parseInt(s.replace(/[^\d]/g, ''), 10) || 0)) : 0
-        sev = maxAmt >= 5000 ? 'HIGH' : maxAmt >= 1000 ? 'MEDIUM' : 'LOW'
-      }
+      // Same helper as the header tile (lib/deal-metrics.getFlagSeverity) so counts never disagree.
+      const sev = getFlagSeverity(flag).toUpperCase() as 'HIGH' | 'MEDIUM' | 'LOW'
       return { flag, idx: i, severity: sev, order: sev === 'HIGH' ? 0 : sev === 'MEDIUM' ? 1 : 2 }
     }).sort((a: any, b: any) => a.order - b.order)
   }, [o?.red_flags])

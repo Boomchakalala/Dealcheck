@@ -15,7 +15,7 @@ import { hasDeepContent, deepAnalysisIsRunning } from '@/lib/deep-analysis-statu
 import { shortenVendorDisplayName } from '@/lib/vendor-normalize'
 import { NEGOTIATION_FEE_PERCENT } from '@/lib/pricing'
 import {
-  type DealLike, getCategory, getDealCurrency, getDealType, getLatestRound, getPotentialSavings, getRedFlagCount,
+  type DealLike, getCategory, getDealCurrency, getDealType, getFlagSeverity, getLatestRound, getPotentialSavings, getRedFlagCount,
   getRenewalDate, getSavingsRange, getScore, getTotalCommitment, getVendorName, isClosed as dealIsClosed, isWon as dealIsWon, fmtMoney,
 } from '@/lib/deal-metrics'
 import { normalizeAmount, parseMoney } from '@/lib/currency'
@@ -96,7 +96,7 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
   const renewal = getRenewalDate(deal)
   const daysToRenewal = renewal ? Math.floor((renewal.getTime() - now) / 86400000) : null
   const sevCounts = (latestOutput.red_flags || []).reduce(
-    (acc, f) => { const s = (f.severity || 'medium') as 'high' | 'medium' | 'low'; acc[s] = (acc[s] || 0) + 1; return acc },
+    (acc, f) => { acc[getFlagSeverity(f)]++; return acc },
     { high: 0, medium: 0, low: 0 } as Record<'high' | 'medium' | 'low', number>,
   )
   const achieved = deal.savings_amount && deal.savings_amount > 0 ? deal.savings_amount : 0
@@ -267,7 +267,7 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
           {won && deal.closed_at ? (
             <StatTile label={t('dealPage.statClosed')} value={dateShort(deal.closed_at)} sub={dateFull(deal.closed_at)} />
           ) : renewal ? (
-            <StatTile label={t('dealPage.statRenewal')} tone={daysToRenewal != null && daysToRenewal <= 90 ? 'warn' : 'neutral'} value={dateShort(renewal)} sub={daysToRenewal != null && daysToRenewal >= 0 ? t('dealPage.statInDays', { n: daysToRenewal }) : dateFull(renewal)} />
+            <StatTile label={t('dealPage.statRenewal')} tone={daysToRenewal != null && daysToRenewal >= 0 && daysToRenewal <= 90 ? 'warn' : 'neutral'} value={dateShort(renewal)} sub={daysToRenewal != null && daysToRenewal >= 0 ? t('dealPage.statInDays', { n: daysToRenewal }) : dateFull(renewal)} />
           ) : (
             <StatTile label={t('dealPage.statStarted')} value={dateShort(deal.created_at)} sub={dateFull(deal.created_at)} />
           )}

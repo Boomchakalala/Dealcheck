@@ -114,6 +114,22 @@ export function getRedFlagCount(deal: DealLike): number {
   return o.red_flags?.length || o.priority_points?.length || 0
 }
 
+export type FlagSeverity = 'high' | 'medium' | 'low'
+
+/**
+ * Severity of one red flag. The model-assigned value is authoritative; older
+ * deals without one fall back to the largest € amount mentioned in
+ * why_it_matters (≥5k high, ≥1k medium). Used by the deal header tile AND the
+ * flags accordion so they can never disagree.
+ */
+export function getFlagSeverity(flag: { severity?: unknown; why_it_matters?: unknown }): FlagSeverity {
+  const assigned = String(flag.severity || '').toLowerCase()
+  if (assigned === 'high' || assigned === 'medium' || assigned === 'low') return assigned
+  const amounts = String(flag.why_it_matters || '').match(/[$€£]([\d,]+)/g)
+  const max = amounts ? Math.max(...amounts.map((s) => parseInt(s.replace(/[^\d]/g, ''), 10) || 0)) : 0
+  return max >= 5000 ? 'high' : max >= 1000 ? 'medium' : 'low'
+}
+
 export function getScore(deal: DealLike): number | undefined {
   const s = getLatestOutput(deal).score
   return typeof s === 'number' ? s : undefined
