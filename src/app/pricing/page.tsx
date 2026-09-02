@@ -46,7 +46,7 @@ export default async function PricingPage() {
           <p className="tl-label text-green-deep text-[11px]">{t('eyebrow')}</p>
           <h1 className="font-display font-extrabold text-[30px] sm:text-[34px] leading-[1.05] tracking-[-0.03em] mt-2.5">{t('title')}</h1>
           <p className="text-[15px] text-ink-2 max-w-[52ch] mx-auto mt-2.5 leading-[1.5]">{t('lead')}</p>
-          <div className="max-w-[720px] mx-auto mt-5"><StageRail current="full" /></div>
+          <div className="max-w-[900px] mx-auto mt-5"><StageRail current="full" /></div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mt-7">
             {/* Step 1 */}

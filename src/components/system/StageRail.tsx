@@ -13,6 +13,8 @@ interface StageRailProps {
   compact?: boolean
   /** Numbers only except the current stage — for very narrow embeds (hero screenshot). */
   minimal?: boolean
+  /** Stages that were bypassed (e.g. a deal won without TermLift negotiating) — drawn neutral, no check. */
+  skipped?: DealStage[]
   className?: string
 }
 
@@ -21,13 +23,13 @@ interface StageRailProps {
  * ground, future ones a dashed circle. Same component on landing, pricing,
  * /try result, and the deal page header.
  */
-export function StageRail({ current, hrefs, compact, minimal, className }: StageRailProps) {
+export function StageRail({ current, hrefs, compact, minimal, skipped = [], className }: StageRailProps) {
   const t = useT()
   const idx = stageIndex(current)
   return (
     <div className={cn('@container flex items-center gap-0 bg-surface border border-line rounded-xl overflow-hidden', compact ? 'p-1' : 'p-1.5', className)} role="list" aria-label="Deal stages">
       {STAGE_ORDER.map((stage, i) => {
-        const state = i < idx ? 'done' : i === idx ? 'now' : 'next'
+        const state: 'done' | 'now' | 'next' | 'skipped' = i === idx ? 'now' : skipped.includes(stage) ? 'skipped' : i < idx ? 'done' : 'next'
         const label = t(STAGE_LABEL_KEY[stage])
         const inner = (
           <>
@@ -37,17 +39,18 @@ export function StageRail({ current, hrefs, compact, minimal, className }: Stage
                 state === 'done' && 'bg-green border-green text-white',
                 state === 'now' && 'border-green text-green-deep bg-surface',
                 state === 'next' && 'border-dashed border-line text-ink-3 bg-surface',
+                state === 'skipped' && 'border-line text-ink-3 bg-line-2',
               )}
               aria-hidden
             >
-              {state === 'done' ? '✓' : i + 1}
+              {state === 'done' ? '✓' : state === 'skipped' ? '–' : i + 1}
             </span>
             {/* Labels give way by importance as the rail narrows: current always shows,
                 done steps need ~600px of rail, future steps ~820px. Numbers stay. */}
             <span
               className={cn(
                 'truncate',
-                state === 'done' && 'hidden @[600px]:inline',
+                (state === 'done' || state === 'skipped') && 'hidden @[600px]:inline',
                 state === 'next' && 'hidden @[820px]:inline',
                 minimal && state !== 'now' && '!hidden',
               )}
@@ -62,7 +65,8 @@ export function StageRail({ current, hrefs, compact, minimal, className }: Stage
           compact ? 'px-2 py-1.5' : 'px-3 py-2',
           state === 'done' && 'text-ink-2',
           state === 'now' && 'bg-green-soft text-green-deep',
-          state === 'next' && 'text-ink-3',
+          (state === 'next' || state === 'skipped') && 'text-ink-3',
+          state === 'skipped' && 'line-through decoration-line',
         )
         const href = hrefs?.[stage]
         return href ? (

@@ -192,7 +192,7 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
             </div>
           )}
         </div>
-        <div className="px-4 sm:px-6 pb-2.5"><StageRail current={stage} hrefs={railHrefs} compact /></div>
+        <div className="px-4 sm:px-6 pb-2.5"><StageRail current={stage} hrefs={railHrefs} skipped={closed && !negotiationRequest ? ['termlift'] : []} /></div>
       </div>
 
       <PageBody className={cn(isTrial && 'pb-4')}>
