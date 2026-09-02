@@ -141,7 +141,7 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
     body = verdict || scoreRationale || ''
   }
 
-  const stageChipLabel = closed && !won ? t('dealList.noChange') : t(STAGE_LABEL_KEY[stage])
+  const stageChipLabel = won ? t('dealList.won') : closed ? t('dealList.noChange') : t(STAGE_LABEL_KEY[stage])
 
   return (
     <AppPage className={isTrial ? '!mx-0 !my-0 min-h-0 rounded-[14px] border border-line overflow-hidden' : undefined}>

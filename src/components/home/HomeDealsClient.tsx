@@ -113,7 +113,7 @@ export function HomeDealsClient({ rows: initialRows, linkBase = '/app', readOnly
 
   const renderRow = (r: HomeRow) => {
     const tone = stageTone(r.stage, { won: r.won, waitingOnClient: r.waitingOnClient })
-    const stageLabel = r.closed && !r.won ? t('dealList.noChange') : t(STAGE_LABEL_KEY[r.stage])
+    const stageLabel = r.won ? t('dealList.won') : r.closed ? t('dealList.noChange') : t(STAGE_LABEL_KEY[r.stage])
     return (
       <TableRow key={r.id} cols={COLS} href={`${linkBase}/deal/${r.id}`} className={cn('group', deletingId === r.id && 'opacity-50')}>
         <NameCell name={r.vendor} sub={[r.category, r.dealType].filter(Boolean).join(' · ')} />

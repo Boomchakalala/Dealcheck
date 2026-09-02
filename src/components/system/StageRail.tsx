@@ -11,6 +11,8 @@ interface StageRailProps {
   hrefs?: Partial<Record<DealStage, string>>
   /** Tighter padding, hides labels for future stages — for embeds and mobile. */
   compact?: boolean
+  /** Numbers only except the current stage — for very narrow embeds (hero screenshot). */
+  minimal?: boolean
   className?: string
 }
 
@@ -19,7 +21,7 @@ interface StageRailProps {
  * ground, future ones a dashed circle. Same component on landing, pricing,
  * /try result, and the deal page header.
  */
-export function StageRail({ current, hrefs, compact, className }: StageRailProps) {
+export function StageRail({ current, hrefs, compact, minimal, className }: StageRailProps) {
   const t = useT()
   const idx = stageIndex(current)
   return (
@@ -40,11 +42,12 @@ export function StageRail({ current, hrefs, compact, className }: StageRailProps
             >
               {state === 'done' ? '✓' : i + 1}
             </span>
-            <span className={cn('truncate', compact && state !== 'now' && 'hidden sm:inline', state === 'next' && 'max-sm:hidden')}>{label}</span>
+            <span className={cn('truncate', minimal && state !== 'now' && 'hidden', compact && state !== 'now' && 'hidden sm:inline', state === 'next' && 'max-sm:hidden')}>{label}</span>
           </>
         )
         const cls = cn(
-          'flex items-center justify-center gap-2 flex-1 rounded-lg text-[12.5px] font-semibold whitespace-nowrap min-w-0',
+          'flex items-center justify-center gap-2 rounded-lg text-[12.5px] font-semibold whitespace-nowrap min-w-0',
+          minimal ? (state === 'now' ? 'flex-1' : 'flex-none') : 'flex-1',
           compact ? 'px-2 py-1.5' : 'px-3 py-2',
           state === 'done' && 'text-ink-2',
           state === 'now' && 'bg-green-soft text-green-deep',

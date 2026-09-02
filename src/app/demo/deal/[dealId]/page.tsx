@@ -25,7 +25,7 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
       isAdmin={false}
       showFullPlaybook
       addRoundForm={
-        <GateCard tone="green" title={t('demoCta')} body={t('trialKeepBody')} action={<Btn href="/login?from=demo" variant="primary">{t('demoCta')}</Btn>} />
+        <GateCard tone="green" title={t('demoRoundTitle')} body={t('demoRoundBody')} action={<Btn href="/login?from=demo" variant="primary">{t('demoCta')}</Btn>} />
       }
     />
   )

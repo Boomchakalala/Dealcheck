@@ -69,11 +69,13 @@ export default async function LandingPage() {
               <span>{t('trust1')}</span><span aria-hidden>·</span><span>{t('trust2')}</span><span aria-hidden>·</span><span>{t('trust3')}</span>
             </div>
             {/* Vendors whose quotes have been analysed — honest social proof until customer logos exist */}
-            <div className="mt-6 pt-4 border-t border-line flex flex-wrap items-center gap-2">
-              <span className="tl-label text-ink-3 text-[10px] mr-1 w-full sm:w-auto">{t('logosCap')}</span>
-              {['Salesforce', 'Microsoft', 'DHL', 'HubSpot', 'FedEx'].map((v) => (
-                <span key={v} className="flex-1 min-w-[80px] h-8 rounded-lg bg-ground border border-dashed border-[#C9D3CE] grid place-items-center tl-label text-[9.5px] text-ink-3">{v}</span>
-              ))}
+            <div className="mt-6 pt-4 border-t border-line">
+              <p className="tl-label text-ink-3 text-[10px] mb-2">{t('logosCap')}</p>
+              <div className="grid grid-cols-5 gap-2">
+                {['Salesforce', 'Microsoft', 'DHL', 'HubSpot', 'FedEx'].map((v) => (
+                  <span key={v} className="h-8 rounded-lg bg-ground border border-dashed border-[#C9D3CE] grid place-items-center tl-label text-[9.5px] text-ink-3 truncate px-1">{v}</span>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -88,7 +90,7 @@ export default async function LandingPage() {
                   <div className="text-[12.5px] text-ink-2">{t('shot.sub')}</div>
                 </div>
               </div>
-              <StageRail current="full" compact />
+              <StageRail current="full" compact minimal />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div className="rounded-xl border border-green-line bg-green-soft px-3.5 py-3">
                   <p className="tl-label text-green-deep mb-2">{t('shot.pushFor')}</p>

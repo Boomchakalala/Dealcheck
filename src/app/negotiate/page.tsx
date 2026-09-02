@@ -1,69 +1,54 @@
 export const dynamic = 'force-dynamic'
 
 import { createClient } from '@/lib/supabase/server'
-import { Calendar, PhoneCall, FileCheck } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
+import { FileCheck, PhoneCall, Calendar } from 'lucide-react'
 import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { NegotiationRequestForm } from '@/components/NegotiationRequestForm'
-
-const sora = "'Sora', sans-serif"
-const mono = "'JetBrains Mono', monospace"
-const green = '#1DB954'
+import { StageRail } from '@/components/system'
+import { NEGOTIATION_FEE_PERCENT } from '@/lib/pricing'
 
 export default async function NegotiatePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const t = await getTranslations('negotiateRequest')
+  const l = await getTranslations('landing')
+
+  const steps = [
+    { icon: FileCheck, label: t('step1'), sub: t('step1sub') },
+    { icon: PhoneCall, label: t('step2'), sub: t('step2sub') },
+    { icon: Calendar, label: t('step3'), sub: t('step3sub') },
+  ]
 
   return (
-    <div className="min-h-screen bg-white text-slate-900" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-white text-ink">
       <MarketingHeader />
-
-      <section className="relative px-6 pt-14 pb-10 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 800px 400px at 80% 20%, rgba(29,185,84,0.14) 0%, transparent 70%)' }} />
-        <div className="relative max-w-3xl mx-auto text-center">
-          <p className="text-[11.5px] mb-3 font-bold tracking-widest uppercase" style={{ fontFamily: mono, color: green }}>Renewal coming up?</p>
-          <h1 className="text-slate-900 mb-4" style={{ fontFamily: sora, fontWeight: 800, fontSize: 'clamp(32px, 4.5vw, 48px)', lineHeight: 1.06, letterSpacing: '-0.025em' }}>
-            Let TermLift negotiate it.
-          </h1>
-          <p className="text-[16px] text-slate-500 leading-relaxed">
-            Already know you want help? You don&apos;t need to run the free analysis first — tell us what&apos;s renewing and a negotiator picks it up from here.
-          </p>
+      <main className="max-w-[880px] mx-auto px-5 sm:px-7 pt-10 pb-14">
+        <div className="text-center">
+          <p className="tl-label text-green-deep text-[11px]">{t('publicEyebrow')}</p>
+          <h1 className="font-display font-extrabold text-[30px] sm:text-[36px] leading-[1.05] tracking-[-0.03em] mt-2.5">{t('publicTitle')}</h1>
+          <p className="text-[15px] text-ink-2 max-w-[56ch] mx-auto mt-2.5 leading-[1.5]">{t('publicSub')}</p>
+          <div className="max-w-[720px] mx-auto mt-5"><StageRail current="termlift" /></div>
         </div>
-      </section>
 
-      <section className="px-6 pb-10">
-        <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-          {[
-            { icon: FileCheck, label: 'Tell us the details', sub: 'Vendor, spend, deadline — a couple minutes' },
-            { icon: PhoneCall, label: 'We review it', sub: 'A negotiator gets in touch to confirm scope' },
-            { icon: Calendar, label: 'We run the negotiation', sub: 'You follow progress, approve the outcome' },
-          ].map((s) => (
-            <div key={s.label} className="text-center p-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ background: 'rgba(29,185,84,0.12)', color: green }}>
-                <s.icon className="w-5 h-5" />
-              </div>
-              <p className="text-[13.5px] font-bold text-slate-900" style={{ fontFamily: sora }}>{s.label}</p>
-              <p className="text-[12px] text-slate-500 mt-1">{s.sub}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-7">
+          {steps.map((s) => (
+            <div key={s.label} className="rounded-[14px] border border-line bg-surface px-4 py-3.5 flex items-start gap-3">
+              <span className="w-8 h-8 rounded-lg bg-green-soft text-green-deep grid place-items-center shrink-0"><s.icon className="w-4 h-4" /></span>
+              <div><p className="text-[13px] font-semibold">{s.label}</p><p className="text-[12px] text-ink-2 mt-0.5">{s.sub}</p></div>
             </div>
           ))}
         </div>
 
-        {/* Prefer a call first — routes to email until a scheduler is wired up */}
-        <div className="max-w-3xl mx-auto mb-10 rounded-2xl border-2 border-slate-200 p-5 text-center">
-          <p className="text-[13.5px] font-semibold text-slate-600">Prefer to talk it through first?</p>
-          <a
-            href="mailto:hello@termlift.com?subject=Let's%20talk%20negotiation"
-            className="text-[12.5px] text-emerald-600 hover:text-emerald-700 font-semibold mt-1 inline-block transition-colors"
-          >
-            Email hello@termlift.com and we'll set up a call
-          </a>
+        <div className="rounded-[14px] bg-ink text-white px-5 py-4 mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
+          <p className="font-display font-extrabold text-[30px] leading-none text-green tl-num">{NEGOTIATION_FEE_PERCENT}%<span className="font-sans text-[13px] text-[#A9B7B1] font-normal ml-2">{t('feeUnit')}</span></p>
+          <p className="text-[13px] text-[#C4D0CA]">{l('neg.noFee')} {t('feeNote')}</p>
+          <a href="mailto:hello@termlift.com?subject=Let's%20talk%20negotiation" className="ml-auto text-[13px] font-semibold text-white underline underline-offset-2 decoration-[#3d4a44] hover:decoration-white">{t('talkFirst')}</a>
         </div>
 
-        <div className="max-w-3xl mx-auto">
-          <NegotiationRequestForm source="direct" isAuthenticated={!!user} />
-        </div>
-      </section>
-
+        <div className="mt-6"><NegotiationRequestForm source="direct" isAuthenticated={!!user} /></div>
+      </main>
       <MarketingFooter />
     </div>
   )
