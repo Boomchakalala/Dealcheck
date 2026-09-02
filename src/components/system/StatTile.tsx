@@ -27,8 +27,8 @@ export function StatTile({ label, value, sub, tone = 'neutral', hi, className }:
       )}
     >
       <span className="tl-label text-ink-3">{label}</span>
-      <span className={cn('font-display text-[21px] leading-[1.05] font-bold tracking-[-0.02em] tl-num truncate', valueColor)}>{value}</span>
-      {sub && <span className="text-[11.5px] text-ink-2 truncate">{sub}</span>}
+      <span className={cn('font-display text-[21px] leading-[1.05] font-bold tracking-[-0.02em] tl-num break-words', valueColor)}>{value}</span>
+      {sub && <span className="text-[11.5px] text-ink-2 leading-snug line-clamp-2">{sub}</span>}
     </div>
   )
 }

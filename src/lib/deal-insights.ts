@@ -34,10 +34,18 @@ export interface Insights {
   wonCount: number
   winRate: number
   avgScore: number | null
-  categories: Array<{ name: string; spend: number; count: number; saved: number }>
+  /** achieved ÷ identified-at-time — how much of what was found got captured (won deals only). */
+  captureRate: number | null
+  avgDaysToClose: number | null
+  categories: Array<{ name: string; spend: number; count: number; saved: number; potential: number }>
+  categoryScores: Array<{ name: string; score: number; count: number }>
+  topSuppliers: Array<{ name: string; spend: number; count: number; saved: number; potential: number; dealId: string }>
   monthly: Array<{ key: string; label: string; amount: number }>
   renewals: Array<{ id: string; vendor: string; date: Date; daysOut: number; amount: number; saved: number; won: boolean }>
   topWins: Array<{ id: string; vendor: string; category: string; saved: number }>
+  closedDeals: Array<{ id: string; vendor: string; category: string; original: number; final: number; saved: number; pct: number; closedAt: string; won: boolean }>
+  /** Active deals that need a nudge: stale (no update ≥ 7 days) or heavy on flags. */
+  attention: Array<{ id: string; vendor: string; daysSinceUpdate: number; flags: number; reason: 'stale' | 'flags' }>
   scoreBuckets: Array<{ key: '0' | '40' | '60' | '80'; count: number }>
   nextRenewal: { id: string; vendor: string; date: Date; daysOut: number } | null
 }
@@ -86,14 +94,27 @@ export function computeInsights(rows: EnrichedDeal[], baseCurrency: Currency, no
   const active = rows.filter((r) => !r.closed)
   const scored = rows.filter((r) => r.score != null)
 
-  const catMap = new Map<string, { spend: number; count: number; saved: number }>()
+  // categories
+  const catMap = new Map<string, { spend: number; count: number; saved: number; potential: number; scoreSum: number; scoreN: number }>()
   for (const r of rows) {
-    const e = catMap.get(r.category) || { spend: 0, count: 0, saved: 0 }
-    e.spend += r.amount; e.count++; e.saved += r.achieved
+    const e = catMap.get(r.category) || { spend: 0, count: 0, saved: 0, potential: 0, scoreSum: 0, scoreN: 0 }
+    e.spend += r.amount; e.count++; e.saved += r.achieved; e.potential += r.closed ? 0 : r.potential
+    if (r.score != null) { e.scoreSum += r.score; e.scoreN++ }
     catMap.set(r.category, e)
   }
-  const categories = [...catMap.entries()].map(([name, v]) => ({ name, ...v })).sort((a, b) => b.spend - a.spend).slice(0, 5)
+  const categories = [...catMap.entries()].map(([name, v]) => ({ name, spend: v.spend, count: v.count, saved: v.saved, potential: v.potential })).sort((a, b) => b.spend - a.spend).slice(0, 6)
+  const categoryScores = [...catMap.entries()].filter(([, v]) => v.scoreN > 0).map(([name, v]) => ({ name, score: Math.round(v.scoreSum / v.scoreN), count: v.scoreN })).sort((a, b) => a.score - b.score)
 
+  // suppliers
+  const supMap = new Map<string, { spend: number; count: number; saved: number; potential: number; dealId: string }>()
+  for (const r of rows) {
+    const e = supMap.get(r.vendor) || { spend: 0, count: 0, saved: 0, potential: 0, dealId: r.deal.id }
+    e.spend += r.amount; e.count++; e.saved += r.achieved; e.potential += r.closed ? 0 : r.potential
+    supMap.set(r.vendor, e)
+  }
+  const topSuppliers = [...supMap.entries()].map(([name, v]) => ({ name, ...v })).sort((a, b) => b.spend - a.spend).slice(0, 5)
+
+  // monthly
   const monthMap = new Map<string, { label: string; amount: number }>()
   for (const r of rows) {
     const d = new Date(r.deal.created_at)
@@ -104,6 +125,7 @@ export function computeInsights(rows: EnrichedDeal[], baseCurrency: Currency, no
   }
   const monthly = [...monthMap.entries()].sort(([a], [b]) => a.localeCompare(b)).slice(-6).map(([key, v]) => ({ key, ...v }))
 
+  // renewals
   const renewals = rows
     .filter((r) => r.renewal && r.renewal.getTime() > now.getTime())
     .map((r) => ({
@@ -113,13 +135,39 @@ export function computeInsights(rows: EnrichedDeal[], baseCurrency: Currency, no
     }))
     .sort((a, b) => a.daysOut - b.daysOut)
 
+  // wins + closed table
   const topWins = [...won].filter((r) => r.achieved > 0).sort((a, b) => b.achieved - a.achieved).slice(0, 3)
     .map((r) => ({ id: r.deal.id, vendor: r.vendor, category: r.category, saved: r.achieved }))
+  const closedDeals = [...closed]
+    .sort((a, b) => new Date(b.deal.closed_at || b.deal.updated_at).getTime() - new Date(a.deal.closed_at || a.deal.updated_at).getTime())
+    .slice(0, 8)
+    .map((r) => ({
+      id: r.deal.id, vendor: r.vendor, category: r.category, original: r.amount, final: r.amount - r.achieved, saved: r.achieved,
+      pct: r.amount > 0 ? (r.achieved / r.amount) * 100 : 0, closedAt: r.deal.closed_at || r.deal.updated_at, won: r.won,
+    }))
 
+  // attention: stale or flag-heavy active deals
+  const attention = active
+    .map((r) => ({ r, days: Math.floor((now.getTime() - new Date(r.deal.updated_at).getTime()) / 86400000) }))
+    .filter(({ r, days }) => days >= 7 || r.flags >= 3)
+    .sort((a, b) => b.r.flags - a.r.flags || b.days - a.days)
+    .slice(0, 4)
+    .map(({ r, days }) => ({ id: r.deal.id, vendor: r.vendor, daysSinceUpdate: days, flags: r.flags, reason: (r.flags >= 3 ? 'flags' : 'stale') as 'flags' | 'stale' }))
+
+  // score buckets
   const bucket = (lo: number, hi: number) => scored.filter((r) => (r.score as number) >= lo && (r.score as number) < hi).length
   const scoreBuckets: Insights['scoreBuckets'] = [
     { key: '0', count: bucket(0, 40) }, { key: '40', count: bucket(40, 60) }, { key: '60', count: bucket(60, 80) }, { key: '80', count: bucket(80, 101) },
   ]
+
+  // performance
+  const wonWithPotential = won.filter((r) => r.potential > 0)
+  const captureRate = wonWithPotential.length
+    ? Math.round((wonWithPotential.reduce((s, r) => s + r.achieved, 0) / wonWithPotential.reduce((s, r) => s + r.potential, 0)) * 100)
+    : null
+  const avgDaysToClose = closed.length
+    ? Math.round(closed.reduce((s, r) => s + Math.max(1, (new Date(r.deal.closed_at || r.deal.updated_at).getTime() - new Date(r.deal.created_at).getTime()) / 86400000), 0) / closed.length)
+    : null
 
   return {
     baseCurrency,
@@ -132,10 +180,16 @@ export function computeInsights(rows: EnrichedDeal[], baseCurrency: Currency, no
     wonCount: won.length,
     winRate: closed.length ? Math.round((won.length / closed.length) * 100) : 0,
     avgScore: scored.length ? Math.round(scored.reduce((s, r) => s + (r.score as number), 0) / scored.length) : null,
+    captureRate,
+    avgDaysToClose,
     categories,
+    categoryScores,
+    topSuppliers,
     monthly,
-    renewals: renewals.slice(0, 4),
+    renewals: renewals.slice(0, 5),
     topWins,
+    closedDeals,
+    attention,
     scoreBuckets,
     nextRenewal: renewals[0] ? { id: renewals[0].id, vendor: renewals[0].vendor, date: renewals[0].date, daysOut: renewals[0].daysOut } : null,
   }
