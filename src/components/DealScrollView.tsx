@@ -575,7 +575,11 @@ export function DealScrollView(props: DealScrollViewProps) {
                             {savingsData.niceToHave.map((item: any, i: number) => (
                               <li key={i} className="flex items-start justify-between gap-4 py-3">
                                 <span className="flex items-start gap-2.5 min-w-0"><span className="w-5 h-5 rounded-full bg-line-2 text-ink-2 tl-label text-[10px] grid place-items-center shrink-0">+</span><span className="min-w-0"><span className="block text-[13.5px] text-ink">{item.ask}</span>{item.rationale && <span className="block text-[12.5px] text-ink-3 mt-0.5">{item.rationale}</span>}</span></span>
-                                <span className="font-display font-semibold text-[13.5px] text-ink-2 shrink-0 tl-num">{fmtSav(item.amount)}</span>
+                                {item.amount > 0 ? (
+                                  <span className="font-display font-semibold text-[13.5px] text-ink-2 shrink-0 tl-num">{fmtSav(item.amount)}</span>
+                                ) : (
+                                  <span className="text-[12px] text-ink-3 shrink-0 whitespace-nowrap">{fr ? 'Non chiffré' : 'Not quantified'}</span>
+                                )}
                               </li>
                             ))}
                           </ol>
