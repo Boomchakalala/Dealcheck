@@ -91,7 +91,6 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
   const scoreLabel = latestOutput.score_label
   const scoreRationale = latestOutput.score_rationale
   const verdict = latestOutput.verdict
-  const targetRange = (latestOutput as unknown as { target_price_range?: { low: number; high: number } | null }).target_price_range
   const renewal = getRenewalDate(deal)
   const daysToRenewal = renewal ? Math.floor((renewal.getTime() - now) / 86400000) : null
   const sevCounts = (latestOutput.red_flags || []).reduce(
@@ -154,7 +153,7 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
     <AppPage className={isTrial ? '!mx-0 !my-0 min-h-0 rounded-[14px] border border-line overflow-hidden' : undefined}>
       {/* ── Sticky header ─────────────────────────────────────── */}
       <div className={cn('bg-surface border-b border-line z-30', !isTrial && 'sticky', isDemo ? 'top-[44px]' : 'top-0')}>
-        <div className="px-4 sm:px-6 pt-2.5 flex items-center gap-3 min-h-[34px]">
+        <div className="px-4 sm:px-6 pt-2.5 flex items-center gap-3 min-h-[30px]">
           {isTrial ? (
             <span className="text-[12.5px] text-ink-3">{t('dealPage.trialNotSaved')}</span>
           ) : (
@@ -166,6 +165,20 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
           )}
           <div className="ml-auto flex items-center gap-2">
             {isDemo && <span className="tl-label text-ink-3 hidden sm:inline">{t('dealPage.demoSample')}</span>}
+          </div>
+        </div>
+        <div className="px-4 sm:px-6 pt-1.5 pb-2.5 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 className="font-display font-bold text-[20px] tracking-[-0.02em] text-ink leading-tight truncate max-w-full">{vendor}</h1>
+          <div className="flex flex-wrap gap-1.5">
+            {category && category !== 'Other' && <Chip>{category}</Chip>}
+            {dealType && <Chip>{dealType}</Chip>}
+            <Chip tone={stageTone(stage, { won, waitingOnClient })}>{stageChipLabel}</Chip>
+            {sortedRounds.length > 1 && <Chip>{t('dealPage.rounds', { n: sortedRounds.length })}</Chip>}
+          </div>
+          {/* One action cluster: secondary · primary · ⋯ (export / mark as won / reopen) */}
+          <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto [&>a]:flex-1 sm:[&>a]:flex-none [&>button]:flex-1 sm:[&>button]:flex-none">
+            {secondary}
+            {primary}
             {mode === 'app' && (
               <DealHeaderClient
                 dealId={deal.id}
@@ -183,21 +196,6 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
               />
             )}
           </div>
-        </div>
-        <div className="px-4 sm:px-6 pt-1.5 pb-2.5 flex flex-wrap items-center gap-x-3 gap-y-2">
-          <h1 className="font-display font-bold text-[20px] tracking-[-0.02em] text-ink leading-tight truncate max-w-full">{vendor}</h1>
-          <div className="flex flex-wrap gap-1.5">
-            {category && category !== 'Other' && <Chip>{category}</Chip>}
-            {dealType && <Chip>{dealType}</Chip>}
-            <Chip tone={stageTone(stage, { won, waitingOnClient })}>{stageChipLabel}</Chip>
-            {sortedRounds.length > 1 && <Chip>{t('dealPage.rounds', { n: sortedRounds.length })}</Chip>}
-          </div>
-          {(primary || secondary) && (
-            <div className="flex gap-2 w-full sm:w-auto sm:ml-auto [&>*]:flex-1 sm:[&>*]:flex-none">
-              {secondary}
-              {primary}
-            </div>
-          )}
         </div>
         <div className="px-4 sm:px-6 pb-2.5"><StageRail current={stage} hrefs={railHrefs} skipped={closed && !negotiationRequest ? ['termlift'] : []} /></div>
       </div>

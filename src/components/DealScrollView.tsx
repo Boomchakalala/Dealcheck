@@ -77,6 +77,8 @@ function getNextBusinessDate(daysOut = 5) {
 }
 
 const inputCls = 'w-full rounded-[10px] border border-line bg-surface px-3 py-2 text-[13px] text-ink placeholder:text-ink-3 focus:outline-none focus:border-green focus:ring-[3px] focus:ring-green/15'
+/** Deal-page cards get more room than the default Card so sections don't read as squished. */
+const PAD = 'px-5 py-5'
 const scoreBarClass = (pct: number) => (pct >= 60 ? 'bg-green' : pct >= 40 ? 'bg-warn' : 'bg-risk')
 const scoreTextClass = (pct: number) => (pct >= 60 ? 'text-green-deep' : pct >= 40 ? 'text-warn' : 'text-risk')
 
@@ -84,8 +86,8 @@ const scoreTextClass = (pct: number) => (pct >= 60 ? 'text-green-deep' : pct >= 
 function IconHeading({ icon: Icon, title, sub, right, tone = 'neutral' }: { icon: typeof Zap; title: React.ReactNode; sub?: React.ReactNode; right?: React.ReactNode; tone?: 'neutral' | 'green' | 'risk' | 'ink' }) {
   const tile = tone === 'green' ? 'bg-green-soft text-green-deep' : tone === 'risk' ? 'bg-risk-soft text-risk' : tone === 'ink' ? 'bg-ink text-white' : 'bg-ground text-ink-2'
   return (
-    <div className="flex flex-wrap items-center gap-3 mb-3">
-      <span className={cn('w-8 h-8 rounded-[10px] grid place-items-center shrink-0', tile)}><Icon className="w-4 h-4" /></span>
+    <div className="flex flex-wrap items-center gap-3 mb-4">
+      <span className={cn('w-9 h-9 rounded-[10px] grid place-items-center shrink-0', tile)}><Icon className="w-4 h-4" /></span>
       <div className="min-w-0 flex-1">
         <h3 className="tl-h3 text-ink">{title}</h3>
         {sub && <p className="text-[12.5px] text-ink-2 mt-0.5">{sub}</p>}
@@ -149,8 +151,8 @@ export function DealScrollView(props: DealScrollViewProps) {
   }
 
   // ── collapsible state ─────────────────────
-  const [showSolid, setShowSolid] = useState(true)
   const [expandedBar, setExpandedBar] = useState<string | null>(null)
+  const [showNiceToHave, setShowNiceToHave] = useState(false)
 
   // ── savings data ──────────────────────────
   const savingsData = useMemo(() => {
@@ -331,41 +333,26 @@ export function DealScrollView(props: DealScrollViewProps) {
   // RENDER — sections as separate objects on the page ground
   // ═══════════════════════════════════════════
   return (
-    <div className="flex flex-col gap-3.5">
+    <div className="flex flex-col gap-5">
 
-      {/* ═══ 1. OVERVIEW — snapshot + score breakdown ═══ */}
-      <div id="overview" className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-3.5 scroll-mt-[170px]">
-        <Card>
+      {/* ═══ 1. OVERVIEW — snapshot | score breakdown + already solid (as in the draft) ═══ */}
+      <div id="overview" className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5 scroll-mt-[170px]">
+        <Card className={PAD}>
           <IconHeading icon={BookOpen} title={t('output.dealSnapshot')} />
-          <dl className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-3.5 m-0">
+          <dl className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-5 m-0">
             {snapshotItems.map((item) => (
               <div key={item.label} className="min-w-0">
                 <dt className="tl-label text-ink-3">{item.label}</dt>
-                <dd className="m-0 mt-0.5 text-[13.5px] font-semibold text-ink break-words">{item.val}</dd>
+                <dd className="m-0 mt-1 text-[14px] font-semibold text-ink break-words">{item.val}</dd>
               </div>
             ))}
           </dl>
-          {o?.quick_read?.whats_solid && o.quick_read.whats_solid.length > 0 && (
-            <div className="mt-4 pt-3.5 border-t border-line-2">
-              <button onClick={() => setShowSolid(!showSolid)} className="w-full flex items-center justify-between gap-3 text-left" aria-expanded={showSolid}>
-                <span className="flex items-center gap-2 text-[13px] font-semibold text-ink"><CheckCircle2 className="w-4 h-4 text-green-deep" />{t('output.whatsAlreadySolid')} <span className="text-ink-3 font-normal">· {o.quick_read.whats_solid.length}</span></span>
-                <ChevronDown className={cn('w-4 h-4 text-ink-3 transition-transform', showSolid && 'rotate-180')} />
-              </button>
-              {showSolid && (
-                <ul className="m-0 mt-2.5 p-0 list-none grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {o.quick_read.whats_solid.map((item: string, i: number) => (
-                    <li key={i} className="flex items-start gap-2 rounded-[10px] bg-green-soft border border-green-line px-3 py-2 text-[12.5px] text-ink leading-snug"><CheckCircle2 className="w-3.5 h-3.5 text-green-deep shrink-0 mt-0.5" />{item}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
         </Card>
 
-        <Card>
+        <Card className={PAD}>
           <IconHeading icon={Target} title={fr ? 'Détail du score' : 'Score breakdown'} />
           {scoreRows ? (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3.5">
               {scoreRows.map((r) => {
                 const canExpand = r.items.length > 0
                 const open = expandedBar === r.key
@@ -395,6 +382,16 @@ export function DealScrollView(props: DealScrollViewProps) {
               })}
             </div>
           ) : <p className="text-[13px] text-ink-3">—</p>}
+          {o?.quick_read?.whats_solid && o.quick_read.whats_solid.length > 0 && (
+            <div className="mt-5 pt-4 border-t border-line-2">
+              <p className="tl-label text-ink-3 mb-2.5">{t('output.whatsAlreadySolid')}</p>
+              <ul className="m-0 p-0 list-none flex flex-col gap-2">
+                {o.quick_read.whats_solid.map((item: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2.5 text-[13px] text-ink-2 leading-snug"><CheckCircle2 className="w-4 h-4 text-green shrink-0 mt-px" />{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </Card>
       </div>
 
@@ -444,20 +441,20 @@ export function DealScrollView(props: DealScrollViewProps) {
               const money = (String(flag.issue || '').match(/[$€£]\s?\d[\d.,]*(?:\/[a-zA-Z]+)?/) || [])[0]
               return (
                 <div key={idx} className={cn('border-l-[3px]', stripe)}>
-                  <button onClick={() => toggleFlag(idx)} className="w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-surface-2 transition-colors" aria-expanded={open}>
-                    <span className={cn('w-6 h-6 rounded-full text-[11px] font-bold grid place-items-center shrink-0 mt-0.5 font-display', severity === 'HIGH' ? 'bg-risk text-white' : severity === 'MEDIUM' ? 'bg-warn text-white' : 'bg-line-2 text-ink-2')}>{pos + 1}</span>
+                  <button onClick={() => toggleFlag(idx)} className="w-full flex items-start gap-3.5 px-5 py-4 text-left hover:bg-surface-2 transition-colors" aria-expanded={open}>
+                    <span className={cn('w-7 h-7 rounded-full text-[12px] font-bold grid place-items-center shrink-0 font-display', severity === 'HIGH' ? 'bg-risk text-white' : severity === 'MEDIUM' ? 'bg-warn text-white' : 'bg-line-2 text-ink-2')}>{pos + 1}</span>
                     <span className="flex-1 min-w-0">
-                      <span className="flex items-center gap-2 flex-wrap mb-0.5"><Chip tone={tone} mono>{severity}</Chip>{money && <span className="text-[12.5px] font-bold text-green-deep font-display tl-num">{money}</span>}</span>
-                      <span className="block text-[13.5px] font-semibold text-ink leading-snug">{flag.issue}</span>
+                      <span className="flex items-center gap-2 flex-wrap mb-1"><Chip tone={tone} mono>{severity}</Chip>{money && <span className="text-[12.5px] font-bold text-green-deep font-display tl-num">{money}</span>}</span>
+                      <span className="block text-[14px] font-semibold text-ink leading-snug">{flag.issue}</span>
                     </span>
-                    <ChevronDown className={cn('w-4 h-4 text-ink-3 shrink-0 mt-1 transition-transform', open && 'rotate-180')} />
+                    <ChevronDown className={cn('w-4 h-4 text-ink-3 shrink-0 mt-1.5 transition-transform', open && 'rotate-180')} />
                   </button>
                   <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: open ? '1fr' : '0fr' }}>
                     <div className="overflow-hidden">
-                      <div className="pb-3.5 pr-4 pl-[52px]">
-                        <p className="text-[13px] text-ink-2 leading-relaxed">{flag.why_it_matters}</p>
+                      <div className="pb-5 pr-5 pl-[62px]">
+                        <p className="text-[13.5px] text-ink-2 leading-relaxed">{flag.why_it_matters}</p>
                         {(flag.what_to_ask_for || flag.if_they_push_back) && (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                             {flag.what_to_ask_for && <div className="border-l-2 border-green pl-3"><p className="tl-label text-ink-3 mb-1">{t('output.whatToAskFor')}</p><p className="text-[13px] text-ink font-medium leading-snug">{flag.what_to_ask_for}</p></div>}
                             {flag.if_they_push_back && <div className="border-l-2 border-line pl-3"><p className="tl-label text-ink-3 mb-1">{t('output.fallbackPosition')}</p><p className="text-[13px] text-ink-2 leading-snug">{flag.if_they_push_back}</p></div>}
                           </div>
@@ -505,10 +502,10 @@ export function DealScrollView(props: DealScrollViewProps) {
           ) : (
             <>
               <IconHeading icon={Zap} tone="green" title={fr ? 'Votre plan de négociation' : 'Your negotiation playbook'} sub={fr ? 'Quoi demander, votre levier, et quoi offrir en retour' : 'What to push for, your leverage, and what to offer in return'} />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="rounded-[14px] border border-green-line bg-green-soft px-4 py-3.5">
-                  <p className="tl-label text-green-deep mb-2.5 flex items-center gap-1.5"><Target className="w-3.5 h-3.5" />{t('output.pushFor')}</p>
-                  <ol className="m-0 p-0 list-none flex flex-col gap-2.5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className={cn('rounded-[14px] border border-green-line bg-green-soft', PAD)}>
+                  <p className="tl-label text-green-deep mb-3.5 flex items-center gap-1.5"><Target className="w-3.5 h-3.5" />{t('output.pushFor')}</p>
+                  <ol className="m-0 p-0 list-none flex flex-col gap-3">
                     {o?.what_to_ask_for?.must_have?.map((item: string, i: number) => (
                       <li key={i} className="flex items-start gap-2 text-[13px] font-medium text-ink leading-snug"><span className="w-[18px] h-[18px] rounded-full bg-green text-white tl-label text-[10px] grid place-items-center shrink-0 mt-px">{i + 1}</span>{item}</li>
                     ))}
@@ -517,17 +514,17 @@ export function DealScrollView(props: DealScrollViewProps) {
                     ))}
                   </ol>
                 </div>
-                <Card>
-                  <p className="tl-label text-ink-3 mb-2.5 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" />{t('output.yourLeverage')}</p>
-                  <ul className="m-0 p-0 list-none flex flex-col gap-2.5">
+                <Card className={PAD}>
+                  <p className="tl-label text-ink-3 mb-3.5 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" />{t('output.yourLeverage')}</p>
+                  <ul className="m-0 p-0 list-none flex flex-col gap-3">
                     {o?.negotiation_plan?.leverage_you_have?.map((item: string, i: number) => (
                       <li key={i} className="flex items-start gap-2 text-[13px] text-ink leading-snug"><span className="w-3.5 h-3.5 rounded-full border-[1.5px] border-green shrink-0 mt-[3px]" />{item}</li>
                     ))}
                   </ul>
                 </Card>
-                <Card>
-                  <p className="tl-label text-ink-3 mb-2.5 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" />{t('output.canOffer')}</p>
-                  <ul className="m-0 p-0 list-none flex flex-col gap-2.5">
+                <Card className={PAD}>
+                  <p className="tl-label text-ink-3 mb-3.5 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" />{t('output.canOffer')}</p>
+                  <ul className="m-0 p-0 list-none flex flex-col gap-3">
                     {o?.negotiation_plan?.trades_you_can_offer?.map((item: string, i: number) => (
                       <li key={i} className="flex items-start gap-2 text-[13px] text-ink leading-snug"><span className="w-3.5 h-3.5 rounded-full border-[1.5px] border-green shrink-0 mt-[3px]" />{item}</li>
                     ))}
@@ -541,21 +538,22 @@ export function DealScrollView(props: DealScrollViewProps) {
                 const afterAmt = Math.max(0, dealTotalNum - savingsData.total)
                 const pct = dealTotalNum > 0 ? Math.min(Math.round((savingsData.total / dealTotalNum) * 100), 50) : 0
                 return (
-                  <Card className="mt-3">
-                    <IconHeading icon={DollarSign} tone="green" title={t('output.savingsImpact')} right={<span className="font-display font-extrabold text-[20px] text-green-deep tl-num">{fmtSav(savingsData.total)}</span>} />
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-                      <div><p className="tl-label text-ink-3">{fr ? 'Devis initial' : 'Original quote'}</p><p className="font-display font-bold text-[20px] text-ink-3 line-through tl-num">{totalCommitment ? normalizeAmount(totalCommitment) : '—'}</p></div>
-                      <div><p className="tl-label text-ink-3">{fr ? 'Après économies' : 'After savings'}</p><p className="font-display font-bold text-[20px] text-ink tl-num">{fmtSav(afterAmt)}</p></div>
-                      <div><p className="tl-label text-green-deep">{fr ? 'Réduction potentielle' : 'Potential reduction'}</p><p className="font-display font-bold text-[20px] text-green-deep tl-num">{pct}%</p></div>
+                  <Card className={cn('mt-4', PAD)}>
+                    <IconHeading icon={DollarSign} tone="green" title={t('output.savingsImpact')} sub={fr ? 'Si toutes les demandes indispensables aboutissent' : 'If every must-have ask lands'} />
+                    {/* Three figures on one baseline; the green total sits over the right-hand column so it lines up with the list amounts below. */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                      <div><p className="tl-label text-ink-3">{fr ? 'Devis initial' : 'Original quote'}</p><p className="font-display font-bold text-[22px] text-ink-3 line-through tl-num leading-none mt-1.5">{totalCommitment ? normalizeAmount(totalCommitment) : '—'}</p></div>
+                      <div><p className="tl-label text-ink-3">{fr ? 'Après économies' : 'After savings'}</p><p className="font-display font-bold text-[22px] text-ink tl-num leading-none mt-1.5">{fmtSav(afterAmt)}</p></div>
+                      <div className="sm:text-right"><p className="tl-label text-green-deep">{fr ? `Économies · ${pct} %` : `Savings · ${pct}%`}</p><p className="font-display font-extrabold text-[22px] text-green-deep tl-num leading-none mt-1.5">{fmtSav(savingsData.total)}</p></div>
                     </div>
-                    <div className="h-1.5 rounded-full bg-line-2 overflow-hidden mt-3"><div className="h-full rounded-full bg-green transition-all duration-500" style={{ width: `${pct}%` }} /></div>
+                    <div className="h-1.5 rounded-full bg-line-2 overflow-hidden mt-4"><div className="h-full rounded-full bg-green transition-all duration-500" style={{ width: `${pct}%` }} /></div>
                     {savingsData.mustHave.length > 0 && (
-                      <div className="mt-4 pt-3.5 border-t border-line-2">
-                        <p className="tl-label text-green-deep mb-2">{fr ? 'Économies indispensables' : 'Must-have savings'}</p>
+                      <div className="mt-5 pt-4 border-t border-line-2">
+                        <p className="tl-label text-green-deep mb-1">{fr ? 'Économies indispensables' : 'Must-have savings'}</p>
                         <ol className="m-0 p-0 list-none divide-y divide-line-2">
                           {savingsData.mustHave.map((item: any, i: number) => (
-                            <li key={i} className="flex items-start justify-between gap-4 py-2.5">
-                              <span className="flex items-start gap-2 min-w-0"><span className="w-[18px] h-[18px] rounded-full bg-green text-white tl-label text-[10px] grid place-items-center shrink-0 mt-px">{i + 1}</span><span className="min-w-0"><span className="block text-[13px] font-medium text-ink">{item.ask}</span>{item.rationale && <span className="block text-[12px] text-ink-2 mt-0.5">{item.rationale}</span>}</span></span>
+                            <li key={i} className="flex items-start justify-between gap-4 py-3">
+                              <span className="flex items-start gap-2.5 min-w-0"><span className="w-5 h-5 rounded-full bg-green text-white tl-label text-[10px] grid place-items-center shrink-0">{i + 1}</span><span className="min-w-0"><span className="block text-[13.5px] font-medium text-ink">{item.ask}</span>{item.rationale && <span className="block text-[12.5px] text-ink-2 mt-0.5">{item.rationale}</span>}</span></span>
                               <span className="font-display font-bold text-[14px] text-green-deep shrink-0 tl-num">{fmtSav(item.amount)}</span>
                             </li>
                           ))}
@@ -563,16 +561,21 @@ export function DealScrollView(props: DealScrollViewProps) {
                       </div>
                     )}
                     {savingsData.niceToHave.length > 0 && (
-                      <div className="mt-3 pt-3.5 border-t border-line-2">
-                        <p className="tl-label text-ink-3 mb-2">{fr ? 'Souhaitables' : 'Nice-to-have'}</p>
-                        <ol className="m-0 p-0 list-none divide-y divide-line-2">
-                          {savingsData.niceToHave.map((item: any, i: number) => (
-                            <li key={i} className="flex items-start justify-between gap-4 py-2.5">
-                              <span className="flex items-start gap-2 min-w-0"><span className="w-[18px] h-[18px] rounded-full bg-line-2 text-ink-2 tl-label text-[10px] grid place-items-center shrink-0 mt-px">+</span><span className="min-w-0"><span className="block text-[13px] text-ink">{item.ask}</span>{item.rationale && <span className="block text-[12px] text-ink-3 mt-0.5">{item.rationale}</span>}</span></span>
-                              <span className="font-display font-semibold text-[13.5px] text-ink-2 shrink-0 tl-num">{fmtSav(item.amount)}</span>
-                            </li>
-                          ))}
-                        </ol>
+                      <div className="mt-2 pt-3 border-t border-line-2">
+                        <button onClick={() => setShowNiceToHave(!showNiceToHave)} className="w-full flex items-center justify-between gap-3 py-1 text-left" aria-expanded={showNiceToHave}>
+                          <span className="tl-label text-ink-3">{fr ? 'Souhaitables' : 'Nice-to-have'} <span className="text-ink-3 normal-case tracking-normal font-normal">· {savingsData.niceToHave.length} · {fmtSav(savingsData.niceToHave.reduce((s: number, i: any) => s + (i.amount || 0), 0))}</span></span>
+                          <ChevronDown className={cn('w-4 h-4 text-ink-3 transition-transform', showNiceToHave && 'rotate-180')} />
+                        </button>
+                        {showNiceToHave && (
+                          <ol className="m-0 p-0 list-none divide-y divide-line-2">
+                            {savingsData.niceToHave.map((item: any, i: number) => (
+                              <li key={i} className="flex items-start justify-between gap-4 py-3">
+                                <span className="flex items-start gap-2.5 min-w-0"><span className="w-5 h-5 rounded-full bg-line-2 text-ink-2 tl-label text-[10px] grid place-items-center shrink-0">+</span><span className="min-w-0"><span className="block text-[13.5px] text-ink">{item.ask}</span>{item.rationale && <span className="block text-[12.5px] text-ink-3 mt-0.5">{item.rationale}</span>}</span></span>
+                                <span className="font-display font-semibold text-[13.5px] text-ink-2 shrink-0 tl-num">{fmtSav(item.amount)}</span>
+                              </li>
+                            ))}
+                          </ol>
+                        )}
                       </div>
                     )}
                   </Card>
@@ -580,7 +583,7 @@ export function DealScrollView(props: DealScrollViewProps) {
               })()}
 
               {o?.cash_flow_improvements && o.cash_flow_improvements.length > 0 && (
-                <div className="mt-3 rounded-[14px] border border-info-line bg-info-soft px-4 py-3.5">
+                <div className={cn('mt-4 rounded-[14px] border border-info-line bg-info-soft', PAD)}>
                   <p className="tl-label text-info mb-2.5 flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" />{t('output.cashFlowAndRiskImprovements')}</p>
                   <ul className="m-0 p-0 list-none flex flex-col gap-2">
                     {o.cash_flow_improvements.map((item: any, i: number) => (
@@ -608,18 +611,18 @@ export function DealScrollView(props: DealScrollViewProps) {
 
             {hasEmail && (
               <Card pad={false} className="mb-3">
-                <div className="px-4 py-2.5 border-b border-line flex flex-wrap items-center gap-2">
+                <div className="px-5 py-3 border-b border-line flex flex-wrap items-center gap-2">
                   {toneOrder.map((tone, i) => (
                     <button key={tone} onClick={() => setEmailTab(i)} className={cn('h-[22px] px-2 rounded-md border text-[11.5px] font-semibold transition-colors', emailTab === i ? 'bg-info-soft border-info-line text-info' : 'bg-surface border-line text-ink-2 hover:border-[#C9D3CE]')} aria-pressed={emailTab === i}>{toneChipLabel(tone)}</button>
                   ))}
                   {!demoMode && <span className="ml-auto text-[12px] text-ink-3">{remainingRegens > 0 ? (fr ? `${remainingRegens} régénération(s) restante(s)` : `${remainingRegens} regeneration${remainingRegens === 1 ? '' : 's'} left`) : (fr ? 'Limite atteinte' : 'Limit reached')}</span>}
                 </div>
-                <div className="px-4 py-3 border-b border-line flex items-center gap-2">
+                <div className="px-5 py-3 border-b border-line flex items-center gap-2">
                   <span className="tl-label text-ink-3 shrink-0">{fr ? 'Objet' : 'Subject'}</span>
                   <input type="text" value={emailSubjects[emailTab]} onChange={(e) => { const n = [...emailSubjects]; n[emailTab] = e.target.value; setEmailSubjects(n) }} className="flex-1 min-w-0 text-[13.5px] font-semibold text-ink bg-transparent border-none focus:outline-none p-0" />
                 </div>
-                <textarea value={emailBodies[emailTab]} onChange={(e) => { const n = [...emailBodies]; n[emailTab] = e.target.value; setEmailBodies(n) }} rows={14} className="w-full text-[13.5px] text-ink leading-[1.65] bg-surface px-4 py-3.5 border-0 resize-y focus:outline-none focus:bg-surface-2" />
-                <div className="px-4 py-2.5 border-t border-line flex flex-wrap items-center gap-2">
+                <textarea value={emailBodies[emailTab]} onChange={(e) => { const n = [...emailBodies]; n[emailTab] = e.target.value; setEmailBodies(n) }} rows={14} className="w-full text-[13.5px] text-ink leading-[1.65] bg-surface px-5 py-4 border-0 resize-y focus:outline-none focus:bg-surface-2" />
+                <div className="px-5 py-3 border-t border-line flex flex-wrap items-center gap-2">
                   <Btn variant="primary" size="sm" onClick={() => { window.location.href = `mailto:?subject=${encodeURIComponent(emailSubjects[emailTab])}&body=${encodeURIComponent(emailBodies[emailTab])}` }}><Send className="w-3.5 h-3.5" />{t('output.openInEmailClient')}</Btn>
                   <Btn variant="ghost" size="sm" onClick={() => { setCopiedEmail(true); navigator.clipboard.writeText(emailBodies[emailTab]); setTimeout(() => setCopiedEmail(false), 2000) }}>{copiedEmail ? <><CheckCircle2 className="w-3.5 h-3.5 text-green-deep" />{fr ? 'Copié' : 'Copied'}</> : <><Copy className="w-3.5 h-3.5" />{fr ? 'Copier' : 'Copy'}</>}</Btn>
                   <span className="text-[11.5px] text-ink-3 ml-auto">{fr ? 'Objet et corps modifiables' : 'Subject and body are editable'}</span>
@@ -635,7 +638,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                   {!showEmailContext && <span className="text-[11.5px] font-normal text-ink-3">— {fr ? 'facultatif' : 'optional'}</span>}
                 </button>
                 {showEmailContext && (
-                  <Card className="flex flex-col gap-3">
+                  <Card className={cn('flex flex-col gap-3.5', PAD)}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Objectif de négociation' : 'Negotiation objective'}</span><input type="text" value={negotiationObjective} onChange={(e) => setNegotiationObjective(e.target.value)} placeholder={fr ? 'ex. Obtenir 10 % de remise et supprimer le renouvellement auto' : 'e.g. Get 10% off and remove auto-renewal'} className={inputCls} /></label>
                       <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Budget / prix maximum' : 'Budget / maximum acceptable price'}</span><input type="text" value={budgetCeiling} onChange={(e) => setBudgetCeiling(e.target.value)} placeholder={fr ? 'ex. Budget plafonné à 45 000 €' : 'e.g. Budget capped at €45,000'} className={inputCls} /></label>
@@ -669,9 +672,9 @@ export function DealScrollView(props: DealScrollViewProps) {
 
       {/* ═══ 5. ROUNDS + ASSUMPTIONS ═══ */}
       {(hasNegotiationActivity || ((o?.assumptions?.length ?? 0) > 0)) && (
-        <div id="rounds" className={cn('grid grid-cols-1 gap-3.5 scroll-mt-[170px]', hasNegotiationActivity && (o?.assumptions?.length ?? 0) > 0 && 'lg:grid-cols-[1.4fr_1fr]')}>
+        <div id="rounds" className={cn('grid grid-cols-1 gap-5 scroll-mt-[170px]', hasNegotiationActivity && (o?.assumptions?.length ?? 0) > 0 && 'lg:grid-cols-[1.4fr_1fr]')}>
           {hasNegotiationActivity && (
-            <Card>
+            <Card className={PAD}>
               <IconHeading icon={Clock} title={fr ? 'Tours de négociation' : 'Negotiation rounds'} />
               <ol className="m-0 p-0 list-none">
                 {sortedRounds.slice().reverse().map((round: any) => {
@@ -721,7 +724,7 @@ export function DealScrollView(props: DealScrollViewProps) {
             </Card>
           )}
           {o?.assumptions && o.assumptions.length > 0 && (
-            <Card>
+            <Card className={PAD}>
               <SectionHeading title={fr ? 'Hypothèses' : 'Assumptions'} />
               <ul className="m-0 p-0 list-none flex flex-col gap-1.5">
                 {o.assumptions.map((a: string, i: number) => (
