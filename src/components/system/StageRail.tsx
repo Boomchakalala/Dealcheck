@@ -25,7 +25,7 @@ export function StageRail({ current, hrefs, compact, minimal, className }: Stage
   const t = useT()
   const idx = stageIndex(current)
   return (
-    <div className={cn('flex items-center gap-0 bg-surface border border-line rounded-xl overflow-x-auto', compact ? 'p-1' : 'p-1.5', className)} role="list" aria-label="Deal stages">
+    <div className={cn('@container flex items-center gap-0 bg-surface border border-line rounded-xl overflow-hidden', compact ? 'p-1' : 'p-1.5', className)} role="list" aria-label="Deal stages">
       {STAGE_ORDER.map((stage, i) => {
         const state = i < idx ? 'done' : i === idx ? 'now' : 'next'
         const label = t(STAGE_LABEL_KEY[stage])
@@ -42,7 +42,18 @@ export function StageRail({ current, hrefs, compact, minimal, className }: Stage
             >
               {state === 'done' ? '✓' : i + 1}
             </span>
-            <span className={cn('truncate', minimal && state !== 'now' && 'hidden', compact && state !== 'now' && 'hidden sm:inline', state === 'next' && 'max-sm:hidden')}>{label}</span>
+            {/* Labels give way by importance as the rail narrows: current always shows,
+                done steps need ~600px of rail, future steps ~820px. Numbers stay. */}
+            <span
+              className={cn(
+                'truncate',
+                state === 'done' && 'hidden @[600px]:inline',
+                state === 'next' && 'hidden @[820px]:inline',
+                minimal && state !== 'now' && '!hidden',
+              )}
+            >
+              {label}
+            </span>
           </>
         )
         const cls = cn(

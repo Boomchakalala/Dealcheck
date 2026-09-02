@@ -13,7 +13,6 @@ export default async function NegotiatePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   const t = await getTranslations('negotiateRequest')
-  const l = await getTranslations('landing')
 
   const steps = [
     { icon: FileCheck, label: t('step1'), sub: t('step1sub') },
@@ -43,7 +42,7 @@ export default async function NegotiatePage() {
 
         <div className="rounded-[14px] bg-ink text-white px-5 py-4 mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
           <p className="font-display font-extrabold text-[30px] leading-none text-green tl-num">{NEGOTIATION_FEE_PERCENT}%<span className="font-sans text-[13px] text-[#A9B7B1] font-normal ml-2">{t('feeUnit')}</span></p>
-          <p className="text-[13px] text-[#C4D0CA]">{l('neg.noFee')} {t('feeNote')}</p>
+          <p className="text-[13px] text-[#C4D0CA]">{t('feeNote')}</p>
           <a href="mailto:hello@termlift.com?subject=Let's%20talk%20negotiation" className="ml-auto text-[13px] font-semibold text-white underline underline-offset-2 decoration-[#3d4a44] hover:decoration-white">{t('talkFirst')}</a>
         </div>
 
