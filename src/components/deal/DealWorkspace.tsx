@@ -91,6 +91,8 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
   const scoreLabel = latestOutput.score_label
   const scoreRationale = latestOutput.score_rationale
   const verdict = latestOutput.verdict
+  const targetRange = (latestOutput as unknown as { target_price_range?: { low: number; high: number } | null }).target_price_range || null
+  const topReasons = (latestOutput.red_flags || []).slice(0, 3).map((f) => f.issue).filter(Boolean)
   const renewal = getRenewalDate(deal)
   const daysToRenewal = renewal ? Math.floor((renewal.getTime() - now) / 86400000) : null
   const sevCounts = (latestOutput.red_flags || []).reduce(
@@ -208,30 +210,48 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
             {eyebrow && <p className={cn('tl-label', waitingOnClient ? 'text-warn' : 'text-green-deep')}>{eyebrow}</p>}
             {title && <p className="font-display font-bold text-[16px] text-ink mt-1 leading-snug">{title}</p>}
             {body && <HeroVerdict text={String(body)} className="text-[13px] text-ink-2 mt-1 leading-relaxed max-w-[72ch] sm:mx-0 mx-auto" />}
+            {/* The actual issues, not just a count — visible before scrolling to the flags (kept from prod). */}
+            {!closed && topReasons.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-line-2 text-left">
+                <p className="tl-label text-risk mb-1.5">{t('dealPage.topReasons')}</p>
+                <ul className="m-0 p-0 list-none flex flex-col gap-1">
+                  {topReasons.map((r, i) => (
+                    <li key={i} className="flex items-start gap-2 text-[13px] text-ink leading-snug"><span className="w-1.5 h-1.5 rounded-full bg-risk shrink-0 mt-[7px]" />{r}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
 
         {/* ── Stats — one story, left to right: what it costs → what you can win → why → when ── */}
         <StatRow>
-          {/* 1. Total (or Original → Final once won) */}
-          {won ? (
-            <StatTile label={t('dealPage.statFinal')} tone="money" value={achieved > 0 && totalCommitment ? fmtMoney(parseMoney(totalCommitment).amount - achieved, currency) : totalCommitment ? normalizeAmount(totalCommitment) : '—'} sub={achieved > 0 && totalCommitment ? t('dealPage.statWas', { v: normalizeAmount(totalCommitment) }) : term || undefined} />
-          ) : (
-            <StatTile label={t('dealPage.statTotal')} value={totalCommitment ? normalizeAmount(totalCommitment) : '—'} sub={[term, latestOutput.snapshot?.billing_payment].filter(Boolean).join(' · ') || undefined} />
-          )}
-          {/* 2. Savings */}
+          {/* 1. Savings — for a quick analysis this is a target ("up to €X"), not a promise */}
           <StatTile
             tone="money" hi={won && achieved > 0}
             label={won ? t('dealPage.statSaved') : t('dealPage.statSavings')}
-            value={won && achieved > 0 ? fmtMoney(achieved, currency) : potential > 0 ? fmtMoney(potential, currency) : '—'}
+            value={
+              won && achieved > 0 ? fmtMoney(achieved, currency)
+              : range && range.high > 0 ? t('dealPage.statUpTo', { v: fmtMoney(range.high, currency) })
+              : potential > 0 ? fmtMoney(potential, currency)
+              : '—'
+            }
             sub={
               won && achieved > 0 && savingsPct != null ? t('dealPage.statAchieved', { pct: savingsPct.toFixed(1) })
-              : potential > 0 && range ? t('dealPage.statRange', { low: fmtMoney(range.low, currency), high: fmtMoney(range.high, currency) })
+              : range ? t('dealPage.statSavingsRange', { low: fmtMoney(range.low, currency), high: fmtMoney(range.high, currency) })
               : potential > 0 && latestOutput.potential_savings?.must_have?.length ? t('dealPage.statAsks', { n: latestOutput.potential_savings.must_have.length })
               : potential > 0 ? t('dealPage.statPotential')
               : t('dealPage.statSavingsNone')
             }
           />
+          {/* 2. Target price (what to aim for) — falls back to Total / Final price */}
+          {won ? (
+            <StatTile label={t('dealPage.statFinal')} tone="money" value={achieved > 0 && totalCommitment ? fmtMoney(parseMoney(totalCommitment).amount - achieved, currency) : totalCommitment ? normalizeAmount(totalCommitment) : '—'} sub={achieved > 0 && totalCommitment ? t('dealPage.statWas', { v: normalizeAmount(totalCommitment) }) : term || undefined} />
+          ) : targetRange ? (
+            <StatTile label={t('dealPage.statTargetLabel')} value={`${fmtMoney(targetRange.low, currency)}–${fmtMoney(targetRange.high, currency)}`} sub={totalCommitment ? t('dealPage.statTargetSub', { v: normalizeAmount(totalCommitment) }) : undefined} />
+          ) : (
+            <StatTile label={t('dealPage.statTotal')} value={totalCommitment ? normalizeAmount(totalCommitment) : '—'} sub={[term, latestOutput.snapshot?.billing_payment].filter(Boolean).join(' · ') || undefined} />
+          )}
           {/* 3. Red flags, by severity */}
           <StatTile
             tone={won ? 'neutral' : flags > 0 ? 'risk' : 'neutral'}

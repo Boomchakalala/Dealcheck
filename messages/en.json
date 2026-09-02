@@ -1554,7 +1554,15 @@
     "statInDays": "in {n} days",
     "statAsks": "{n, plural, one {# ask} other {# asks}}",
     "statNoFlags": "nothing to push on",
-    "statSavingsNone": "no asks yet — run Full Analysis"
+    "statSavingsNone": "no asks yet — run Full Analysis",
+    "statUpTo": "up to {v}",
+    "statSavingsRange": "{low} – {high} realistic range",
+    "statTargetSub": "vs {v} quoted",
+    "statTargetLabel": "Target price",
+    "topReasons": "Top reasons to push back",
+    "snapNotice": "Notice",
+    "snapRenewal": "Renewal date",
+    "snapDeadline": "Signing deadline"
   },
   "tryPage": {
     "eyebrow": "Step 1 · free · no signup",

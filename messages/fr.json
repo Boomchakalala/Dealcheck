@@ -1554,7 +1554,15 @@
     "statInDays": "dans {n} jours",
     "statAsks": "{n, plural, one {# demande} other {# demandes}}",
     "statNoFlags": "rien à contester",
-    "statSavingsNone": "pas encore de demandes — lancez l'analyse complète"
+    "statSavingsNone": "pas encore de demandes — lancez l'analyse complète",
+    "statUpTo": "jusqu'à {v}",
+    "statSavingsRange": "fourchette réaliste {low} – {high}",
+    "statTargetSub": "vs {v} au devis",
+    "statTargetLabel": "Prix cible",
+    "topReasons": "Principales raisons de négocier",
+    "snapNotice": "Préavis",
+    "snapRenewal": "Date de renouvellement",
+    "snapDeadline": "Date limite de signature"
   },
   "tryPage": {
     "eyebrow": "Étape 1 · gratuit · sans inscription",

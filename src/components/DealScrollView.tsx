@@ -318,6 +318,12 @@ export function DealScrollView(props: DealScrollViewProps) {
     return rows.map((r) => ({ ...r, pct: Math.round((r.val / r.max) * 100), items: isNew ? (nb.deductions as any[]).filter((d) => d.category === r.key) : [] }))
   })()
 
+  const fmtSnapDate = (d?: string) => {
+    if (!d || d === 'not_stated') return null
+    const dt = new Date(d)
+    return isNaN(dt.getTime()) ? d : dt.toLocaleDateString(fr ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  }
+  // Vertical label/value list (as in the draft) — fills the card beside the score breakdown.
   const snapshotItems = o?.snapshot ? [
     { label: t('output.vendor'), val: (o.snapshot.vendor_product || o.vendor || '').split('/')[0].trim() },
     { label: t('output.total'), val: o.snapshot.total_commitment ? normalizeAmount(o.snapshot.total_commitment) : '—' },
@@ -325,7 +331,9 @@ export function DealScrollView(props: DealScrollViewProps) {
     { label: fr ? 'Facturation' : 'Billing', val: o.snapshot.billing_payment || '—' },
     { label: t('output.dealType'), val: o.snapshot.deal_type || '—' },
     { label: t('output.pricingModel'), val: o.snapshot.pricing_model || '—' },
-  ] : []
+    ...(fmtSnapDate(o.snapshot.renewal_date) ? [{ label: fr ? 'Renouvellement' : 'Renewal date', val: fmtSnapDate(o.snapshot.renewal_date) as string }] : []),
+    ...(fmtSnapDate(o.snapshot.signing_deadline) ? [{ label: fr ? 'Date limite de signature' : 'Signing deadline', val: fmtSnapDate(o.snapshot.signing_deadline) as string }] : []),
+  ].filter((i) => i.val && i.val !== '—' || ['Vendor', 'Total', 'Term'].includes(i.label)) : []
 
   const toneChipLabel = (tone: EmailTone) => TONE_LABELS[tone][fr ? 'fr' : 'en']
 
@@ -339,11 +347,11 @@ export function DealScrollView(props: DealScrollViewProps) {
       <div id="overview" className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5 scroll-mt-[170px]">
         <Card className={PAD}>
           <IconHeading icon={BookOpen} title={t('output.dealSnapshot')} />
-          <dl className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-5 m-0">
+          <dl className="m-0 divide-y divide-line-2">
             {snapshotItems.map((item) => (
-              <div key={item.label} className="min-w-0">
+              <div key={item.label} className="grid grid-cols-[130px_1fr] gap-4 py-2.5 first:pt-0 last:pb-0 items-baseline">
                 <dt className="tl-label text-ink-3">{item.label}</dt>
-                <dd className="m-0 mt-1 text-[14px] font-semibold text-ink break-words">{item.val}</dd>
+                <dd className="m-0 text-[14px] font-semibold text-ink break-words">{item.val}</dd>
               </div>
             ))}
           </dl>
