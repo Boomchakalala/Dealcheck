@@ -2,14 +2,16 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Mail, Sparkles, Loader2, Target, DollarSign, Zap, TrendingUp, Shield, BookOpen, Send, Clock, Briefcase, Copy, ArrowRight, Microscope, Plus, ThumbsDown, ThumbsUp, RotateCcw } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Mail, Sparkles, Loader2, Target, DollarSign, Zap, TrendingUp, Shield, BookOpen, Send, Clock, Briefcase, Copy, ArrowRight, Microscope, Plus, RotateCcw, Eye } from 'lucide-react'
 import Link from 'next/link'
-import { normalizeAmount, formatCurrency, parseMoney, detectCurrency } from '@/lib/currency'
-import type { DealOutput, DealOutputV2 } from '@/types'
+import { normalizeAmount, formatCurrency, parseMoney } from '@/lib/currency'
+import type { DealOutput } from '@/types'
 import type { Plan } from '@/lib/tiers'
 import { getCanOffer } from '@/lib/email-asks'
 import { hasDeepContent as computeHasDeepContent } from '@/lib/deep-analysis-status'
 import { TONE_LABELS, type EmailTone } from '@/lib/tone-recommend'
+import { Btn, Card, Chip, GateCard, SectionHeading } from '@/components/system'
+import { cn } from '@/lib/utils'
 
 interface DealScrollViewProps {
   latestOutput: any
@@ -74,26 +76,44 @@ function getNextBusinessDate(daysOut = 5) {
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long' }) + ' ' + n + suf
 }
 
+const inputCls = 'w-full rounded-[10px] border border-line bg-surface px-3 py-2 text-[13px] text-ink placeholder:text-ink-3 focus:outline-none focus:border-green focus:ring-[3px] focus:ring-green/15'
+const scoreBarClass = (pct: number) => (pct >= 60 ? 'bg-green' : pct >= 40 ? 'bg-warn' : 'bg-risk')
+const scoreTextClass = (pct: number) => (pct >= 60 ? 'text-green-deep' : pct >= 40 ? 'text-warn' : 'text-risk')
+
+/** Section title with the icon Kevin missed: icon tile + caps heading + one-line sub. */
+function IconHeading({ icon: Icon, title, sub, right, tone = 'neutral' }: { icon: typeof Zap; title: React.ReactNode; sub?: React.ReactNode; right?: React.ReactNode; tone?: 'neutral' | 'green' | 'risk' | 'ink' }) {
+  const tile = tone === 'green' ? 'bg-green-soft text-green-deep' : tone === 'risk' ? 'bg-risk-soft text-risk' : tone === 'ink' ? 'bg-ink text-white' : 'bg-ground text-ink-2'
+  return (
+    <div className="flex flex-wrap items-center gap-3 mb-3">
+      <span className={cn('w-8 h-8 rounded-[10px] grid place-items-center shrink-0', tile)}><Icon className="w-4 h-4" /></span>
+      <div className="min-w-0 flex-1">
+        <h3 className="tl-h3 text-ink">{title}</h3>
+        {sub && <p className="text-[12.5px] text-ink-2 mt-0.5">{sub}</p>}
+      </div>
+      {right && <div className="flex items-center gap-2 shrink-0">{right}</div>}
+    </div>
+  )
+}
+
 // ─── component ────────────────────────────────────────────
 export function DealScrollView(props: DealScrollViewProps) {
   const {
-    latestOutput, latestRoundId, inferredDealType, isV2,
-    score, scoreLabel, scoreRationale, totalCommitment, term,
+    latestOutput, latestRoundId, inferredDealType,
+    score, totalCommitment,
     redFlagCount, potentialSavings, dealCurrency,
     sortedRounds, dealId, dealStatus, locale,
-    closeSummary, savingsAmount, savingsPercent, closedAt, whatChanged, originalTotal,
-    userPlan, isAdmin, addRoundForm, messages, demoMode, showFullPlaybook,
+    savingsAmount, savingsPercent, closedAt,
+    addRoundForm, messages, demoMode, showFullPlaybook,
     negotiateHref = `/app/deal/${dealId}/negotiate`,
     hasNegotiationRequest = false,
     savedNegotiationContext,
-    hideNextStep = false,
   } = props
 
   const o = latestOutput as DealOutput
   const isClosed = dealStatus?.startsWith('closed_')
-  const latestRound = sortedRounds[0]
   const fmtSav = (n: number) => formatCurrency(n, dealCurrency as any)
   const router = useRouter()
+  const fr = locale === 'fr'
 
   // ── deep analysis (on-demand enrichment) ──
   const deepAnalysisStatus = (o as any)?.deep_analysis_status as 'idle' | 'running' | 'done' | undefined
@@ -132,12 +152,6 @@ export function DealScrollView(props: DealScrollViewProps) {
   const [showSolid, setShowSolid] = useState(true)
   const [expandedBar, setExpandedBar] = useState<string | null>(null)
 
-  // ── score colors ──────────────────────────
-  const sc = score ?? 0
-  const ringColor  = sc >= 80 ? '#1DB954' : sc >= 60 ? '#F59E0B' : '#E24B4A'
-  const trackColor = sc >= 80 ? '#D1FAE5' : sc >= 60 ? '#FEF3C7' : '#FECDC5'
-  const textColor  = sc >= 80 ? '#15803D' : sc >= 60 ? '#B45309' : '#C2410C'
-
   // ── savings data ──────────────────────────
   const savingsData = useMemo(() => {
     const ps = o?.potential_savings as any
@@ -154,10 +168,6 @@ export function DealScrollView(props: DealScrollViewProps) {
     }
     return { total: 0, mustHave: [], niceToHave: [] }
   }, [o?.potential_savings])
-
-  const commitAmt = parseMoney(totalCommitment || '0').amount
-  const cappedSavings = (commitAmt > 0 && potentialSavings > commitAmt) ? commitAmt * 0.3 : potentialSavings
-  const savingsPct = (cappedSavings > 0 && commitAmt > 0) ? Math.min(Math.round((cappedSavings / commitAmt) * 100), 50) : 0
 
   // ── email state ───────────────────────────
   const bizDate = getNextBusinessDate()
@@ -185,8 +195,7 @@ export function DealScrollView(props: DealScrollViewProps) {
   // Optional user-supplied negotiation context (Part 2) — everything the
   // quote/analysis can't reliably know. Objective and competing-quote
   // prefill from an existing negotiation_requests row for this deal where
-  // available (Part 6); nothing here is persisted anywhere new — see the
-  // "Needs decision" note in the report on why.
+  // available (Part 6); nothing here is persisted anywhere new.
   const [showEmailContext, setShowEmailContext] = useState(false)
   const [negotiationObjective, setNegotiationObjective] = useState(savedNegotiationContext?.objective || '')
   const [budgetCeiling, setBudgetCeiling] = useState('')
@@ -201,9 +210,7 @@ export function DealScrollView(props: DealScrollViewProps) {
   // uploaded, counter-offer added) already exists.
   const hasNegotiationActivity = sortedRounds.length > 1 || hasEmail || hasNegotiationRequest || isClosed
   // Email section starts collapsed to a single entry CTA unless an email
-  // already exists (a prior visit already generated one) — the permanent
-  // "Ready-to-send negotiation email" section should not appear before the
-  // user chooses that path.
+  // already exists (a prior visit already generated one).
   const [emailSectionOpened, setEmailSectionOpened] = useState(false)
   const emailSectionVisible = emailSectionOpened || hasEmail
   const openEmailSection = () => { setEmailSectionOpened(true) }
@@ -229,8 +236,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           canOffer: getCanOffer(o),
           conclusion: o?.quick_read?.conclusion,
           dealType: inferredDealType && inferredDealType !== 'unknown' ? inferredDealType : undefined,
-          // Automatic context (Part 1) — pulled from the existing analysis,
-          // never re-asked of the user.
+          // Automatic context (Part 1) — pulled from the existing analysis, never re-asked of the user.
           targetPriceLow: (o as any)?.target_price_range?.low,
           targetPriceHigh: (o as any)?.target_price_range?.high,
           potentialSavingsTotal: savingsData.total > 0 ? fmtSav(savingsData.total) : undefined,
@@ -260,19 +266,12 @@ export function DealScrollView(props: DealScrollViewProps) {
     finally { setRegenerating(false) }
   }
 
-  // Post-generation tone adjustment (Part 4) — switches between the 3
-  // variants already returned by the one generation call above; never
-  // triggers a new LLM call. neutral(0) -> firm(1) -> final_push(2) is a
-  // soft-to-firm spectrum, so this is just a clamped index shift.
-  const makeSofter = () => setEmailTab((t) => Math.max(0, t - 1))
-  const makeFirmer = () => setEmailTab((t) => Math.min(2, t + 1))
-
   // ── flag sorting ──────────────────────────
   const sortedFlags = useMemo(() => {
     if (!o?.red_flags) return []
     return o.red_flags.map((flag: any, i: number) => {
-      // Prefer the model-assigned severity (now authoritative — fraud is forced HIGH there).
-      // Fall back to a dollar-amount heuristic only for older deals with no severity field.
+      // Prefer the model-assigned severity (authoritative). Fall back to a
+      // dollar-amount heuristic only for older deals with no severity field.
       const assigned = String(flag.severity || '').toLowerCase()
       let sev: 'HIGH' | 'MEDIUM' | 'LOW'
       if (assigned === 'high' || assigned === 'medium' || assigned === 'low') {
@@ -286,7 +285,7 @@ export function DealScrollView(props: DealScrollViewProps) {
     }).sort((a: any, b: any) => a.order - b.order)
   }, [o?.red_flags])
 
-  // ── red flag accordion state (HIGH + MEDIUM open by default, LOW collapsed) ──
+  // ── red flag accordion state ──
   const [openFlags, setOpenFlags] = useState<Record<number, boolean>>({})
   const [showWatch, setShowWatch] = useState(false)
   const allFlagsOpen = sortedFlags.length > 0 && sortedFlags.every(({ idx }: any) => openFlags[idx])
@@ -299,870 +298,449 @@ export function DealScrollView(props: DealScrollViewProps) {
 
   // ── score breakdown ───────────────────────
   const bd = o?.score_breakdown
+  const scoreRows = (() => {
+    if (!bd || score == null) return null
+    const nb = bd as any
+    const isNew = Array.isArray(nb.deductions)
+    const rows = isNew
+      ? [
+          { key: 'pricing', label: fr ? 'Prix' : 'Pricing', val: nb.pricing ?? 0, max: 100 },
+          { key: 'terms', label: fr ? 'Conditions' : 'Terms', val: nb.terms ?? 0, max: 100 },
+          { key: 'leverage', label: fr ? 'Levier' : 'Leverage', val: nb.leverage ?? 0, max: 100 },
+        ]
+      : [
+          { key: 'pricing', label: fr ? 'Prix' : 'Pricing', val: nb.pricing_fairness ?? 0, max: 50 },
+          { key: 'terms', label: fr ? 'Conditions' : 'Terms', val: nb.terms_protections ?? 0, max: 30 },
+          { key: 'leverage', label: fr ? 'Levier' : 'Leverage', val: nb.leverage_position ?? 0, max: 20 },
+        ]
+    return rows.map((r) => ({ ...r, pct: Math.round((r.val / r.max) * 100), items: isNew ? (nb.deductions as any[]).filter((d) => d.category === r.key) : [] }))
+  })()
 
+  const snapshotItems = o?.snapshot ? [
+    { label: t('output.vendor'), val: (o.snapshot.vendor_product || o.vendor || '').split('/')[0].trim() },
+    { label: t('output.total'), val: o.snapshot.total_commitment ? normalizeAmount(o.snapshot.total_commitment) : '—' },
+    { label: t('output.term'), val: o.snapshot.term || '—' },
+    { label: fr ? 'Facturation' : 'Billing', val: o.snapshot.billing_payment || '—' },
+    { label: t('output.dealType'), val: o.snapshot.deal_type || '—' },
+    { label: t('output.pricingModel'), val: o.snapshot.pricing_model || '—' },
+  ] : []
+
+  const toneChipLabel = (tone: EmailTone) => TONE_LABELS[tone][fr ? 'fr' : 'en']
 
   // ═══════════════════════════════════════════
-  // RENDER — single scroll, no tabs
+  // RENDER — sections as separate objects on the page ground
   // ═══════════════════════════════════════════
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col gap-3.5">
 
-      {/* ═══ SECTION 1: OVERVIEW (white bg) ═══ */}
-      <div id="overview" className="bg-white border-b border-slate-200 scroll-mt-40">
-        <div className="p-5 sm:p-8">
-          {/* Deal snapshot + Score breakdown side by side */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
-            {/* Deal snapshot — left col */}
-            <div className="col-span-3">
-              <div className="flex items-center gap-2.5 mb-5">
-                <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 text-slate-600" />
-                </div>
-                <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide">{t('output.dealSnapshot')}</p>
+      {/* ═══ 1. OVERVIEW — snapshot + score breakdown ═══ */}
+      <div id="overview" className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-3.5 scroll-mt-[170px]">
+        <Card>
+          <IconHeading icon={BookOpen} title={t('output.dealSnapshot')} />
+          <dl className="grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-3.5 m-0">
+            {snapshotItems.map((item) => (
+              <div key={item.label} className="min-w-0">
+                <dt className="tl-label text-ink-3">{item.label}</dt>
+                <dd className="m-0 mt-0.5 text-[13.5px] font-semibold text-ink break-words">{item.val}</dd>
               </div>
-              {o?.snapshot && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-y-5 gap-x-6">
-                  {[
-                    { label: t('output.vendor'), val: (o.snapshot.vendor_product || o.vendor || '').split('/')[0].trim() },
-                    { label: t('output.total'), val: o.snapshot.total_commitment ? normalizeAmount(o.snapshot.total_commitment) : '—' },
-                    { label: t('output.term'), val: o.snapshot.term || '—' },
-                    { label: 'Invoice', val: o.snapshot.billing_payment || '—' },
-                    { label: t('output.dealType'), val: o.snapshot.deal_type || '—' },
-                    { label: t('output.pricingModel'), val: o.snapshot.pricing_model || '—' },
-                  ].map((item) => (
-                    <div key={item.label}>
-                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">{item.label}</span>
-                      <span className="text-[14px] font-semibold text-slate-900">{item.val}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Score breakdown — right col */}
-            <div className="col-span-2 lg:border-l border-slate-200 lg:pl-6 pt-4 lg:pt-0">
-              <div className="flex items-center gap-2.5 mb-5">
-                <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center">
-                  <Target className="w-5 h-5 text-slate-600" />
-                </div>
-                <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide">Score breakdown</p>
-              </div>
-              {bd && score != null && (() => {
-                const nb = bd as any
-                // New deals carry a flat `deductions` array + 0-100 pricing/terms/leverage.
-                // Legacy deals only have pricing_fairness/terms_protections/leverage_position.
-                const isNew = Array.isArray(nb.deductions)
-                const rows = isNew
-                  ? [
-                      { key: 'pricing', label: 'Pricing', val: nb.pricing ?? 0, max: 100 },
-                      { key: 'terms', label: 'Terms', val: nb.terms ?? 0, max: 100 },
-                      { key: 'leverage', label: 'Leverage', val: nb.leverage ?? 0, max: 100 },
-                    ]
-                  : [
-                      { key: 'pricing', label: 'Pricing', val: nb.pricing_fairness ?? 0, max: 50 },
-                      { key: 'terms', label: 'Terms', val: nb.terms_protections ?? 0, max: 30 },
-                      { key: 'leverage', label: 'Leverage', val: nb.leverage_position ?? 0, max: 20 },
-                    ]
-                return (
-                  <div className="space-y-3">
-                    {rows.map((r) => {
-                      const pct = Math.round((r.val / r.max) * 100)
-                      const barColor = pct >= 80 ? '#1DB954' : pct >= 60 ? '#F59E0B' : '#E24B4A'
-                      const barTrack = pct >= 80 ? '#D1FAE5' : pct >= 60 ? '#FEF3C7' : '#FECDC5'
-                      const items: any[] = isNew ? (nb.deductions as any[]).filter((d) => d.category === r.key) : []
-                      const canExpand = items.length > 0
-                      const open = expandedBar === r.key
-                      const bar = (
-                        <div className="flex items-center gap-3">
-                          <span className="text-[13px] font-medium text-slate-700 w-[72px] flex-shrink-0 text-left flex items-center gap-1">
-                            {r.label}
-                            {canExpand && <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />}
-                          </span>
-                          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: barTrack }}>
-                            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: barColor }} />
-                          </div>
-                          <span className="text-[13px] font-bold w-12 text-right" style={{ color: barColor }}>{pct}%</span>
-                        </div>
-                      )
-                      return (
-                        <div key={r.key}>
-                          {canExpand ? (
-                            <button onClick={() => setExpandedBar(open ? null : r.key)} className="w-full">{bar}</button>
-                          ) : bar}
-                          {canExpand && (
-                            <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: open ? '1fr' : '0fr' }}>
-                              <div className="overflow-hidden">
-                                <div className="pl-[72px] pr-12 pt-2 space-y-1.5">
-                                  {items.map((d, i) => (
-                                    <div key={i} className="flex items-center justify-between gap-3 text-[12px]">
-                                      <span className="text-slate-500 leading-snug">{d.label}</span>
-                                      <span className={`font-bold flex-shrink-0 ${d.points < 0 ? 'text-red-500' : 'text-emerald-600'}`} style={{ fontFamily: 'Sora, sans-serif' }}>
-                                        {d.points < 0 ? `−${Math.abs(d.points)}` : `+${d.points}`}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                )
-              })()}
-            </div>
-          </div>
-
-          {/* What's already solid — collapsible */}
+            ))}
+          </dl>
           {o?.quick_read?.whats_solid && o.quick_read.whats_solid.length > 0 && (
-            <div className="mt-8 border-t border-slate-100 pt-6">
-              <button
-                onClick={() => setShowSolid(!showSolid)}
-                className="flex items-center justify-between w-full text-left mb-4"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-[14px] font-bold text-slate-900">{t('output.whatsAlreadySolid')}</h3>
-                    <p className="text-[12px] text-slate-500">{o.quick_read.whats_solid.length} {locale === 'fr' ? 'bons aspects de ce contrat' : 'good aspects of this deal'}</p>
-                  </div>
-                </div>
-                <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${showSolid ? 'rotate-180' : ''}`} />
+            <div className="mt-4 pt-3.5 border-t border-line-2">
+              <button onClick={() => setShowSolid(!showSolid)} className="w-full flex items-center justify-between gap-3 text-left" aria-expanded={showSolid}>
+                <span className="flex items-center gap-2 text-[13px] font-semibold text-ink"><CheckCircle2 className="w-4 h-4 text-green-deep" />{t('output.whatsAlreadySolid')} <span className="text-ink-3 font-normal">· {o.quick_read.whats_solid.length}</span></span>
+                <ChevronDown className={cn('w-4 h-4 text-ink-3 transition-transform', showSolid && 'rotate-180')} />
               </button>
               {showSolid && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <ul className="m-0 mt-2.5 p-0 list-none grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {o.quick_read.whats_solid.map((item: string, i: number) => (
-                    <div key={i} className="flex items-start gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-[13px] text-slate-800 font-medium leading-relaxed">{item}</span>
-                    </div>
+                    <li key={i} className="flex items-start gap-2 rounded-[10px] bg-green-soft border border-green-line px-3 py-2 text-[12.5px] text-ink leading-snug"><CheckCircle2 className="w-3.5 h-3.5 text-green-deep shrink-0 mt-0.5" />{item}</li>
                   ))}
-                </div>
+                </ul>
               )}
             </div>
           )}
-        </div>
-      </div>
+        </Card>
 
-      {/* ═══ SECTION 2: RED FLAGS ═══ */}
-      <div id="flags" className="bg-red-50/40 border-b border-red-200 scroll-mt-40">
-        <div className="p-5 sm:p-8">
-          {/* Section header */}
-          <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
-            <div className="flex items-center gap-4 min-w-0">
-              <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center shadow-md flex-shrink-0">
-                <AlertTriangle className="w-6 h-6 text-white" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
-                  {sortedFlags.length} {sortedFlags.length === 1 ? 'red flag' : 'red flags'} found
-                </h2>
-                <p className="text-[13px] text-slate-500">
-                  {locale === 'fr' ? 'Chaque problème inclut des conseils de négociation' : 'Each issue includes what to ask for and a fallback position'}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {hasDeepContent && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  {locale === 'fr' ? 'Analyse détaillée prête' : 'Detailed analysis ready'}
-                </span>
-              )}
-              {sortedFlags.length > 1 && (
-                <button
-                  onClick={toggleAllFlags}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors flex-shrink-0"
-                >
-                  {allFlagsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                  {allFlagsOpen
-                    ? (locale === 'fr' ? 'Réduire tous les détails' : 'Collapse all details')
-                    : (locale === 'fr' ? 'Afficher tous les détails' : 'Expand all details')}
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Deep analysis: optional deeper layer — its own card, not squeezed into
-              the header, so there's room for a supporting line and (while running)
-              a staged progress view. The fast analysis above/below stays fully
-              usable throughout; this never blocks the page. */}
-          {!demoMode && !hasDeepContent && (
-            <div id="deep-analysis" className="mb-5 sm:mb-6 scroll-mt-20">
-              {deepAnalysisLoading ? (
-                <DeepAnalysisProgress locale={locale} />
-              ) : (
-                <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13.5px] font-bold text-slate-900">
-                      {locale === 'fr' ? 'Construire la stratégie de négociation complète' : 'Build full negotiation strategy'}
-                    </p>
-                    <p className="text-[12.5px] text-slate-500 mt-0.5">
-                      {locale === 'fr'
-                        ? "Obtenez les opportunités d'économies détaillées, le levier, la séquence de négociation et les positions de repli avant d'agir."
-                        : 'Get the detailed savings opportunities, leverage, negotiation sequencing and fallback positions before taking action.'}
-                    </p>
-                    {deepAnalysisError && (
-                      <p className="text-[12px] text-red-600 mt-1.5">{deepAnalysisError}</p>
-                    )}
+        <Card>
+          <IconHeading icon={Target} title={fr ? 'Détail du score' : 'Score breakdown'} />
+          {scoreRows ? (
+            <div className="flex flex-col gap-3">
+              {scoreRows.map((r) => {
+                const canExpand = r.items.length > 0
+                const open = expandedBar === r.key
+                const bar = (
+                  <div className="flex items-center gap-3">
+                    <span className="text-[13px] font-medium text-ink w-[76px] shrink-0 text-left flex items-center gap-1">{r.label}{canExpand && <ChevronDown className={cn('w-3 h-3 text-ink-3 transition-transform', open && 'rotate-180')} />}</span>
+                    <div className="flex-1 h-1.5 rounded-full bg-line-2 overflow-hidden"><div className={cn('h-full rounded-full transition-all duration-500', scoreBarClass(r.pct))} style={{ width: `${r.pct}%` }} /></div>
+                    <span className={cn('text-[13px] font-bold w-10 text-right tl-num', scoreTextClass(r.pct))}>{r.pct}%</span>
                   </div>
-                  <button
-                    onClick={handleDeepAnalysis}
-                    className="flex-shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-[13px] font-bold rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors"
-                  >
-                    <Microscope className="w-4 h-4" />
-                    {deepAnalysisError
-                      ? (locale === 'fr' ? 'Réessayer' : 'Try again')
-                      : (locale === 'fr' ? 'Lancer' : 'Run deep analysis')}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          <div>
-
-          {/* Accordion — one bordered group, flat rows */}
-          {sortedFlags.length > 0 ? (
-            <div className="bg-white border border-red-200 rounded-2xl shadow-sm divide-y divide-red-100 overflow-hidden">
-              {sortedFlags.map(({ flag, idx, severity }: any, displayPos: number) => {
-                const isHigh = severity === 'HIGH'
-                const isMed = severity === 'MEDIUM'
-                const numBg = isHigh ? 'bg-red-600' : isMed ? 'bg-amber-500' : 'bg-slate-400'
-                const sevBg = isHigh ? 'bg-red-600' : isMed ? 'bg-amber-500' : 'bg-slate-500'
-                const open = !!openFlags[idx]
-                const money = (String(flag.issue || '').match(/[$€£]\s?\d[\d.,]*(?:\/[a-zA-Z]+)?/) || [])[0]
+                )
                 return (
-                  <div key={idx}>
-                    {/* Collapsed row */}
-                    <button
-                      onClick={() => toggleFlag(idx)}
-                      className="w-full flex items-start gap-3 px-4 sm:px-5 py-3.5 text-left hover:bg-red-50/40 transition-colors"
-                      aria-expanded={open}
-                    >
-                      <div className={`w-7 h-7 rounded-full ${numBg} text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5`} style={{ fontFamily: 'Sora, sans-serif' }}>{displayPos + 1}</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white flex-shrink-0 ${sevBg}`}>{severity}</span>
-                          {money && <span className="text-[12px] font-bold text-slate-700 flex-shrink-0" style={{ fontFamily: 'Sora, sans-serif' }}>{money}</span>}
-                        </div>
-                        <span className="text-[14px] font-bold text-slate-900 leading-snug line-clamp-2">{flag.issue}</span>
-                      </div>
-                      <ChevronDown className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform mt-1 ${open ? 'rotate-180' : ''}`} />
-                    </button>
-                    {/* Expanded content — animated height */}
-                    <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: open ? '1fr' : '0fr' }}>
-                      <div className="overflow-hidden">
-                        <div className="pb-4 pr-4 sm:pr-5 pl-[52px] sm:pl-[60px]">
-                          <p className="text-[13px] text-slate-600 leading-relaxed">{flag.why_it_matters}</p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div className="border-l-2 border-emerald-500 pl-3">
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t('output.whatToAskFor')}</p>
-                              <p className="text-[13px] text-slate-800 font-medium leading-snug">{flag.what_to_ask_for}</p>
-                            </div>
-                            <div className="border-l-2 border-slate-300 pl-3">
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{t('output.fallbackPosition')}</p>
-                              <p className="text-[13px] text-slate-700 leading-snug">{flag.if_they_push_back}</p>
-                            </div>
-                          </div>
+                  <div key={r.key}>
+                    {canExpand ? <button onClick={() => setExpandedBar(open ? null : r.key)} className="w-full" aria-expanded={open}>{bar}</button> : bar}
+                    {canExpand && (
+                      <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: open ? '1fr' : '0fr' }}>
+                        <div className="overflow-hidden">
+                          <ul className="m-0 p-0 list-none pl-[76px] pr-10 pt-2 flex flex-col gap-1">
+                            {r.items.map((d: any, i: number) => (
+                              <li key={i} className="flex items-center justify-between gap-3 text-[12px]"><span className="text-ink-2 leading-snug">{d.label}</span><span className={cn('font-bold shrink-0 font-display tl-num', d.points < 0 ? 'text-risk' : 'text-green-deep')}>{d.points < 0 ? `−${Math.abs(d.points)}` : `+${d.points}`}</span></li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )
               })}
             </div>
-          ) : (
-            <div className="text-center py-12">
-              <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-              <p className="text-[16px] text-slate-600 font-semibold">No red flags found</p>
-              <p className="text-[13px] text-slate-400 mt-1">This deal looks clean — nice work</p>
-            </div>
-          )}
+          ) : <p className="text-[13px] text-ink-3">—</p>}
+        </Card>
+      </div>
 
-          {/* Worth noting — minor items that didn't meet the red flag bar. Deep-only
-              content — gated explicitly on hasDeepContent, not just array length,
-              per the "use explicit status, don't rely solely on emptiness" rule. */}
-          {hasDeepContent && Array.isArray((o as any)?.watchItems) && (o as any).watchItems.length > 0 && (
-            <div className="mt-4 bg-white border border-slate-200 rounded-xl overflow-hidden">
-              <button
-                onClick={() => setShowWatch(!showWatch)}
-                className="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3 text-left hover:bg-slate-50 transition-colors"
-                aria-expanded={showWatch}
-              >
-                <span className="text-[13px] font-semibold text-slate-600">
-                  {showWatch
-                    ? (locale === 'fr' ? 'À noter' : 'Worth noting')
-                    : `${locale === 'fr' ? 'Afficher' : 'Show'} ${(o as any).watchItems.length} ${locale === 'fr' ? 'point(s) mineur(s)' : `minor item${(o as any).watchItems.length === 1 ? '' : 's'}`}`}
-                </span>
-                <ChevronDown className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform ${showWatch ? 'rotate-180' : ''}`} />
-              </button>
-              <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: showWatch ? '1fr' : '0fr' }}>
-                <div className="overflow-hidden">
-                  <ul className="px-5 sm:px-6 pb-4 pt-1 space-y-1.5">
-                    {(o as any).watchItems.map((w: any, i: number) => (
-                      <li key={i} className="text-[13px] text-slate-500 leading-snug flex items-start gap-2">
-                        <span className="text-slate-300 flex-shrink-0 mt-0.5">&bull;</span>
-                        {w.description}
-                      </li>
+      {/* ═══ 2. RED FLAGS ═══ */}
+      <section id="flags" className="scroll-mt-[170px]">
+        <IconHeading
+          icon={AlertTriangle}
+          tone={sortedFlags.length > 0 ? 'risk' : 'green'}
+          title={`${t('output.redFlags')} · ${sortedFlags.length}`}
+          sub={fr ? 'Chaque point inclut quoi demander et une position de repli' : 'Each issue includes what to ask for and a fallback position'}
+          right={
+            <>
+              {hasDeepContent && <Chip tone="green"><CheckCircle2 className="w-3 h-3" />{fr ? 'Analyse détaillée prête' : 'Detailed analysis ready'}</Chip>}
+              {sortedFlags.length > 1 && (
+                <Btn variant="link" size="sm" onClick={toggleAllFlags}>
+                  {allFlagsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  {allFlagsOpen ? (fr ? 'Tout réduire' : 'Collapse all') : (fr ? 'Tout afficher' : 'Expand all')}
+                </Btn>
+              )}
+            </>
+          }
+        />
+
+        {/* Full Analysis gate — its own object, never blocks the fast analysis. */}
+        {!demoMode && !hasDeepContent && (
+          <div id="deep-analysis" className="mb-3.5 scroll-mt-[170px]">
+            {deepAnalysisLoading ? (
+              <DeepAnalysisProgress locale={locale} />
+            ) : (
+              <GateCard
+                tone="green"
+                eyebrow={fr ? 'Étape 2 · par dossier' : 'Step 2 · per deal'}
+                title={fr ? 'Lancer l’analyse complète sur ce dossier' : 'Run Full Analysis on this deal'}
+                body={<>{fr ? "Les opportunités d'économies détaillées, votre levier, l'ordre des demandes et les positions de repli — puis l'e-mail. Environ deux minutes." : 'The detailed savings opportunities, your leverage, the order to push in and fallback positions — then the email. About two minutes.'}{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
+                action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? "Lancer l'analyse complète" : 'Run Full Analysis')}</Btn>}
+              />
+            )}
+          </div>
+        )}
+
+        {sortedFlags.length > 0 ? (
+          <div className="bg-surface border border-line rounded-[14px] overflow-hidden divide-y divide-line-2">
+            {sortedFlags.map(({ flag, idx, severity }: any, pos: number) => {
+              const tone: 'risk' | 'warn' | 'neutral' = severity === 'HIGH' ? 'risk' : severity === 'MEDIUM' ? 'warn' : 'neutral'
+              const stripe = severity === 'HIGH' ? 'border-l-risk' : severity === 'MEDIUM' ? 'border-l-warn' : 'border-l-line'
+              const open = !!openFlags[idx]
+              const money = (String(flag.issue || '').match(/[$€£]\s?\d[\d.,]*(?:\/[a-zA-Z]+)?/) || [])[0]
+              return (
+                <div key={idx} className={cn('border-l-[3px]', stripe)}>
+                  <button onClick={() => toggleFlag(idx)} className="w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-surface-2 transition-colors" aria-expanded={open}>
+                    <span className={cn('w-6 h-6 rounded-full text-[11px] font-bold grid place-items-center shrink-0 mt-0.5 font-display', severity === 'HIGH' ? 'bg-risk text-white' : severity === 'MEDIUM' ? 'bg-warn text-white' : 'bg-line-2 text-ink-2')}>{pos + 1}</span>
+                    <span className="flex-1 min-w-0">
+                      <span className="flex items-center gap-2 flex-wrap mb-0.5"><Chip tone={tone} mono>{severity}</Chip>{money && <span className="text-[12.5px] font-bold text-green-deep font-display tl-num">{money}</span>}</span>
+                      <span className="block text-[13.5px] font-semibold text-ink leading-snug">{flag.issue}</span>
+                    </span>
+                    <ChevronDown className={cn('w-4 h-4 text-ink-3 shrink-0 mt-1 transition-transform', open && 'rotate-180')} />
+                  </button>
+                  <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: open ? '1fr' : '0fr' }}>
+                    <div className="overflow-hidden">
+                      <div className="pb-3.5 pr-4 pl-[52px]">
+                        <p className="text-[13px] text-ink-2 leading-relaxed">{flag.why_it_matters}</p>
+                        {(flag.what_to_ask_for || flag.if_they_push_back) && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                            {flag.what_to_ask_for && <div className="border-l-2 border-green pl-3"><p className="tl-label text-ink-3 mb-1">{t('output.whatToAskFor')}</p><p className="text-[13px] text-ink font-medium leading-snug">{flag.what_to_ask_for}</p></div>}
+                            {flag.if_they_push_back && <div className="border-l-2 border-line pl-3"><p className="tl-label text-ink-3 mb-1">{t('output.fallbackPosition')}</p><p className="text-[13px] text-ink-2 leading-snug">{flag.if_they_push_back}</p></div>}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <Card className="text-center py-8">
+            <CheckCircle2 className="w-9 h-9 text-green mx-auto mb-2" />
+            <p className="text-[14px] font-semibold text-ink">{fr ? 'Aucun point de vigilance' : 'No red flags found'}</p>
+            <p className="text-[12.5px] text-ink-2 mt-0.5">{fr ? 'Ce dossier est propre — bien joué.' : 'This deal looks clean — nice work.'}</p>
+          </Card>
+        )}
+
+        {/* Worth noting — deep-only minor items */}
+        {hasDeepContent && Array.isArray((o as any)?.watchItems) && (o as any).watchItems.length > 0 && (
+          <Card pad={false} className="mt-3">
+            <button onClick={() => setShowWatch(!showWatch)} className="w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left hover:bg-surface-2 transition-colors" aria-expanded={showWatch}>
+              <span className="flex items-center gap-2 text-[13px] font-semibold text-ink-2"><Eye className="w-3.5 h-3.5 text-ink-3" />{showWatch ? (fr ? 'À noter' : 'Worth noting') : `${fr ? 'Afficher' : 'Show'} ${(o as any).watchItems.length} ${fr ? 'point(s) mineur(s)' : `minor item${(o as any).watchItems.length === 1 ? '' : 's'}`}`}</span>
+              <ChevronDown className={cn('w-4 h-4 text-ink-3 shrink-0 transition-transform', showWatch && 'rotate-180')} />
+            </button>
+            <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: showWatch ? '1fr' : '0fr' }}>
+              <div className="overflow-hidden">
+                <ul className="m-0 px-4 pb-3.5 pt-0.5 list-none flex flex-col gap-1.5">
+                  {(o as any).watchItems.map((w: any, i: number) => (
+                    <li key={i} className="text-[13px] text-ink-2 leading-snug flex items-start gap-2"><span className="text-ink-3 shrink-0">•</span>{w.description}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </Card>
+        )}
+      </section>
+
+      {/* ═══ 3. PLAYBOOK (deep only) ═══ */}
+      {(!showFullPlaybook || hasDeepContent) && (
+        <section id="playbook" className="scroll-mt-[170px]">
+          {!showFullPlaybook ? (
+            <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Zap} />
+          ) : (
+            <>
+              <IconHeading icon={Zap} tone="green" title={fr ? 'Votre plan de négociation' : 'Your negotiation playbook'} sub={fr ? 'Quoi demander, votre levier, et quoi offrir en retour' : 'What to push for, your leverage, and what to offer in return'} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="rounded-[14px] border border-green-line bg-green-soft px-4 py-3.5">
+                  <p className="tl-label text-green-deep mb-2.5 flex items-center gap-1.5"><Target className="w-3.5 h-3.5" />{t('output.pushFor')}</p>
+                  <ol className="m-0 p-0 list-none flex flex-col gap-2.5">
+                    {o?.what_to_ask_for?.must_have?.map((item: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-[13px] font-medium text-ink leading-snug"><span className="w-[18px] h-[18px] rounded-full bg-green text-white tl-label text-[10px] grid place-items-center shrink-0 mt-px">{i + 1}</span>{item}</li>
+                    ))}
+                    {o?.what_to_ask_for?.nice_to_have?.map((item: string, i: number) => (
+                      <li key={`n${i}`} className="flex items-start gap-2 text-[12.5px] text-ink-2 leading-snug"><span className="w-[18px] h-[18px] rounded-full bg-surface border border-green-line text-green-deep tl-label text-[10px] grid place-items-center shrink-0 mt-px">+</span>{item}</li>
+                    ))}
+                  </ol>
+                </div>
+                <Card>
+                  <p className="tl-label text-ink-3 mb-2.5 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" />{t('output.yourLeverage')}</p>
+                  <ul className="m-0 p-0 list-none flex flex-col gap-2.5">
+                    {o?.negotiation_plan?.leverage_you_have?.map((item: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-[13px] text-ink leading-snug"><span className="w-3.5 h-3.5 rounded-full border-[1.5px] border-green shrink-0 mt-[3px]" />{item}</li>
+                    ))}
+                  </ul>
+                </Card>
+                <Card>
+                  <p className="tl-label text-ink-3 mb-2.5 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" />{t('output.canOffer')}</p>
+                  <ul className="m-0 p-0 list-none flex flex-col gap-2.5">
+                    {o?.negotiation_plan?.trades_you_can_offer?.map((item: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-[13px] text-ink leading-snug"><span className="w-3.5 h-3.5 rounded-full border-[1.5px] border-green shrink-0 mt-[3px]" />{item}</li>
+                    ))}
+                  </ul>
+                </Card>
+              </div>
+
+              {/* Savings impact */}
+              {(savingsData.mustHave.length > 0 || savingsData.niceToHave.length > 0) && (() => {
+                const dealTotalNum = parseMoney(totalCommitment || '0').amount
+                const afterAmt = Math.max(0, dealTotalNum - savingsData.total)
+                const pct = dealTotalNum > 0 ? Math.min(Math.round((savingsData.total / dealTotalNum) * 100), 50) : 0
+                return (
+                  <Card className="mt-3">
+                    <IconHeading icon={DollarSign} tone="green" title={t('output.savingsImpact')} right={<span className="font-display font-extrabold text-[20px] text-green-deep tl-num">{fmtSav(savingsData.total)}</span>} />
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                      <div><p className="tl-label text-ink-3">{fr ? 'Devis initial' : 'Original quote'}</p><p className="font-display font-bold text-[20px] text-ink-3 line-through tl-num">{totalCommitment ? normalizeAmount(totalCommitment) : '—'}</p></div>
+                      <div><p className="tl-label text-ink-3">{fr ? 'Après économies' : 'After savings'}</p><p className="font-display font-bold text-[20px] text-ink tl-num">{fmtSav(afterAmt)}</p></div>
+                      <div><p className="tl-label text-green-deep">{fr ? 'Réduction potentielle' : 'Potential reduction'}</p><p className="font-display font-bold text-[20px] text-green-deep tl-num">{pct}%</p></div>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-line-2 overflow-hidden mt-3"><div className="h-full rounded-full bg-green transition-all duration-500" style={{ width: `${pct}%` }} /></div>
+                    {savingsData.mustHave.length > 0 && (
+                      <div className="mt-4 pt-3.5 border-t border-line-2">
+                        <p className="tl-label text-green-deep mb-2">{fr ? 'Économies indispensables' : 'Must-have savings'}</p>
+                        <ol className="m-0 p-0 list-none divide-y divide-line-2">
+                          {savingsData.mustHave.map((item: any, i: number) => (
+                            <li key={i} className="flex items-start justify-between gap-4 py-2.5">
+                              <span className="flex items-start gap-2 min-w-0"><span className="w-[18px] h-[18px] rounded-full bg-green text-white tl-label text-[10px] grid place-items-center shrink-0 mt-px">{i + 1}</span><span className="min-w-0"><span className="block text-[13px] font-medium text-ink">{item.ask}</span>{item.rationale && <span className="block text-[12px] text-ink-2 mt-0.5">{item.rationale}</span>}</span></span>
+                              <span className="font-display font-bold text-[14px] text-green-deep shrink-0 tl-num">{fmtSav(item.amount)}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                    {savingsData.niceToHave.length > 0 && (
+                      <div className="mt-3 pt-3.5 border-t border-line-2">
+                        <p className="tl-label text-ink-3 mb-2">{fr ? 'Souhaitables' : 'Nice-to-have'}</p>
+                        <ol className="m-0 p-0 list-none divide-y divide-line-2">
+                          {savingsData.niceToHave.map((item: any, i: number) => (
+                            <li key={i} className="flex items-start justify-between gap-4 py-2.5">
+                              <span className="flex items-start gap-2 min-w-0"><span className="w-[18px] h-[18px] rounded-full bg-line-2 text-ink-2 tl-label text-[10px] grid place-items-center shrink-0 mt-px">+</span><span className="min-w-0"><span className="block text-[13px] text-ink">{item.ask}</span>{item.rationale && <span className="block text-[12px] text-ink-3 mt-0.5">{item.rationale}</span>}</span></span>
+                              <span className="font-display font-semibold text-[13.5px] text-ink-2 shrink-0 tl-num">{fmtSav(item.amount)}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                  </Card>
+                )
+              })()}
+
+              {o?.cash_flow_improvements && o.cash_flow_improvements.length > 0 && (
+                <div className="mt-3 rounded-[14px] border border-info-line bg-info-soft px-4 py-3.5">
+                  <p className="tl-label text-info mb-2.5 flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" />{t('output.cashFlowAndRiskImprovements')}</p>
+                  <ul className="m-0 p-0 list-none flex flex-col gap-2">
+                    {o.cash_flow_improvements.map((item: any, i: number) => (
+                      <li key={i} className="flex items-start gap-2 text-[13px] text-ink leading-snug"><CheckCircle2 className="w-3.5 h-3.5 text-info shrink-0 mt-0.5" />{item.recommendation}</li>
                     ))}
                   </ul>
                 </div>
-              </div>
-            </div>
+              )}
+            </>
           )}
-          </div>
-        </div>
-      </div>
-
-      {/* ═══ SECTION 3: STRATEGY (emerald-tinted bg) ═══
-          Deep-only: this whole section is deferred until hasDeepContent — the
-          fast pass's must_have asks and leverage points are already shown via
-          the hero's top-reasons block and each red flag's own ask, so showing
-          this synthesized playbook view too, empty ("Can offer" had nothing to
-          show), would be duplicate + broken UI, not "concise and complete." */}
-      {(!showFullPlaybook || hasDeepContent) && (
-      <div id="playbook" className="bg-emerald-50/40 border-b border-emerald-200 scroll-mt-40">
-        <div className="p-5 sm:p-8">
-          {!showFullPlaybook ? (
-            <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={<Zap className="w-6 h-6 text-white" />} iconBg="bg-emerald-600" />
-          ) : (
-          <>
-          {/* Section header */}
-          <div className="flex items-center gap-4 mb-4 sm:mb-6">
-            <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center shadow-md">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Your negotiation playbook</h2>
-              <p className="text-[13px] text-slate-500">
-                {locale === 'fr' ? 'Quoi demander, votre levier, et quoi offrir en retour' : 'What to push for, your leverage, and what to offer in return'}
-              </p>
-            </div>
-          </div>
-
-          {/* 3-col grid: Push for, Leverage, Can offer */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Push for */}
-            <div className="bg-white border-2 border-emerald-200 rounded-2xl p-4 sm:p-5 shadow-sm">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                  <Target className="w-4 h-4 text-emerald-600" />
-                </div>
-                <p className="text-[12px] font-bold text-emerald-700 uppercase tracking-wider">{t('output.pushFor')}</p>
-              </div>
-              {o?.what_to_ask_for?.must_have?.map((item: string, i: number) => (
-                <div key={i} className="flex items-start gap-2.5 py-3 border-b border-slate-100 last:border-0">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</div>
-                  <span className="text-[13px] font-semibold text-slate-900 leading-snug">{item}</span>
-                </div>
-              ))}
-              {o?.what_to_ask_for?.nice_to_have?.map((item: string, i: number) => (
-                <div key={`n${i}`} className="flex items-start gap-2.5 py-3 border-b border-slate-100 last:border-0">
-                  <div className="w-5 h-5 rounded-full bg-slate-200 text-slate-500 text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">+</div>
-                  <span className="text-[12px] text-slate-500 leading-snug">{item}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Leverage */}
-            <div className="bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                  <Shield className="w-4 h-4 text-slate-600" />
-                </div>
-                <p className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">{t('output.yourLeverage')}</p>
-              </div>
-              {o?.negotiation_plan?.leverage_you_have?.map((item: string, i: number) => (
-                <div key={i} className="flex items-start gap-2.5 py-3 border-b border-slate-100 last:border-0">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-[13px] text-slate-800 leading-snug">{item}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Can offer */}
-            <div className="bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-slate-600" />
-                </div>
-                <p className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">{t('output.canOffer')}</p>
-              </div>
-              {o?.negotiation_plan?.trades_you_can_offer?.map((item: string, i: number) => (
-                <div key={i} className="flex items-start gap-2.5 py-3 border-b border-slate-100 last:border-0">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-[13px] text-slate-800 leading-snug">{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Savings impact card */}
-          {(savingsData.mustHave.length > 0 || savingsData.niceToHave.length > 0) && (() => {
-            const dealTotalNum = parseMoney(totalCommitment || '0').amount
-            const afterAmt = Math.max(0, dealTotalNum - savingsData.total)
-            const pct = dealTotalNum > 0 ? Math.min(Math.round((savingsData.total / dealTotalNum) * 100), 50) : 0
-            return (
-              <div className="mt-6 bg-white border-2 border-emerald-200 rounded-2xl overflow-hidden shadow-sm">
-                <div className="bg-emerald-600 px-6 py-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                      <DollarSign className="w-5 h-5 text-white" />
-                    </div>
-                    <p className="text-[14px] font-bold text-white uppercase tracking-wide">{t('output.savingsImpact')}</p>
-                  </div>
-                  <span className="text-[20px] sm:text-[24px] font-bold text-white" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtSav(savingsData.total)}</span>
-                </div>
-                <div className="bg-emerald-50 p-4 sm:p-6">
-                  {/* Before -> After */}
-                  <div className="flex items-end justify-between mb-4">
-                    <div>
-                      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Original quote</p>
-                      <p className="text-[20px] sm:text-[26px] font-bold text-slate-400 line-through" style={{ fontFamily: 'Sora, sans-serif' }}>{totalCommitment ? normalizeAmount(totalCommitment) : '—'}</p>
-                    </div>
-                    <ArrowRight className="w-6 h-6 text-emerald-400 mb-3" />
-                    <div className="text-right">
-                      <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider mb-1">After savings</p>
-                      <p className="text-[20px] sm:text-[26px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>{fmtSav(afterAmt)}</p>
-                    </div>
-                  </div>
-                  <div className="h-3 bg-emerald-100 rounded-full overflow-hidden mb-2">
-                    <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${pct}%` }} />
-                  </div>
-                  <p className="text-[13px] font-bold text-emerald-700 mb-5">{pct}% potential reduction</p>
-
-                  {/* Must-have items */}
-                  {savingsData.mustHave.length > 0 && (
-                    <div className="border-t border-emerald-200 pt-4">
-                      <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider mb-3">Must-have savings</p>
-                      {savingsData.mustHave.map((item: any, i: number) => (
-                        <div key={i} className="flex items-start justify-between py-3 border-b border-emerald-100 last:border-0">
-                          <div className="flex items-start gap-2.5">
-                            <div className="w-5 h-5 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</div>
-                            <div>
-                              <span className="text-[13px] font-medium text-slate-900 block">{item.ask}</span>
-                              {item.rationale && <span className="text-[12px] text-slate-500">{item.rationale}</span>}
-                            </div>
-                          </div>
-                          <span className="text-[15px] font-bold text-emerald-700 flex-shrink-0 ml-4">{fmtSav(item.amount)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Nice-to-have items */}
-                  {savingsData.niceToHave.length > 0 && (
-                    <div className="border-t border-emerald-200 pt-4 mt-2">
-                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">Nice-to-have</p>
-                      {savingsData.niceToHave.map((item: any, i: number) => (
-                        <div key={i} className="flex items-start justify-between py-3 border-b border-slate-100 last:border-0">
-                          <div className="flex items-start gap-2.5">
-                            <div className="w-5 h-5 rounded-full bg-slate-300 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">+</div>
-                            <div>
-                              <span className="text-[13px] text-slate-700 block">{item.ask}</span>
-                              {item.rationale && <span className="text-[12px] text-slate-400">{item.rationale}</span>}
-                            </div>
-                          </div>
-                          <span className="text-[14px] font-semibold text-slate-500 flex-shrink-0 ml-4">{fmtSav(item.amount)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )
-          })()}
-
-          {/* Cash flow card — blue tint */}
-          {o?.cash_flow_improvements && o.cash_flow_improvements.length > 0 && (
-            <div className="mt-4 bg-blue-50/60 border-2 border-blue-200 rounded-2xl p-4 sm:p-5 shadow-sm">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <Briefcase className="w-4 h-4 text-blue-600" />
-                </div>
-                <p className="text-[12px] font-bold text-blue-800 uppercase tracking-wider">{t('output.cashFlowAndRiskImprovements')}</p>
-              </div>
-              {o.cash_flow_improvements.map((item: any, i: number) => (
-                <div key={i} className="flex items-start gap-3 py-3 border-b border-blue-100 last:border-0">
-                  <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-[13px] text-slate-800 font-medium leading-relaxed">{item.recommendation}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          </>
-          )}
-        </div>
-      </div>
+        </section>
       )}
 
-      {/* ═══ SECTION 4: EMAIL (slate bg) ═══ */}
-      <div id="email-section" className="bg-slate-100 border-b border-slate-200">
-        <div className="p-5 sm:p-8">
-          {!showFullPlaybook ? (
-            <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={<Mail className="w-6 h-6 text-white" />} iconBg="bg-slate-800" variant="email" />
-          ) : !hasDeepContent && !hasEmail ? (
-            /* Fast-only, nothing generated yet — email is a deep-complete action
-               (per the action-hierarchy rules), so point at the strategy step
-               instead of offering to generate an email prematurely. */
-            <a
-              href="#deep-analysis"
-              className="w-full flex items-center gap-4 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 text-left hover:border-slate-300 transition-colors no-underline"
-            >
-              <div className="w-12 h-12 rounded-xl bg-slate-300 flex items-center justify-center shadow-md flex-shrink-0">
-                <Mail className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[14.5px] font-bold text-slate-900">{locale === 'fr' ? "D'abord, la stratégie complète" : 'First, build the full strategy'}</p>
-                <p className="text-[12.5px] text-slate-500 mt-0.5">{locale === 'fr' ? "L'email de négociation arrive une fois la stratégie complète prête." : "The negotiation email comes together once the full strategy is ready."}</p>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
-            </a>
-          ) : !emailSectionVisible && !demoMode ? (
-            /* Collapsed entry point — the permanent generator only appears once the
-               user actually chooses this path, matching the hero's own CTA text. */
-            <button
-              onClick={openEmailSection}
-              className="w-full flex items-center gap-4 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 text-left hover:border-slate-300 transition-colors"
-            >
-              <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center shadow-md flex-shrink-0">
-                <Mail className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[14.5px] font-bold text-slate-900">{locale === 'fr' ? 'Générer un email de négociation' : 'Generate negotiation email'}</p>
-                <p className="text-[12.5px] text-slate-500 mt-0.5">{locale === 'fr' ? 'Créez un email prêt à envoyer à partir de votre devis et analyse.' : 'Create a ready-to-send supplier email using your quote and analysis.'}</p>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
-            </button>
-          ) : (
+      {/* ═══ 4. EMAIL ═══ */}
+      <section id="email-section" className="scroll-mt-[170px]">
+        {!showFullPlaybook ? (
+          <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Mail} variant="email" />
+        ) : !hasDeepContent && !hasEmail ? (
+          <GateCard tone="neutral" eyebrow={fr ? 'Étape 3' : 'Step 3'} title={fr ? "D'abord, la stratégie complète" : 'First, build the full strategy'} body={fr ? "L'e-mail de négociation se construit une fois la stratégie complète prête." : 'The negotiation email comes together once the full strategy is ready.'} action={<Btn href="#deep-analysis" variant="ghost">{fr ? 'Voir l’étape 2' : 'Go to step 2'} <ArrowRight className="w-3.5 h-3.5" /></Btn>} />
+        ) : !emailSectionVisible && !demoMode ? (
+          <GateCard tone="neutral" eyebrow={fr ? 'Étape 3' : 'Step 3'} title={fr ? "Générer l'e-mail de négociation" : 'Generate the negotiation email'} body={fr ? 'Construit à partir du plan ci-dessus, dans le ton qui convient à la relation. Ajoutez ce que le document ne peut pas nous dire.' : 'Built from the playbook above, in the tone that fits the relationship. Add anything the document can’t tell us.'} action={<Btn variant="primary" onClick={openEmailSection}><Mail className="w-4 h-4" />{fr ? "Générer l'e-mail" : 'Generate email'}</Btn>} />
+        ) : (
           <>
-          {/* Section header */}
-          <div className="flex items-start justify-between gap-3 mb-4 sm:mb-6">
-            <div className="flex items-center gap-4 min-w-0">
-              <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center shadow-md flex-shrink-0">
-                <Mail className="w-6 h-6 text-white" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
-                  {locale === 'fr' ? 'Email de négociation prêt à envoyer' : 'Ready-to-send negotiation email'}
-                </h2>
-                <p className="text-[13px] text-slate-500">
-                  {locale === 'fr' ? "TermLift connaît déjà le devis et la stratégie de négociation. Ajoutez ce que le document ne peut pas nous dire." : "TermLift already knows the quote and negotiation strategy. Add any context the document can't tell us."}
-                </p>
-              </div>
-            </div>
-          </div>
+            <IconHeading icon={Mail} tone="ink" title={fr ? 'E-mail de négociation' : 'Negotiation email'} sub={fr ? "TermLift connaît déjà le devis et la stratégie. Ajoutez ce que le document ne peut pas nous dire." : "TermLift already knows the quote and the strategy. Add any context the document can’t tell us."} />
 
-          {/* ───────── EMAIL DISPLAY ───────── */}
-          {hasEmail && (
-            <div className="border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white mb-4">
-              <div className="px-5 sm:px-6 py-3.5 flex items-center gap-3 border-b border-slate-200">
-                <Mail className="w-4 h-4 text-slate-400" />
-                <input
-                  type="text" value={emailSubjects[emailTab]}
-                  onChange={(e) => { const n = [...emailSubjects]; n[emailTab] = e.target.value; setEmailSubjects(n) }}
-                  className="flex-1 text-[14px] font-normal text-slate-900 bg-transparent border-none focus:outline-none p-0 placeholder-slate-400"
-                />
-                <span className="text-[10.5px] font-semibold text-slate-400 uppercase tracking-wide flex-shrink-0">{TONE_LABELS[toneOrder[emailTab]][locale === 'fr' ? 'fr' : 'en']}</span>
-              </div>
-              <div className="p-4 sm:p-6">
-                <p className="text-[11px] text-slate-400 font-medium mb-3 flex items-center gap-1.5">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  {locale === 'fr' ? 'Cliquez pour modifier' : 'Click to edit subject and body'}
-                </p>
-                <textarea
-                  value={emailBodies[emailTab]}
-                  onChange={(e) => { const n = [...emailBodies]; n[emailTab] = e.target.value; setEmailBodies(n) }}
-                  rows={14}
-                  className="w-full text-[13px] text-slate-800 leading-relaxed bg-white rounded-xl p-5 border-2 border-slate-200 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-300"
-                />
-                <div className="flex flex-wrap items-center gap-3 mt-5">
-                  <button onClick={() => { window.location.href = `mailto:?subject=${encodeURIComponent(emailSubjects[emailTab])}&body=${encodeURIComponent(emailBodies[emailTab])}` }} className="text-[13px] px-6 py-3 rounded-xl bg-emerald-600 text-white font-bold flex items-center gap-2 hover:bg-emerald-700 transition-colors shadow-sm">
-                    <Send className="w-4 h-4" />{t('output.openInEmailClient')}
-                  </button>
-                  <button onClick={() => { setCopiedEmail(true); navigator.clipboard.writeText(emailBodies[emailTab]); setTimeout(() => setCopiedEmail(false), 2000) }} className="text-[13px] px-6 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-semibold flex items-center gap-2 hover:bg-slate-50 transition-colors">
-                    {copiedEmail ? <><CheckCircle2 className="w-4 h-4 text-emerald-500" />Copied!</> : <><Copy className="w-4 h-4" />Copy email body</>}
-                  </button>
-                  {/* Lightweight post-generation tone adjustment (Part 4) — switches
-                      between the 3 variants already generated, no new call. */}
-                  <div className="flex items-center gap-1.5 ml-auto">
-                    <button onClick={makeSofter} disabled={emailTab === 0} title="Make softer" className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors disabled:opacity-30 disabled:pointer-events-none">
-                      <ThumbsUp className="w-3.5 h-3.5" />
-                    </button>
-                    <button onClick={makeFirmer} disabled={emailTab === 2} title="Make firmer" className="p-2 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors disabled:opacity-30 disabled:pointer-events-none">
-                      <ThumbsDown className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+            {hasEmail && (
+              <Card pad={false} className="mb-3">
+                <div className="px-4 py-2.5 border-b border-line flex flex-wrap items-center gap-2">
+                  {toneOrder.map((tone, i) => (
+                    <button key={tone} onClick={() => setEmailTab(i)} className={cn('h-[22px] px-2 rounded-md border text-[11.5px] font-semibold transition-colors', emailTab === i ? 'bg-info-soft border-info-line text-info' : 'bg-surface border-line text-ink-2 hover:border-[#C9D3CE]')} aria-pressed={emailTab === i}>{toneChipLabel(tone)}</button>
+                  ))}
+                  {!demoMode && <span className="ml-auto text-[12px] text-ink-3">{remainingRegens > 0 ? (fr ? `${remainingRegens} régénération(s) restante(s)` : `${remainingRegens} regeneration${remainingRegens === 1 ? '' : 's'} left`) : (fr ? 'Limite atteinte' : 'Limit reached')}</span>}
+                </div>
+                <div className="px-4 py-3 border-b border-line flex items-center gap-2">
+                  <span className="tl-label text-ink-3 shrink-0">{fr ? 'Objet' : 'Subject'}</span>
+                  <input type="text" value={emailSubjects[emailTab]} onChange={(e) => { const n = [...emailSubjects]; n[emailTab] = e.target.value; setEmailSubjects(n) }} className="flex-1 min-w-0 text-[13.5px] font-semibold text-ink bg-transparent border-none focus:outline-none p-0" />
+                </div>
+                <textarea value={emailBodies[emailTab]} onChange={(e) => { const n = [...emailBodies]; n[emailTab] = e.target.value; setEmailBodies(n) }} rows={14} className="w-full text-[13.5px] text-ink leading-[1.65] bg-surface px-4 py-3.5 border-0 resize-y focus:outline-none focus:bg-surface-2" />
+                <div className="px-4 py-2.5 border-t border-line flex flex-wrap items-center gap-2">
+                  <Btn variant="primary" size="sm" onClick={() => { window.location.href = `mailto:?subject=${encodeURIComponent(emailSubjects[emailTab])}&body=${encodeURIComponent(emailBodies[emailTab])}` }}><Send className="w-3.5 h-3.5" />{t('output.openInEmailClient')}</Btn>
+                  <Btn variant="ghost" size="sm" onClick={() => { setCopiedEmail(true); navigator.clipboard.writeText(emailBodies[emailTab]); setTimeout(() => setCopiedEmail(false), 2000) }}>{copiedEmail ? <><CheckCircle2 className="w-3.5 h-3.5 text-green-deep" />{fr ? 'Copié' : 'Copied'}</> : <><Copy className="w-3.5 h-3.5" />{fr ? 'Copier' : 'Copy'}</>}</Btn>
+                  <span className="text-[11.5px] text-ink-3 ml-auto">{fr ? 'Objet et corps modifiables' : 'Subject and body are editable'}</span>
+                </div>
+              </Card>
+            )}
+
+            {!demoMode && (
+              <div className="flex flex-col gap-3">
+                <button onClick={() => setShowEmailContext(!showEmailContext)} className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink-2 hover:text-green-deep transition-colors self-start" aria-expanded={showEmailContext}>
+                  <Plus className={cn('w-3.5 h-3.5 transition-transform', showEmailContext && 'rotate-45')} />
+                  {fr ? 'Ajouter du contexte de négociation' : 'Add negotiation context'}
+                  {!showEmailContext && <span className="text-[11.5px] font-normal text-ink-3">— {fr ? 'facultatif' : 'optional'}</span>}
+                </button>
+                {showEmailContext && (
+                  <Card className="flex flex-col gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Objectif de négociation' : 'Negotiation objective'}</span><input type="text" value={negotiationObjective} onChange={(e) => setNegotiationObjective(e.target.value)} placeholder={fr ? 'ex. Obtenir 10 % de remise et supprimer le renouvellement auto' : 'e.g. Get 10% off and remove auto-renewal'} className={inputCls} /></label>
+                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Budget / prix maximum' : 'Budget / maximum acceptable price'}</span><input type="text" value={budgetCeiling} onChange={(e) => setBudgetCeiling(e.target.value)} placeholder={fr ? 'ex. Budget plafonné à 45 000 €' : 'e.g. Budget capped at €45,000'} className={inputCls} /></label>
+                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Alternative / devis concurrent' : 'Alternatives / competing quote'}</span><input type="text" value={competingQuote} onChange={(e) => setCompetingQuote(e.target.value)} placeholder={fr ? 'ex. Offre concurrente à 41 000 €' : 'e.g. We have a competing offer at €41,000'} className={inputCls} /></label>
+                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Échéance interne' : 'Internal deadline'}</span><input type="text" value={internalDeadline} onChange={(e) => setInternalDeadline(e.target.value)} placeholder={fr ? 'ex. Signer avant le 15 sept.' : 'e.g. Need to sign by Sept 15'} className={inputCls} /></label>
+                    </div>
+                    <div>
+                      <p className="tl-label text-ink-3 mb-1.5">{fr ? 'Marge de manœuvre' : 'Walk-away flexibility'}</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {([{ v: 'flexible', l: 'Flexible' }, { v: 'prefer_stay', l: fr ? 'Préfère rester' : 'Prefer to stay' }, { v: 'can_walk', l: fr ? 'Peut partir' : 'Can walk away' }] as const).map((opt) => (
+                          <button key={opt.v} type="button" onClick={() => setWalkAwayFlexibility(walkAwayFlexibility === opt.v ? '' : opt.v)} className={cn('h-8 px-3 rounded-lg text-[12.5px] font-semibold border transition-colors', walkAwayFlexibility === opt.v ? 'bg-green-soft border-green-line text-green-deep' : 'bg-surface border-line text-ink-2 hover:border-[#C9D3CE]')} aria-pressed={walkAwayFlexibility === opt.v}>{opt.l}</button>
+                        ))}
+                      </div>
+                    </div>
+                    <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Instructions supplémentaires' : 'Additional instructions'}</span><textarea value={customPrompt} onChange={(e) => setCustomPrompt(e.target.value)} rows={2} className={cn(inputCls, 'resize-none')} placeholder={fr ? 'ex. Mentionner que nous pouvons signer cette semaine si le prix est approuvé' : 'e.g. Mention that we can sign this week if pricing is approved'} /></label>
+                  </Card>
+                )}
+                <div className="flex flex-col gap-2">
+                  <Btn variant={hasEmail ? 'ghost' : 'primary'} onClick={handleGenerate} disabled={regenerating || remainingRegens <= 0} className="self-start">
+                    {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{fr ? 'Génération…' : 'Generating…'}</> : hasEmail ? <><RotateCcw className="w-4 h-4" />{fr ? 'Régénérer avec ce contexte' : 'Regenerate with this context'}</> : <><Sparkles className="w-4 h-4" />{fr ? "Générer l'e-mail recommandé" : 'Generate recommended email'}</>}
+                  </Btn>
+                  {remainingRegens <= 0 && <p className="text-[12px] text-ink-3">{fr ? 'Limite de régénération atteinte.' : 'Regeneration limit reached.'}</p>}
+                  {regenError && <p role="alert" className="text-[13px] text-risk bg-risk-soft border border-risk-line rounded-[10px] px-3.5 py-2.5">{regenError}</p>}
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* ───────── OPTIONAL NEGOTIATION CONTEXT (Part 2) ───────── */}
-          {!demoMode && (
-            <div className="mb-4">
-              <button
-                onClick={() => setShowEmailContext(!showEmailContext)}
-                className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-slate-500 hover:text-emerald-700 transition-colors"
-              >
-                <Plus className={`w-3.5 h-3.5 transition-transform ${showEmailContext ? 'rotate-45' : ''}`} />
-                {locale === 'fr' ? 'Ajouter du contexte de négociation' : 'Add negotiation context'}
-                {!showEmailContext && <span className="text-[11px] font-normal text-slate-400">— {locale === 'fr' ? 'optionnel' : 'optional'}</span>}
-              </button>
-              {showEmailContext && (
-                <div className="mt-3 bg-white border-2 border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[11px] font-semibold text-slate-500 block mb-1">{locale === 'fr' ? 'Objectif de négociation' : 'Negotiation objective'}</label>
-                      <input type="text" value={negotiationObjective} onChange={(e) => setNegotiationObjective(e.target.value)}
-                        placeholder={locale === 'fr' ? 'ex. Obtenir 10% de réduction et supprimer le renouvellement auto' : 'e.g. Get 10% off and remove auto-renewal'}
-                        className="w-full px-3 py-2 text-[13px] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 placeholder:text-slate-300" />
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-slate-500 block mb-1">{locale === 'fr' ? 'Budget / prix maximum' : 'Budget / maximum acceptable price'}</label>
-                      <input type="text" value={budgetCeiling} onChange={(e) => setBudgetCeiling(e.target.value)}
-                        placeholder={locale === 'fr' ? 'ex. Budget plafonné à 45 000 €' : 'e.g. Budget capped at €45,000'}
-                        className="w-full px-3 py-2 text-[13px] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 placeholder:text-slate-300" />
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-slate-500 block mb-1">{locale === 'fr' ? 'Alternative / devis concurrent' : 'Alternatives / competing quote'}</label>
-                      <input type="text" value={competingQuote} onChange={(e) => setCompetingQuote(e.target.value)}
-                        placeholder={locale === 'fr' ? 'ex. Offre concurrente à 41 000 €' : 'e.g. We have a competing offer at €41,000'}
-                        className="w-full px-3 py-2 text-[13px] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 placeholder:text-slate-300" />
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-slate-500 block mb-1">{locale === 'fr' ? 'Échéance interne' : 'Internal deadline'}</label>
-                      <input type="text" value={internalDeadline} onChange={(e) => setInternalDeadline(e.target.value)}
-                        placeholder={locale === 'fr' ? 'ex. Doit signer avant le 15 sept.' : 'e.g. Need to sign by Sept 15'}
-                        className="w-full px-3 py-2 text-[13px] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 placeholder:text-slate-300" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-500 block mb-1.5">{locale === 'fr' ? 'Marge de manœuvre' : 'Walk-away flexibility'}</label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {([
-                        { v: 'flexible', l: locale === 'fr' ? 'Flexible' : 'Flexible' },
-                        { v: 'prefer_stay', l: locale === 'fr' ? 'Préfère rester' : 'Prefer to stay' },
-                        { v: 'can_walk', l: locale === 'fr' ? 'Peut partir' : 'Can walk away' },
-                      ] as const).map((opt) => (
-                        <button key={opt.v} type="button" onClick={() => setWalkAwayFlexibility(walkAwayFlexibility === opt.v ? '' : opt.v)}
-                          className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold border transition-colors ${walkAwayFlexibility === opt.v ? 'bg-emerald-50 border-emerald-300 text-emerald-700' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'}`}>
-                          {opt.l}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-500 block mb-1">{locale === 'fr' ? 'Instructions supplémentaires' : 'Additional instructions'}</label>
-                    <textarea
-                      value={customPrompt}
-                      onChange={(e) => setCustomPrompt(e.target.value)}
-                      rows={2}
-                      className="w-full px-3 py-2 text-[13px] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300 resize-none placeholder:text-slate-300"
-                      placeholder={locale === 'fr' ? "ex. Mentionner que nous pouvons signer cette semaine si le prix est approuvé" : "e.g. Mention that we can sign this week if pricing is approved"}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ───────── GENERATE / REGENERATE ───────── */}
-          {!demoMode && (
-            <div className="space-y-3">
-              <button
-                onClick={handleGenerate}
-                disabled={regenerating || remainingRegens <= 0}
-                className={`w-full px-4 py-3 rounded-xl flex items-center justify-center gap-2 text-[13.5px] font-bold transition-colors ${regenerating || remainingRegens <= 0 ? 'bg-slate-100 text-slate-400' : hasEmail ? 'bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'}`}
-              >
-                {regenerating
-                  ? <><Loader2 className="w-4 h-4 animate-spin" />{locale === 'fr' ? 'Génération...' : 'Generating...'}</>
-                  : hasEmail
-                    ? <><RotateCcw className="w-4 h-4" />{locale === 'fr' ? 'Régénérer' : `Regenerate${remainingRegens > 0 && remainingRegens < 3 ? ` (${remainingRegens} left)` : ''}`}</>
-                    : <><Sparkles className="w-4 h-4" />{locale === 'fr' ? "Générer l'email recommandé" : 'Generate recommended email'}</>}
-              </button>
-              {remainingRegens <= 0 && <p className="text-[12px] text-slate-400 text-center">{locale === 'fr' ? 'Limite de régénération atteinte.' : 'Regeneration limit reached.'}</p>}
-              {regenError && <p className="text-[13px] text-red-700 bg-red-50 border-2 border-red-200 rounded-xl p-3.5 font-medium">{regenError}</p>}
-            </div>
-          )}
-          {demoMode && !hasEmail && (
-            <Link href="/login?from=demo" className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13.5px] font-bold text-white transition-all hover:-translate-y-0.5" style={{ background: '#1DB954', boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}>
-              {locale === 'fr' ? 'Inscrivez-vous pour générer' : 'Sign up to generate'}<ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          )}
+            )}
+            {demoMode && !hasEmail && <Btn href="/login?from=demo" variant="primary">{fr ? 'Inscrivez-vous pour générer' : 'Sign up to generate'} <ArrowRight className="w-3.5 h-3.5" /></Btn>}
           </>
-          )}
-        </div>
-      </div>
+        )}
+      </section>
 
-      {/* ═══ SECTION 5: ROUNDS + ASSUMPTIONS (white bg) ═══
-          No empty section: renders only if there's real activity to show, or
-          real assumptions content — never a blank white band. */}
+      {/* ═══ 5. ROUNDS + ASSUMPTIONS ═══ */}
       {(hasNegotiationActivity || ((o?.assumptions?.length ?? 0) > 0)) && (
-      <div id="rounds" className="bg-white scroll-mt-40">
-        <div className="p-5 sm:p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
-            {/* Rounds timeline — left col. An analysis is not a negotiation round —
-                only render this once real activity exists: a genuine round 2+,
-                an email was generated, a TermLift negotiation request exists, or
-                the deal is closed. A fresh fast-analysis deal skips this entirely. */}
-            {hasNegotiationActivity && (
-            <div className="col-span-3">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-slate-600" />
-                </div>
-                <p className="text-[14px] font-bold text-slate-900 uppercase tracking-wide">Negotiation rounds</p>
-              </div>
-
-              {/* Round entries */}
-              {sortedRounds.slice().reverse().map((round: any) => {
-                const ro = round.output_json as any
-                const rTotal = ro?.snapshot?.total_commitment
-                const rFlags = ro?.red_flags?.length || 0
-                return (
-                  <div key={round.id} className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-3">
-                    <div className="w-9 h-9 rounded-full bg-emerald-500 text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0">R{round.round_number}</div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-semibold text-slate-900">Round {round.round_number}{round.round_number === 1 ? ' — Initial analysis' : ''}</p>
-                      {round.created_at && !isNaN(new Date(round.created_at).getTime()) && (
-                        <p className="text-[12px] text-emerald-500 mt-0.5">{new Date(round.created_at).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}</p>
+        <div id="rounds" className={cn('grid grid-cols-1 gap-3.5 scroll-mt-[170px]', hasNegotiationActivity && (o?.assumptions?.length ?? 0) > 0 && 'lg:grid-cols-[1.4fr_1fr]')}>
+          {hasNegotiationActivity && (
+            <Card>
+              <IconHeading icon={Clock} title={fr ? 'Tours de négociation' : 'Negotiation rounds'} />
+              <ol className="m-0 p-0 list-none">
+                {sortedRounds.slice().reverse().map((round: any) => {
+                  const ro = round.output_json as any
+                  const rTotal = ro?.snapshot?.total_commitment
+                  const rFlags = ro?.red_flags?.length || 0
+                  const rDate = round.created_at && !isNaN(new Date(round.created_at).getTime()) ? new Date(round.created_at).toLocaleDateString(fr ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' }) : null
+                  return (
+                    <li key={round.id} className="grid grid-cols-[22px_1fr] gap-3 pb-4 relative">
+                      <span className="w-[22px] h-[22px] rounded-full bg-green text-white tl-label text-[10px] grid place-items-center relative after:content-[''] after:absolute after:top-[22px] after:bottom-[-16px] after:left-[10px] after:w-0.5 after:bg-line">{round.round_number}</span>
+                      <div className="min-w-0 flex flex-wrap items-baseline gap-x-2">
+                        <p className="text-[13px] font-semibold text-ink">{fr ? `Tour ${round.round_number}` : `Round ${round.round_number}`}{round.round_number === 1 ? (fr ? ' — analyse initiale' : ' — initial analysis') : ''}</p>
+                        <p className="text-[12px] text-ink-3 tl-num">{[rDate, rTotal ? normalizeAmount(rTotal) : null, rFlags > 0 ? `${rFlags} ${fr ? 'point(s)' : 'flags'}` : null].filter(Boolean).join(' · ')}</p>
+                      </div>
+                    </li>
+                  )
+                })}
+                {isClosed ? (
+                  <li className="grid grid-cols-[22px_1fr] gap-3">
+                    <span className="w-[22px] h-[22px] rounded-full bg-green text-white grid place-items-center"><CheckCircle2 className="w-3.5 h-3.5" /></span>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-green-deep">{dealStatus === 'closed_won' ? (fr ? 'Dossier gagné' : 'Deal won') : (fr ? 'Dossier clôturé' : 'Deal closed')}</p>
+                      <p className="text-[12px] text-ink-2 tl-num">{[closedAt ? new Date(closedAt).toLocaleDateString(fr ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' }) : null, savingsAmount != null && savingsAmount > 0 ? `${fmtSav(savingsAmount)} ${fr ? 'économisés' : 'saved'}` : null, savingsPercent != null ? `${savingsPercent.toFixed(1)}%` : null].filter(Boolean).join(' · ')}</p>
+                      {dealStatus === 'closed_won' && <Link href={`/app/deal/${dealId}/outcome`} className="inline-block mt-1.5 text-[12.5px] font-semibold text-green-deep hover:underline">{fr ? 'Voir le résultat complet →' : 'View full outcome →'}</Link>}
+                    </div>
+                  </li>
+                ) : sortedRounds.length > 0 && (
+                  <li className="grid grid-cols-[22px_1fr] gap-3">
+                    <span className="w-[22px] h-[22px] rounded-full border-[1.5px] border-dashed border-line text-ink-3 tl-label text-[10px] grid place-items-center">{sortedRounds.length + 1}</span>
+                    <div className="min-w-0">
+                      {hasDeepContent ? (
+                        <div id="add-round" className="scroll-mt-[170px]">
+                          <p className="text-[13px] font-semibold text-ink">{fr ? 'Importer la réponse du fournisseur' : "Upload the vendor's reply"}</p>
+                          <p className="text-[12px] text-ink-2">{fr ? 'Nous ré-analysons ce qui a changé et mettons le plan à jour.' : 'We re-analyse what changed and update the playbook.'}</p>
+                          <div className="mt-2">{addRoundForm}</div>
+                        </div>
+                      ) : (
+                        <a id="add-round" href="#deep-analysis" className="block no-underline scroll-mt-[170px]">
+                          <p className="text-[13px] font-semibold text-ink">{fr ? `Tour ${sortedRounds.length + 1}` : `Round ${sortedRounds.length + 1}`}</p>
+                          <p className="text-[12px] text-ink-2">{fr ? "Se débloque avec l'analyse complète →" : 'Unlocks with Full Analysis →'}</p>
+                        </a>
                       )}
                     </div>
-                    {rFlags > 0 && <span className="text-[12px] font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-md flex-shrink-0">{rFlags} flags</span>}
-                    {rTotal && <span className="text-[13px] font-bold text-slate-700 flex-shrink-0">{normalizeAmount(rTotal)}</span>}
-                  </div>
-                )
-              })}
-
-              {/* Won state entry */}
-              {isClosed && (
-                <div className="flex items-center gap-3 bg-emerald-100 border-2 border-emerald-300 rounded-xl p-4 mb-3">
-                  <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle2 className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold text-emerald-800">Deal closed — {dealStatus === 'closed_won' ? 'Won' : 'Closed'}</p>
-                    <p className="text-[12px] text-emerald-600 mt-0.5">
-                      {closedAt && new Date(closedAt).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })}
-                      {savingsAmount != null && savingsAmount > 0 && ` · ${fmtSav(savingsAmount)} saved`}
-                      {savingsPercent != null && ` · ${savingsPercent.toFixed(1)}% reduction`}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Active: upload CTA — rounds belong to the deal's negotiation
-                  workspace, unlocked by Full Analysis, not a subscription
-                  tier. See lib/deep-analysis-status.ts's hasDeepContent(). */}
-              {!isClosed && sortedRounds.length > 0 && (
-                hasDeepContent ? (
-                  <>
-                    <div id="add-round" className="border-2 border-dashed border-emerald-300 rounded-xl p-4 text-center cursor-pointer bg-emerald-50 hover:bg-emerald-100 transition-colors">
-                      <span className="text-[13px] font-semibold text-emerald-700 block mb-0.5">+ Upload vendor response</span>
-                      <span className="text-[12px] text-emerald-500 block">Add Round {sortedRounds.length + 1} to continue negotiating</span>
-                    </div>
-                    <div className="mt-2.5">{addRoundForm}</div>
-                  </>
-                ) : (
-                  <a
-                    id="add-round"
-                    href="#deep-analysis"
-                    className="flex items-center gap-3 border-2 border-dashed border-slate-200 rounded-xl p-4 hover:border-emerald-300 hover:bg-emerald-50/30 transition-colors no-underline"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[13px] font-semibold text-slate-700 block mb-0.5">Unlock Full Analysis to continue negotiating</span>
-                      <span className="text-[12px] text-slate-400 block">Round {sortedRounds.length + 1} opens up once this deal&apos;s negotiation workspace is unlocked</span>
-                    </div>
-                  </a>
-                )
-              )}
-
-              {/* Won: view outcome card */}
-              {isClosed && dealStatus === 'closed_won' && (
-                <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 flex items-center justify-between border border-emerald-200">
-                  <div>
-                    <p className="text-[13px] font-semibold text-emerald-700 mb-0.5">See the full breakdown</p>
-                    <p className="text-[12px] text-emerald-500">Wins secured, timeline, shareable card</p>
-                  </div>
-                  <Link href={`/app/deal/${dealId}/outcome`} className="text-[12px] font-bold text-emerald-700 bg-white px-4 py-2 rounded-lg flex-shrink-0 border border-emerald-200 shadow-sm hover:shadow-md transition-all">
-                    View outcome →
-                  </Link>
-                </div>
-              )}
-            </div>
-            )}
-
-            {/* Assumptions — right col. No empty shell: only renders with real content. */}
-            {o?.assumptions && o.assumptions.length > 0 && (
-              <div className={hasNegotiationActivity ? 'col-span-2 border-l border-slate-200 pl-6' : 'col-span-5'}>
-                <p className="text-[12px] font-bold text-slate-400 uppercase tracking-wider mb-4">Assumptions</p>
-                {o.assumptions.map((a: string, i: number) => (
-                  <p key={i} className="text-[13px] text-slate-500 leading-relaxed mb-3 last:mb-0 flex items-start gap-2">
-                    <span className="text-slate-300 flex-shrink-0 mt-0.5">&bull;</span>{a}
-                  </p>
-                ))}
-                {o.disclaimer && <p className="mt-4 pt-4 border-t border-slate-100 text-[12px] text-slate-400 italic">{o.disclaimer}</p>}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-      )}
-
-      {/* ═══ SECTION 6: NEXT STEP (compact — not a sales block) ═══
-          Same action-hierarchy rules as the hero: fast-only points at the
-          strategy step first, deep-complete reveals the two execution paths.
-          Kept as one small card, not a full-bleed dark section. */}
-      {showFullPlaybook && !isClosed && !hideNextStep && (
-        <div className="bg-white border-t border-slate-200">
-          <div className="p-5 sm:p-8">
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5">
-              <p className="text-[13px] font-bold text-slate-900 mb-3">
-                {hasDeepContent
-                  ? (locale === 'fr' ? 'Prêt à négocier ?' : 'Ready to negotiate?')
-                  : (locale === 'fr' ? 'Aller plus loin sur ce deal' : 'Go deeper on this deal')}
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {hasDeepContent ? (
-                  <a href="#email-section" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13px] font-bold text-slate-700 bg-white border border-slate-200 hover:border-slate-300 transition-colors no-underline">
-                    <Mail className="w-4 h-4" />
-                    {locale === 'fr' ? 'Générer un email de négociation' : 'Generate negotiation email'}
-                  </a>
-                ) : (
-                  <a href="#deep-analysis" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13px] font-bold text-slate-700 bg-white border border-slate-200 hover:border-slate-300 transition-colors no-underline">
-                    <Microscope className="w-4 h-4" />
-                    {deepAnalysisLoading
-                      ? (locale === 'fr' ? 'Construction en cours…' : 'Building your strategy…')
-                      : (locale === 'fr' ? 'Construire la stratégie complète' : 'Build full negotiation strategy')}
-                  </a>
+                  </li>
                 )}
-                <Link
-                  href={negotiateHref}
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13px] font-bold text-white transition-all hover:-translate-y-0.5 no-underline"
-                  style={{ background: '#1DB954', boxShadow: '0 6px 18px -6px rgba(29,185,84,0.5)' }}
-                >
-                  <Zap className="w-4 h-4" />
-                  {locale === 'fr' ? 'Faire négocier par TermLift' : 'Let TermLift negotiate'}
-                </Link>
-              </div>
-            </div>
-          </div>
+              </ol>
+            </Card>
+          )}
+          {o?.assumptions && o.assumptions.length > 0 && (
+            <Card>
+              <SectionHeading title={fr ? 'Hypothèses' : 'Assumptions'} />
+              <ul className="m-0 p-0 list-none flex flex-col gap-1.5">
+                {o.assumptions.map((a: string, i: number) => (
+                  <li key={i} className="text-[13px] text-ink-2 leading-relaxed flex items-start gap-2"><span className="text-ink-3 shrink-0">•</span>{a}</li>
+                ))}
+              </ul>
+              {o.disclaimer && <p className="mt-3 pt-3 border-t border-line-2 text-[12px] text-ink-3 italic leading-relaxed">{o.disclaimer}</p>}
+            </Card>
+          )}
         </div>
       )}
     </div>
   )
 }
 
-// ─── Negotiation teaser — replaces the DIY playbook/email sections ─────────
+// ─── Deep analysis progress ─────────────────────────────────
 // Staged progress for the deep-analysis call (~100-120s, one long LLM call —
 // there's no intermediate backend event to key off, so this is a restrained
-// time-based progression, same approach as AnalysisProgress in
-// AnalysisUploader.tsx. The last stage holds with a spinner until the
+// time-based progression. The last stage holds with a spinner until the
 // request actually completes; nothing is ever claimed done early.
 function DeepAnalysisProgress({ locale }: { locale: 'en' | 'fr' }) {
   const [elapsed, setElapsed] = useState(0)
@@ -1190,98 +768,56 @@ function DeepAnalysisProgress({ locale }: { locale: 'en' | 'fr' }) {
   const currentIdx = stages.reduce((acc, s, i) => (elapsed >= s.at ? i : acc), 0)
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-[13.5px] font-bold text-slate-900">
-          {locale === 'fr' ? 'Construction de la stratégie de négociation complète' : 'Building your full negotiation strategy'}
-        </p>
-        <span className="text-[11.5px] font-medium text-slate-400 tabular-nums" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{elapsed}s</span>
+    <Card>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[13.5px] font-semibold text-ink">{locale === 'fr' ? "Construction de l'analyse complète" : 'Building your full negotiation strategy'}</p>
+        <span className="tl-label text-ink-3 tl-num">{elapsed}s</span>
       </div>
-      <div className="space-y-2.5">
+      <ul className="m-0 p-0 list-none flex flex-col gap-2">
         {stages.map((s, i) => {
           const done = i < currentIdx
           const active = i === currentIdx
           return (
-            <div key={i} className="flex items-center gap-2.5">
-              {done
-                ? <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                : active
-                  ? <Loader2 className="w-4 h-4 text-slate-500 animate-spin flex-shrink-0" />
-                  : <div className="w-4 h-4 rounded-full border-2 border-slate-200 flex-shrink-0" />}
-              <p className={`text-[12.5px] ${done ? 'text-slate-400' : active ? 'text-slate-900 font-semibold' : 'text-slate-400'}`}>{s.label}</p>
-            </div>
+            <li key={i} className="flex items-center gap-2.5">
+              {done ? <CheckCircle2 className="w-4 h-4 text-green shrink-0" /> : active ? <Loader2 className="w-4 h-4 text-ink-2 animate-spin shrink-0" /> : <span className="w-4 h-4 rounded-full border-[1.5px] border-line shrink-0" />}
+              <p className={cn('text-[12.5px]', active ? 'text-ink font-semibold' : 'text-ink-3')}>{s.label}</p>
+            </li>
           )
         })}
-      </div>
-      <p className="text-[11.5px] text-slate-400 mt-4 pt-3 border-t border-slate-100 leading-relaxed">
-        {locale === 'fr'
-          ? "Cela prend généralement environ deux minutes. Vous pouvez continuer à consulter l'analyse ci-dessus pendant ce temps."
-          : "This usually takes about two minutes — feel free to keep reading the analysis above while it runs."}
+      </ul>
+      <p className="text-[11.5px] text-ink-3 mt-3 pt-3 border-t border-line-2 leading-relaxed">
+        {locale === 'fr' ? "Cela prend généralement environ deux minutes. Vous pouvez continuer à consulter l'analyse pendant ce temps." : 'This usually takes about two minutes — keep reading the analysis while it runs.'}
       </p>
-    </div>
+    </Card>
   )
 }
 
-function NegotiationTeaser({
-  negotiateHref, locale, redFlagCount, potentialSavings, fmtSav, icon, iconBg, variant = 'strategy',
-}: {
+// ─── Negotiation teaser — replaces the DIY playbook/email sections when the playbook is hidden ───
+function NegotiationTeaser({ negotiateHref, locale, redFlagCount, potentialSavings, fmtSav, icon: Icon, variant = 'strategy' }: {
   negotiateHref: string
   locale: 'en' | 'fr'
   redFlagCount: number
   potentialSavings: number
   fmtSav: (n: number) => string
-  icon: React.ReactNode
-  iconBg: string
+  icon: typeof Zap
   variant?: 'strategy' | 'email'
 }) {
+  const fr = locale === 'fr'
   const heading = variant === 'email'
-    ? (locale === 'fr' ? 'Nous rédigeons et envoyons les emails' : 'We write and send the emails')
-    : (locale === 'fr' ? 'La stratégie complète' : 'The full negotiation strategy')
+    ? (fr ? 'Nous rédigeons et envoyons les e-mails' : 'We write and send the emails')
+    : (fr ? 'La stratégie complète' : 'The full negotiation strategy')
   const body = variant === 'email'
-    ? (locale === 'fr'
-      ? "Une fois la négociation confiée à TermLift, l'envoi des emails fait partie du service."
-      : 'Once TermLift takes this on, drafting and sending the negotiation emails is part of the service.')
-    : (locale === 'fr'
-      ? "Ce qu'il faut demander, votre levier, et la séquence de négociation font partie de la négociation menée par TermLift."
-      : "What to ask for, your leverage, and the negotiation sequence are part of the negotiation TermLift runs on your behalf.")
-
+    ? (fr ? "Une fois la négociation confiée à TermLift, l'envoi des e-mails fait partie du service." : 'Once TermLift takes this on, drafting and sending the negotiation emails is part of the service.')
+    : (fr ? "Ce qu'il faut demander, votre levier et la séquence de négociation font partie de la négociation menée par TermLift." : 'What to ask for, your leverage, and the negotiation sequence are part of the negotiation TermLift runs on your behalf.')
   return (
     <div>
-      <div className="flex items-center gap-4 mb-5">
-        <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center shadow-md`}>{icon}</div>
-        <div>
-          <h2 className="text-[17px] sm:text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{heading}</h2>
-          <p className="text-[13px] text-slate-500">{body}</p>
-        </div>
-      </div>
-
-      <div className="bg-white border-2 border-emerald-200 rounded-2xl p-5 sm:p-6">
-        <div className="flex flex-wrap items-center gap-4 mb-5">
-          {redFlagCount > 0 && (
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-500" />
-              <span className="text-[13.5px] font-semibold text-slate-800">
-                {redFlagCount} {locale === 'fr' ? (redFlagCount === 1 ? 'levier de négociation identifié' : 'leviers de négociation identifiés') : (redFlagCount === 1 ? 'negotiation lever identified' : 'negotiation levers identified')}
-              </span>
-            </div>
-          )}
-          {potentialSavings > 0 && (
-            <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-emerald-600" />
-              <span className="text-[13.5px] font-semibold text-emerald-700">
-                {fmtSav(potentialSavings)} {locale === 'fr' ? "d'économies potentielles" : 'in potential savings'}
-              </span>
-            </div>
-          )}
-        </div>
-        <Link
-          href={negotiateHref}
-          className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-[14px] font-bold text-white no-underline transition-all hover:shadow-lg hover:-translate-y-0.5"
-          style={{ background: '#1DB954', boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}
-        >
-          {locale === 'fr' ? 'Faire négocier ce deal' : 'Get this deal negotiated'} <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
+      <IconHeading icon={Icon} tone="ink" title={heading} sub={body} />
+      <GateCard
+        tone="neutral"
+        title={fr ? 'Faire négocier ce dossier' : 'Get this deal negotiated'}
+        body={<span className="flex flex-wrap gap-x-4 gap-y-1">{redFlagCount > 0 && <span className="inline-flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5 text-warn" />{redFlagCount} {fr ? (redFlagCount === 1 ? 'levier identifié' : 'leviers identifiés') : (redFlagCount === 1 ? 'negotiation lever identified' : 'negotiation levers identified')}</span>}{potentialSavings > 0 && <span className="inline-flex items-center gap-1.5 text-green-deep font-semibold"><DollarSign className="w-3.5 h-3.5" />{fmtSav(potentialSavings)} {fr ? "d'économies potentielles" : 'in potential savings'}</span>}</span>}
+        action={<Btn href={negotiateHref} variant="ink">{fr ? 'Faire négocier ce dossier' : 'Get this deal negotiated'} <ArrowRight className="w-3.5 h-3.5" /></Btn>}
+      />
     </div>
   )
 }

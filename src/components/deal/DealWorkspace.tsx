@@ -9,7 +9,7 @@ import type { DealOutput } from '@/types'
 import { DealScrollView } from '@/components/DealScrollView'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { HeroVerdict } from '@/components/HeroVerdict'
-import { AppPage, Btn, Card, Chip, GateCard, PageBody, ScoreRing, StageRail, StatRow, StatTile } from '@/components/system'
+import { AppPage, Btn, Chip, GateCard, PageBody, ScoreRing, StageRail, StatRow, StatTile } from '@/components/system'
 import { deriveDealStage, STAGE_LABEL_KEY, stageTone, type DealStage } from '@/lib/deal-stage'
 import { hasDeepContent, deepAnalysisIsRunning } from '@/lib/deep-analysis-status'
 import { shortenVendorDisplayName } from '@/lib/vendor-normalize'
@@ -259,9 +259,8 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
           <GateCard tone="green" eyebrow={t('dealPage.trialEyebrow')} title={t('dealPage.trialTitle')} body={t('dealPage.trialBody')} action={<Btn href="/login?from=trial" variant="primary">{t('dealPage.trialCta')}</Btn>} />
         )}
 
-        {/* ── Analysis sections (existing renderer) ───────────── */}
-        <Card pad={false} className="overflow-hidden">
-          <DealScrollView
+        {/* ── Analysis sections — each section is its own object on the ground ── */}
+        <DealScrollView
             latestOutput={latestOutput}
             latestRoundId={latestRound.id as string}
             inferredDealType={inferredDealType}
@@ -297,7 +296,6 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
             demoMode={isDemo}
             hideNextStep
           />
-        </Card>
 
         {/* ── Hand-off ────────────────────────────────────────── */}
         {!isTrial && !closed && (
