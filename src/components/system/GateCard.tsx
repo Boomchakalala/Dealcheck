@@ -21,11 +21,11 @@ export function GateCard({ eyebrow, title, body, action, tone = 'green', classNa
     tone === 'green' ? 'bg-green-soft border-green-line' : tone === 'warn' ? 'bg-warn-soft border-warn-line' : 'bg-surface border-line'
   const eyebrowCls = tone === 'warn' ? 'text-warn' : 'text-green-deep'
   return (
-    <div className={cn('rounded-[14px] border border-dashed px-4.5 py-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4 items-center', toneCls, className)}>
+    <div className={cn('rounded-[14px] border border-dashed px-5 py-5 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-5 items-center', toneCls, className)}>
       <div className="min-w-0">
-        {eyebrow && <p className={cn('tl-label', eyebrowCls)}>{eyebrow}</p>}
-        <h3 className="font-display text-[15px] font-bold text-ink mt-1">{title}</h3>
-        {body && <div className="text-[13px] text-ink-2 mt-1 max-w-[60ch] leading-relaxed">{body}</div>}
+        {eyebrow && <p className={cn('tl-label text-[11.5px]', eyebrowCls)}>{eyebrow}</p>}
+        <h3 className="font-display text-[16.5px] font-bold text-ink mt-1.5 leading-snug">{title}</h3>
+        {body && <div className="text-[14px] text-ink-2 mt-1.5 max-w-[64ch] leading-relaxed">{body}</div>}
       </div>
       {action && <div className="flex sm:justify-end">{action}</div>}
     </div>

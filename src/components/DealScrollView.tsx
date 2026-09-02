@@ -84,12 +84,13 @@ const scoreBarClass = (pct: number) => (pct >= 60 ? 'bg-green' : pct >= 40 ? 'bg
 const scoreTextClass = (pct: number) => (pct >= 60 ? 'text-green-deep' : pct >= 40 ? 'text-warn' : 'text-risk')
 
 /** Section title with the icon Kevin missed: icon tile + caps heading + one-line sub. */
-function IconHeading({ icon: Icon, title, sub, right, tone = 'neutral' }: { icon: typeof Zap; title: React.ReactNode; sub?: React.ReactNode; right?: React.ReactNode; tone?: 'neutral' | 'green' | 'risk' | 'ink' }) {
+function IconHeading({ icon: Icon, title, sub, right, tone = 'neutral', eyebrow }: { icon: typeof Zap; title: React.ReactNode; sub?: React.ReactNode; right?: React.ReactNode; tone?: 'neutral' | 'green' | 'risk' | 'ink'; eyebrow?: React.ReactNode }) {
   const tile = tone === 'green' ? 'bg-green-soft text-green-deep' : tone === 'risk' ? 'bg-risk-soft text-risk' : tone === 'ink' ? 'bg-ink text-white' : 'bg-ground text-ink-2'
   return (
     <div className="flex flex-wrap items-center gap-3 mb-4">
       <span className={cn('w-9 h-9 rounded-[10px] grid place-items-center shrink-0', tile)}><Icon className="w-4 h-4" /></span>
       <div className="min-w-0 flex-1">
+        {eyebrow && <p className="tl-label text-[11.5px] text-green-deep mb-0.5">{eyebrow}</p>}
         <h3 className="tl-h3 text-ink">{title}</h3>
         {sub && <p className="text-[12.5px] text-ink-2 mt-0.5">{sub}</p>}
       </div>
@@ -336,7 +337,9 @@ export function DealScrollView(props: DealScrollViewProps) {
     <div className="flex flex-col gap-5">
 
       {/* ═══ 1. OVERVIEW — snapshot | score breakdown + already solid (as in the draft) ═══ */}
-      <div id="overview" className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5 scroll-mt-[170px]">
+      <div id="overview" className="scroll-mt-[170px]">
+        <p className="tl-label text-[11.5px] text-green-deep mb-2.5">{fr ? 'Étape 1 · Analyse rapide' : 'Step 1 · Quick analysis'}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5">
         <Card className={PAD}>
           <IconHeading icon={BookOpen} title={t('output.dealSnapshot')} />
           <dl className="m-0 divide-y divide-line-2">
@@ -394,6 +397,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           )}
         </Card>
       </div>
+      </div>
 
       {/* ═══ 2. RED FLAGS ═══ */}
       <section id="flags" className="scroll-mt-[170px]">
@@ -423,7 +427,7 @@ export function DealScrollView(props: DealScrollViewProps) {
             ) : (
               <GateCard
                 tone="green"
-                eyebrow={fr ? 'Étape 2 · par dossier' : 'Step 2 · per deal'}
+                eyebrow={fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Full Analysis'}
                 title={fr ? 'Lancer l’analyse complète sur ce dossier' : 'Run Full Analysis on this deal'}
                 body={<>{fr ? "Les opportunités d'économies détaillées, votre levier, l'ordre des demandes et les positions de repli — puis l'e-mail. Environ deux minutes." : 'The detailed savings opportunities, your leverage, the order to push in and fallback positions — then the email. About two minutes.'}{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
                 action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? "Lancer l'analyse complète" : 'Run Full Analysis')}</Btn>}
@@ -501,7 +505,7 @@ export function DealScrollView(props: DealScrollViewProps) {
             <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Zap} />
           ) : (
             <>
-              <IconHeading icon={Zap} tone="green" title={fr ? 'Votre plan de négociation' : 'Your negotiation playbook'} sub={fr ? 'Quoi demander, votre levier, et quoi offrir en retour' : 'What to push for, your leverage, and what to offer in return'} />
+              <IconHeading icon={Zap} tone="green" eyebrow={fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Full Analysis'} title={fr ? 'Votre plan de négociation' : 'Your negotiation playbook'} sub={fr ? 'Quoi demander, votre levier, et quoi offrir en retour' : 'What to push for, your leverage, and what to offer in return'} />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className={cn('rounded-[14px] border border-green-line bg-green-soft', PAD)}>
                   <p className="tl-label text-green-deep mb-3.5 flex items-center gap-1.5"><Target className="w-3.5 h-3.5" />{t('output.pushFor')}</p>
@@ -602,12 +606,12 @@ export function DealScrollView(props: DealScrollViewProps) {
         {!showFullPlaybook ? (
           <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Mail} variant="email" />
         ) : !hasDeepContent && !hasEmail ? (
-          <GateCard tone="neutral" eyebrow={fr ? 'Étape 3' : 'Step 3'} title={fr ? "D'abord, la stratégie complète" : 'First, build the full strategy'} body={fr ? "L'e-mail de négociation se construit une fois la stratégie complète prête." : 'The negotiation email comes together once the full strategy is ready.'} action={<Btn href="#deep-analysis" variant="ghost">{fr ? 'Voir l’étape 2' : 'Go to step 2'} <ArrowRight className="w-3.5 h-3.5" /></Btn>} />
+          <GateCard tone="neutral" eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'} title={fr ? "D'abord, la stratégie complète" : 'First, build the full strategy'} body={fr ? "L'e-mail de négociation se construit une fois la stratégie complète prête." : 'The negotiation email comes together once the full strategy is ready.'} action={<Btn href="#deep-analysis" variant="ghost">{fr ? 'Voir l’étape 2' : 'Go to step 2'} <ArrowRight className="w-3.5 h-3.5" /></Btn>} />
         ) : !emailSectionVisible && !demoMode ? (
-          <GateCard tone="neutral" eyebrow={fr ? 'Étape 3' : 'Step 3'} title={fr ? "Générer l'e-mail de négociation" : 'Generate the negotiation email'} body={fr ? 'Construit à partir du plan ci-dessus, dans le ton qui convient à la relation. Ajoutez ce que le document ne peut pas nous dire.' : 'Built from the playbook above, in the tone that fits the relationship. Add anything the document can’t tell us.'} action={<Btn variant="primary" onClick={openEmailSection}><Mail className="w-4 h-4" />{fr ? "Générer l'e-mail" : 'Generate email'}</Btn>} />
+          <GateCard tone="neutral" eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'} title={fr ? "Générer l'e-mail de négociation" : 'Generate the negotiation email'} body={fr ? 'Construit à partir du plan ci-dessus, dans le ton qui convient à la relation. Ajoutez ce que le document ne peut pas nous dire.' : 'Built from the playbook above, in the tone that fits the relationship. Add anything the document can’t tell us.'} action={<Btn variant="primary" onClick={openEmailSection}><Mail className="w-4 h-4" />{fr ? "Générer l'e-mail" : 'Generate email'}</Btn>} />
         ) : (
           <>
-            <IconHeading icon={Mail} tone="ink" title={fr ? 'E-mail de négociation' : 'Negotiation email'} sub={fr ? "TermLift connaît déjà le devis et la stratégie. Ajoutez ce que le document ne peut pas nous dire." : "TermLift already knows the quote and the strategy. Add any context the document can’t tell us."} />
+            <IconHeading icon={Mail} tone="ink" eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'} title={fr ? 'E-mail de négociation' : 'Negotiation email'} sub={fr ? "TermLift connaît déjà le devis et la stratégie. Ajoutez ce que le document ne peut pas nous dire." : "TermLift already knows the quote and the strategy. Add any context the document can’t tell us."} />
 
             {hasEmail && (
               <Card pad={false} className="mb-3">
