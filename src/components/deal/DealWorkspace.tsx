@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useI18n } from '@/i18n/context'
 import { cn } from '@/lib/utils'
 import type { Plan } from '@/lib/tiers'
@@ -56,6 +56,8 @@ interface DealWorkspaceProps {
  */
 export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFullPlaybook, negotiationRequest, addRoundForm, inferredDealType, latestOutputOverride }: DealWorkspaceProps) {
   const { t, locale } = useI18n()
+  // Captured once per mount so render stays pure (react-compiler rule).
+  const [now] = useState(() => Date.now())
   const isTrial = mode === 'trial'
   const isDemo = mode === 'demo'
   const linkBase = isDemo ? '/demo' : '/app'
@@ -91,7 +93,7 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
   const verdict = latestOutput.verdict
   const targetRange = (latestOutput as unknown as { target_price_range?: { low: number; high: number } | null }).target_price_range
   const renewal = getRenewalDate(deal)
-  const daysToRenewal = renewal ? Math.floor((renewal.getTime() - Date.now()) / 86400000) : null
+  const daysToRenewal = renewal ? Math.floor((renewal.getTime() - now) / 86400000) : null
   const sevCounts = (latestOutput.red_flags || []).reduce(
     (acc, f) => { const s = (f.severity || 'medium') as 'high' | 'medium' | 'low'; acc[s] = (acc[s] || 0) + 1; return acc },
     { high: 0, medium: 0, low: 0 } as Record<'high' | 'medium' | 'low', number>,
