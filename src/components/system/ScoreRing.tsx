@@ -33,21 +33,16 @@ export function ScoreRing({ score, size = 88, stroke, className, muted }: ScoreR
   const r = (size - sw) / 2
   const c = 2 * Math.PI * r
   const off = c * (1 - s / 100)
-  const showDenominator = size >= 64
+  // Just the number. "/100" is implied by the ring and only cluttered it.
   return (
     <span className={cn('relative inline-grid place-items-center shrink-0', className)} style={{ width: size, height: size }} aria-label={`Score ${s} out of 100`} role="img">
       <svg width={size} height={size} className="-rotate-90">
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--tl-line-2)" strokeWidth={sw} />
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={muted ? 'var(--tl-ink-3)' : scoreColor(s)} strokeWidth={sw} strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" />
       </svg>
-      <span className="absolute font-display font-extrabold tracking-[-0.03em] leading-none text-ink tl-num" style={{ fontSize: size * 0.34, marginTop: showDenominator ? -size * 0.1 : 0 }}>
+      <span className="absolute font-display font-extrabold tracking-[-0.03em] leading-none text-ink tl-num" style={{ fontSize: size * 0.36 }}>
         {s}
       </span>
-      {showDenominator && (
-        <span className="absolute tl-label text-ink-3" style={{ fontSize: Math.max(8, size * 0.1), marginTop: size * 0.36 }}>
-          /100
-        </span>
-      )}
     </span>
   )
 }

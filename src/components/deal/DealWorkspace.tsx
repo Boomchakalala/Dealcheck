@@ -204,8 +204,9 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
 
       <PageBody className={cn(isTrial && 'pb-4')}>
         {/* ── Verdict ─────────────────────────────────────────── */}
-        <div className={cn('rounded-[14px] border px-4 py-4 sm:px-5 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-4 sm:gap-5 items-center', won ? 'bg-green-soft border-green-line' : waitingOnClient ? 'bg-warn-soft border-warn-line' : 'bg-surface border-line')}>
-          {score != null && <ScoreRing score={score} size={84} muted={closed && !won} className="mx-auto sm:mx-0" />}
+        <div className={cn('rounded-[14px] border px-4 py-4 sm:px-5 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-4 sm:gap-5 items-start', won ? 'bg-green-soft border-green-line' : waitingOnClient ? 'bg-warn-soft border-warn-line' : 'bg-surface border-line')}>
+          {/* Top-aligned with the verdict text (not centred on the whole card, which left it floating between the verdict and the reasons list). */}
+          {score != null && <ScoreRing score={score} size={76} muted={closed && !won} className="mx-auto sm:mx-0 sm:mt-0.5" />}
           <div className="min-w-0 text-center sm:text-left">
             {eyebrow && <p className={cn('tl-label', waitingOnClient ? 'text-warn' : 'text-green-deep')}>{eyebrow}</p>}
             {title && <p className="font-display font-bold text-[16px] text-ink mt-1 leading-snug">{title}</p>}
