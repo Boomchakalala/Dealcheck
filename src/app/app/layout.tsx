@@ -32,7 +32,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       />
       {/* Offset by the sidebar on desktop. The inner padding is what legacy pages
           escape with negative margins; redesigned pages use <AppPage> to go full-bleed. */}
-      <main className="min-h-screen overflow-x-hidden transition-[margin] duration-200 md:ml-[var(--sidebar-width,220px)]">
+      {/* overflow-x-clip (not -hidden): `hidden` on an ancestor disables position: sticky, which the deal header relies on. */}
+      <main className="min-h-screen overflow-x-clip transition-[margin] duration-200 md:ml-[var(--sidebar-width,220px)]">
         <div className="px-5 sm:px-8 py-8 pb-24 md:pb-8">{children}</div>
       </main>
     </div>

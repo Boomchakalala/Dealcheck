@@ -567,7 +567,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                     {savingsData.niceToHave.length > 0 && (
                       <div className="mt-2 pt-3 border-t border-line-2">
                         <button onClick={() => setShowNiceToHave(!showNiceToHave)} className="w-full flex items-center justify-between gap-3 py-1 text-left" aria-expanded={showNiceToHave}>
-                          <span className="tl-label text-ink-3">{fr ? 'Souhaitables' : 'Nice-to-have'} <span className="text-ink-3 normal-case tracking-normal font-normal">· {savingsData.niceToHave.length} · {fmtSav(savingsData.niceToHave.reduce((s: number, i: any) => s + (i.amount || 0), 0))}</span></span>
+                          <span className="tl-label text-ink-3">{fr ? 'Souhaitables' : 'Nice-to-have'} <span className="text-ink-3 normal-case tracking-normal font-normal">· {savingsData.niceToHave.length}{(() => { const sub = savingsData.niceToHave.reduce((s: number, i: any) => s + (i.amount || 0), 0); return sub > 0 ? ` · ${fmtSav(sub)}` : '' })()}</span></span>
                           <ChevronDown className={cn('w-4 h-4 text-ink-3 transition-transform', showNiceToHave && 'rotate-180')} />
                         </button>
                         {showNiceToHave && (
