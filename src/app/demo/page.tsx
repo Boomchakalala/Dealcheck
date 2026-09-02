@@ -20,7 +20,7 @@ export default async function DemoHomePage({ searchParams }: { searchParams: Pro
   const rows = buildHomeRows(deals)
   const enriched = await enrichDeals(deals, 'EUR', false)
   const insights = computeInsights(enriched, 'EUR')
-  const needsYou = rows.filter((r) => r.needsUnlock || r.waitingOnClient).length
+  const needsYou = rows.filter((r) => r.waitingOnClient).length
   const dateShort = (d: Date) => d.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })
   const tabCls = (on: boolean) => cn('px-3 py-2 text-[13.5px] font-semibold border-b-2 -mb-px no-underline transition-colors', on ? 'text-ink border-green' : 'text-ink-3 border-transparent hover:text-ink-2')
 
@@ -34,7 +34,7 @@ export default async function DemoHomePage({ searchParams }: { searchParams: Pro
         <StatRow className="mt-3.5">
           <StatTile hi tone="money" label={t('kpiSaved')} value={fmtMoney(insights.savingsAchieved, 'EUR')} sub={t('kpiSavedSub', { n: insights.wonCount })} />
           <StatTile tone="money" label={t('kpiPipeline')} value={insights.savingsIdentified > 0 ? fmtMoney(insights.savingsIdentified, 'EUR') : '—'} sub={t('kpiPipelineSub', { n: insights.activeCount })} />
-          <StatTile tone={needsYou > 0 ? 'warn' : 'neutral'} label={t('kpiNeeds')} value={needsYou} sub={needsYou ? t('kpiNeedsUnlock', { n: needsYou }) : t('kpiNeedsNone')} />
+          <StatTile tone={needsYou > 0 ? 'warn' : 'neutral'} label={t('kpiNeeds')} value={needsYou} sub={needsYou ? t('kpiNeedsReply', { n: needsYou }) : t('kpiNeedsNone')} />
           <StatTile label={t('kpiRenewal')} value={insights.nextRenewal ? dateShort(insights.nextRenewal.date) : '—'} sub={insights.nextRenewal ? t('kpiRenewalSub', { vendor: insights.nextRenewal.vendor, days: insights.nextRenewal.daysOut }) : t('kpiRenewalNone')} />
         </StatRow>
         <nav className="flex gap-1 border-b border-line mt-3.5" aria-label="Home tabs">

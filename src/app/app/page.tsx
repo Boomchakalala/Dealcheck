@@ -77,14 +77,10 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const rows = buildHomeRows(allDeals, reqByDeal)
   const enriched = await enrichDeals(allDeals, baseCurrency)
   const insights = computeInsights(enriched, baseCurrency)
-  const needsUnlock = rows.filter((r) => r.needsUnlock).length
-  const needsReply = rows.filter((r) => r.waitingOnClient).length
-  const needsYou = needsUnlock + needsReply
-
-  const needsSub = [
-    needsUnlock ? t('kpiNeedsUnlock', { n: needsUnlock }) : null,
-    needsReply ? t('kpiNeedsReply', { n: needsReply }) : null,
-  ].filter(Boolean).join(' · ') || t('kpiNeedsNone')
+  // "Needs you" = TermLift is waiting on an answer from you. Running Full
+  // Analysis is an option, not an obligation, so quick-stage deals don't count.
+  const needsYou = rows.filter((r) => r.waitingOnClient).length
+  const needsSub = needsYou ? t('kpiNeedsReply', { n: needsYou }) : t('kpiNeedsNone')
 
   const dateShort = (d: Date) => d.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' })
 

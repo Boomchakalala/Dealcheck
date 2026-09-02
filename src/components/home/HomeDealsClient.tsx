@@ -75,13 +75,13 @@ export function HomeDealsClient({ rows: initialRows, linkBase = '/app', readOnly
   const [deletingId, setDeletingId] = useState<string | null>(null)
   useEffect(() => setRows(initialRows), [initialRows])
 
-  const needsCount = rows.filter((r) => r.needsUnlock || r.waitingOnClient).length
+  const needsCount = rows.filter((r) => r.waitingOnClient).length
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase()
     return rows.filter((r) => {
       if (term && !r.vendor.toLowerCase().includes(term) && !r.category.toLowerCase().includes(term)) return false
-      if (filter === 'needs') return r.needsUnlock || r.waitingOnClient
+      if (filter === 'needs') return r.waitingOnClient
       if (filter === 'termlift') return r.stage === 'termlift'
       if (filter === 'won') return r.won
       return true
