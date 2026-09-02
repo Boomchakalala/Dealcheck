@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Mail, Sparkles, Loader2, Target, DollarSign, Zap, TrendingUp, Shield, BookOpen, Send, Clock, Briefcase, Copy, ArrowRight, Microscope, Plus, RotateCcw, Eye } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Mail, Sparkles, Loader2, Target, DollarSign, Zap, TrendingUp, Shield, BookOpen, Send, Clock, Briefcase, Copy, ArrowRight, Microscope, Plus, RotateCcw, Eye, Info } from 'lucide-react'
 import Link from 'next/link'
 import { normalizeAmount, formatCurrency, parseMoney } from '@/lib/currency'
 import type { DealOutput } from '@/types'
@@ -11,7 +11,7 @@ import { getCanOffer } from '@/lib/email-asks'
 import { hasDeepContent as computeHasDeepContent } from '@/lib/deep-analysis-status'
 import { TONE_LABELS, type EmailTone } from '@/lib/tone-recommend'
 import { getFlagSeverity } from '@/lib/deal-metrics'
-import { Btn, Card, Chip, GateCard, SectionHeading } from '@/components/system'
+import { Btn, Card, Chip, GateCard } from '@/components/system'
 import { cn } from '@/lib/utils'
 
 interface DealScrollViewProps {
@@ -337,7 +337,7 @@ export function DealScrollView(props: DealScrollViewProps) {
     <div className="flex flex-col gap-5">
 
       {/* ═══ 1. OVERVIEW — snapshot | score breakdown + already solid (as in the draft) ═══ */}
-      <div id="overview" className="scroll-mt-[170px]">
+      <div id="overview" className="scroll-mt-[196px]">
         <p className="tl-label text-[11.5px] text-green-deep mb-2.5">{fr ? 'Étape 1 · Analyse rapide' : 'Step 1 · Quick analysis'}</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5">
         <Card className={PAD}>
@@ -400,7 +400,7 @@ export function DealScrollView(props: DealScrollViewProps) {
       </div>
 
       {/* ═══ 2. RED FLAGS ═══ */}
-      <section id="flags" className="scroll-mt-[170px]">
+      <section id="flags" className="scroll-mt-[196px]">
         <IconHeading
           icon={AlertTriangle}
           tone={sortedFlags.length > 0 ? 'risk' : 'green'}
@@ -421,7 +421,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
         {/* Full Analysis gate — its own object, never blocks the fast analysis. */}
         {!demoMode && !hasDeepContent && (
-          <div id="deep-analysis" className="mb-3.5 scroll-mt-[170px]">
+          <div id="deep-analysis" className="mb-3.5 scroll-mt-[196px]">
             {deepAnalysisLoading ? (
               <DeepAnalysisProgress locale={locale} />
             ) : (
@@ -500,7 +500,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
       {/* ═══ 3. PLAYBOOK (deep only) ═══ */}
       {(!showFullPlaybook || hasDeepContent) && (
-        <section id="playbook" className="scroll-mt-[170px]">
+        <section id="playbook" className="scroll-mt-[196px]">
           {!showFullPlaybook ? (
             <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Zap} />
           ) : (
@@ -602,7 +602,7 @@ export function DealScrollView(props: DealScrollViewProps) {
       )}
 
       {/* ═══ 4. EMAIL ═══ */}
-      <section id="email-section" className="scroll-mt-[170px]">
+      <section id="email-section" className="scroll-mt-[196px]">
         {!showFullPlaybook ? (
           <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Mail} variant="email" />
         ) : !hasDeepContent && !hasEmail ? (
@@ -676,7 +676,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
       {/* ═══ 5. ROUNDS + ASSUMPTIONS ═══ */}
       {(hasNegotiationActivity || ((o?.assumptions?.length ?? 0) > 0)) && (
-        <div id="rounds" className={cn('grid grid-cols-1 gap-5 scroll-mt-[170px]', hasNegotiationActivity && (o?.assumptions?.length ?? 0) > 0 && 'lg:grid-cols-[1.4fr_1fr]')}>
+        <div id="rounds" className={cn('grid grid-cols-1 gap-5 scroll-mt-[196px]', hasNegotiationActivity && (o?.assumptions?.length ?? 0) > 0 && 'lg:grid-cols-[1.4fr_1fr]')}>
           {hasNegotiationActivity && (
             <Card className={PAD}>
               <IconHeading icon={Clock} title={fr ? 'Tours de négociation' : 'Negotiation rounds'} />
@@ -710,13 +710,13 @@ export function DealScrollView(props: DealScrollViewProps) {
                     <span className="w-[22px] h-[22px] rounded-full border-[1.5px] border-dashed border-line text-ink-3 tl-label text-[10px] grid place-items-center">{sortedRounds.length + 1}</span>
                     <div className="min-w-0">
                       {hasDeepContent ? (
-                        <div id="add-round" className="scroll-mt-[170px]">
+                        <div id="add-round" className="scroll-mt-[196px]">
                           <p className="text-[13px] font-semibold text-ink">{fr ? 'Importer la réponse du fournisseur' : "Upload the vendor's reply"}</p>
                           <p className="text-[12px] text-ink-2">{fr ? 'Nous ré-analysons ce qui a changé et mettons le plan à jour.' : 'We re-analyse what changed and update the playbook.'}</p>
                           <div className="mt-2">{addRoundForm}</div>
                         </div>
                       ) : (
-                        <a id="add-round" href="#deep-analysis" className="block no-underline scroll-mt-[170px]">
+                        <a id="add-round" href="#deep-analysis" className="block no-underline scroll-mt-[196px]">
                           <p className="text-[13px] font-semibold text-ink">{fr ? `Tour ${sortedRounds.length + 1}` : `Round ${sortedRounds.length + 1}`}</p>
                           <p className="text-[12px] text-ink-2">{fr ? "Se débloque avec l'analyse complète →" : 'Unlocks with Full Analysis →'}</p>
                         </a>
@@ -729,7 +729,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           )}
           {o?.assumptions && o.assumptions.length > 0 && (
             <Card className={PAD}>
-              <SectionHeading title={fr ? 'Hypothèses' : 'Assumptions'} />
+              <IconHeading icon={Info} title={fr ? 'Hypothèses' : 'Assumptions'} />
               <ul className="m-0 p-0 list-none flex flex-col gap-1.5">
                 {o.assumptions.map((a: string, i: number) => (
                   <li key={i} className="text-[13px] text-ink-2 leading-relaxed flex items-start gap-2"><span className="text-ink-3 shrink-0">•</span>{a}</li>
