@@ -21,6 +21,24 @@ function isV2(output: DealOutput | DealOutputV2): output is DealOutputV2 {
 }
 
 /**
+ * Quick-analysis redaction (2026-09-03): a deal that has not run Full
+ * Analysis keeps every flag's issue, severity and "why it matters", but loses
+ * the per-flag "what to ask for" and "fallback position". Those are the
+ * actionable half of the flag and the thing Full Analysis sells — showing
+ * them on the free tier made Full Analysis look like it added nothing.
+ *
+ * Applied at the render/response boundary only (deal page, trial route);
+ * output_json in the DB is never touched, so the deep-analysis run and every
+ * server-side consumer (emails, negotiate flow) still see the full flags.
+ */
+export function stripFlagDetailForQuick<T extends DealOutput | DealOutputV2>(output: T): T {
+  if (isV2(output)) return output
+  const o = output as DealOutput
+  if (!Array.isArray(o.red_flags)) return output
+  return { ...o, red_flags: o.red_flags.map(stripRedFlag) } as T
+}
+
+/**
  * Redacts the DIY negotiation playbook from an analysis output. Only applied
  * at outbound response/render boundaries — never at persistence. `output_json`
  * in the `rounds` table always keeps the full data so this stays reversible

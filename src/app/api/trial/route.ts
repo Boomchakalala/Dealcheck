@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { analyzeDeal } from '@/lib/claude'
-import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
+import { stripAdvancedOutput, stripFlagDetailForQuick, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
 import { runWithAiContext } from '@/lib/ai-telemetry'
 import { createAdminClient } from '@/lib/supabase/server'
 import { TRIAL_MAX_PER_IP_PER_DAY } from '@/lib/ai-limits'
@@ -156,9 +156,11 @@ export async function POST(request: Request) {
       validPdfData
     )))
 
-    const responseOutput = SHOW_FULL_NEGOTIATION_PLAYBOOK
+    const playbookOutput = SHOW_FULL_NEGOTIATION_PLAYBOOK
       ? output
       : stripAdvancedOutput(output as DealOutput | DealOutputV2)
+    // Trial = quick stage: per-flag asks/fallbacks stay server-side, same rule as /app/deal.
+    const responseOutput = stripFlagDetailForQuick(playbookOutput as DealOutput | DealOutputV2)
 
     return NextResponse.json({
       success: true,

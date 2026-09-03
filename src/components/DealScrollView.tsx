@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Mail, Sparkles, Loader2, Target, DollarSign, Zap, TrendingUp, Shield, BookOpen, Send, Clock, Briefcase, Copy, ArrowRight, Microscope, Plus, RotateCcw, Eye, Info } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Mail, Sparkles, Loader2, Target, DollarSign, Zap, TrendingUp, Shield, BookOpen, Send, Clock, Briefcase, Copy, ArrowRight, Microscope, Plus, RotateCcw, Eye, Info, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { normalizeAmount, formatCurrency, parseMoney } from '@/lib/currency'
 import type { DealOutput } from '@/types'
@@ -405,7 +405,9 @@ export function DealScrollView(props: DealScrollViewProps) {
           icon={AlertTriangle}
           tone={sortedFlags.length > 0 ? 'risk' : 'green'}
           title={`${t('output.redFlags')} · ${sortedFlags.length}`}
-          sub={fr ? 'Chaque point inclut quoi demander et une position de repli' : 'Each issue includes what to ask for and a fallback position'}
+          sub={hasDeepContent || demoMode
+            ? (fr ? 'Chaque point inclut quoi demander et une position de repli' : 'Each issue includes what to ask for and a fallback position')
+            : (fr ? 'Ouvrez un point pour voir pourquoi il compte. Les demandes et positions de repli arrivent avec l’analyse complète.' : 'Open an issue to see why it matters. The asks and fallback positions come with Full Analysis.')}
           right={
             <>
               {hasDeepContent && <Chip tone="green"><CheckCircle2 className="w-3 h-3" />{fr ? 'Analyse détaillée prête' : 'Detailed analysis ready'}</Chip>}
@@ -457,12 +459,19 @@ export function DealScrollView(props: DealScrollViewProps) {
                     <div className="overflow-hidden">
                       <div className="pb-5 pr-5 pl-[62px]">
                         <p className="text-[13.5px] text-ink-2 leading-relaxed">{flag.why_it_matters}</p>
-                        {(flag.what_to_ask_for || flag.if_they_push_back) && (
+                        {(flag.what_to_ask_for || flag.if_they_push_back) ? (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                             {flag.what_to_ask_for && <div className="border-l-2 border-green pl-3"><p className="tl-label text-ink-3 mb-1">{t('output.whatToAskFor')}</p><p className="text-[13px] text-ink font-medium leading-snug">{flag.what_to_ask_for}</p></div>}
                             {flag.if_they_push_back && <div className="border-l-2 border-line pl-3"><p className="tl-label text-ink-3 mb-1">{t('output.fallbackPosition')}</p><p className="text-[13px] text-ink-2 leading-snug">{flag.if_they_push_back}</p></div>}
                           </div>
-                        )}
+                        ) : !hasDeepContent && !demoMode ? (
+                          /* Quick stage: the ask + fallback were stripped server-side (lib/negotiation-gating.ts). */
+                          <p className="mt-3.5 flex items-center gap-2 text-[12.5px] text-ink-3">
+                            <Lock className="w-3.5 h-3.5 shrink-0" />
+                            {fr ? 'La demande et la position de repli pour ce point arrivent avec l’analyse complète.' : 'The ask and fallback position for this issue come with Full Analysis.'}
+                            {showFullPlaybook && <a href="#deep-analysis" className="text-green-deep font-medium no-underline hover:underline">{fr ? "Lancer l'analyse complète" : 'Run Full Analysis'}</a>}
+                          </p>
+                        ) : null}
                       </div>
                     </div>
                   </div>

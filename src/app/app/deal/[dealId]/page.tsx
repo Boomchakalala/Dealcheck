@@ -6,7 +6,7 @@ import { AddRoundForm } from './AddRoundForm'
 import { DealWorkspace } from '@/components/deal/DealWorkspace'
 import type { Plan } from '@/lib/tiers'
 import type { DealOutput, DealOutputV2 } from '@/types'
-import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
+import { stripAdvancedOutput, stripFlagDetailForQuick, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
 import { hasDeepContent } from '@/lib/deep-analysis-status'
 import { inferDealType } from '@/lib/deal-type-inference'
 import enMessages from '@/i18n/en.json'
@@ -34,11 +34,13 @@ export default async function DealPage({ params }: { params: Promise<{ dealId: s
   const latestRound = sortedRounds[0]
   const rawLatestOutput = latestRound?.output_json as DealOutput | DealOutputV2 | undefined
   // Redaction happens at the render boundary only — never at persistence.
-  const latestOutput = rawLatestOutput && !showFullPlaybook ? stripAdvancedOutput(rawLatestOutput) : rawLatestOutput
+  const deepComplete = hasDeepContent(rawLatestOutput)
+  const playbookOutput = rawLatestOutput && !showFullPlaybook ? stripAdvancedOutput(rawLatestOutput) : rawLatestOutput
+  // Quick stage: per-flag asks/fallbacks stay server-side until Full Analysis has run (admins included, so the gated view is what we QA).
+  const latestOutput = playbookOutput && !deepComplete ? stripFlagDetailForQuick(playbookOutput) : playbookOutput
 
   // Deal-type inference — server-side from extracted_text (never sent to the client).
   const inferred = inferDealType((latestOutput as DealOutput | undefined)?.snapshot?.deal_type, undefined, latestRound?.extracted_text)
-  const deepComplete = hasDeepContent(latestOutput)
 
   // Strip extracted_text from what goes to the client.
   const clientDeal = {
