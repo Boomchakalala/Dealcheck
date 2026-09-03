@@ -521,6 +521,13 @@ export function DealScrollView(props: DealScrollViewProps) {
               action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? "Lancer l'analyse complète" : 'Run Full Analysis')}</Btn>}
             />
           )}
+          {/* The add-on, one quiet line: you can skip the whole ladder and hand it over right now. */}
+          {showFullPlaybook && !hasNegotiationRequest && !isClosed && (
+            <p className="text-[12.5px] text-ink-3 mt-2.5 text-center">
+              {fr ? 'Vous préférez ne rien faire de tout ça ? ' : "Prefer not to do any of this? "}
+              <Link href={negotiateHref} className="text-ink-2 font-medium hover:text-green-deep no-underline hover:underline">{fr ? 'Confiez la négociation à TermLift →' : 'Let TermLift negotiate it for you →'}</Link>
+            </p>
+          )}
         </div>
       )}
 

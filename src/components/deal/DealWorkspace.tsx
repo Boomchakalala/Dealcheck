@@ -130,8 +130,8 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
   else if (stage === 'quick') primary = <Btn href="#deep-analysis" variant="primary" disabled={deepRunning}>{deepRunning ? t('dealPage.primaryRunning') : t('dealPage.primaryRunFull')}</Btn>
   else if (stage === 'full') primary = <Btn href="#email-section" variant="primary">{t('dealPage.primaryEmail')}</Btn>
   else primary = <Btn href="#add-round" variant="primary">{t('dealPage.primaryUploadReply')}</Btn>
-  // The hand-off is an add-on to step 3: offered once the playbook exists, never before.
-  const secondary = !isTrial && !closed && !termliftRuns && deepDone ? <Btn href={negotiateHref} variant="ghost">{t('dealPage.secondaryNegotiate')}</Btn> : null
+  // The hand-off is an add-on, not a step — available at every stage, quietly (ghost button).
+  const secondary = !isTrial && !closed && !termliftRuns ? <Btn href={negotiateHref} variant="ghost">{t('dealPage.secondaryNegotiate')}</Btn> : null
 
   const railHrefs: Partial<Record<DealStage, string>> | undefined = isTrial ? undefined : {
     quick: '#overview',
