@@ -101,7 +101,8 @@ export default function NewAnalysisPage() {
         actions={<Btn href="/app" variant="link" size="sm">← {t('nav.deals')}</Btn>}
       />
       <PageBody>
-        <div className="max-w-[760px] w-full">
+        {/* AnalysisUploader is a 3+2 column grid (shared with /try); it needs the width or the side column collapses. */}
+        <div className="max-w-[1080px] w-full">
           <AnalysisUploader
             input={input} setInput={setInput}
             uploading={uploading} analyzing={analyzing} error={error}
