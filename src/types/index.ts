@@ -249,6 +249,28 @@ export type DealOutput = {
   }
   assumptions: string[]
   disclaimer: string
+  // ── Market Benchmark (Full Analysis only; all optional, absent on older deals) ──
+  /** Structured facts pulled from the quote for benchmark matching. */
+  benchmark_input?: import('@/lib/benchmark/types').BenchmarkInput
+  /** Deterministic engine output — the source of truth for every benchmark number shown. */
+  market_benchmark?: import('@/lib/benchmark/types').BenchmarkResult
+  /** The query the engine ran (reproducibility). */
+  market_benchmark_query?: import('@/lib/benchmark/types').BenchmarkQuery
+  /** LLM explanation of the benchmark. Strings only; target/opening are clamped in code. */
+  benchmark_interpretation?: BenchmarkInterpretation
+}
+
+export type BenchmarkInterpretation = {
+  summary: string
+  why_bullets: string[]
+  /** Proposed negotiation target, in the quote currency. Clamped to the strong-outcome-low .. fair-market-high band. */
+  target_price: number | null
+  /** Proposed opening ask, in the quote currency. Clamped to >= strong_outcome_low. */
+  opening_ask: number | null
+  target_rationale: string
+  limitations_note: string
+  /** Set by code when a proposed number had to be clamped into the evidence band. */
+  clamped?: string[]
 }
 
 // V2 Schema Types

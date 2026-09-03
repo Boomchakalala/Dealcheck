@@ -7,6 +7,10 @@ import type { ExtractedFacts } from '@/lib/claude/extract'
 import type { QuoteClassificationType } from '@/lib/schemas'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { runWithAiContext } from '@/lib/ai-telemetry'
+import { extractBenchmarkInput } from '@/lib/claude/benchmark-input'
+import { computeMarketBenchmark, type BenchmarkRun } from '@/lib/benchmark/service'
+import { clampInterpretation } from '@/lib/benchmark/interpret'
+import type { BenchmarkInput } from '@/lib/benchmark/types'
 
 export const maxDuration = 120
 
@@ -111,16 +115,45 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
       const locale = (await cookies()).get('termlift_lang')?.value || 'en'
 
       const deepStart = Date.now()
-      const { classification, deep } = await runWithAiContext({ userId: user.id, dealId, roundId: round.id }, async () => {
+      const { classification, deep, benchmarkInput, benchmarkRun } = await runWithAiContext({ userId: user.id, dealId, roundId: round.id }, async () => {
         const classification: QuoteClassificationType = output.classification
           || await classifyQuote(round.extracted_text, deal.deal_type as 'New' | 'Renewal')
+
+        // ── Market Benchmark (optional, never blocks Full Analysis) ──────────
+        // 1. small fact-extraction call for product/quantity/unit price
+        // 2. deterministic engine over stored observations (no LLM)
+        // Any failure here is logged and Full Analysis proceeds without a benchmark.
+        let benchmarkInput: BenchmarkInput | null = null
+        let benchmarkRun: BenchmarkRun | null = null
+        try {
+          benchmarkInput = await extractBenchmarkInput(round.extracted_text, output.snapshot || {})
+        } catch (e) {
+          console.warn('[TermLift] Benchmark input extraction failed (continuing without):', e instanceof Error ? e.message : e)
+        }
+        try {
+          benchmarkRun = await computeMarketBenchmark({
+            vendor: output.vendor,
+            snapshot: output.snapshot || {},
+            category: classification?.quote_type ?? null,
+            deal_size_bracket: classification?.deal_size_bracket ?? null,
+            dealType: deal.deal_type,
+          }, benchmarkInput)
+        } catch (e) {
+          console.warn('[TermLift] Market benchmark failed (continuing without):', e instanceof Error ? e.message : e)
+        }
+
         const deep = await analyzeDealFacts(facts, classification, round.extracted_text, {
           dealType: deal.deal_type as 'New' | 'Renewal',
           userLocale: locale,
+          marketBenchmark: benchmarkRun?.result,
         })
-        return { classification, deep }
+        return { classification, deep, benchmarkInput, benchmarkRun }
       })
       console.log(`[TermLift timing] Deep analysis (analyzeDealFacts): ${Date.now() - deepStart}ms`)
+
+      // The model's benchmark commentary is clamped into the engine's evidence band —
+      // it can explain the numbers, never move them.
+      const benchmark_interpretation = benchmarkRun ? clampInterpretation(deep.benchmark_interpretation, benchmarkRun.result) : null
 
       // Enrich, don't overwrite: score/score_breakdown/extraction/deductions/
       // confidence/target_price_range/verdict/verdict_type/title/snapshot/
@@ -139,6 +172,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
         assumptions: deep.assumptions,
         price_insight: deep.price_insight,
         classification,
+        // Market Benchmark — deterministic result + the query that produced it (reproducible),
+        // plus the clamped model commentary. All absent when the step was skipped/failed.
+        ...(benchmarkInput ? { benchmark_input: benchmarkInput } : {}),
+        ...(benchmarkRun ? { market_benchmark: benchmarkRun.result, market_benchmark_query: benchmarkRun.query } : {}),
+        ...(benchmark_interpretation ? { benchmark_interpretation } : {}),
         deep_analysis_status: 'done',
         deep_analysis_completed_at: new Date().toISOString(),
       }

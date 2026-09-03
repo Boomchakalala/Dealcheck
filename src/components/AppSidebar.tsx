@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect, useSyncExternalStore } from 'react'
-import { FileText, Building2, Settings, User, LogOut, HelpCircle, ChevronDown, Globe, PanelLeftClose, PanelLeftOpen, Briefcase, Gauge, Plus } from 'lucide-react'
+import { FileText, Building2, Settings, User, LogOut, HelpCircle, ChevronDown, Globe, PanelLeftClose, PanelLeftOpen, Briefcase, Gauge, Plus, BarChart3 } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { NotificationBell, type NotificationItem } from '@/components/NotificationBell'
 import { useT } from '@/i18n/context'
@@ -67,6 +67,7 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, linkBas
     ...(demoMode ? [] : [{ href: `${linkBase}/vendors`, icon: Building2, label: t('nav.vendors') }]),
     ...(isAdmin && !demoMode ? [{ href: '/app/admin/negotiations', icon: Briefcase, label: t('nav.adminNegotiations'), badge: adminUnread, tone: 'risk' as const }] : []),
     ...(isAdmin && !demoMode ? [{ href: '/app/admin/ai-usage', icon: Gauge, label: t('nav.adminAiUsage') }] : []),
+    ...(isAdmin && !demoMode ? [{ href: '/app/admin/benchmarks', icon: BarChart3, label: t('nav.adminBenchmarks') }] : []),
   ]
   const account: Item[] = [
     { href: `${linkBase}/settings`, icon: Settings, label: t('nav.settings') },

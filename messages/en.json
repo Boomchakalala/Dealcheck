@@ -26,7 +26,8 @@
     "demoSignup": "Sign up to use it for real",
     "newShort": "New",
     "accountShort": "Account",
-    "signUpShort": "Sign up"
+    "signUpShort": "Sign up",
+    "adminBenchmarks": "Benchmarks (admin)"
   },
   "hero": {
     "badge": "Procurement-grade quote review",
@@ -1562,7 +1563,9 @@
     "topReasons": "Top reasons to push back",
     "snapNotice": "Notice",
     "snapRenewal": "Renewal date",
-    "snapDeadline": "Signing deadline"
+    "snapDeadline": "Signing deadline",
+    "statTargetBenchSub": "{pct} vs observed market",
+    "statTargetBenchAt": "at observed market"
   },
   "tryPage": {
     "eyebrow": "Step 1 · free · no signup",

@@ -1,0 +1,7 @@
+{
+  "nav": { "adminBenchmarks": "Benchmarks (admin)" },
+  "dealPage": {
+    "statTargetBenchSub": "{pct} vs observed market",
+    "statTargetBenchAt": "at observed market"
+  }
+}

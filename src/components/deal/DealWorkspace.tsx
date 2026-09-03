@@ -92,6 +92,19 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
   const scoreRationale = latestOutput.score_rationale
   const verdict = latestOutput.verdict
   const targetRange = (latestOutput as unknown as { target_price_range?: { low: number; high: number } | null }).target_price_range || null
+  // Market Benchmark (Full Analysis): when the engine published a range, the tile shows the
+  // model's clamped target (or the fair-market band) with the market position. Numbers come
+  // from the engine result / clamped interpretation only.
+  const bench = (latestOutput as DealOutput | undefined)?.market_benchmark
+  const benchInterp = (latestOutput as DealOutput | undefined)?.benchmark_interpretation
+  const benchTile = bench && bench.benchmark_available
+    ? {
+        value: benchInterp?.target_price != null ? fmtMoney(benchInterp.target_price, currency) : `${fmtMoney(bench.fair_market_low, currency)}–${fmtMoney(bench.fair_market_high, currency)}`,
+        sub: bench.quote_vs_market_percent !== 0
+          ? t('dealPage.statTargetBenchSub', { pct: `${bench.quote_vs_market_percent > 0 ? '+' : ''}${bench.quote_vs_market_percent}%` })
+          : t('dealPage.statTargetBenchAt'),
+      }
+    : null
   const topReasons = (latestOutput.red_flags || []).slice(0, 3).map((f) => f.issue).filter(Boolean)
   const renewal = getRenewalDate(deal)
   const daysToRenewal = renewal ? Math.floor((renewal.getTime() - now) / 86400000) : null
@@ -248,6 +261,8 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
           {/* 2. Target price (what to aim for) — falls back to Total / Final price */}
           {won ? (
             <StatTile label={t('dealPage.statFinal')} tone="money" value={achieved > 0 && totalCommitment ? fmtMoney(parseMoney(totalCommitment).amount - achieved, currency) : totalCommitment ? normalizeAmount(totalCommitment) : '—'} sub={achieved > 0 && totalCommitment ? t('dealPage.statWas', { v: normalizeAmount(totalCommitment) }) : term || undefined} />
+          ) : benchTile ? (
+            <StatTile label={t('dealPage.statTargetLabel')} value={benchTile.value} sub={benchTile.sub} />
           ) : targetRange ? (
             <StatTile label={t('dealPage.statTargetLabel')} value={`${fmtMoney(targetRange.low, currency)}–${fmtMoney(targetRange.high, currency)}`} sub={totalCommitment ? t('dealPage.statTargetSub', { v: normalizeAmount(totalCommitment) }) : undefined} />
           ) : (

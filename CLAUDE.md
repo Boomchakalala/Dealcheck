@@ -53,3 +53,11 @@ Configured in `.env.local` (see README.md for the full list): Supabase URL/anon/
 - Deal numbers come from `src/lib/deal-metrics.ts` only; Home KPIs/insights from `src/lib/deal-insights.ts`.
 - i18n: live strings are `messages/{en,fr}.json` (nested). Add new copy in both via `scripts/i18n-merge.mjs <fragment> <locale>`. `src/i18n/*.json` is a stale flat copy still read by `DealScrollView` — don't add to it.
 - App pages wrap in `<AppPage>` (full-bleed) → `<PageHeader>` → `<PageBody>`. `/app/dashboard` and `/app/negotiations` redirect into Home tabs/filters.
+
+## Market Benchmark (Full Analysis, Sept 2026)
+
+- Data: `benchmark_sources` / `benchmark_products` / `benchmark_observations` (admin-only RLS via `private.is_admin()`; `is_test` rows excluded in production unless `BENCHMARK_INCLUDE_TEST_DATA=true`). Native currency + EUR values + recorded FX rate on every observation.
+- Engine: `src/lib/benchmark/` — pure, deterministic, unit-tested (`engine.test.ts`). Match levels 1-5; only same-vendor same-product (1-2) feed money ranges; 3-4 give a vendor discount signal; 5 is the curated category model, always labelled "not observed". Tukey outlier guard, weighted percentiles (fair = P30-P60, strong = P10-P30), confidence 0-100 → high/medium/low.
+- Flow: `deep-analysis/route.ts` → `extractBenchmarkInput` (one Haiku call, facts only) → `computeMarketBenchmark` (service role reads) → result injected into `analyzeDealFacts` as an authoritative block → `clampInterpretation` forces the model's target/opening ask inside the evidence band. Stored on `rounds.output_json` as `benchmark_input`, `market_benchmark`, `market_benchmark_query`, `benchmark_interpretation`. Never blocks Full Analysis.
+- UI: `components/deal/MarketBenchmark.tsx` renders numbers from the engine result only; the model text is commentary. Admin entry at `/app/admin/benchmarks` (+ `/api/admin/benchmarks*`).
+- Rule: the LLM may explain a benchmark, never produce one. No benchmark numbers come from prompts.

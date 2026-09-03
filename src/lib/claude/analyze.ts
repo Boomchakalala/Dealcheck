@@ -194,8 +194,23 @@ Return valid JSON only:
   },
   "score_rationale": "Short qualitative read for the buyer. No numbers.",
   "assumptions": ["..."],
-  "disclaimer": "This analysis is commercial guidance, not legal advice. Verify final terms before signing."
+  "disclaimer": "This analysis is commercial guidance, not legal advice. Verify final terms before signing.",
+  "benchmark_interpretation": {
+    "summary": "ONLY when a MARKET BENCHMARK block is provided: one or two sentences on what the benchmark means for this buyer.",
+    "why_bullets": ["3-5 short bullets connecting the benchmark evidence to the negotiation. Reuse the benchmark's own numbers; add none."],
+    "target_price": 0,
+    "opening_ask": 0,
+    "target_rationale": "Why this target and opening ask, in one or two sentences.",
+    "limitations_note": "One sentence restating the benchmark's limitations in plain language."
+  }
 }
+
+MARKET BENCHMARK RULES (apply only when a MARKET BENCHMARK block is present in the context; otherwise omit benchmark_interpretation entirely):
+- The benchmark numbers are computed by TermLift from stored observations. They are the source of truth. Never recompute, adjust, or contradict them.
+- Never invent additional comparable transactions, market medians, discounts, or sources. Do not cite any market data that is not in the block.
+- target_price must sit inside [strong_outcome_low, fair_market_high]; opening_ask must be >= strong_outcome_low and <= target_price. Both in the quote currency. If the block says benchmark_available is false, set both to null and explain the evidence is directional.
+- If confidence is "low", say so plainly and describe the guidance as directional. Never upgrade the confidence in your wording.
+- Fold the benchmark into the playbook: the must_have asks and potential_savings may reference the target, but every amount must still trace to the quote or the benchmark block.
 
 ==================================================
 GROUND RULES
@@ -270,6 +285,15 @@ export interface AnalysisOutput {
   score_rationale?: string
   assumptions: string[]
   disclaimer: string
+  /** Present only when a market benchmark block was supplied. See MARKET BENCHMARK RULES in the prompt. */
+  benchmark_interpretation?: {
+    summary: string
+    why_bullets: string[]
+    target_price: number | null
+    opening_ask: number | null
+    target_rationale: string
+    limitations_note: string
+  }
 }
 
 export async function analyzeDealFacts(
@@ -287,6 +311,8 @@ export async function analyzeDealFacts(
     pdfData?: { base64: string; mimeType: string }
     userPreferences?: { payment_terms?: string; top_priority?: string; auto_renewal?: string }
     codeFlags?: Array<{ type: string; severity: string; issue: string; what_to_ask_for: string }>
+    /** Deterministic Market Benchmark result (lib/benchmark). Injected as an authoritative block; the model may only interpret it. */
+    marketBenchmark?: import('@/lib/benchmark/types').BenchmarkResult
   }
 ): Promise<AnalysisOutput> {
   // Build the enhanced prompt with overlays
@@ -303,6 +329,7 @@ export async function analyzeDealFacts(
     options.goal && `User Goal: ${options.goal}`,
     options.notes && `User Notes: ${options.notes}`,
     options.previousRoundOutput && `MULTI-ROUND ANALYSIS CONTEXT:\nThis is a follow-up round. Previous analysis: ${JSON.stringify(options.previousRoundOutput, null, 2)}\nKeep findings and extraction consistent. Only change them if the quote materially changed.`,
+    options.marketBenchmark && `MARKET BENCHMARK (computed by TermLift from stored observations — authoritative, do not recompute or extend):\n${JSON.stringify(benchmarkForPrompt(options.marketBenchmark), null, 2)}`,
   ].filter(Boolean)
 
   const visualContent = buildImageContent(options.imageData, options.allPages, options.pdfData)
@@ -352,6 +379,34 @@ export async function analyzeDealFacts(
   }
 
   return parsed
+}
+
+/** The subset of the engine result the model needs — no per-observation detail, no source URLs to "quote". */
+function benchmarkForPrompt(b: import('@/lib/benchmark/types').BenchmarkResult) {
+  const base = {
+    benchmark_available: b.benchmark_available,
+    currency: b.currency,
+    confidence: b.confidence,
+    confidence_score: b.confidence_score,
+    comparable_count: b.comparable_count,
+    evidence_summary: b.evidence_summary,
+    limitations: b.limitations,
+    vendor_discount_signal: b.vendor_discount_signal ?? null,
+    category_signal: b.category_signal ? { label: b.category_signal.label, typical_discount_low_pct: b.category_signal.typical_discount_low_pct, typical_discount_high_pct: b.category_signal.typical_discount_high_pct, source_label: b.category_signal.source_label } : null,
+    sources: b.sources.map((s) => ({ name: s.name, type: s.source_type, observations: s.observation_count })),
+  }
+  if (!b.benchmark_available) return { ...base, reason: b.reason }
+  return {
+    ...base,
+    basis: b.basis,
+    quoted_price: b.quoted_price,
+    fair_market_low: b.fair_market_low,
+    fair_market_high: b.fair_market_high,
+    strong_outcome_low: b.strong_outcome_low,
+    strong_outcome_high: b.strong_outcome_high,
+    market_median: b.market_median,
+    quote_vs_market_percent: b.quote_vs_market_percent,
+  }
 }
 
 export function buildPreferencesDirective(prefs?: { payment_terms?: string; top_priority?: string; auto_renewal?: string; contract_term_strategy?: string }): string {

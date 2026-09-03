@@ -9,6 +9,7 @@ import type { DealOutput } from '@/types'
 import type { Plan } from '@/lib/tiers'
 import { getCanOffer } from '@/lib/email-asks'
 import { hasDeepContent as computeHasDeepContent } from '@/lib/deep-analysis-status'
+import { MarketBenchmark } from '@/components/deal/MarketBenchmark'
 import { TONE_LABELS, type EmailTone } from '@/lib/tone-recommend'
 import { getFlagSeverity } from '@/lib/deal-metrics'
 import { Btn, Card, Chip, GateCard } from '@/components/system'
@@ -612,6 +613,11 @@ export function DealScrollView(props: DealScrollViewProps) {
             </>
           )}
         </section>
+      )}
+
+      {/* ═══ 3b. MARKET BENCHMARK (deep only; absent on deals analysed before the feature) ═══ */}
+      {hasDeepContent && (o as any)?.market_benchmark && (
+        <MarketBenchmark benchmark={(o as any).market_benchmark} interpretation={(o as any).benchmark_interpretation ?? null} fmt={fmtSav} locale={locale} />
       )}
 
       {/* ═══ 4. EMAIL ═══ */}

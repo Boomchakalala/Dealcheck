@@ -26,7 +26,8 @@
     "demoSignup": "Créer un compte pour l'utiliser vraiment",
     "newShort": "Nouveau",
     "accountShort": "Compte",
-    "signUpShort": "S'inscrire"
+    "signUpShort": "S'inscrire",
+    "adminBenchmarks": "Benchmarks (admin)"
   },
   "hero": {
     "badge": "Votre expert achats, en un clic",
@@ -1562,7 +1563,9 @@
     "topReasons": "Principales raisons de négocier",
     "snapNotice": "Préavis",
     "snapRenewal": "Date de renouvellement",
-    "snapDeadline": "Date limite de signature"
+    "snapDeadline": "Date limite de signature",
+    "statTargetBenchSub": "{pct} vs marché observé",
+    "statTargetBenchAt": "au niveau du marché observé"
   },
   "tryPage": {
     "eyebrow": "Étape 1 · gratuit · sans inscription",
