@@ -89,9 +89,7 @@ function LoginForm() {
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
       {/* Left — ink panel */}
       <aside className="hidden lg:flex flex-col bg-ink text-white px-12 py-10">
-        <Link href="/" className="flex items-center gap-2 no-underline">
-          <span className="font-display font-bold text-[17px] tracking-[-0.02em] text-white">Term<span className="text-green">Lift</span></span>
-        </Link>
+        <Logo tone="white" />
         <h2 className="font-display font-extrabold text-[30px] leading-[1.1] tracking-[-0.03em] max-w-[16ch] mt-16">{t('login.panel.title')}</h2>
         <ul className="list-none p-0 m-0 mt-6 flex flex-col gap-3 text-[14px] text-[#C4D0CA]">
           {[t('login.panel.point1'), t('login.panel.point2'), t('login.panel.point3')].map((p) => (

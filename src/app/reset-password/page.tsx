@@ -4,9 +4,9 @@ import { useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, ArrowRight, CheckCircle2 } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useT } from '@/i18n/context'
+import { Logo } from '@/components/MarketingHeader'
 
 function ResetPasswordForm() {
   const t = useT()
@@ -71,14 +71,8 @@ function ResetPasswordForm() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col">
       {/* Header */}
-      <div className="border-b border-slate-200 bg-white px-5 py-4">
-        <Link href="/" className="flex items-center gap-2.5">
-          <Image src="/logo-icon.png" alt="TermLift" width={28} height={28} />
-          <div className="flex items-baseline">
-            <span className="text-lg font-bold text-slate-900">Term</span>
-            <span className="text-lg font-bold text-emerald-600">Lift</span>
-          </div>
-        </Link>
+      <div className="border-b border-line bg-surface px-5 h-14 flex items-center">
+        <Logo />
       </div>
 
       <main className="flex-1 flex items-center justify-center px-5 py-12">

@@ -7,11 +7,12 @@ import { Menu, X } from 'lucide-react'
 import { useT } from '@/i18n/context'
 import { Btn } from '@/components/system'
 
-export function Logo({ size = 28, className = '' }: { size?: number; className?: string }) {
+/** Icon + wordmark. `tone="white"` for dark panels (login aside). */
+export function Logo({ size = 28, className = '', tone = 'ink' }: { size?: number; className?: string; tone?: 'ink' | 'white' }) {
   return (
     <Link href="/" className={`flex items-center gap-2 no-underline shrink-0 ${className}`}>
       <Image src="/logo-icon.png" alt="TermLift" width={size} height={size} priority />
-      <span className="font-display font-bold text-[17px] tracking-[-0.02em] text-ink">
+      <span className={`font-display font-bold text-[17px] tracking-[-0.02em] ${tone === 'white' ? 'text-white' : 'text-ink'}`}>
         Term<span className="text-green">Lift</span>
       </span>
     </Link>
