@@ -1,6 +1,7 @@
 ﻿import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { textForPersistence } from '@/lib/extract'
 import { CreateDealSchema } from '@/lib/schemas'
 import { analyzeDeal, type ExtractedFacts } from '@/lib/claude'
 import type { QuoteClassificationType } from '@/lib/schemas'
@@ -181,6 +182,14 @@ export async function POST(request: Request) {
       console.error('[TermLift] vendor link failed (non-fatal):', e)
     }
 
+    // Text to keep for Full Analysis later: pasted text, else extracted from the
+    // uploaded PDF/image now (best-effort). The file itself is never stored.
+    const persistText = await textForPersistence({
+      extractedText: validated.extractedText,
+      pdfData: validated.pdfData ?? null,
+      imageData: validated.imageData ?? null,
+    })
+
     // Create Round 1 with V2 schema
     const { data: round, error: roundError } = await supabase
       .from('rounds')
@@ -193,7 +202,7 @@ export async function POST(request: Request) {
         // analysis (on-demand, triggered later from the deal page) needs the
         // original quote text and can't rely on it still being in the
         // browser's memory. Extracted text only, never the original file.
-        extracted_text: validated.extractedText || null,
+        extracted_text: persistText,
         output_json: output,
         output_markdown: '', // V1 doesn't need markdown
         status: 'done',

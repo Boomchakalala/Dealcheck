@@ -82,8 +82,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
     }
 
     if (!round.extracted_text) {
+      // Legacy deals: analysed from a file before the quote text was kept. There is no
+      // re-upload on an existing deal — the way forward is a new analysis of the same file.
       return NextResponse.json({
-        error: 'Re-upload the original quote to run detailed analysis.',
+        error: 'This deal was analysed before we kept the quote text, so Full Analysis can’t run on it. Start a new analysis with the same quote to unlock it.',
       }, { status: 422 })
     }
 

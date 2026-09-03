@@ -212,11 +212,12 @@ export function computeScores(extraction: ExtractionResult): ScoreResult {
 // ── label band ───────────────────────────────────────────────────────────────
 /** Qualitative label for the overall score band (mirrors the legacy thresholds). */
 export function scoreLabel(overall: number): string {
-  if (overall >= 80) return 'Low risk, minor improvements possible'
-  if (overall >= 65) return 'Mostly fair, a few points to tighten'
-  if (overall >= 45) return 'Several issues to address'
-  if (overall >= 25) return 'Significant concerns found'
-  return 'Major issues, do not sign as-is'
+  // Stored for reference/admin tooling; the deal page renders scoreHeadline() from lib/deal-metrics (localised).
+  if (overall >= 80) return 'Solid quote — small gains still on the table'
+  if (overall >= 65) return 'Decent quote — push on a few points'
+  if (overall >= 45) return 'Real leverage — negotiate before signing'
+  if (overall >= 25) return 'Weak quote — serious issues to fix first'
+  return 'Don’t sign this as it stands'
 }
 
 // ── extraction normalizer ─────────────────────────────────────────────────────

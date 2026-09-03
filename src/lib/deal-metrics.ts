@@ -211,3 +211,18 @@ export function fmtCompact(n: number, currency: Currency): string {
   if (n >= 1_000) return `${sym}${(n / 1000).toFixed(1)}k`
   return `${sym}${Math.round(n)}`
 }
+
+/**
+ * The verdict headline for a score band. Replaces the stored `score_label`
+ * ("Low risk, minor improvements possible"), which named a band without saying
+ * what to do. Same language as the Insights score buckets: solid / push harder /
+ * real leverage / push back.
+ */
+export function scoreHeadline(score: number, locale: string): string {
+  const fr = locale === 'fr'
+  if (score >= 80) return fr ? 'Devis solide — quelques gains encore possibles' : 'Solid quote — small gains still on the table'
+  if (score >= 65) return fr ? 'Devis correct — quelques points à pousser' : 'Decent quote — push on a few points'
+  if (score >= 45) return fr ? 'Vrai levier — négociez avant de signer' : 'Real leverage — negotiate before signing'
+  if (score >= 25) return fr ? 'Devis faible — des problèmes sérieux à régler' : 'Weak quote — serious issues to fix first'
+  return fr ? 'Ne signez pas en l’état' : 'Don’t sign this as it stands'
+}

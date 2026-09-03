@@ -149,6 +149,52 @@ export async function extractTextFromImage(buffer: Buffer): Promise<string> {
   }
 }
 
+/**
+ * The text we PERSIST on a round (rounds.extracted_text) so Full Analysis can
+ * run later without the file. The upload route hands files to the model as
+ * vision input and never extracts text, so for uploads the client sends
+ * extractedText = '' (or a "[Document received]" placeholder) — which used to
+ * be stored as-is and made every uploaded deal fail Full Analysis with
+ * "re-upload the original quote".
+ *
+ * Best-effort and never throws: pasted text wins; else pdf-parse for PDFs;
+ * else OCR for images (bounded to 25s). Returns null when nothing usable.
+ * Only text is kept, never the file — the "files deleted after extraction"
+ * promise stands.
+ */
+export async function textForPersistence(input: {
+  extractedText?: string | null
+  pdfData?: { base64: string; mimeType?: string } | null
+  imageData?: { base64: string; mimeType?: string } | null
+  allPages?: Array<{ base64: string; mimeType?: string }> | null
+}): Promise<string | null> {
+  const typed = (input.extractedText || '').trim()
+  const isPlaceholder = /^\[.{0,80}\]$/.test(typed)
+  if (typed.length >= 10 && !isPlaceholder) return typed
+
+  const withTimeout = <T,>(p: Promise<T>, ms: number) =>
+    Promise.race([p, new Promise<never>((_, rej) => setTimeout(() => rej(new Error('extraction timeout')), ms))])
+
+  try {
+    if (input.pdfData?.base64) {
+      const text = await withTimeout(extractTextFromPDF(Buffer.from(input.pdfData.base64, 'base64')), 20000)
+      return text || null
+    }
+    const pages = input.allPages && input.allPages.length > 0 ? input.allPages : input.imageData ? [input.imageData] : []
+    if (pages.length > 0) {
+      const parts: string[] = []
+      for (const page of pages.slice(0, 5)) {
+        const t = await withTimeout(extractTextFromImage(Buffer.from(page.base64, 'base64')), 25000)
+        if (t) parts.push(t)
+      }
+      return parts.length ? parts.join('\n\n--- page break ---\n\n') : null
+    }
+  } catch (e) {
+    console.warn('[TermLift] textForPersistence: extraction failed (non-fatal):', e instanceof Error ? e.message : e)
+  }
+  return null
+}
+
 export async function extractText(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer())
   const fileType = file.type

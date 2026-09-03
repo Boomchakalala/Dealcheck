@@ -521,12 +521,17 @@ export function DealScrollView(props: DealScrollViewProps) {
               action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? "Lancer l'analyse complète" : 'Run Full Analysis')}</Btn>}
             />
           )}
-          {/* The add-on, one quiet line: you can skip the whole ladder and hand it over right now. */}
+          {/* The add-on: skip the whole ladder and hand it over right now. Neutral card, ink button — visible, but never the green primary. */}
           {showFullPlaybook && !hasNegotiationRequest && !isClosed && (
-            <p className="text-[12.5px] text-ink-3 mt-2.5 text-center">
-              {fr ? 'Vous préférez ne rien faire de tout ça ? ' : "Prefer not to do any of this? "}
-              <Link href={negotiateHref} className="text-ink-2 font-medium hover:text-green-deep no-underline hover:underline">{fr ? 'Confiez la négociation à TermLift →' : 'Let TermLift negotiate it for you →'}</Link>
-            </p>
+            <div className="mt-3">
+              <GateCard
+                tone="neutral"
+                eyebrow={fr ? 'TermLift négocie · option' : 'TermLift negotiates · add-on'}
+                title={fr ? 'Vous préférez ne rien faire de tout ça ?' : 'Prefer not to do any of this?'}
+                body={fr ? `Passez-nous la main dès maintenant. Un négociateur mène les échanges avec ${o?.vendor || 'le fournisseur'}, vous validez chaque résultat. ${NEGOTIATION_FEE_PERCENT} % des économies vérifiées, rien si nous ne vous faisons pas économiser.` : `Hand it over right now. A negotiator runs the back-and-forth with ${o?.vendor || 'the vendor'}, you approve every outcome. ${NEGOTIATION_FEE_PERCENT}% of verified savings, nothing if we don't save you money.`}
+                action={<Btn href={negotiateHref} variant="ink">{fr ? 'Confier à TermLift' : 'Let TermLift negotiate'}</Btn>}
+              />
+            </div>
           )}
         </div>
       )}

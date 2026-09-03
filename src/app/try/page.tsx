@@ -113,7 +113,8 @@ export default function TryPage() {
           hasCategory: !!data.output.snapshot?.category,
         },
       })
-      saveTrialToStorage({ output: data.output, dealType: 'New', goal: goal || null, extractedText: input })
+      // Prefer the server-extracted text: for uploads `input` is only a "[Document received]" placeholder.
+      saveTrialToStorage({ output: data.output, dealType: 'New', goal: goal || null, extractedText: data.extractedText || input })
       window.scrollTo(0, 0)
     } catch (err) {
       const message = err instanceof Error ? err.message : t('try.errorOccurred')

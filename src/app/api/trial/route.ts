@@ -4,6 +4,7 @@ import { analyzeDeal } from '@/lib/claude'
 import { stripAdvancedOutput, stripFlagDetailForQuick, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
 import { runWithAiContext } from '@/lib/ai-telemetry'
 import { createAdminClient } from '@/lib/supabase/server'
+import { textForPersistence } from '@/lib/extract'
 import { TRIAL_MAX_PER_IP_PER_DAY } from '@/lib/ai-limits'
 import type { DealOutput, DealOutputV2 } from '@/types'
 
@@ -162,9 +163,15 @@ export async function POST(request: Request) {
     // Trial = quick stage: per-flag asks/fallbacks stay server-side, same rule as /app/deal.
     const responseOutput = stripFlagDetailForQuick(playbookOutput as DealOutput | DealOutputV2)
 
+    // Text the browser stashes with the trial so import-trial can persist it —
+    // otherwise an uploaded trial imports with "[Document received]" as its text
+    // and can never run Full Analysis.
+    const persistText = await textForPersistence({ extractedText, pdfData: validPdfData ?? null, imageData: validImageData ?? null, allPages: validAllPages ?? null })
+
     return NextResponse.json({
       success: true,
       output: responseOutput,
+      extractedText: persistText,
       message: 'Sign up to save your analysis and track negotiation rounds!'
     })
   } catch (error) {

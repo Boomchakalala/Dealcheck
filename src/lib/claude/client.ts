@@ -67,7 +67,8 @@ export function getResponseText(response: Anthropic.Message): string {
   return textBlock?.text ?? ''
 }
 
-export function parseJsonFromContent(content: string): unknown {
+/** Model output as parsed, before dash normalisation — see parseJsonFromContent. */
+function parseJsonFromContentRaw(content: string): unknown {
   const trimmed = content.trim()
   const stripped = trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim()
   // Start at the first '{' — the JSON object start. Tolerates any preamble text
@@ -146,4 +147,25 @@ export function buildImageContent(
   }
 
   return null
+}
+
+/**
+ * The prompts forbid en/em dashes, so the model substitutes " -- ", which then
+ * shows up verbatim in the UI. Every parse site goes through here, so the
+ * substitution is undone once, centrally: "--" becomes a proper em dash in every
+ * string field, at any depth. Keys are never touched.
+ */
+export function normalizeDashes<T>(value: T): T {
+  if (typeof value === 'string') return value.replace(/\s*--\s*/g, ' — ') as unknown as T
+  if (Array.isArray(value)) return value.map((v) => normalizeDashes(v)) as unknown as T
+  if (value && typeof value === 'object') {
+    const out: Record<string, unknown> = {}
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) out[k] = normalizeDashes(v)
+    return out as T
+  }
+  return value
+}
+
+export function parseJsonFromContent(content: string): unknown {
+  return normalizeDashes(parseJsonFromContentRaw(content))
 }

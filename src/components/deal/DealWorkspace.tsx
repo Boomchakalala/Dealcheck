@@ -15,7 +15,7 @@ import { hasDeepContent, deepAnalysisIsRunning } from '@/lib/deep-analysis-statu
 import { shortenVendorDisplayName } from '@/lib/vendor-normalize'
 import {
   type DealLike, getCategory, getDealCurrency, getDealType, getFlagSeverity, getLatestRound, getPotentialSavings, getRedFlagCount,
-  getRenewalDate, getSavingsRange, getScore, getTotalCommitment, getVendorName, isClosed as dealIsClosed, isWon as dealIsWon, fmtMoney,
+  getRenewalDate, getSavingsRange, getScore, getTotalCommitment, getVendorName, isClosed as dealIsClosed, isWon as dealIsWon, fmtMoney, scoreHeadline,
 } from '@/lib/deal-metrics'
 import { normalizeAmount, parseMoney } from '@/lib/currency'
 
@@ -89,7 +89,8 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
   const potential = getPotentialSavings(deal)
   const range = getSavingsRange(deal)
   const score = getScore(deal)
-  const scoreLabel = latestOutput.score_label
+  // Headline from the score band, localised — not the stored score_label ("Low risk, minor improvements possible").
+  const scoreLabel = score != null ? scoreHeadline(score, locale) : latestOutput.score_label
   const scoreRationale = latestOutput.score_rationale
   const verdict = latestOutput.verdict
   const targetRange = (latestOutput as unknown as { target_price_range?: { low: number; high: number } | null }).target_price_range || null
