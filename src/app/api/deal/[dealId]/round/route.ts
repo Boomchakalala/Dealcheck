@@ -133,14 +133,14 @@ export async function POST(
     const nextRoundNumber = lastRound ? lastRound.round_number + 1 : 1
 
     // Round 2+ belongs to the deal's unlocked negotiation workspace \u2014 the
-    // UI already hides this action until Full Analysis is unlocked, but
+    // UI already hides this action until Deep Analysis is unlocked, but
     // "frontend hiding does NOT count as protection": enforce it here too,
     // since this endpoint is directly callable regardless of what the UI
     // shows. Round 1 (nextRoundNumber === 1) has no prior output to check
     // and is always allowed \u2014 it IS the deal's first analysis.
     if (nextRoundNumber > 1 && !profile.is_admin && !canAccessFullAnalysis(lastRound?.output_json)) {
       return NextResponse.json(
-        { error: 'Unlock Full Analysis for this deal before adding another round.' },
+        { error: 'Unlock Deep Analysis for this deal before adding another round.' },
         { status: 403 }
       )
     }

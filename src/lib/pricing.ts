@@ -20,7 +20,7 @@ export const CURRENCY = 'EUR'
 export const NEGOTIATION_FEE_PERCENT = 20
 
 /**
- * Full Analysis — a one-time purchase per deal that unlocks the full
+ * Deep Analysis — a one-time purchase per deal that unlocks the full
  * negotiation workspace for that specific quote (deeper commercial
  * analysis, negotiation levers, recommended asks, strategy, Round 1 prep,
  * and negotiation email generation).
@@ -28,16 +28,16 @@ export const NEGOTIATION_FEE_PERCENT = 20
  * NO PRICE HAS BEEN CONFIRMED. `amount: null` is deliberate, not a bug —
  * do not replace it with an invented number. `needsConfirmation: true` is
  * the flag any pricing-page/CTA code must check before ever rendering a
- * dollar figure for Full Analysis; while it's true, the product must show
+ * dollar figure for Deep Analysis; while it's true, the product must show
  * neutral "one-time purchase" / "pricing to be confirmed" language instead
  * of a number, and must NOT actually block/charge for the feature — that
  * would mean collecting money against a price nobody approved. Functionally,
- * Full Analysis stays accessible today (same as before this change); only
+ * Deep Analysis stays accessible today (same as before this change); only
  * the entitlement bookkeeping and messaging are new. See
  * lib/deep-analysis-status.ts's hasDeepContent() for how "has this deal
- * unlocked Full Analysis" is actually represented — it reuses the existing
+ * unlocked Deep Analysis" is actually represented — it reuses the existing
  * deep_analysis_status field rather than a new purchase table, since running
- * Full Analysis is currently the entire unlock action (no payment exists
+ * Deep Analysis is currently the entire unlock action (no payment exists
  * yet to gate it further).
  */
 export const FULL_ANALYSIS_PRICE = {
@@ -49,7 +49,7 @@ export const FULL_ANALYSIS_PRICE = {
 
 /**
  * Flat cap on email regenerations per round, now that email generation is
- * part of what Full Analysis unlocks rather than a subscription-tier perk.
+ * part of what Deep Analysis unlocks rather than a subscription-tier perk.
  * This is an abuse safeguard, not a paywall — same limit for every user.
  */
 export const FULL_ANALYSIS_EMAIL_REGEN_LIMIT = 3

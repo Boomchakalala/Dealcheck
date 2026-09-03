@@ -21,7 +21,7 @@ export interface HomeRow {
   won: boolean
   /** TermLift negotiation is waiting on the user. */
   waitingOnClient: boolean
-  /** Deal is stuck at Quick — the "unlock Full Analysis" hint. */
+  /** Deal is stuck at Quick — the "unlock Deep Analysis" hint. */
   needsUnlock: boolean
   score?: number
   flags: number

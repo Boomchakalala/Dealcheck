@@ -109,7 +109,7 @@ export const FEATURE_LABELS: Record<FeatureId, { name: string; description: stri
   savings_tracking: { name: 'Savings tracking', description: 'Track savings identified vs savings achieved', requiredPlan: 'pro' },
   email_regen: { name: 'Email regeneration', description: 'Regenerate email drafts with custom instructions', requiredPlan: 'essentials' },
   email_regen_unlimited: { name: 'Unlimited email regeneration', description: '3 regenerations per round', requiredPlan: 'pro' },
-  export_pdf: { name: 'Export to PDF', description: 'Export full analysis reports as PDF documents', requiredPlan: 'essentials' },
+  export_pdf: { name: 'Export to PDF', description: 'Export deep analysis reports as PDF documents', requiredPlan: 'essentials' },
   team_workspace: { name: 'Team workspace', description: 'Shared workspace with up to 3 team members', requiredPlan: 'business' },
   priority_ai: { name: 'Priority AI processing', description: 'Faster analysis with priority queue', requiredPlan: 'business' },
   unlimited_analyses: { name: 'Unlimited analyses', description: 'Analyze as many vendor quotes as you need', requiredPlan: 'pro' },

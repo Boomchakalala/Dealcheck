@@ -215,7 +215,7 @@ export function DealScrollView(props: DealScrollViewProps) {
   // round. sortedRounds.length > 1 means a genuine round 2+ (vendor response
   // uploaded, counter-offer added) already exists.
   const hasNegotiationActivity = sortedRounds.length > 1 || hasEmail || hasNegotiationRequest || isClosed
-  // Step 2 and 3 content only exists once Full Analysis ran (or, for legacy deals, once
+  // Step 2 and 3 content only exists once Deep Analysis ran (or, for legacy deals, once
   // negotiation activity exists). Before that the page ends at the single Step 2 gate.
   const stepsUnlocked = hasDeepContent || hasNegotiationActivity
   // Email section starts collapsed to a single entry CTA unless an email
@@ -412,7 +412,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           title={`${t('output.redFlags')} · ${sortedFlags.length}`}
           sub={hasDeepContent || demoMode
             ? (fr ? 'Chaque point inclut quoi demander et une position de repli' : 'Each issue includes what to ask for and a fallback position')
-            : (fr ? 'Ouvrez un point pour voir pourquoi il compte. Les demandes et positions de repli arrivent avec l’analyse complète.' : 'Open an issue to see why it matters. The asks and fallback positions come with Full Analysis.')}
+            : (fr ? 'Ouvrez un point pour voir pourquoi il compte. Les demandes et positions de repli arrivent avec l’analyse complète.' : 'Open an issue to see why it matters. The asks and fallback positions come with Deep Analysis.')}
           right={
             <>
               {hasDeepContent && <Chip tone="green"><CheckCircle2 className="w-3 h-3" />{fr ? 'Analyse détaillée prête' : 'Detailed analysis ready'}</Chip>}
@@ -456,8 +456,8 @@ export function DealScrollView(props: DealScrollViewProps) {
                           /* Quick stage: the ask + fallback were stripped server-side (lib/negotiation-gating.ts). */
                           <p className="mt-3.5 flex items-center gap-2 text-[12.5px] text-ink-3">
                             <Lock className="w-3.5 h-3.5 shrink-0" />
-                            {fr ? 'La demande et la position de repli pour ce point arrivent avec l’analyse complète.' : 'The ask and fallback position for this issue come with Full Analysis.'}
-                            {showFullPlaybook && <a href="#deep-analysis" className="text-green-deep font-medium no-underline hover:underline">{fr ? "Lancer l'analyse complète" : 'Run Full Analysis'}</a>}
+                            {fr ? 'La demande et la position de repli pour ce point arrivent avec l’analyse complète.' : 'The ask and fallback position for this issue come with Deep Analysis.'}
+                            {showFullPlaybook && <a href="#deep-analysis" className="text-green-deep font-medium no-underline hover:underline">{fr ? "Lancer l'analyse complète" : 'Run Deep Analysis'}</a>}
                           </p>
                         ) : null}
                       </div>
@@ -507,7 +507,7 @@ export function DealScrollView(props: DealScrollViewProps) {
         </Card>
       )}
 
-      {/* ═══ THE ONE GATE — Step 2, at the end of everything step 1 unlocked. Nothing below it until Full Analysis runs. ═══ */}
+      {/* ═══ THE ONE GATE — Step 2, at the end of everything step 1 unlocked. Nothing below it until Deep Analysis runs. ═══ */}
       {!demoMode && !hasDeepContent && (
         <div id="deep-analysis" className="scroll-mt-[196px]">
           {deepAnalysisLoading ? (
@@ -515,10 +515,10 @@ export function DealScrollView(props: DealScrollViewProps) {
           ) : (
             <GateCard
               tone="green"
-              eyebrow={fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Full Analysis'}
+              eyebrow={fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Deep Analysis'}
               title={fr ? 'Débloquer le plan, les demandes et le benchmark' : 'Unlock the playbook, the asks and the benchmark'}
               body={<>{fr ? "Quoi demander pour chaque point, votre levier, l'ordre des demandes, les positions de repli et la comparaison au marché — puis l'e-mail. Environ deux minutes." : 'What to ask for on every flag, your leverage, the order to push in, fallback positions and the market comparison — then the email. About two minutes.'}{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
-              action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? "Lancer l'analyse complète" : 'Run Full Analysis')}</Btn>}
+              action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? "Lancer l'analyse complète" : 'Run Deep Analysis')}</Btn>}
             />
           )}
           {/* The add-on: skip the whole ladder and hand it over right now. Neutral card, ink button — visible, but never the green primary. */}
@@ -543,7 +543,7 @@ export function DealScrollView(props: DealScrollViewProps) {
             <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Zap} />
           ) : (
             <>
-              <IconHeading icon={Zap} tone="green" eyebrow={fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Full Analysis'} title={fr ? 'Votre plan de négociation' : 'Your negotiation playbook'} sub={fr ? 'Quoi demander, votre levier, et quoi offrir en retour' : 'What to push for, your leverage, and what to offer in return'} />
+              <IconHeading icon={Zap} tone="green" eyebrow={fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Deep Analysis'} title={fr ? 'Votre plan de négociation' : 'Your negotiation playbook'} sub={fr ? 'Quoi demander, votre levier, et quoi offrir en retour' : 'What to push for, your leverage, and what to offer in return'} />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className={cn('rounded-[14px] border border-green-line bg-green-soft', PAD)}>
                   <p className="tl-label text-green-deep mb-3.5 flex items-center gap-1.5"><Target className="w-3.5 h-3.5" />{t('output.pushFor')}</p>
@@ -778,7 +778,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                       ) : (
                         <a id="add-round" href="#deep-analysis" className="block no-underline scroll-mt-[196px]">
                           <p className="text-[13px] font-semibold text-ink">{fr ? `Tour ${sortedRounds.length + 1}` : `Round ${sortedRounds.length + 1}`}</p>
-                          <p className="text-[12px] text-ink-2">{fr ? "Se débloque avec l'analyse complète →" : 'Unlocks with Full Analysis →'}</p>
+                          <p className="text-[12px] text-ink-2">{fr ? "Se débloque avec l'analyse complète →" : 'Unlocks with Deep Analysis →'}</p>
                         </a>
                       )}
                     </div>

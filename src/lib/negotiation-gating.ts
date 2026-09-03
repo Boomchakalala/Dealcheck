@@ -24,8 +24,8 @@ function isV2(output: DealOutput | DealOutputV2): output is DealOutputV2 {
  * Quick-analysis redaction (2026-09-03): a deal that has not run Full
  * Analysis keeps every flag's issue, severity and "why it matters", but loses
  * the per-flag "what to ask for" and "fallback position". Those are the
- * actionable half of the flag and the thing Full Analysis sells — showing
- * them on the free tier made Full Analysis look like it added nothing.
+ * actionable half of the flag and the thing Deep Analysis sells — showing
+ * them on the free tier made Deep Analysis look like it added nothing.
  *
  * Applied at the render/response boundary only (deal page, trial route);
  * output_json in the DB is never touched, so the deep-analysis run and every

@@ -8,7 +8,7 @@ import { FREE_ANALYSIS_LIMIT } from '@/lib/tiers'
 
 export const metadata: Metadata = {
   title: 'Pricing',
-  description: `Analyse a supplier quote free. Unlock Full Analysis per deal. Or have TermLift negotiate for a ${NEGOTIATION_FEE_PERCENT}% success fee — nothing if we don't save you money.`,
+  description: `Analyse a supplier quote free. Unlock Deep Analysis per deal. Or have TermLift negotiate for a ${NEGOTIATION_FEE_PERCENT}% success fee — nothing if we don't save you money.`,
   alternates: { canonical: 'https://www.termlift.com/pricing' },
 }
 
@@ -27,7 +27,7 @@ export default async function PricingPage() {
   const t = await getTranslations('pricingPage')
   const pct = NEGOTIATION_FEE_PERCENT
 
-  // Never show an invented Full Analysis price (see lib/pricing.ts).
+  // Never show an invented Deep Analysis price (see lib/pricing.ts).
   const fullPrice = FULL_ANALYSIS_PRICE.needsConfirmation || FULL_ANALYSIS_PRICE.amount == null
     ? null
     : `${FULL_ANALYSIS_PRICE.currency === 'EUR' ? '€' : ''}${FULL_ANALYSIS_PRICE.amount}`

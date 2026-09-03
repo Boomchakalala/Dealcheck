@@ -38,7 +38,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    // Full Analysis is a long, expensive Sonnet call with no price gate yet
+    // Deep Analysis is a long, expensive Sonnet call with no price gate yet
     // (see lib/pricing.ts) — reuse the same hourly/daily rate-limit budget
     // as any other analysis action rather than leaving it fully unbounded.
     // A failed run reverts deep_analysis_status to 'idle' (see catch block
@@ -85,7 +85,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
       // Legacy deals: analysed from a file before the quote text was kept. There is no
       // re-upload on an existing deal — the way forward is a new analysis of the same file.
       return NextResponse.json({
-        error: 'This deal was analysed before we kept the quote text, so Full Analysis can’t run on it. Start a new analysis with the same quote to unlock it.',
+        error: 'This deal was analysed before we kept the quote text, so Deep Analysis can’t run on it. Start a new analysis with the same quote to unlock it.',
       }, { status: 422 })
     }
 
@@ -121,10 +121,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
         const classification: QuoteClassificationType = output.classification
           || await classifyQuote(round.extracted_text, deal.deal_type as 'New' | 'Renewal')
 
-        // ── Market Benchmark (optional, never blocks Full Analysis) ──────────
+        // ── Market Benchmark (optional, never blocks Deep Analysis) ──────────
         // 1. small fact-extraction call for product/quantity/unit price
         // 2. deterministic engine over stored observations (no LLM)
-        // Any failure here is logged and Full Analysis proceeds without a benchmark.
+        // Any failure here is logged and Deep Analysis proceeds without a benchmark.
         let benchmarkInput: BenchmarkInput | null = null
         let benchmarkRun: BenchmarkRun | null = null
         try {

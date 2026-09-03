@@ -150,11 +150,11 @@ export async function extractTextFromImage(buffer: Buffer): Promise<string> {
 }
 
 /**
- * The text we PERSIST on a round (rounds.extracted_text) so Full Analysis can
+ * The text we PERSIST on a round (rounds.extracted_text) so Deep Analysis can
  * run later without the file. The upload route hands files to the model as
  * vision input and never extracts text, so for uploads the client sends
  * extractedText = '' (or a "[Document received]" placeholder) — which used to
- * be stored as-is and made every uploaded deal fail Full Analysis with
+ * be stored as-is and made every uploaded deal fail Deep Analysis with
  * "re-upload the original quote".
  *
  * Best-effort and never throws: pasted text wins; else pdf-parse for PDFs;

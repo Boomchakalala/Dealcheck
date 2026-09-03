@@ -9,7 +9,7 @@ import { runWithAiContext } from '@/lib/ai-telemetry'
 // Lightweight preview step ahead of /api/deal/create: runs the SAME
 // classify+extract calls analyzeDeal() runs internally as its Steps 0+1,
 // just exposed a beat earlier (~5-17s) so the UI can show real findings
-// while the slower full analysis is still in flight. The client hands the
+// while the slower deep analysis is still in flight. The client hands the
 // result back to /api/deal/create as precomputedClassification/
 // precomputedFacts, which reuses it instead of re-deriving — no LLM calls
 // beyond what analyzeDeal() already makes for a single analysis.

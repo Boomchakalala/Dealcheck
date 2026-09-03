@@ -11,8 +11,8 @@
  * deals; relying on emptiness alone would show empty shells on new
  * fast-only deals. Combining both is the safe condition either way.
  *
- * This is ALSO the Full Analysis entitlement check: "has this deal unlocked
- * Full Analysis" (see lib/pricing.ts's FULL_ANALYSIS_PRICE) is represented
+ * This is ALSO the Deep Analysis entitlement check: "has this deal unlocked
+ * Deep Analysis" (see lib/pricing.ts's FULL_ANALYSIS_PRICE) is represented
  * by this exact same field rather than a separate purchase/entitlement
  * table — deliberately, per "smallest safe change": since running Full
  * Analysis is currently the whole unlock action (no price/payment exists
@@ -36,14 +36,14 @@ export function deepAnalysisIsRunning(output: any): boolean {
 }
 
 /**
- * Whether this deal is ENTITLED to Full Analysis — the question every real
+ * Whether this deal is ENTITLED to Deep Analysis — the question every real
  * gate (Round 2+ creation, email generation) should ask, kept deliberately
  * separate from hasDeepContent() (which only answers "does the content
  * exist") even though the two resolve identically today.
  *
- * Today there is no purchase/payment for Full Analysis (see lib/pricing.ts's
+ * Today there is no purchase/payment for Deep Analysis (see lib/pricing.ts's
  * FULL_ANALYSIS_PRICE — deliberately unset), so entitlement and content
- * existence are the same fact: running Full Analysis IS the entire unlock
+ * existence are the same fact: running Deep Analysis IS the entire unlock
  * action. This function is the seam a future deal-level purchase plugs into
  * — swap its body to check a real entitlement record (e.g. a completed
  * purchase/unlock for this deal_id) instead of content presence, and every

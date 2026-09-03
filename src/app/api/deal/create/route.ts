@@ -182,7 +182,7 @@ export async function POST(request: Request) {
       console.error('[TermLift] vendor link failed (non-fatal):', e)
     }
 
-    // Text to keep for Full Analysis later: pasted text, else extracted from the
+    // Text to keep for Deep Analysis later: pasted text, else extracted from the
     // uploaded PDF/image now (best-effort). The file itself is never stored.
     const persistText = await textForPersistence({
       extractedText: validated.extractedText,

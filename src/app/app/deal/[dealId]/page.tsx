@@ -36,7 +36,7 @@ export default async function DealPage({ params }: { params: Promise<{ dealId: s
   // Redaction happens at the render boundary only — never at persistence.
   const deepComplete = hasDeepContent(rawLatestOutput)
   const playbookOutput = rawLatestOutput && !showFullPlaybook ? stripAdvancedOutput(rawLatestOutput) : rawLatestOutput
-  // Quick stage: per-flag asks/fallbacks stay server-side until Full Analysis has run (admins included, so the gated view is what we QA).
+  // Quick stage: per-flag asks/fallbacks stay server-side until Deep Analysis has run (admins included, so the gated view is what we QA).
   const latestOutput = playbookOutput && !deepComplete ? stripFlagDetailForQuick(playbookOutput) : playbookOutput
 
   // Deal-type inference — server-side from extracted_text (never sent to the client).

@@ -66,7 +66,7 @@
     "usage": "Usage",
     "usageQuick": "Quick analyses",
     "usageUsed": "{used} of {limit} free used",
-    "usageNote": "Full Analysis is per deal · TermLift Negotiate is {pct}% of verified savings. No subscription.",
+    "usageNote": "Deep Analysis is per deal · TermLift Negotiate is {pct}% of verified savings. No subscription.",
     "usageContact": "Need more? Contact us"
   },
   "helpPage": {

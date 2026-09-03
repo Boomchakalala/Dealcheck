@@ -63,7 +63,7 @@ export interface AnalysisProgressProps {
   // resolves (~5-17s in) — rendered as chips. Never simulated: absent
   // means nothing is shown, not a placeholder.
   liveFindings?: LiveFindings | null
-  // Set only once the full analysis response has actually come back —
+  // Set only once the deep analysis response has actually come back —
   // a brief completion beat before the caller navigates away. Never
   // shown before the count is real.
   completionFlash?: { opportunityCount: number } | null

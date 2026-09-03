@@ -249,7 +249,7 @@ export type DealOutput = {
   }
   assumptions: string[]
   disclaimer: string
-  // ── Market Benchmark (Full Analysis only; all optional, absent on older deals) ──
+  // ── Market Benchmark (Deep Analysis only; all optional, absent on older deals) ──
   /** Structured facts pulled from the quote for benchmark matching. */
   benchmark_input?: import('@/lib/benchmark/types').BenchmarkInput
   /** Deterministic engine output — the source of truth for every benchmark number shown. */

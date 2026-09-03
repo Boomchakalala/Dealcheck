@@ -26,7 +26,7 @@
     "kpiPipeline": "In pipeline",
     "kpiPipelineSub": "{n} active deals",
     "kpiNeeds": "Needs you",
-    "kpiNeedsUnlock": "{n} to unlock Full Analysis",
+    "kpiNeedsUnlock": "{n} to unlock Deep Analysis",
     "kpiNeedsReply": "{n} reply to TermLift",
     "kpiNeedsNone": "Nothing waiting on you",
     "kpiRenewal": "Next renewal",
@@ -47,7 +47,7 @@
     "colUpdated": "Updated",
     "colClosed": "Closed",
     "flags": "{n, plural, one {# flag} other {# flags}}",
-    "hintUnlock": "Unlock Full Analysis →",
+    "hintUnlock": "Unlock Deep Analysis →",
     "hintReply": "Reply needed",
     "saved": "saved",
     "potential": "potential",
@@ -61,7 +61,7 @@
     "usageLimitBody": "Analysing a quote is free up to the limit. Get in touch if you need to analyse more deals.",
     "usageContact": "Contact us",
     "usageLeftTitle": "{n, plural, one {# free analysis left} other {# free analyses left}}",
-    "usageLeftBody": "Full Analysis, emails and rounds on your existing deals are not affected.",
+    "usageLeftBody": "Deep Analysis, emails and rounds on your existing deals are not affected.",
     "demoCta": "Sign up to use it with your own quotes"
   },
   "insights": {

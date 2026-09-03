@@ -203,7 +203,7 @@ Return ONLY JSON with this structure:
 }
 
 // ---------------------------------------------------------------------------
-// regenerateEmailDrafts — regenerate emails from existing full analysis
+// regenerateEmailDrafts — regenerate emails from existing deep analysis
 // ---------------------------------------------------------------------------
 
 export async function regenerateEmailDrafts(

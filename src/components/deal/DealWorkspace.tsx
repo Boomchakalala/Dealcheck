@@ -94,7 +94,7 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
   const scoreRationale = latestOutput.score_rationale
   const verdict = latestOutput.verdict
   const targetRange = (latestOutput as unknown as { target_price_range?: { low: number; high: number } | null }).target_price_range || null
-  // Market Benchmark (Full Analysis): when the engine published a range, the tile shows the
+  // Market Benchmark (Deep Analysis): when the engine published a range, the tile shows the
   // model's clamped target (or the fair-market band) with the market position. Numbers come
   // from the engine result / clamped interpretation only.
   const bench = (latestOutput as DealOutput | undefined)?.market_benchmark

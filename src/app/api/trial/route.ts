@@ -165,7 +165,7 @@ export async function POST(request: Request) {
 
     // Text the browser stashes with the trial so import-trial can persist it —
     // otherwise an uploaded trial imports with "[Document received]" as its text
-    // and can never run Full Analysis.
+    // and can never run Deep Analysis.
     const persistText = await textForPersistence({ extractedText, pdfData: validPdfData ?? null, imageData: validImageData ?? null, allPages: validAllPages ?? null })
 
     return NextResponse.json({

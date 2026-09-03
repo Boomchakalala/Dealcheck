@@ -35,9 +35,9 @@ export async function POST(request: Request) {
     const senderName = profile?.first_name
       ? [profile.first_name, profile.last_name].filter(Boolean).join(' ')
       : undefined
-    // Email generation belongs to Full Analysis now, not a subscription tier —
+    // Email generation belongs to Deep Analysis now, not a subscription tier —
     // the cap here is a flat abuse safeguard, not a paywall. Per-deal
-    // entitlement (has this round's Full Analysis been unlocked) is checked
+    // entitlement (has this round's Deep Analysis been unlocked) is checked
     // below, once the round is fetched.
     const maxRegens = profile?.is_admin ? 99 : FULL_ANALYSIS_EMAIL_REGEN_LIMIT
 
@@ -107,11 +107,11 @@ export async function POST(request: Request) {
       }, { status: 400 })
     }
 
-    // Email generation is part of Full Analysis — require it to be unlocked
+    // Email generation is part of Deep Analysis — require it to be unlocked
     // for this deal before drafting, same signal the deal page UI already
     // gates the "Generate email" entry point on.
     if (!profile?.is_admin && !canAccessFullAnalysis(round.output_json)) {
-      return NextResponse.json({ error: 'Unlock Full Analysis for this deal before generating a negotiation email.' }, { status: 403 })
+      return NextResponse.json({ error: 'Unlock Deep Analysis for this deal before generating a negotiation email.' }, { status: 403 })
     }
 
     // Regeneration cap — a flat abuse safeguard, not a plan limit

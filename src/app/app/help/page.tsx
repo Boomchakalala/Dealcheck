@@ -17,7 +17,7 @@ const categories: { key: Category; name: string; icon: React.ReactNode; sub: str
 
 const faqData: Record<Category, { q: string; a: string }[]> = {
   'getting-started': [
-    { q: 'What is TermLift?', a: 'TermLift helps you find and act on negotiation opportunities in supplier quotes. Upload a quote and you get a fast initial assessment (score, red flags, potential savings) in under a minute. From there you can go deeper with a Full Analysis \u2014 the complete negotiation strategy, asks, and leverage \u2014 then either negotiate it yourself or have TermLift negotiate it for you.' },
+    { q: 'What is TermLift?', a: 'TermLift helps you find and act on negotiation opportunities in supplier quotes. Upload a quote and you get a fast initial assessment (score, red flags, potential savings) in under a minute. From there you can go deeper with a Deep Analysis \u2014 the complete negotiation strategy, asks, and leverage \u2014 then either negotiate it yourself or have TermLift negotiate it for you.' },
     { q: 'How does the AI analysis work?', a: "Text is extracted from your document (PDF, image, or pasted text) and sent to Anthropic\u2019s Claude AI, which is specifically trained for procurement analysis. It reads the full content, identifies risks, calculates savings potential, and generates a complete negotiation playbook." },
     { q: 'What file formats are supported?', a: 'PDF, PNG, JPG, WEBP, or plain text paste. Maximum file size is 10 MB. For images, make sure the text is clearly readable. Multi-page PDFs are fully supported \u2014 every page is analyzed.' },
     { q: 'Do I need procurement experience?', a: "No. TermLift is designed for anyone who negotiates vendor contracts \u2014 from first-timers to procurement pros. The AI provides specific asks, fallback positions, and ready-to-send emails so you know exactly what to say." },
@@ -28,13 +28,13 @@ const faqData: Record<Category, { q: string; a: string }[]> = {
     { q: 'What if my PDF has images or complex tables?', a: 'TermLift uses vision AI to read PDFs with images, scanned pages, and complex table layouts. If the text extraction seems off, try pasting the key sections as plain text for more reliable results.' },
   ],
   'output': [
-    { q: 'What do I get back from an analysis?', a: 'The initial analysis gives you a 0\u2013100 deal score with breakdown (pricing, terms, leverage), your top red flags, and a realistic savings estimate \u2014 in under a minute. Running the Full Analysis adds the complete negotiation strategy: every red flag with specific asks and fallback positions, must-have vs. nice-to-have savings, and your negotiation levers. From there you can generate a ready-to-send email yourself, or have TermLift negotiate it for you.' },
+    { q: 'What do I get back from an analysis?', a: 'The initial analysis gives you a 0\u2013100 deal score with breakdown (pricing, terms, leverage), your top red flags, and a realistic savings estimate \u2014 in under a minute. Running the Deep Analysis adds the complete negotiation strategy: every red flag with specific asks and fallback positions, must-have vs. nice-to-have savings, and your negotiation levers. From there you can generate a ready-to-send email yourself, or have TermLift negotiate it for you.' },
     { q: 'What are the three email tones?', a: 'Friendly (warm and collaborative \u2014 good for relationships you want to preserve), Direct (clear and professional \u2014 gets to the point), and Firm (assertive with deadlines \u2014 for when you have leverage or urgency). Pick the one that fits your vendor relationship.' },
     { q: 'How accurate is the AI?', a: 'The AI is good but not perfect. It can miss details, misinterpret terms, or make errors \u2014 especially with complex legal language or unusual contract structures. Always review the outputs against your original documents. Use it as a starting point, not the final word.' },
   ],
   'deals': [
     { q: 'How do I close a deal?', a: "Click \u2018Close deal\u2019 on the deal page. You\u2019ll be asked to enter the final agreed price and select what changed (price reduction, better terms, added scope, etc.). TermLift calculates your actual savings and tracks them in your dashboard." },
-    { q: 'Can I do multiple negotiation rounds?', a: "Yes. Once Full Analysis is unlocked for a deal, you can upload the vendor\u2019s counter-offer as a new round. TermLift re-analyzes the updated terms and adjusts its recommendations \u2014 rounds belong to the deal, not to a subscription." },
+    { q: 'Can I do multiple negotiation rounds?', a: "Yes. Once Deep Analysis is unlocked for a deal, you can upload the vendor\u2019s counter-offer as a new round. TermLift re-analyzes the updated terms and adjusts its recommendations \u2014 rounds belong to the deal, not to a subscription." },
     { q: 'How are savings calculated?', a: 'Savings are calculated by comparing the original quoted price to the final agreed price when you close the deal. The potential savings shown during analysis are estimates based on market benchmarks and the specific issues found in your quote.' },
   ],
   'privacy': [
@@ -44,9 +44,9 @@ const faqData: Record<Category, { q: string; a: string }[]> = {
   ],
   'billing': [
     { q: "Is analyzing a quote free?", a: "Yes \u2014 no credit card required. Create an account to save deals and track your history." },
-    { q: 'How much does Full Analysis cost?', a: "We haven't finalized Full Analysis pricing yet. For now it's included once you've started an analysis on a deal — we'll be upfront here before that changes." },
+    { q: 'How much does Deep Analysis cost?', a: "We haven't finalized Deep Analysis pricing yet. For now it's included once you've started an analysis on a deal — we'll be upfront here before that changes." },
     { q: 'What does it cost to have TermLift negotiate for me?', a: "Nothing upfront — our fee is a success-based percentage of the savings we help you achieve, and nothing if we don't save you money." },
-    { q: 'Can I cancel anytime?', a: "Not applicable right now \u2014 Full Analysis has no subscription to cancel. If you have a legacy subscription, manage it from Settings." },
+    { q: 'Can I cancel anytime?', a: "Not applicable right now \u2014 Deep Analysis has no subscription to cancel. If you have a legacy subscription, manage it from Settings." },
   ],
 }
 

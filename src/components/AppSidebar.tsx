@@ -21,7 +21,7 @@ interface AppSidebarProps {
   linkBase?: string
   demoMode?: boolean
   notifications?: NotificationItem[]
-  /** Deals waiting on the user (unlock Full Analysis, reply to TermLift) — shown as a badge on Deals. */
+  /** Deals waiting on the user (unlock Deep Analysis, reply to TermLift) — shown as a badge on Deals. */
   needsYou?: number
 }
 

@@ -26,7 +26,7 @@ const faqData: Record<Section, { title: string; sub: string; items: { q: string;
     title: 'What TermLift does',
     sub: 'Understanding how TermLift works and what to expect',
     items: [
-      { q: 'What is TermLift?', a: "TermLift helps you negotiate better supplier deals. Upload a quote and you get a fast initial assessment — your deal score, red flags, and potential savings. From there, unlock the Full Analysis for deeper negotiation levers, recommended asks, and strategy — then negotiate the deal yourself, or have TermLift negotiate it for you." },
+      { q: 'What is TermLift?', a: "TermLift helps you negotiate better supplier deals. Upload a quote and you get a fast initial assessment — your deal score, red flags, and potential savings. From there, unlock the Deep Analysis for deeper negotiation levers, recommended asks, and strategy — then negotiate the deal yourself, or have TermLift negotiate it for you." },
       { q: 'What TermLift is NOT', a: "TermLift is not legal advice, not a guarantee of savings, and not a replacement for reading your contracts. It's a starting point that gives you leverage and structure — but you should always review the outputs yourself and consult a professional for legal or financial decisions." },
       { q: 'How does the AI analysis work?', a: "Text is extracted from your document (PDF, image, or pasted text) and sent to Anthropic's Claude AI, which is prompted specifically for procurement analysis. It reads the full content, identifies risks, builds a negotiation strategy, and generates structured output." },
     ],
@@ -44,7 +44,7 @@ const faqData: Record<Section, { title: string; sub: string; items: { q: string;
     title: 'Analysis output',
     sub: 'What you get back and how to use it',
     items: [
-      { q: 'What do I get back from an analysis?', a: "First, a fast initial assessment — a deal score, red flags, and an estimate of potential savings, usually in under a minute. From there, the Full Analysis goes deeper: negotiation levers, recommended asks, priorities, and strategy. Once you have what you need, generate a ready-to-send email yourself or have TermLift negotiate the deal for you." },
+      { q: 'What do I get back from an analysis?', a: "First, a fast initial assessment — a deal score, red flags, and an estimate of potential savings, usually in under a minute. From there, the Deep Analysis goes deeper: negotiation levers, recommended asks, priorities, and strategy. Once you have what you need, generate a ready-to-send email yourself or have TermLift negotiate the deal for you." },
       { q: 'What are the email drafts for?', a: "They're ready-to-copy replies you can send directly to your supplier once you're ready to act on the analysis. Each one comes in three tones — Friendly, Direct, and Firm. Pick the one that fits your relationship with the supplier and copy it." },
       { q: 'Is the AI always accurate?', a: 'No. AI can miss details, misinterpret terms, or make errors. TermLift is a starting point for negotiation, not the final word. Always review the outputs against your original documents before acting on them. If something looks off, it probably is — trust your judgment.' },
     ],
@@ -62,7 +62,7 @@ const faqData: Record<Section, { title: string; sub: string; items: { q: string;
     sub: 'Pricing and account management',
     items: [
       { q: "Is analyzing a quote free?", a: 'Yes — analyze a quote with no signup required, and no credit card. Create an account to save deals and keep going from there.' },
-      { q: 'How much does Full Analysis cost?', a: "We haven't finalized Full Analysis pricing yet. For now it's included once you've started an analysis on a deal — we'll be upfront here before that changes." },
+      { q: 'How much does Deep Analysis cost?', a: "We haven't finalized Deep Analysis pricing yet. For now it's included once you've started an analysis on a deal — we'll be upfront here before that changes." },
       { q: 'What does it cost to have TermLift negotiate for me?', a: "Nothing upfront. If you'd rather hand the negotiation over, our fee is a success-based percentage of the savings we help you achieve — no savings, no fee." },
       { q: 'Can I delete my account?', a: "Yes. Go to your profile settings and choose 'Delete account.' All your data — saved deals, analysis history, account info — is permanently removed. This cannot be undone." },
     ],
