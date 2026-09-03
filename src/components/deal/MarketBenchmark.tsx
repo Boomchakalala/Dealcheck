@@ -12,6 +12,8 @@ interface Props {
   interpretation?: BenchmarkInterpretation | null
   fmt: (n: number) => string
   locale: string
+  /** The section sits inside the Step 2 block, which already carries the step eyebrow. */
+  showEyebrow?: boolean
 }
 
 const PRICE_TYPE_LABEL: Record<string, { en: string; fr: string }> = {
@@ -26,7 +28,7 @@ const PRICE_TYPE_LABEL: Record<string, { en: string; fr: string }> = {
  * Market Benchmark section of the deal page. Every number here comes from the
  * deterministic engine result; the model's text is shown as commentary only.
  */
-export function MarketBenchmark({ benchmark: b, interpretation, fmt, locale }: Props) {
+export function MarketBenchmark({ benchmark: b, interpretation, fmt, locale, showEyebrow = true }: Props) {
   const fr = locale === 'fr'
   const [showSources, setShowSources] = useState(false)
   const confTone = b.confidence === 'high' ? 'green' : b.confidence === 'medium' ? 'warn' : 'neutral'
@@ -37,7 +39,7 @@ export function MarketBenchmark({ benchmark: b, interpretation, fmt, locale }: P
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <span className="w-9 h-9 rounded-[10px] grid place-items-center shrink-0 bg-info-soft text-info"><BarChart3 className="w-4 h-4" /></span>
         <div className="min-w-0 flex-1">
-          <p className="tl-label text-[11.5px] text-green-deep mb-0.5">{fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Full Analysis'}</p>
+          {showEyebrow && <p className="tl-label text-[11.5px] text-green-deep mb-0.5">{fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Full Analysis'}</p>}
           <h3 className="tl-h3 text-ink">{fr ? 'Benchmark marché' : 'Market benchmark'}</h3>
           <p className="text-[12.5px] text-ink-2 mt-0.5">{fr ? 'Votre devis face aux prix observés pour ce fournisseur' : 'Your quote against observed prices for this vendor'}</p>
         </div>

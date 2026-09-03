@@ -31,11 +31,12 @@ export default async function LandingPage() {
   const ladder = await getTranslations('ladder')
   const pct = NEGOTIATION_FEE_PERCENT
 
+  // Three steps + the add-on. "TermLift negotiates" is a way of doing step 3, not a step of its own.
   const steps = [
-    { n: 1, tag: t('how.s1tag'), title: t('how.s1title'), body: t('how.s1body') },
-    { n: 2, tag: t('how.s2tag'), title: t('how.s2title'), body: t('how.s2body') },
-    { n: 3, tag: t('how.s3tag'), title: t('how.s3title'), body: t('how.s3body') },
-    { n: 4, tag: t('how.s4tag', { pct }), title: t('how.s4title'), body: t('how.s4body') },
+    { n: 1, tag: t('how.s1tag'), title: t('how.s1title'), body: t('how.s1body'), addon: false },
+    { n: 2, tag: t('how.s2tag'), title: t('how.s2title'), body: t('how.s2body'), addon: false },
+    { n: 3, tag: t('how.s3tag'), title: t('how.s3title'), body: t('how.s3body'), addon: false },
+    { n: 4, tag: t('how.s4tag', { pct }), title: t('how.s4title'), body: t('how.s4body'), addon: true },
   ]
 
   const tours = [
@@ -126,8 +127,8 @@ export default async function LandingPage() {
           <p className="text-[15px] text-ink-2 max-w-[56ch] mt-2.5 leading-[1.5]">{t('how.lead')}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-7">
             {steps.map((s) => (
-              <div key={s.n} className="bg-surface border border-line rounded-[14px] p-4 flex flex-col gap-2">
-                <div className="flex justify-between tl-label text-green-deep"><span>{t('how.step', { n: s.n })}</span><span className="text-ink-3">{s.tag}</span></div>
+              <div key={s.n} className={`rounded-[14px] p-4 flex flex-col gap-2 ${s.addon ? 'bg-ground border border-dashed border-line' : 'bg-surface border border-line'}`}>
+                <div className="flex justify-between tl-label text-green-deep"><span className={s.addon ? 'text-ink-3' : undefined}>{s.addon ? t('how.addon') : t('how.step', { n: s.n })}</span><span className="text-ink-3">{s.tag}</span></div>
                 <h3 className="font-display font-bold text-[17px]">{s.title}</h3>
                 <p className="text-[13px] text-ink-2 leading-[1.5]">{s.body}</p>
               </div>

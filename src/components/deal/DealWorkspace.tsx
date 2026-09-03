@@ -10,10 +10,9 @@ import { DealScrollView } from '@/components/DealScrollView'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { HeroVerdict } from '@/components/HeroVerdict'
 import { AppPage, Btn, Chip, GateCard, PageBody, ScoreRing, StageRail, StatRow, StatTile } from '@/components/system'
-import { deriveDealStage, STAGE_LABEL_KEY, stageTone, type DealStage } from '@/lib/deal-stage'
+import { deriveDealStage, deriveNegotiationMode, stageChipKey, stageTone, type DealStage } from '@/lib/deal-stage'
 import { hasDeepContent, deepAnalysisIsRunning } from '@/lib/deep-analysis-status'
 import { shortenVendorDisplayName } from '@/lib/vendor-normalize'
-import { NEGOTIATION_FEE_PERCENT } from '@/lib/pricing'
 import {
   type DealLike, getCategory, getDealCurrency, getDealType, getFlagSeverity, getLatestRound, getPotentialSavings, getRedFlagCount,
   getRenewalDate, getSavingsRange, getScore, getTotalCommitment, getVendorName, isClosed as dealIsClosed, isWon as dealIsWon, fmtMoney,
@@ -70,6 +69,8 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
 
   const openRequest = negotiationRequest && !negotiationRequest.status.startsWith('closed_') ? negotiationRequest : null
   const stage: DealStage = isTrial ? 'quick' : deriveDealStage({ status: deal.status, rounds: deal.rounds, negotiationRequestStatus: openRequest?.status })
+  const negMode = isTrial ? null : deriveNegotiationMode({ status: deal.status, rounds: deal.rounds, negotiationRequestStatus: openRequest?.status })
+  const termliftRuns = negMode === 'termlift' && !!openRequest
   const closed = dealIsClosed(deal)
   const won = dealIsWon(deal)
   const waitingOnClient = openRequest?.status === 'waiting_for_client_info'
@@ -105,7 +106,6 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
           : t('dealPage.statTargetBenchAt'),
       }
     : null
-  const topReasons = (latestOutput.red_flags || []).slice(0, 3).map((f) => f.issue).filter(Boolean)
   const renewal = getRenewalDate(deal)
   const daysToRenewal = renewal ? Math.floor((renewal.getTime() - now) / 86400000) : null
   const sevCounts = (latestOutput.red_flags || []).reduce(
@@ -126,17 +126,17 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
   let primary: ReactNode = null
   if (isTrial) primary = <Btn href="/login?from=trial" variant="primary">{t('dealPage.trialCta')}</Btn>
   else if (closed) primary = null
-  else if (stage === 'termlift') primary = <Btn href={negotiationPageHref} variant={waitingOnClient ? 'primary' : 'ink'}>{t('dealPage.primaryOpenNegotiation')}</Btn>
+  else if (termliftRuns) primary = <Btn href={negotiationPageHref} variant={waitingOnClient ? 'primary' : 'ink'}>{t('dealPage.primaryOpenNegotiation')}</Btn>
   else if (stage === 'quick') primary = <Btn href="#deep-analysis" variant="primary" disabled={deepRunning}>{deepRunning ? t('dealPage.primaryRunning') : t('dealPage.primaryRunFull')}</Btn>
   else if (stage === 'full') primary = <Btn href="#email-section" variant="primary">{t('dealPage.primaryEmail')}</Btn>
   else primary = <Btn href="#add-round" variant="primary">{t('dealPage.primaryUploadReply')}</Btn>
-  const secondary = !isTrial && !closed && stage !== 'termlift' ? <Btn href={negotiateHref} variant="ghost">{t('dealPage.secondaryNegotiate')}</Btn> : null
+  // The hand-off is an add-on to step 3: offered once the playbook exists, never before.
+  const secondary = !isTrial && !closed && !termliftRuns && deepDone ? <Btn href={negotiateHref} variant="ghost">{t('dealPage.secondaryNegotiate')}</Btn> : null
 
   const railHrefs: Partial<Record<DealStage, string>> | undefined = isTrial ? undefined : {
     quick: '#overview',
     full: deepDone ? '#playbook' : '#deep-analysis',
-    self: '#email-section',
-    termlift: openRequest ? negotiationPageHref : '#rounds',
+    negotiate: termliftRuns ? negotiationPageHref : '#email-section',
     closed: '#rounds',
   }
 
@@ -152,17 +152,17 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
     eyebrow = t('dealPage.verdictClosedEyebrow')
     title = scoreLabel || ''
     body = scoreRationale || ''
-  } else if (stage === 'termlift') {
+  } else if (termliftRuns) {
     eyebrow = t('dealPage.verdictTermliftEyebrow')
     title = waitingOnClient ? t('dealPage.verdictTermliftWaiting') : scoreLabel || ''
     body = waitingOnClient ? t('dealPage.verdictTermliftBody') : verdict || scoreRationale || ''
   } else {
-    eyebrow = score != null ? t(STAGE_LABEL_KEY[stage]) : ''
+    eyebrow = score != null ? t(stageChipKey(stage, negMode)) : ''
     title = scoreLabel || ''
     body = verdict || scoreRationale || ''
   }
 
-  const stageChipLabel = won ? t('dealList.won') : closed ? t('dealList.noChange') : t(STAGE_LABEL_KEY[stage])
+  const stageChipLabel = won ? t('dealList.won') : closed ? t('dealList.noChange') : t(stageChipKey(stage, negMode))
 
   return (
     <AppPage className={isTrial ? '!mx-0 !my-0 min-h-0 rounded-[14px] border border-line overflow-hidden' : undefined}>
@@ -187,7 +187,7 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
           <div className="flex flex-wrap gap-1.5">
             {category && category !== 'Other' && <Chip>{category}</Chip>}
             {dealType && <Chip>{dealType}</Chip>}
-            <Chip tone={stageTone(stage, { won, waitingOnClient })}>{stageChipLabel}</Chip>
+            <Chip tone={stageTone(stage, { won, waitingOnClient, mode: negMode })}>{stageChipLabel}</Chip>
             {sortedRounds.length > 1 && <Chip>{t('dealPage.rounds', { n: sortedRounds.length })}</Chip>}
           </div>
           {/* One action cluster: secondary · primary · ⋯ (export / mark as won / reopen) */}
@@ -212,7 +212,7 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
             )}
           </div>
         </div>
-        <div className="px-4 sm:px-6 pb-2.5"><StageRail current={stage} hrefs={railHrefs} skipped={closed && !negotiationRequest ? ['termlift'] : []} /></div>
+        <div className="px-4 sm:px-6 pb-2.5"><StageRail current={stage} hrefs={railHrefs} /></div>
       </div>
 
       <PageBody className={cn(isTrial && 'pb-4')}>
@@ -224,17 +224,7 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
             {eyebrow && <p className={cn('tl-label', waitingOnClient ? 'text-warn' : 'text-green-deep')}>{eyebrow}</p>}
             {title && <p className="font-display font-bold text-[16px] text-ink mt-1 leading-snug">{title}</p>}
             {body && <HeroVerdict text={String(body)} className="text-[13px] text-ink-2 mt-1 leading-relaxed max-w-[72ch] sm:mx-0 mx-auto" />}
-            {/* The actual issues, not just a count — visible before scrolling to the flags (kept from prod). */}
-            {!closed && topReasons.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-line-2 text-left">
-                <p className="tl-label text-risk mb-1.5">{t('dealPage.topReasons')}</p>
-                <ul className="m-0 p-0 list-none flex flex-col gap-1">
-                  {topReasons.map((r, i) => (
-                    <li key={i} className="flex items-start gap-2 text-[13px] text-ink leading-snug"><span className="w-1.5 h-1.5 rounded-full bg-risk shrink-0 mt-[7px]" />{r}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            {/* No "top reasons" list here any more — it duplicated the first three red flags one screen below. The tile carries the count. */}
           </div>
         </div>
 
@@ -331,16 +321,12 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
             hideNextStep
           />
 
-        {/* ── Hand-off ────────────────────────────────────────── */}
-        {!isTrial && !closed && (
-          openRequest ? (
-            waitingOnClient ? (
-              <GateCard tone="warn" eyebrow={t('dealPage.handoffWaitingEyebrow')} title={t('dealPage.handoffWaitingTitle')} body={t('dealPage.handoffWaitingBody')} action={<Btn href={negotiationPageHref} variant="ink">{t('dealPage.handoffOpen')}</Btn>} />
-            ) : (
-              <GateCard tone="neutral" eyebrow={t('dealPage.handoffWaitingEyebrow')} title={t('dealPage.handoffActiveTitle')} body={t('dealPage.handoffActiveBody')} action={<Btn href={negotiationPageHref} variant="ghost">{t('dealPage.handoffOpen')}</Btn>} />
-            )
+        {/* ── TermLift negotiation status (only when a request exists; the offer itself lives inside step 3) ── */}
+        {!isTrial && !closed && openRequest && (
+          waitingOnClient ? (
+            <GateCard tone="warn" eyebrow={t('dealPage.handoffWaitingEyebrow')} title={t('dealPage.handoffWaitingTitle')} body={t('dealPage.handoffWaitingBody')} action={<Btn href={negotiationPageHref} variant="ink">{t('dealPage.handoffOpen')}</Btn>} />
           ) : (
-            <GateCard tone="neutral" eyebrow={t('dealPage.handoffEyebrow')} title={t('dealPage.handoffTitle')} body={t('dealPage.handoffBody', { vendor, pct: NEGOTIATION_FEE_PERCENT })} action={<Btn href={negotiateHref} variant="ink">{t('dealPage.handoffCta')}</Btn>} />
+            <GateCard tone="neutral" eyebrow={t('dealPage.handoffWaitingEyebrow')} title={t('dealPage.handoffActiveTitle')} body={t('dealPage.handoffActiveBody')} action={<Btn href={negotiationPageHref} variant="ghost">{t('dealPage.handoffOpen')}</Btn>} />
           )
         )}
         {isTrial && (

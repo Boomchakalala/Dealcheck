@@ -161,7 +161,8 @@
     "proFeature5": "Full deal history + PDF export",
     "business": "Business",
     "getPro": "Get Pro",
-    "getEssentials": "Get Essentials"
+    "getEssentials": "Get Essentials",
+    "step4": "Add-on · any time"
   },
   "social": {
     "stat1": "8 years",
@@ -1284,7 +1285,9 @@
     "full": "Full Analysis",
     "self": "Negotiate",
     "termlift": "TermLift negotiates",
-    "closed": "Closed"
+    "closed": "Closed",
+    "negotiate": "Negotiate",
+    "negotiateTermlift": "Negotiating · TermLift"
   },
   "landing": {
     "eyebrow": "For teams without a procurement department",
@@ -1311,8 +1314,8 @@
     },
     "how": {
       "eyebrow": "How it works",
-      "title": "Four steps. Stop at any of them.",
-      "lead": "Every deal in TermLift moves along the same ladder — you'll see it on your deal page exactly like this.",
+      "title": "Three steps. Stop at any of them.",
+      "lead": "Every deal in TermLift moves along the same ladder — you'll see it on your deal page exactly like this. And at any point, you can hand the negotiation to us.",
       "step": "Step {n}",
       "s1tag": "Free",
       "s1title": "Quick analysis",
@@ -1323,9 +1326,10 @@
       "s3tag": "Included",
       "s3title": "Negotiate it yourself",
       "s3body": "A ready-to-send email in the tone that fits the relationship. Upload the vendor's reply and get round 2.",
-      "s4tag": "{pct}% of savings",
-      "s4title": "Or TermLift negotiates",
-      "s4body": "Hand the deal over. A negotiator runs the back-and-forth, you approve the outcome. No savings, no fee."
+      "s4tag": "Add-on · {pct}% of savings",
+      "s4title": "Or hand it to TermLift",
+      "s4body": "At any point after Full Analysis, hand the deal over. A negotiator runs the back-and-forth, you approve the outcome. No savings, no fee.",
+      "addon": "Any time"
     },
     "who": {
       "eyebrow": "Who it's for",
@@ -1527,11 +1531,11 @@
     "verdictTermliftEyebrow": "TermLift is negotiating this deal",
     "verdictTermliftWaiting": "Waiting on you — open the negotiation to answer your negotiator.",
     "verdictTermliftBody": "Your negotiator is handling the vendor back-and-forth. You'll be asked to approve before anything is agreed.",
-    "handoffEyebrow": "Step 4 · TermLift negotiates · optional",
+    "handoffEyebrow": "TermLift negotiates · add-on",
     "handoffTitle": "Don't want to send it yourself? TermLift negotiates.",
     "handoffBody": "We take the playbook from here and run the back-and-forth with {vendor}. You approve every outcome. {pct}% of verified savings, nothing if we don't save you money.",
     "handoffCta": "Let TermLift negotiate",
-    "handoffWaitingEyebrow": "Step 4 · TermLift is negotiating",
+    "handoffWaitingEyebrow": "TermLift is negotiating",
     "handoffWaitingTitle": "Waiting on you",
     "handoffWaitingBody": "Your negotiator needs an answer before the next round.",
     "handoffOpen": "Open the negotiation",

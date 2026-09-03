@@ -1,0 +1,24 @@
+{
+  "ladder": {
+    "negotiate": "Negotiate",
+    "negotiateTermlift": "Negotiating · TermLift"
+  },
+  "landing": {
+    "how": {
+      "title": "Three steps. Stop at any of them.",
+      "lead": "Every deal in TermLift moves along the same ladder — you'll see it on your deal page exactly like this. And at any point, you can hand the negotiation to us.",
+      "s4tag": "Add-on · {pct}% of savings",
+      "s4title": "Or hand it to TermLift",
+      "s4body": "At any point after Full Analysis, hand the deal over. A negotiator runs the back-and-forth, you approve the outcome. No savings, no fee.",
+      "addon": "Any time"
+    }
+  },
+  "pricing": {
+    "step4": "Add-on · any time"
+  },
+  "dealPage": {
+    "handoffEyebrow": "TermLift negotiates · add-on",
+    "handoffWaitingEyebrow": "TermLift is negotiating",
+    "primaryUploadReply": "Upload vendor reply"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "ladder": {
+    "negotiate": "Négociez",
+    "negotiateTermlift": "Négociation · TermLift"
+  },
+  "landing": {
+    "how": {
+      "title": "Trois étapes. Arrêtez-vous où vous voulez.",
+      "lead": "Chaque dossier TermLift suit la même échelle — vous la retrouvez telle quelle sur la page du dossier. Et à tout moment, vous pouvez nous confier la négociation.",
+      "s4tag": "Option · {pct} % des économies",
+      "s4title": "Ou confiez-la à TermLift",
+      "s4body": "À tout moment après l'analyse complète, passez-nous la main. Un négociateur mène les échanges, vous validez le résultat. Pas d'économies, pas de frais.",
+      "addon": "À tout moment"
+    }
+  },
+  "pricing": {
+    "step4": "Option · à tout moment"
+  },
+  "dealPage": {
+    "handoffEyebrow": "TermLift négocie · option",
+    "handoffWaitingEyebrow": "TermLift négocie",
+    "primaryUploadReply": "Importer la réponse du fournisseur"
+  }
+}

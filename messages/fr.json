@@ -161,7 +161,8 @@
     "proFeature5": "Historique complet + export PDF",
     "business": "Business",
     "getPro": "Passer à Pro",
-    "getEssentials": "Passer à Essentials"
+    "getEssentials": "Passer à Essentials",
+    "step4": "Option · à tout moment"
   },
   "social": {
     "stat1": "8 ans",
@@ -1284,7 +1285,9 @@
     "full": "Analyse complète",
     "self": "Négociez",
     "termlift": "TermLift négocie",
-    "closed": "Clôturé"
+    "closed": "Clôturé",
+    "negotiate": "Négociez",
+    "negotiateTermlift": "Négociation · TermLift"
   },
   "landing": {
     "eyebrow": "Pour les équipes qui n'ont pas de service achats",
@@ -1311,8 +1314,8 @@
     },
     "how": {
       "eyebrow": "Comment ça marche",
-      "title": "Quatre étapes. Arrêtez-vous à celle que vous voulez.",
-      "lead": "Chaque dossier dans TermLift suit la même progression — vous la retrouverez telle quelle sur la page de votre dossier.",
+      "title": "Trois étapes. Arrêtez-vous où vous voulez.",
+      "lead": "Chaque dossier TermLift suit la même échelle — vous la retrouvez telle quelle sur la page du dossier. Et à tout moment, vous pouvez nous confier la négociation.",
       "step": "Étape {n}",
       "s1tag": "Gratuit",
       "s1title": "Analyse rapide",
@@ -1323,9 +1326,10 @@
       "s3tag": "Inclus",
       "s3title": "Négociez vous-même",
       "s3body": "Un e-mail prêt à envoyer, dans le ton qui convient à la relation. Importez la réponse du fournisseur et obtenez le tour 2.",
-      "s4tag": "{pct} % des économies",
-      "s4title": "Ou TermLift négocie",
-      "s4body": "Confiez-nous le dossier. Un négociateur gère les échanges, vous validez le résultat. Pas d'économies, pas d'honoraires."
+      "s4tag": "Option · {pct} % des économies",
+      "s4title": "Ou confiez-la à TermLift",
+      "s4body": "À tout moment après l'analyse complète, passez-nous la main. Un négociateur mène les échanges, vous validez le résultat. Pas d'économies, pas de frais.",
+      "addon": "À tout moment"
     },
     "who": {
       "eyebrow": "Pour qui",
@@ -1527,11 +1531,11 @@
     "verdictTermliftEyebrow": "TermLift négocie ce dossier",
     "verdictTermliftWaiting": "En attente de votre part — ouvrez la négociation pour répondre à votre négociateur.",
     "verdictTermliftBody": "Votre négociateur gère les échanges avec le fournisseur. Votre accord sera demandé avant toute conclusion.",
-    "handoffEyebrow": "Étape 4 · TermLift négocie · optionnelle",
+    "handoffEyebrow": "TermLift négocie · option",
     "handoffTitle": "Pas envie de l'envoyer vous-même ? TermLift négocie.",
     "handoffBody": "Nous reprenons le plan de négociation et menons les échanges avec {vendor}. Vous validez chaque résultat. {pct} % des économies vérifiées, rien si nous ne vous faisons pas économiser.",
     "handoffCta": "Faire négocier par TermLift",
-    "handoffWaitingEyebrow": "Étape 4 · TermLift négocie",
+    "handoffWaitingEyebrow": "TermLift négocie",
     "handoffWaitingTitle": "En attente de votre part",
     "handoffWaitingBody": "Votre négociateur a besoin d'une réponse avant le prochain tour.",
     "handoffOpen": "Ouvrir la négociation",

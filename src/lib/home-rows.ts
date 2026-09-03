@@ -2,7 +2,7 @@
  * Serialisable row model for the Home deals table. Built server-side (real app
  * and demo) and handed to the client list component.
  */
-import { deriveDealStage, type DealStage } from '@/lib/deal-stage'
+import { deriveDealStage, deriveNegotiationMode, type DealStage, type NegotiationMode } from '@/lib/deal-stage'
 import {
   type DealLike, getAchievedSavings, getCategory, getDealCurrency, getDealType, getPotentialSavings,
   getRedFlagCount, getScore, getTotalCommitment, getVendorName, isClosed, isWon,
@@ -15,6 +15,8 @@ export interface HomeRow {
   category: string
   dealType?: string
   stage: DealStage
+  /** Who runs the negotiation (self / termlift) once the deal reached that stage. */
+  mode: NegotiationMode
   closed: boolean
   won: boolean
   /** TermLift negotiation is waiting on the user. */
@@ -36,6 +38,7 @@ export function buildHomeRows(deals: DealLike[], requestStatusByDeal: Map<string
   return deals.map((d) => {
     const nr = requestStatusByDeal.get(d.id)
     const stage = deriveDealStage({ status: d.status, rounds: d.rounds, negotiationRequestStatus: nr })
+    const mode = deriveNegotiationMode({ status: d.status, rounds: d.rounds, negotiationRequestStatus: nr })
     const closed = isClosed(d)
     const won = isWon(d)
     const cur = getDealCurrency(d)
@@ -58,6 +61,7 @@ export function buildHomeRows(deals: DealLike[], requestStatusByDeal: Map<string
       category: getCategory(d),
       dealType: getDealType(d),
       stage,
+      mode,
       closed,
       won,
       waitingOnClient: nr === 'waiting_for_client_info',

@@ -10,6 +10,7 @@ import type { Plan } from '@/lib/tiers'
 import { getCanOffer } from '@/lib/email-asks'
 import { hasDeepContent as computeHasDeepContent } from '@/lib/deep-analysis-status'
 import { MarketBenchmark } from '@/components/deal/MarketBenchmark'
+import { NEGOTIATION_FEE_PERCENT } from '@/lib/pricing'
 import { TONE_LABELS, type EmailTone } from '@/lib/tone-recommend'
 import { getFlagSeverity } from '@/lib/deal-metrics'
 import { Btn, Card, Chip, GateCard } from '@/components/system'
@@ -214,6 +215,9 @@ export function DealScrollView(props: DealScrollViewProps) {
   // round. sortedRounds.length > 1 means a genuine round 2+ (vendor response
   // uploaded, counter-offer added) already exists.
   const hasNegotiationActivity = sortedRounds.length > 1 || hasEmail || hasNegotiationRequest || isClosed
+  // Step 2 and 3 content only exists once Full Analysis ran (or, for legacy deals, once
+  // negotiation activity exists). Before that the page ends at the single Step 2 gate.
+  const stepsUnlocked = hasDeepContent || hasNegotiationActivity
   // Email section starts collapsed to a single entry CTA unless an email
   // already exists (a prior visit already generated one).
   const [emailSectionOpened, setEmailSectionOpened] = useState(false)
@@ -340,7 +344,7 @@ export function DealScrollView(props: DealScrollViewProps) {
       {/* ═══ 1. OVERVIEW — snapshot | score breakdown + already solid (as in the draft) ═══ */}
       <div id="overview" className="scroll-mt-[196px]">
         <p className="tl-label text-[11.5px] text-green-deep mb-2.5">{fr ? 'Étape 1 · Analyse rapide' : 'Step 1 · Quick analysis'}</p>
-      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5 items-start">
         <Card className={PAD}>
           <IconHeading icon={BookOpen} title={t('output.dealSnapshot')} />
           <dl className="m-0 divide-y divide-line-2">
@@ -422,23 +426,6 @@ export function DealScrollView(props: DealScrollViewProps) {
           }
         />
 
-        {/* Full Analysis gate — its own object, never blocks the fast analysis. */}
-        {!demoMode && !hasDeepContent && (
-          <div id="deep-analysis" className="mb-3.5 scroll-mt-[196px]">
-            {deepAnalysisLoading ? (
-              <DeepAnalysisProgress locale={locale} />
-            ) : (
-              <GateCard
-                tone="green"
-                eyebrow={fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Full Analysis'}
-                title={fr ? 'Lancer l’analyse complète sur ce dossier' : 'Run Full Analysis on this deal'}
-                body={<>{fr ? "Les opportunités d'économies détaillées, votre levier, l'ordre des demandes et les positions de repli — puis l'e-mail. Environ deux minutes." : 'The detailed savings opportunities, your leverage, the order to push in and fallback positions — then the email. About two minutes.'}{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
-                action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? "Lancer l'analyse complète" : 'Run Full Analysis')}</Btn>}
-              />
-            )}
-          </div>
-        )}
-
         {sortedFlags.length > 0 ? (
           <div className="bg-surface border border-line rounded-[14px] overflow-hidden divide-y divide-line-2">
             {sortedFlags.map(({ flag, idx, severity }: any, pos: number) => {
@@ -508,7 +495,36 @@ export function DealScrollView(props: DealScrollViewProps) {
         )}
       </section>
 
-      {/* ═══ 3. PLAYBOOK (deep only) ═══ */}
+      {/* ═══ 1c. ASSUMPTIONS — part of the analysis, so they sit with step 1 ═══ */}
+      {o?.assumptions && o.assumptions.length > 0 && (
+        <Card className={PAD}>
+          <IconHeading icon={Info} title={fr ? 'Hypothèses' : 'Assumptions'} />
+          <ul className="m-0 p-0 list-none flex flex-col gap-1.5">
+            {o.assumptions.map((a: string, i: number) => (
+              <li key={i} className="text-[13px] text-ink-2 leading-relaxed flex items-start gap-2"><span className="text-ink-3 shrink-0">•</span>{a}</li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {/* ═══ THE ONE GATE — Step 2, at the end of everything step 1 unlocked. Nothing below it until Full Analysis runs. ═══ */}
+      {!demoMode && !hasDeepContent && (
+        <div id="deep-analysis" className="scroll-mt-[196px]">
+          {deepAnalysisLoading ? (
+            <DeepAnalysisProgress locale={locale} />
+          ) : (
+            <GateCard
+              tone="green"
+              eyebrow={fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Full Analysis'}
+              title={fr ? 'Débloquer le plan, les demandes et le benchmark' : 'Unlock the playbook, the asks and the benchmark'}
+              body={<>{fr ? "Quoi demander pour chaque point, votre levier, l'ordre des demandes, les positions de repli et la comparaison au marché — puis l'e-mail. Environ deux minutes." : 'What to ask for on every flag, your leverage, the order to push in, fallback positions and the market comparison — then the email. About two minutes.'}{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
+              action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? "Lancer l'analyse complète" : 'Run Full Analysis')}</Btn>}
+            />
+          )}
+        </div>
+      )}
+
+      {/* ═══ 2. PLAYBOOK — the Step 2 block (playbook · savings · benchmark) ═══ */}
       {(!showFullPlaybook || hasDeepContent) && (
         <section id="playbook" className="scroll-mt-[196px]">
           {!showFullPlaybook ? (
@@ -617,15 +633,14 @@ export function DealScrollView(props: DealScrollViewProps) {
 
       {/* ═══ 3b. MARKET BENCHMARK (deep only; absent on deals analysed before the feature) ═══ */}
       {hasDeepContent && (o as any)?.market_benchmark && (
-        <MarketBenchmark benchmark={(o as any).market_benchmark} interpretation={(o as any).benchmark_interpretation ?? null} fmt={fmtSav} locale={locale} />
+        <MarketBenchmark benchmark={(o as any).market_benchmark} interpretation={(o as any).benchmark_interpretation ?? null} fmt={fmtSav} locale={locale} showEyebrow={false} />
       )}
 
-      {/* ═══ 4. EMAIL ═══ */}
+      {/* ═══ 3. EMAIL — Step 3. Rendered only once step 2 exists (trial keeps its teaser). ═══ */}
+      {(stepsUnlocked || !showFullPlaybook) && (
       <section id="email-section" className="scroll-mt-[196px]">
         {!showFullPlaybook ? (
           <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Mail} variant="email" />
-        ) : !hasDeepContent && !hasEmail ? (
-          <GateCard tone="neutral" eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'} title={fr ? "D'abord, la stratégie complète" : 'First, build the full strategy'} body={fr ? "L'e-mail de négociation se construit une fois la stratégie complète prête." : 'The negotiation email comes together once the full strategy is ready.'} action={<Btn href="#deep-analysis" variant="ghost">{fr ? 'Voir l’étape 2' : 'Go to step 2'} <ArrowRight className="w-3.5 h-3.5" /></Btn>} />
         ) : !emailSectionVisible && !demoMode ? (
           <GateCard tone="neutral" eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'} title={fr ? "Générer l'e-mail de négociation" : 'Generate the negotiation email'} body={fr ? 'Construit à partir du plan ci-dessus, dans le ton qui convient à la relation. Ajoutez ce que le document ne peut pas nous dire.' : 'Built from the playbook above, in the tone that fits the relationship. Add anything the document can’t tell us.'} action={<Btn variant="primary" onClick={openEmailSection}><Mail className="w-4 h-4" />{fr ? "Générer l'e-mail" : 'Generate email'}</Btn>} />
         ) : (
@@ -691,11 +706,25 @@ export function DealScrollView(props: DealScrollViewProps) {
             {demoMode && !hasEmail && <Btn href="/login?from=demo" variant="primary">{fr ? 'Inscrivez-vous pour générer' : 'Sign up to generate'} <ArrowRight className="w-3.5 h-3.5" /></Btn>}
           </>
         )}
-      </section>
 
-      {/* ═══ 5. ROUNDS + ASSUMPTIONS ═══ */}
-      {(hasNegotiationActivity || ((o?.assumptions?.length ?? 0) > 0)) && (
-        <div id="rounds" className={cn('grid grid-cols-1 gap-5 scroll-mt-[196px]', hasNegotiationActivity && (o?.assumptions?.length ?? 0) > 0 && 'lg:grid-cols-[1.4fr_1fr]')}>
+        {/* The other way to do step 3: hand it to TermLift. An add-on, offered here and nowhere else on the page. */}
+        {showFullPlaybook && !demoMode && !hasNegotiationRequest && !isClosed && hasDeepContent && (
+          <div className="mt-4">
+            <GateCard
+              tone="neutral"
+              eyebrow={fr ? 'TermLift négocie · option' : 'TermLift negotiates · add-on'}
+              title={fr ? "Vous préférez ne pas l'envoyer vous-même ?" : "Don't want to send it yourself?"}
+              body={fr ? `Nous reprenons le plan et menons les échanges avec ${o?.vendor || 'le fournisseur'}. Vous validez chaque résultat. ${NEGOTIATION_FEE_PERCENT} % des économies vérifiées, rien si nous ne vous faisons pas économiser.` : `We take the playbook from here and run the back-and-forth with ${o?.vendor || 'the vendor'}. You approve every outcome. ${NEGOTIATION_FEE_PERCENT}% of verified savings, nothing if we don't save you money.`}
+              action={<Btn href={negotiateHref} variant="ink">{fr ? 'Confier à TermLift' : 'Let TermLift negotiate'}</Btn>}
+            />
+          </div>
+        )}
+      </section>
+      )}
+
+      {/* ═══ 4. ROUNDS — only once there is negotiation activity ═══ */}
+      {hasNegotiationActivity && (
+        <div id="rounds" className="grid grid-cols-1 gap-5 scroll-mt-[196px]">
           {hasNegotiationActivity && (
             <Card className={PAD}>
               <IconHeading icon={Clock} title={fr ? 'Tours de négociation' : 'Negotiation rounds'} />
@@ -746,19 +775,11 @@ export function DealScrollView(props: DealScrollViewProps) {
               </ol>
             </Card>
           )}
-          {o?.assumptions && o.assumptions.length > 0 && (
-            <Card className={PAD}>
-              <IconHeading icon={Info} title={fr ? 'Hypothèses' : 'Assumptions'} />
-              <ul className="m-0 p-0 list-none flex flex-col gap-1.5">
-                {o.assumptions.map((a: string, i: number) => (
-                  <li key={i} className="text-[13px] text-ink-2 leading-relaxed flex items-start gap-2"><span className="text-ink-3 shrink-0">•</span>{a}</li>
-                ))}
-              </ul>
-              {o.disclaimer && <p className="mt-3 pt-3 border-t border-line-2 text-[12px] text-ink-3 italic leading-relaxed">{o.disclaimer}</p>}
-            </Card>
-          )}
         </div>
       )}
+
+      {/* Footer line — the AI disclaimer belongs at the end of the page, not inside a card. */}
+      {o?.disclaimer && <p className="text-[12px] text-ink-3 italic leading-relaxed text-center px-4">{o.disclaimer}</p>}
     </div>
   )
 }

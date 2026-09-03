@@ -28,7 +28,7 @@ export default async function NegotiatePage() {
           <p className="tl-label text-green-deep text-[11px]">{t('publicEyebrow')}</p>
           <h1 className="font-display font-extrabold text-[30px] sm:text-[36px] leading-[1.05] tracking-[-0.03em] mt-2.5">{t('publicTitle')}</h1>
           <p className="text-[15px] text-ink-2 max-w-[56ch] mx-auto mt-2.5 leading-[1.5]">{t('publicSub')}</p>
-          <div className="max-w-[720px] mx-auto mt-5"><StageRail current="termlift" /></div>
+          <div className="max-w-[720px] mx-auto mt-5"><StageRail current="negotiate" /></div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-7">

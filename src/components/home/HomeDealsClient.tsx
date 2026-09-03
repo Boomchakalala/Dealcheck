@@ -6,7 +6,7 @@ import { Search, MoreHorizontal, CheckCircle2, Trash2 } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/lib/analytics'
-import { STAGE_LABEL_KEY, stageTone } from '@/lib/deal-stage'
+import { stageChipKey, stageTone } from '@/lib/deal-stage'
 import type { HomeRow } from '@/lib/home-rows'
 import { Chip, ScoreRing, Table, TableHead, TableRow, HideM, NameCell, Btn } from '@/components/system'
 import { CloseDealModal } from '@/components/CloseDealModal'
@@ -82,7 +82,7 @@ export function HomeDealsClient({ rows: initialRows, linkBase = '/app', readOnly
     return rows.filter((r) => {
       if (term && !r.vendor.toLowerCase().includes(term) && !r.category.toLowerCase().includes(term)) return false
       if (filter === 'needs') return r.waitingOnClient
-      if (filter === 'termlift') return r.stage === 'termlift'
+      if (filter === 'termlift') return r.mode === 'termlift' && !r.closed
       if (filter === 'won') return r.won
       return true
     })
@@ -112,13 +112,13 @@ export function HomeDealsClient({ rows: initialRows, linkBase = '/app', readOnly
   ]
 
   const renderRow = (r: HomeRow) => {
-    const tone = stageTone(r.stage, { won: r.won, waitingOnClient: r.waitingOnClient })
-    const stageLabel = r.won ? t('dealList.won') : r.closed ? t('dealList.noChange') : t(STAGE_LABEL_KEY[r.stage])
+    const tone = stageTone(r.stage, { won: r.won, waitingOnClient: r.waitingOnClient, mode: r.mode })
+    const stageLabel = r.won ? t('dealList.won') : r.closed ? t('dealList.noChange') : t(stageChipKey(r.stage, r.mode))
     return (
       <TableRow key={r.id} cols={COLS} href={`${linkBase}/deal/${r.id}`} className={cn('group', deletingId === r.id && 'opacity-50')}>
         <NameCell name={r.vendor} sub={[r.category, r.dealType].filter(Boolean).join(' · ')} />
         <div className="min-w-0 flex flex-col items-start gap-1">
-          <Chip tone={tone}>{r.stage === 'self' && r.roundCount > 1 ? `${stageLabel} · R${r.roundCount}` : stageLabel}</Chip>
+          <Chip tone={tone}>{r.stage === 'negotiate' && r.mode === 'self' && r.roundCount > 1 ? `${stageLabel} · R${r.roundCount}` : stageLabel}</Chip>
           {r.waitingOnClient && <span className="text-[11.5px] text-warn font-medium">{t('home.hintReply')}</span>}
           {!r.waitingOnClient && r.needsUnlock && <span className="text-[11.5px] text-ink-3 group-hover:text-green-deep transition-colors">{t('home.hintUnlock')}</span>}
         </div>
