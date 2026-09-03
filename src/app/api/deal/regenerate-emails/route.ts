@@ -26,15 +26,17 @@ export async function POST(request: Request) {
     }
 
     // Get user plan for regen limit
-    const { data: profile } = await supabase
+    // NB: profiles has no first_name/last_name (verified against information_schema);
+    // selecting them made this whole query fail, so profile was always null → every
+    // user, admins included, hit the hard cap of 3 and never got a sender name.
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('plan, is_admin, first_name, last_name')
+      .select('plan, is_admin, contact_name')
       .eq('id', user.id)
       .single()
+    if (profileError) console.error('[TermLift] regenerate-emails: profile lookup failed:', profileError.message)
 
-    const senderName = profile?.first_name
-      ? [profile.first_name, profile.last_name].filter(Boolean).join(' ')
-      : undefined
+    const senderName = profile?.contact_name?.trim() || undefined
     // Email generation belongs to Deep Analysis now, not a subscription tier —
     // the cap here is a flat abuse safeguard, not a paywall. Per-deal
     // entitlement (has this round's Deep Analysis been unlocked) is checked
@@ -80,6 +82,14 @@ export async function POST(request: Request) {
       walkAwayFlexibility,
       internalDeadline,
       additionalInstructions,
+      // Market Benchmark (deterministic engine + clamped model target) — internal numbers.
+      benchmarkAvailable,
+      benchmarkTarget,
+      benchmarkOpeningAsk,
+      benchmarkFairLow,
+      benchmarkFairHigh,
+      benchmarkConfidence,
+      benchmarkPositionPct,
     } = body
 
     const dealTypeContext: Record<string, string> = {
@@ -147,7 +157,9 @@ Term: ${term || 'not specified'}
 Currency: ${currency || 'match the source quote'}
 Payment terms: ${paymentTerms || 'not specified'}
 Pricing model: ${pricingModel || 'not specified'}
-${targetPriceLow && targetPriceHigh ? `Realistic target price range: ${targetPriceLow}–${targetPriceHigh} — push toward this range, do not just ask for an unspecified "discount."` : ''}
+${benchmarkAvailable && (benchmarkTarget || benchmarkFairLow) ? `INTERNAL PRICE TARGET (from TermLift's market benchmark — ${benchmarkConfidence || 'medium'} confidence${typeof benchmarkPositionPct === 'number' ? `, quote sits ${benchmarkPositionPct > 0 ? '+' : ''}${benchmarkPositionPct}% vs observed market` : ''}):
+- Target to land at: ${benchmarkTarget ?? `${benchmarkFairLow}–${benchmarkFairHigh}`}${benchmarkOpeningAsk ? `\n- Opening ask: ${benchmarkOpeningAsk}` : ''}${benchmarkFairLow && benchmarkFairHigh ? `\n- Fair market band: ${benchmarkFairLow}–${benchmarkFairHigh}` : ''}
+Use these to set the ask and the posture. Open at the opening ask (or the target if none), hold toward the target. NEVER write "TermLift", "benchmark", "our data" or "the market price is X" — if it genuinely helps, phrase it as the buyer's expectation ("we'd expect to be closer to X", "comparable renewals we've seen land around X") and only when confidence is medium or high.` : targetPriceLow && targetPriceHigh ? `Realistic target price range: ${targetPriceLow}–${targetPriceHigh} — push toward this range, do not just ask for an unspecified "discount."` : ''}
 ${potentialSavingsTotal ? `Estimated savings opportunity identified: ${potentialSavingsTotal} — this is the internal estimate, not a number to quote directly to the supplier.` : ''}
 Situation: ${conclusion || 'Negotiation in progress'}
 ${dealType && dealTypeContext[dealType] ? `\n${dealTypeContext[dealType]}\n` : ''}
@@ -208,14 +220,50 @@ Return ONLY valid JSON (no markdown, no code fences):
       return NextResponse.json({ error: 'Invalid response format' }, { status: 500 })
     }
 
-    // Increment regeneration count
-    await supabase
+    // ── Persist ───────────────────────────────────────────────────────────
+    // Root cause of the "email vanishes on refresh" bug: this route only bumped
+    // the counter and returned the drafts. Nothing ever wrote them to
+    // output_json.email_drafts, so the page (hasEmail), the stage derivation
+    // (Negotiate), the Rounds section and Round 2's previous-round context all
+    // saw "no email". Now the three variants, the context they were built from
+    // and the recommended tone are stored on the round. No schema change:
+    // email_drafts has always been an output_json key (the old pipeline wrote it).
+    const byLabel = (label: string) => result.emails.find((e: { label?: string }) => e?.label === label)
+    const pick = (label: string, idx: number) => byLabel(label) ?? result.emails[idx]
+    const emailDrafts = {
+      neutral: { subject: String(pick('neutral', 0)?.subject ?? ''), body: String(pick('neutral', 0)?.body ?? '') },
+      firm: { subject: String(pick('firm', 1)?.subject ?? ''), body: String(pick('firm', 1)?.body ?? '') },
+      final_push: { subject: String(pick('final_push', 2)?.subject ?? ''), body: String(pick('final_push', 2)?.body ?? '') },
+    }
+    const emailContext = {
+      negotiationObjective: negotiationObjective || null,
+      budgetCeiling: budgetCeiling || null,
+      competingQuote: competingQuote || null,
+      walkAwayFlexibility: walkAwayFlexibility || null,
+      internalDeadline: internalDeadline || null,
+      additionalInstructions: additionalInstructions || customPrompt || null,
+      benchmarkUsed: !!(benchmarkAvailable && (benchmarkTarget || benchmarkFairLow)),
+      generatedAt: new Date().toISOString(),
+    }
+    const { error: persistError } = await supabase
       .from('rounds')
-      .update({ email_regeneration_count: round.email_regeneration_count + 1 })
+      .update({
+        email_regeneration_count: round.email_regeneration_count + 1,
+        output_json: { ...(round.output_json as Record<string, unknown>), email_drafts: emailDrafts, email_context: emailContext, email_recommended_tone: recommendedTone },
+      })
       .eq('id', roundId)
+      .eq('user_id', user.id)
+    if (persistError) {
+      console.error('[TermLift] Failed to persist generated emails:', persistError.message)
+      return NextResponse.json({ error: 'Emails were generated but could not be saved. Please try again.' }, { status: 500 })
+    }
 
     return NextResponse.json({
-      emails: result.emails.slice(0, 3),
+      emails: [
+        { label: 'neutral', ...emailDrafts.neutral },
+        { label: 'firm', ...emailDrafts.firm },
+        { label: 'final_push', ...emailDrafts.final_push },
+      ],
       recommendedTone,
       remainingRegenerations: maxRegens - round.email_regeneration_count - 1
     })

@@ -10,7 +10,7 @@ import type { Plan } from '@/lib/tiers'
 import { getCanOffer } from '@/lib/email-asks'
 import { hasDeepContent as computeHasDeepContent } from '@/lib/deep-analysis-status'
 import { MarketBenchmark } from '@/components/deal/MarketBenchmark'
-import { NEGOTIATION_FEE_PERCENT } from '@/lib/pricing'
+import { NEGOTIATION_FEE_PERCENT, FULL_ANALYSIS_EMAIL_REGEN_LIMIT } from '@/lib/pricing'
 import { TONE_LABELS, type EmailTone } from '@/lib/tone-recommend'
 import { getFlagSeverity } from '@/lib/deal-metrics'
 import { Btn, Card, Chip, GateCard } from '@/components/system'
@@ -178,7 +178,10 @@ export function DealScrollView(props: DealScrollViewProps) {
   // ── email state ───────────────────────────
   const bizDate = getNextBusinessDate()
   const toneOrder: EmailTone[] = ['neutral', 'firm', 'final_push']
-  const [emailTab, setEmailTab] = useState(0)
+  // Recommended variant: stored with the drafts on generation; falls back to the first.
+  const storedRecIdx = toneOrder.indexOf(((o as any)?.email_recommended_tone ?? '') as EmailTone)
+  const [recommendedIdx, setRecommendedIdx] = useState(storedRecIdx >= 0 ? storedRecIdx : 0)
+  const [emailTab, setEmailTab] = useState(storedRecIdx >= 0 ? storedRecIdx : 0)
   const [emailSubjects, setEmailSubjects] = useState([
     o?.email_drafts?.neutral?.subject?.replace(/\[DATE\]/gi, bizDate) || '',
     o?.email_drafts?.firm?.subject?.replace(/\[DATE\]/gi, bizDate) || '',
@@ -192,10 +195,18 @@ export function DealScrollView(props: DealScrollViewProps) {
   // "Additional instructions" (Part 2, field 6) — same field that used to be
   // the bare "custom instructions" box, just relabeled and moved into the
   // context panel below.
-  const [customPrompt, setCustomPrompt] = useState('')
+  // Context persistence (no schema): the context used for the last generation lives
+  // on the round as output_json.email_context. On a new round (vendor reply
+  // uploaded) the previous round's context carries over. A negotiation request's
+  // fields are the last fallback; walk_away_notes (free text) lands in
+  // "additional instructions" only when nothing newer exists.
+  const savedCtx: import('@/types').EmailContext | undefined =
+    (o as any)?.email_context ?? (sortedRounds[1]?.output_json as any)?.email_context ?? undefined
+  const [customPrompt, setCustomPrompt] = useState(savedCtx?.additionalInstructions || savedNegotiationContext?.walkAwayNotes || '')
   const [regenerating, setRegenerating] = useState(false)
   const [regenError, setRegenError] = useState<string | null>(null)
-  const [remainingRegens, setRemainingRegens] = useState(3)
+  // Real remaining budget from the round's counter (was a hard-coded 3, wrong after a reload).
+  const [remainingRegens, setRemainingRegens] = useState(Math.max(0, (props.isAdmin ? 99 : FULL_ANALYSIS_EMAIL_REGEN_LIMIT) - ((sortedRounds[0] as any)?.email_regeneration_count ?? 0)))
   const [copiedEmail, setCopiedEmail] = useState(false)
 
   // Optional user-supplied negotiation context (Part 2) — everything the
@@ -203,11 +214,11 @@ export function DealScrollView(props: DealScrollViewProps) {
   // prefill from an existing negotiation_requests row for this deal where
   // available (Part 6); nothing here is persisted anywhere new.
   const [showEmailContext, setShowEmailContext] = useState(false)
-  const [negotiationObjective, setNegotiationObjective] = useState(savedNegotiationContext?.objective || '')
-  const [budgetCeiling, setBudgetCeiling] = useState('')
-  const [competingQuote, setCompetingQuote] = useState(savedNegotiationContext?.competitorContext || '')
-  const [walkAwayFlexibility, setWalkAwayFlexibility] = useState<'flexible' | 'prefer_stay' | 'can_walk' | ''>('')
-  const [internalDeadline, setInternalDeadline] = useState('')
+  const [negotiationObjective, setNegotiationObjective] = useState(savedCtx?.negotiationObjective || savedNegotiationContext?.objective || '')
+  const [budgetCeiling, setBudgetCeiling] = useState(savedCtx?.budgetCeiling || '')
+  const [competingQuote, setCompetingQuote] = useState(savedCtx?.competingQuote || savedNegotiationContext?.competitorContext || '')
+  const [walkAwayFlexibility, setWalkAwayFlexibility] = useState<'flexible' | 'prefer_stay' | 'can_walk' | ''>(savedCtx?.walkAwayFlexibility || '')
+  const [internalDeadline, setInternalDeadline] = useState(savedCtx?.internalDeadline || '')
 
   const hasEmail = !!(o?.email_drafts?.neutral?.body)
 
@@ -260,6 +271,15 @@ export function DealScrollView(props: DealScrollViewProps) {
           competingQuote: competingQuote.trim() || undefined,
           walkAwayFlexibility: walkAwayFlexibility || undefined,
           internalDeadline: internalDeadline.trim() || undefined,
+          // Market Benchmark (deterministic engine + clamped model target). Internal numbers —
+          // the route tells the model how (not) to voice them.
+          benchmarkAvailable: !!(o as any)?.market_benchmark?.benchmark_available,
+          benchmarkTarget: (o as any)?.benchmark_interpretation?.target_price != null ? fmtSav((o as any).benchmark_interpretation.target_price) : undefined,
+          benchmarkOpeningAsk: (o as any)?.benchmark_interpretation?.opening_ask != null ? fmtSav((o as any).benchmark_interpretation.opening_ask) : undefined,
+          benchmarkFairLow: (o as any)?.market_benchmark?.benchmark_available ? fmtSav((o as any).market_benchmark.fair_market_low) : undefined,
+          benchmarkFairHigh: (o as any)?.market_benchmark?.benchmark_available ? fmtSav((o as any).market_benchmark.fair_market_high) : undefined,
+          benchmarkConfidence: (o as any)?.market_benchmark?.confidence,
+          benchmarkPositionPct: (o as any)?.market_benchmark?.benchmark_available ? (o as any).market_benchmark.quote_vs_market_percent : undefined,
         }),
       })
       const data = await res.json()
@@ -267,10 +287,12 @@ export function DealScrollView(props: DealScrollViewProps) {
       setEmailSubjects(data.emails.map((e: any) => e.subject))
       setEmailBodies(data.emails.map((e: any) => e.body))
       const recIdx = toneOrder.indexOf(data.recommendedTone)
+      setRecommendedIdx(recIdx >= 0 ? recIdx : 0)
       setEmailTab(recIdx >= 0 ? recIdx : 0)
       setRemainingRegens(data.remainingRegenerations)
-      setCustomPrompt('')
+      // Context is now persisted with the drafts — keep it in the form (it prefills next time too).
       setShowEmailContext(false)
+      router.refresh()
     } catch (err) { setRegenError(err instanceof Error ? err.message : 'Failed') }
     finally { setRegenerating(false) }
   }
@@ -661,10 +683,15 @@ export function DealScrollView(props: DealScrollViewProps) {
 
             {hasEmail && (
               <Card pad={false} className="mb-3">
+                {/* Tone: the recommended variant is shown first; softer/firmer step through the three
+                    variants already generated in the one call — no extra LLM request. */}
                 <div className="px-5 py-3 border-b border-line flex flex-wrap items-center gap-2">
-                  {toneOrder.map((tone, i) => (
-                    <button key={tone} onClick={() => setEmailTab(i)} className={cn('h-[22px] px-2 rounded-md border text-[11.5px] font-semibold transition-colors', emailTab === i ? 'bg-info-soft border-info-line text-info' : 'bg-surface border-line text-ink-2 hover:border-[#C9D3CE]')} aria-pressed={emailTab === i}>{toneChipLabel(tone)}</button>
-                  ))}
+                  <span className="text-[12.5px] font-semibold text-ink">{toneChipLabel(toneOrder[emailTab])}</span>
+                  {emailTab === recommendedIdx && <Chip tone="green">{fr ? 'Recommandé' : 'Recommended'}</Chip>}
+                  <span className="flex items-center gap-1 ml-1">
+                    <button type="button" onClick={() => setEmailTab(Math.max(0, emailTab - 1))} disabled={emailTab === 0} className="h-[24px] px-2 rounded-md border border-line bg-surface text-[11.5px] font-semibold text-ink-2 hover:border-[#C9D3CE] disabled:opacity-40 disabled:cursor-not-allowed">{fr ? 'Plus doux' : 'Make softer'}</button>
+                    <button type="button" onClick={() => setEmailTab(Math.min(toneOrder.length - 1, emailTab + 1))} disabled={emailTab === toneOrder.length - 1} className="h-[24px] px-2 rounded-md border border-line bg-surface text-[11.5px] font-semibold text-ink-2 hover:border-[#C9D3CE] disabled:opacity-40 disabled:cursor-not-allowed">{fr ? 'Plus ferme' : 'Make firmer'}</button>
+                  </span>
                   {!demoMode && <span className="ml-auto text-[12px] text-ink-3">{remainingRegens > 0 ? (fr ? `${remainingRegens} régénération(s) restante(s)` : `${remainingRegens} regeneration${remainingRegens === 1 ? '' : 's'} left`) : (fr ? 'Limite atteinte' : 'Limit reached')}</span>}
                 </div>
                 <div className="px-5 py-3 border-b border-line flex items-center gap-2">

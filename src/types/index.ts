@@ -258,6 +258,22 @@ export type DealOutput = {
   market_benchmark_query?: import('@/lib/benchmark/types').BenchmarkQuery
   /** LLM explanation of the benchmark. Strings only; target/opening are clamped in code. */
   benchmark_interpretation?: BenchmarkInterpretation
+  // ── Negotiation email (written by /api/deal/regenerate-emails) ──
+  /** The optional context the user gave when generating the email — prefills the form on reload and on later rounds. */
+  email_context?: EmailContext
+  /** Which of the three variants the deterministic recommender picked. */
+  email_recommended_tone?: 'neutral' | 'firm' | 'final_push'
+}
+
+export type EmailContext = {
+  negotiationObjective?: string | null
+  budgetCeiling?: string | null
+  competingQuote?: string | null
+  walkAwayFlexibility?: 'flexible' | 'prefer_stay' | 'can_walk' | null
+  internalDeadline?: string | null
+  additionalInstructions?: string | null
+  benchmarkUsed?: boolean
+  generatedAt?: string
 }
 
 export type BenchmarkInterpretation = {
