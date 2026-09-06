@@ -3,7 +3,18 @@ import { getTranslations } from 'next-intl/server'
 import { ArrowRight, Check } from 'lucide-react'
 import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
+import Image from 'next/image'
 import { Btn, Chip, ImageSlot, ScoreRing, StageRail } from '@/components/system'
+import { LogoStrip } from '@/components/LogoStrip'
+
+/** A product screenshot in a soft device frame — same treatment for every picture on the page. */
+function Frame({ src, alt, width, height, className }: { src: string; alt: string; width: number; height: number; className?: string }) {
+  return (
+    <div className={`rounded-[14px] border border-line bg-surface shadow-[0_18px_50px_-24px_rgba(16,26,23,0.35)] overflow-hidden ${className || ''}`}>
+      <Image src={src} alt={alt} width={width} height={height} className="w-full h-auto block" sizes="(min-width: 1024px) 640px, 100vw" />
+    </div>
+  )
+}
 import { SHOWCASE_CARDS, SHOWCASE_COUNT, SHOWCASE_TOTAL_EUR } from '@/lib/demo-showcase'
 import { NEGOTIATION_FEE_PERCENT } from '@/lib/pricing'
 
@@ -40,9 +51,9 @@ export default async function LandingPage() {
   ]
 
   const tours = [
-    { k: t('tour.t1k'), title: t('tour.t1title'), body: t('tour.t1body'), bullets: [t('tour.t1b1'), t('tour.t1b2'), t('tour.t1b3')], img: t('tour.t1img'), flip: false },
-    { k: t('tour.t2k'), title: t('tour.t2title'), body: t('tour.t2body'), bullets: [t('tour.t2b1'), t('tour.t2b2'), t('tour.t2b3')], img: t('tour.t2img'), flip: true },
-    { k: t('tour.t3k'), title: t('tour.t3title'), body: t('tour.t3body'), bullets: [t('tour.t3b1'), t('tour.t3b2'), t('tour.t3b3')], img: t('tour.t3img'), flip: false },
+    { k: t('tour.t1k'), title: t('tour.t1title'), body: t('tour.t1body'), bullets: [t('tour.t1b1'), t('tour.t1b2'), t('tour.t1b3')], img: t('tour.t1img'), src: '/landing/tour-playbook.png', w: 1120, h: 709, flip: false },
+    { k: t('tour.t2k'), title: t('tour.t2title'), body: t('tour.t2body'), bullets: [t('tour.t2b1'), t('tour.t2b2'), t('tour.t2b3')], img: t('tour.t2img'), src: '/landing/tour-email.png', w: 1120, h: 606, flip: true },
+    { k: t('tour.t3k'), title: t('tour.t3title'), body: t('tour.t3body'), bullets: [t('tour.t3b1'), t('tour.t3b2'), t('tour.t3b3')], img: t('tour.t3img'), src: '/landing/tour-negotiate.png', w: 840, h: 716, flip: false },
   ]
 
   const wrap = 'max-w-[1120px] mx-auto px-5 sm:px-7'
@@ -69,14 +80,10 @@ export default async function LandingPage() {
             <div className="flex flex-wrap gap-x-3.5 gap-y-1 mt-4 tl-label text-ink-3 text-[10px]">
               <span>{t('trust1')}</span><span aria-hidden>·</span><span>{t('trust2')}</span><span aria-hidden>·</span><span>{t('trust3')}</span>
             </div>
-            {/* Vendors whose quotes have been analysed — honest social proof until customer logos exist */}
+            {/* Vendors whose quotes TermLift analyses — monochrome marks, never "customers" */}
             <div className="mt-6 pt-4 border-t border-line">
-              <p className="tl-label text-ink-3 text-[10px] mb-2">{t('logosCap')}</p>
-              <div className="grid grid-cols-5 gap-2">
-                {['Salesforce', 'Microsoft', 'DHL', 'HubSpot', 'FedEx'].map((v) => (
-                  <span key={v} className="h-8 rounded-lg bg-ground border border-dashed border-[#C9D3CE] grid place-items-center tl-label text-[9.5px] text-ink-3 truncate px-1">{v}</span>
-                ))}
-              </div>
+              <p className="tl-label text-ink-3 text-[10px] mb-3">{t('logosCap')}</p>
+              <LogoStrip compact />
             </div>
           </div>
 
@@ -140,7 +147,7 @@ export default async function LandingPage() {
       {/* ═══ WHO IT'S FOR — photo slot ═══ */}
       <section className="py-12 sm:py-14">
         <div className={`${wrap} grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-10 items-center`}>
-          <ImageSlot alt={t('who.imgAlt')} hint={t('who.imgHint')} dims="960 × 720" ratio="4 / 3" />
+          <Frame src="/landing/who-home.png" alt={t('who.imgAlt')} width={1220} height={900} />
           <div>
             <Eyebrow>{t('who.eyebrow')}</Eyebrow>
             <h2 className="font-display font-extrabold text-[26px] sm:text-[32px] leading-[1.08] tracking-[-0.03em] max-w-[24ch] mt-2.5">{t('who.title')}</h2>
@@ -170,7 +177,7 @@ export default async function LandingPage() {
                     {tr.bullets.map((b) => <li key={b}><span className="text-green mr-1.5">—</span>{b}</li>)}
                   </ul>
                 </div>
-                <ImageSlot alt={tr.img} dims="1440 wide · cropped" ratio="16 / 10" className={tr.flip ? 'lg:order-1' : ''} />
+                <Frame src={tr.src} alt={tr.img} width={tr.w} height={tr.h} className={tr.flip ? 'lg:order-1' : ''} />
               </div>
             ))}
           </div>
