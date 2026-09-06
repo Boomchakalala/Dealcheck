@@ -51,7 +51,13 @@ export default async function NegotiateDealPage({ params }: { params: Promise<{ 
   const defaultVendor = deal.vendor || (isV2 ? (latestOutput as DealOutputV2)?.commercial_facts?.supplier : (latestOutput as DealOutput)?.vendor) || ''
   const defaultCategory = (latestOutput as DealOutput)?.category || ''
   const rawRenewalDate = isV2 ? undefined : (latestOutput as DealOutput)?.snapshot?.renewal_date
-  const defaultRenewalDate = rawRenewalDate && !isNaN(Date.parse(rawRenewalDate)) ? new Date(rawRenewalDate).toISOString().slice(0, 10) : ''
+  // Local date parts, not toISOString(): "January 31, 2027" parses as local midnight and
+  // came out as Jan 30 once shifted to UTC.
+  const defaultRenewalDate = (() => {
+    if (!rawRenewalDate || isNaN(Date.parse(rawRenewalDate))) return ''
+    const d = new Date(rawRenewalDate)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  })()
   const defaultCurrentTotal = isV2 ? (latestOutput as DealOutputV2)?.commercial_facts?.total_value : (latestOutput as DealOutput)?.snapshot?.total_commitment
 
   const redFlagCount = getRedFlagCount(deal as DealLike)
