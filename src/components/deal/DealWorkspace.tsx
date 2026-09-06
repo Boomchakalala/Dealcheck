@@ -179,7 +179,7 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
             </nav>
           )}
           <div className="ml-auto flex items-center gap-2">
-            {isDemo && <span className="tl-label text-ink-3 hidden sm:inline">{t('dealPage.demoSample')}</span>}
+            {isDemo && <Chip>{t('dealPage.demoSample')}</Chip>}
           </div>
         </div>
         <div className="px-4 sm:px-6 pt-1.5 pb-2.5 flex flex-wrap items-center gap-x-3 gap-y-2">

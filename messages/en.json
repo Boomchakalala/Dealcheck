@@ -1328,17 +1328,13 @@
       "t3img": "Screenshot — negotiation detail"
     },
     "wins": {
-      "eyebrow": "Real wins",
-      "title": "{count} quotes. €{total}K back in pocket.",
-      "lead": "Click any of them to walk through the actual deal — every flag, every ask, the email that closed it.",
+      "eyebrow": "Sample deals",
+      "title": "What a win looks like.",
+      "lead": "{count} sample quotes, analysed exactly the way yours would be — every flag, every ask, the email. Click any of them to walk through the deal.",
       "quoted": "Quoted",
       "signed": "Signed",
-      "saved": "{pct} saved"
-    },
-    "quote": {
-      "text": "“I sent the Direct email on Tuesday. By Friday, 80 seats were on Standard and we had 8% off the rest. I'd never have known to ask.”",
-      "cite": "Head of IT, 200-person scale-up · Atlassian expansion, $15k saved",
-      "imgAlt": "Photo"
+      "saved": "{pct} saved",
+      "note": "Sample deals · figures are illustrative"
     },
     "neg": {
       "eyebrow": "TermLift Negotiate",

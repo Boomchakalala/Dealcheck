@@ -1328,17 +1328,13 @@
       "t3img": "Capture — détail de la négociation"
     },
     "wins": {
-      "eyebrow": "Résultats réels",
-      "title": "{count} devis. {total} K€ récupérés.",
-      "lead": "Cliquez sur l'un d'eux pour parcourir le dossier réel — chaque point de vigilance, chaque demande, l'e-mail qui a conclu.",
+      "eyebrow": "Dossiers exemples",
+      "title": "À quoi ressemble un dossier gagné.",
+      "lead": "{count} devis exemples, analysés exactement comme le vôtre le serait — chaque point de vigilance, chaque demande, l’e-mail. Cliquez pour parcourir le dossier.",
       "quoted": "Devis initial",
       "signed": "Signé",
-      "saved": "{pct} économisés"
-    },
-    "quote": {
-      "text": "« J'ai envoyé l'e-mail en ton direct le mardi. Le vendredi, 80 sièges étaient passés en Standard et nous avions 8 % sur le reste. Je n'aurais jamais su quoi demander. »",
-      "cite": "Responsable IT, scale-up de 200 personnes · extension Atlassian, 15 k$ économisés",
-      "imgAlt": "Photo"
+      "saved": "{pct} économisés",
+      "note": "Dossiers exemples · chiffres illustratifs"
     },
     "neg": {
       "eyebrow": "TermLift Négociation",

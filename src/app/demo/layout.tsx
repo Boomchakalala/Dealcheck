@@ -32,8 +32,9 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
             <div className="flex items-center gap-2 min-w-0">
               <Sparkles className="w-4 h-4 text-green-deep flex-shrink-0" />
               <span className="text-[12.5px] sm:text-[13.5px] text-ink-2 truncate">
-                <span className="font-semibold">You&apos;re exploring TermLift</span>
-                <span className="hidden sm:inline text-ink-3"> with sample data — sign up to use it with your own quotes.</span>
+                <span className="font-semibold">Sample data</span>
+                <span className="text-ink-3"> — six example deals to explore.</span>
+                <span className="hidden sm:inline text-ink-3"> Sign up to use TermLift with your own quotes.</span>
               </span>
             </div>
             <Link

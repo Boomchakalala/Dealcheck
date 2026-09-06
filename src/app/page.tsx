@@ -208,13 +208,8 @@ export default async function LandingPage() {
               </Link>
             ))}
           </div>
-          <figure className="mt-6 m-0 bg-surface border border-line rounded-[16px] px-6 py-5 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-5 items-center">
-            <div aria-label={t('quote.imgAlt')} className="w-14 h-14 rounded-full bg-green-soft border border-green-line grid place-items-center font-display font-bold text-[16px] text-green-deep">MR</div>
-            <div>
-              <blockquote className="m-0 font-display font-semibold text-[16px] sm:text-[18px] leading-[1.35] tracking-[-0.01em]">{t('quote.text')}</blockquote>
-              <figcaption className="text-[12.5px] text-ink-2 mt-2">{t('quote.cite')}</figcaption>
-            </div>
-          </figure>
+          {/* No testimonial until there is a real one — a labelled fake quote is worse than none. */}
+          <p className="tl-label text-ink-3 text-[10px] mt-4">{t('wins.note')}</p>
         </div>
       </section>
 
