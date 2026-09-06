@@ -168,7 +168,8 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
   return (
     <AppPage className={isTrial ? '!mx-0 !my-0 min-h-0 rounded-[14px] border border-line overflow-hidden' : undefined}>
       {/* ── Sticky header ─────────────────────────────────────── */}
-      <div className={cn('bg-surface border-b border-line z-30', !isTrial && 'sticky', isDemo ? 'top-[44px]' : 'top-0')}>
+      {/* Sticky from tablet up only — on a phone the breadcrumb + title + rail would pin 40% of the screen. */}
+      <div className={cn('bg-surface border-b border-line z-30', !isTrial && 'md:sticky', isDemo ? 'top-[44px]' : 'top-0')}>
         <div className="px-4 sm:px-6 pt-2.5 flex items-center gap-3 min-h-[30px]">
           {isTrial ? (
             <span className="text-[12.5px] text-ink-3">{t('dealPage.trialNotSaved')}</span>

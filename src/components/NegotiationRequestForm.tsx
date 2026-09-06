@@ -311,8 +311,8 @@ export function NegotiationRequestForm({
 
       {error && <p role="alert" className="text-[13px] text-risk bg-risk-soft border border-risk-line rounded-[10px] px-3.5 py-2.5">{error}</p>}
 
-      {/* ── Submit — sticky on long screens so the action is never out of reach ── */}
-      <div className="sticky bottom-0 -mx-1 px-1 pb-1 pt-2 bg-ground/95 backdrop-blur-sm">
+      {/* ── Submit — sticky from tablet up so the action is never out of reach; on phones it would eat a fifth of the screen, so it stays in flow ── */}
+      <div className="sm:sticky bottom-0 -mx-1 px-1 pb-1 pt-2 bg-ground/95 backdrop-blur-sm">
         <div className="bg-surface border border-line rounded-[14px] px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
           <Btn type="submit" variant="primary" disabled={loading} className="w-full sm:w-auto">
             {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> {fr ? 'Envoi…' : 'Submitting…'}</> : (fr ? 'Envoyer la demande de négociation' : 'Submit negotiation request')}

@@ -96,7 +96,8 @@ function IconHeading({ icon: Icon, title, sub, right, tone = 'neutral', eyebrow 
         <h3 className="tl-h3 text-ink">{title}</h3>
         {sub && <p className="text-[12.5px] text-ink-2 mt-0.5">{sub}</p>}
       </div>
-      {right && <div className="flex items-center gap-2 shrink-0">{right}</div>}
+      {/* On phones the actions drop to their own row instead of squeezing the title into a column. */}
+      {right && <div className="flex items-center gap-2 shrink-0 basis-full sm:basis-auto">{right}</div>}
     </div>
   )
 }
