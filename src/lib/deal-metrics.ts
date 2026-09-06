@@ -176,11 +176,20 @@ export function getRenewalDate(deal: DealLike): Date | null {
 export function normalizeCategory(raw: string | undefined | null): string {
   const lower = (raw || '').toLowerCase()
   if (!lower) return 'Other'
-  if (/(saas|software|crm|cloud|platform|tool|\bapp\b|subscription)/.test(lower)) return 'SaaS & Software'
+  // Software is split into the buckets an IT buyer actually budgets by. The
+  // specific checks run before the generic SaaS catch-all on purpose.
+  if (/(crm|\bsales\b|salesforce|hubspot|pipedrive)/.test(lower)) return 'CRM & Sales'
+  if (/(security|identity|\bsso\b|\biam\b|cyber|okta|endpoint|firewall|antivirus)/.test(lower)) return 'Security & Identity'
+  if (/(devops|developer|dev tool|source control|ci\/cd|\bgit|atlassian|jira)/.test(lower)) return 'Developer Tools & DevOps'
+  if (/(infrastructure|monitoring|observability|hosting|server|\bapm\b|\bcdn\b|database|compute|\baws\b|azure|\bgcp\b|data ?center|cloud)/.test(lower)) return 'Infrastructure & Cloud'
+  if (/(signature|e-?sign|document|contract management)/.test(lower)) return 'Documents & E-signature'
+  if (/(analytics|business intelligence|\bbi\b|data (platform|warehouse|lake))/.test(lower)) return 'Data & Analytics'
+  if (/(collaboration|productivity|workspace|microsoft 365|office 365|communication|messaging|\bchat\b|meeting|video|e-?mail|wiki|project management)/.test(lower)) return 'Collaboration & Productivity'
+  if (/(saas|software|platform|tool|\bapp\b|subscription|licen[cs]e)/.test(lower)) return 'Other software'
   if (/(marketing|advertising|agency|media|seo|content)/.test(lower)) return 'Marketing & Advertising'
   if (/(consult|professional|advisory|accounting|staffing|design|freelance|landscap|tree)/.test(lower)) return 'Professional Services'
   if (/(office|supplies|facilities|cleaning|maintenance|furniture)/.test(lower)) return 'Office & Facilities'
-  if (/(\bit\b|infrastructure|hosting|server|network|telecom|hardware|security|cyber)/.test(lower)) return 'IT & Infrastructure'
+  if (/(\bit\b|network|telecom|hardware|equipment)/.test(lower)) return 'Hardware & Telecom'
   if (/(logistics|shipping|delivery|courier|freight|warehouse)/.test(lower)) return 'Logistics & Delivery'
   if (/(legal|finance|insurance|banking|audit|compliance)/.test(lower)) return 'Legal & Finance'
   if (/(event|hospitality|catering|venue|travel|hotel)/.test(lower)) return 'Events & Hospitality'

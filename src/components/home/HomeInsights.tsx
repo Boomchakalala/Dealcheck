@@ -2,36 +2,101 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import type { Insights } from '@/lib/deal-insights'
 import { fmtCompact, fmtMoney } from '@/lib/deal-metrics'
-import { Card, Chip, SectionHeading, StatRow, StatTile, ScoreRing, Table, TableHead, TableRow, HideM, NameCell } from '@/components/system'
+import { Card, Chip, SectionHeading, Table, TableHead, TableRow, HideM, NameCell } from '@/components/system'
 
-/** Server-rendered Insights tab. Pure render — all numbers come from computeInsights(). */
+/**
+ * Insights tab. Server-rendered, pure — every number comes from computeInsights().
+ * Order: the savings story first (numbers + chart), then what needs a nudge,
+ * then where the money goes (categories, suppliers), then what's coming
+ * (renewals), then the record (wins, closed deals).
+ */
 export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'en' }: { insights: Insights; linkBase?: string; locale?: string }) {
   const t = await getTranslations('insights')
   const cur = I.baseCurrency
   const maxCat = I.categories[0]?.spend || 1
   const maxSup = I.topSuppliers[0]?.spend || 1
-  const maxMonth = Math.max(...I.monthly.map((m) => m.amount), 1)
-  const maxBucket = Math.max(...I.scoreBuckets.map((b) => b.count), 1)
   const dLocale = locale === 'fr' ? 'fr-FR' : 'en-US'
   const dateFmt = (d: Date | string) => new Date(d).toLocaleDateString(dLocale, { month: 'short', day: 'numeric', year: 'numeric' })
-  const bucketLabel: Record<string, string> = { '0': t('bucket0'), '40': t('bucket40'), '60': t('bucket60'), '80': t('bucket80') }
-  const bucketColor: Record<string, string> = { '0': 'var(--tl-risk)', '40': 'var(--tl-warn)', '60': 'var(--tl-green)', '80': 'var(--tl-green)' }
-  const scoreBar = (s: number) => (s >= 60 ? 'bg-green' : s >= 40 ? 'bg-warn' : 'bg-risk')
+  const avgSaving = I.wonCount ? Math.round(I.savingsAchieved / I.wonCount) : 0
 
   const Bar = ({ pct, cls = 'bg-green' }: { pct: number; cls?: string }) => (
     <div className="h-1.5 rounded-full bg-line-2 overflow-hidden"><div className={`h-full rounded-full ${cls}`} style={{ width: `${Math.max(2, Math.min(100, pct))}%` }} /></div>
   )
 
+  // ── Savings chart geometry (SVG, no library) ─────────────────────────────
+  const S = I.savingsMonthly
+  const W = 560, H = 190, padL = 44, padR = 12, padT = 14, padB = 26
+  const innerW = W - padL - padR, innerH = H - padT - padB
+  const maxBar = Math.max(...S.map((m) => Math.max(m.saved, m.potential)), 1)
+  const maxCum = Math.max(...S.map((m) => m.cumulative), 1)
+  const yBar = (v: number) => padT + innerH - (v / maxBar) * innerH
+  const yCum = (v: number) => padT + innerH - (v / maxCum) * innerH
+  const slot = innerW / Math.max(S.length, 1)
+  const barW = Math.min(26, slot * 0.36)
+  const cx = (i: number) => padL + i * slot + slot / 2
+  const linePts = S.map((m, i) => `${cx(i)},${yCum(m.cumulative)}`).join(' ')
+  const hasSavings = S.some((m) => m.saved > 0 || m.potential > 0)
+
   return (
     <>
-      {/* Performance strip */}
-      <StatRow>
-        <StatTile label={t('perfWinRate')} value={I.closedCount ? `${I.winRate}%` : '—'} sub={t('perfWinRateSub', { won: I.wonCount, closed: I.closedCount })} tone={I.winRate >= 50 ? 'money' : 'neutral'} />
-        <StatTile label={t('perfCapture')} value={I.captureRate != null ? `${I.captureRate}%` : '—'} sub={t('perfCaptureSub')} tone="money" />
-        <StatTile label={t('perfAvgScore')} value={I.avgScore ?? '—'} sub={t('perfAvgScoreSub', { n: I.dealCount })} />
-        <StatTile label={t('perfDaysToClose')} value={I.avgDaysToClose != null ? t('days', { n: I.avgDaysToClose }) : '—'} sub={t('perfDaysToCloseSub')} />
-      </StatRow>
+      {/* 1. The savings story */}
+      <Card>
+        <SectionHeading title={t('overview')} sub={t('overviewSub')} />
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-5 items-start">
+          <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+            <div>
+              <p className="tl-label text-ink-3">{t('savedToDate')}</p>
+              <p className="font-display font-extrabold text-[28px] leading-none tracking-[-0.03em] text-green-deep tl-num mt-1">{fmtMoney(I.savingsAchieved, cur)}</p>
+              <p className="text-[12px] text-ink-2 mt-1">{t('perfWinRateSub', { won: I.wonCount, closed: I.closedCount })}{I.closedCount ? ` · ${I.winRate}% ${t('perfWinRate').toLowerCase()}` : ''}</p>
+            </div>
+            <div>
+              <p className="tl-label text-ink-3">{t('inPipeline')}</p>
+              <p className="font-display font-bold text-[22px] leading-none tracking-[-0.02em] text-ink tl-num mt-1">{fmtMoney(I.savingsIdentified, cur)}</p>
+              <p className="text-[12px] text-ink-2 mt-1">{t('inPipelineSub', { n: I.activeCount })}</p>
+            </div>
+            <div className="hidden lg:block">
+              <p className="tl-label text-ink-3">{t('avgSaving')}</p>
+              <p className="font-display font-bold text-[18px] leading-none tracking-[-0.02em] text-ink tl-num mt-1">{avgSaving ? fmtMoney(avgSaving, cur) : '—'}</p>
+              <p className="text-[12px] text-ink-2 mt-1">{I.captureRate != null ? `${I.captureRate}% ${t('perfCapture').toLowerCase()}` : t('perfCaptureSub')}</p>
+            </div>
+          </div>
 
+          <div className="min-w-0">
+            {!hasSavings ? (
+              <p className="text-[13px] text-ink-3 py-8 text-center">{t('noSavingsYet')}</p>
+            ) : (
+              <>
+                <svg viewBox={`0 0 ${W} ${H}`} width="100%" className="block" role="img" aria-label={t('overview')}>
+                  {[0, 0.5, 1].map((f) => (
+                    <g key={f}>
+                      <line x1={padL} x2={W - padR} y1={padT + innerH - f * innerH} y2={padT + innerH - f * innerH} stroke="var(--tl-line-2)" />
+                      <text x={padL - 6} y={padT + innerH - f * innerH + 3} textAnchor="end" fontSize="9" fill="var(--tl-ink-3)" fontFamily="var(--font-jetbrains)">{fmtCompact(maxBar * f, cur)}</text>
+                    </g>
+                  ))}
+                  {S.map((m, i) => (
+                    <g key={m.key}>
+                      {m.potential > 0 && <rect x={cx(i) + 2} y={yBar(m.potential)} width={barW} height={Math.max(2, padT + innerH - yBar(m.potential))} rx="4" fill="var(--tl-line)" />}
+                      <rect x={cx(i) - barW - 2} y={yBar(m.saved)} width={barW} height={Math.max(2, padT + innerH - yBar(m.saved))} rx="4" fill={m.saved > 0 ? 'var(--tl-green)' : 'var(--tl-line-2)'} />
+                      <text x={cx(i)} y={H - 8} textAnchor="middle" fontSize="10" fill="var(--tl-ink-2)" fontFamily="var(--font-geist-sans)">{m.label}</text>
+                    </g>
+                  ))}
+                  <polyline points={linePts} fill="none" stroke="var(--tl-ink)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+                  {S.map((m, i) => <circle key={m.key} cx={cx(i)} cy={yCum(m.cumulative)} r={i === S.length - 1 ? 4 : 2.5} fill={i === S.length - 1 ? 'var(--tl-ink)' : 'var(--tl-surface)'} stroke="var(--tl-ink)" strokeWidth="2" />)}
+                  {/* Running-total label: sits left of the last point so it never collides with the top gridline. */}
+                  {S.length > 0 && <text x={cx(S.length - 1) - 9} y={Math.max(padT + 10, yCum(S[S.length - 1].cumulative)) + 4} textAnchor="end" fontSize="10.5" fontWeight="700" fill="var(--tl-ink)" fontFamily="var(--font-geist-sans)">{fmtCompact(S[S.length - 1].cumulative, cur)}</text>}
+                </svg>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-[11.5px] text-ink-2">
+                  <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px] bg-green" />{t('legendSaved')}</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px] bg-line" />{t('legendPotential')}</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="w-3 h-0.5 rounded-full bg-ink" />{t('legendCumulative')}</span>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      {/* 2. What needs a nudge */}
       {I.attention.length > 0 && (
         <Card>
           <SectionHeading title={t('attention')} sub={t('attentionSub')} />
@@ -46,7 +111,8 @@ export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'e
         </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-3.5">
+      {/* 3. Where the money goes */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
         <Card>
           <SectionHeading title={t('spendByCategory')} sub={t('total', { v: fmtCompact(I.totalSpend, cur) })} />
           {I.categories.length === 0 ? <p className="text-[13px] text-ink-3">{t('noData')}</p> : (
@@ -57,7 +123,6 @@ export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'e
                     <span className="min-w-0 truncate"><b>{c.name}</b> <span className="text-ink-3 text-[12px]">{t('deals', { n: c.count })}</span></span>
                     <span className="tl-num whitespace-nowrap text-[12px]">
                       {c.saved > 0 && <span className="text-green-deep mr-2">{t('saved', { v: fmtCompact(c.saved, cur) })}</span>}
-                      {c.potential > 0 && <span className="text-ink-3 mr-2">{t('potential', { v: fmtCompact(c.potential, cur) })}</span>}
                       <b className="text-[13px]">{fmtCompact(c.spend, cur)}</b>
                     </span>
                   </div>
@@ -67,37 +132,6 @@ export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'e
             </div>
           )}
         </Card>
-
-        <Card>
-          <SectionHeading title={t('monthly')} sub={t('lastMonths', { n: I.monthly.length })} />
-          {I.monthly.length === 0 ? <p className="text-[13px] text-ink-3">{t('noData')}</p> : (
-            <svg viewBox="0 0 320 150" width="100%" className="block" role="img" aria-label={t('monthly')}>
-              {[0, 0.5, 1].map((f) => (
-                <g key={f}>
-                  <line x1="34" x2="320" y1={120 - f * 100} y2={120 - f * 100} stroke="var(--tl-line-2)" />
-                  <text x="0" y={123 - f * 100} fontSize="9" fill="var(--tl-ink-3)" fontFamily="var(--font-jetbrains)">{fmtCompact(maxMonth * f, cur)}</text>
-                </g>
-              ))}
-              {I.monthly.map((m, i) => {
-                const n = I.monthly.length
-                const slot = 286 / n
-                const w = Math.min(34, slot * 0.6)
-                const x = 34 + i * slot + (slot - w) / 2
-                const h = Math.max(2, (m.amount / maxMonth) * 100)
-                return (
-                  <g key={m.key}>
-                    <rect x={x} y={120 - h} width={w} height={h} rx="4" fill={i === n - 1 ? 'var(--tl-green)' : 'var(--tl-green-line)'} />
-                    <text x={x + w / 2} y="138" textAnchor="middle" fontSize="9.5" fill="var(--tl-ink-2)" fontFamily="var(--font-geist-sans)">{m.label}</text>
-                    <text x={x + w / 2} y={114 - h} textAnchor="middle" fontSize="9.5" fontWeight="600" fill="var(--tl-ink)" fontFamily="var(--font-geist-sans)">{fmtCompact(m.amount, cur)}</text>
-                  </g>
-                )
-              })}
-            </svg>
-          )}
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-3.5">
         <Card>
           <SectionHeading title={t('topSuppliers')} sub={t('topSuppliersSub')} />
           {I.topSuppliers.length === 0 ? <p className="text-[13px] text-ink-3">{t('noData')}</p> : (
@@ -105,7 +139,7 @@ export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'e
               {I.topSuppliers.map((s) => (
                 <div key={s.name}>
                   <div className="flex justify-between items-baseline text-[13px] mb-1.5 gap-3">
-                    <span className="min-w-0 truncate"><b>{s.name}</b> <span className="text-ink-3 text-[12px]">{t('deals', { n: s.count })}</span></span>
+                    <Link href={`${linkBase}/deal/${s.dealId}`} className="min-w-0 truncate no-underline text-ink hover:text-green-deep"><b>{s.name}</b> <span className="text-ink-3 text-[12px]">{t('deals', { n: s.count })}</span></Link>
                     <span className="tl-num whitespace-nowrap text-[12px]">
                       {s.saved > 0 && <span className="text-green-deep mr-2">{t('saved', { v: fmtCompact(s.saved, cur) })}</span>}
                       <b className="text-[13px]">{fmtCompact(s.spend, cur)}</b>
@@ -117,37 +151,10 @@ export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'e
             </div>
           )}
         </Card>
-
-        <div className="flex flex-col gap-3.5">
-          <Card>
-            <SectionHeading title={t('scoreByCategory')} sub={t('scoreByCategorySub')} />
-            {I.categoryScores.length === 0 ? <p className="text-[13px] text-ink-3">{t('noData')}</p> : (
-              <div className="flex flex-col gap-2">
-                {I.categoryScores.map((c) => (
-                  <div key={c.name} className="grid grid-cols-[1fr_28px] items-center gap-3 text-[12.5px]">
-                    <div className="min-w-0"><div className="flex justify-between mb-1"><span className="truncate">{c.name}</span><span className="text-ink-3 text-[11.5px] ml-2 shrink-0">{t('deals', { n: c.count })}</span></div><Bar pct={c.score} cls={scoreBar(c.score)} /></div>
-                    <ScoreRing score={c.score} size={28} stroke={3} />
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-          <Card>
-            <SectionHeading title={t('scoreDist')} sub={t('scoreDistSub')} />
-            <div className="flex flex-col gap-2">
-              {I.scoreBuckets.map((b) => (
-                <div key={b.key} className="grid grid-cols-[140px_1fr_24px] gap-2.5 items-center text-[12.5px]">
-                  <span className="text-ink-2 truncate">{bucketLabel[b.key]}</span>
-                  <div className="h-1.5 rounded-full bg-line-2 overflow-hidden"><div className="h-full rounded-full" style={{ width: `${(b.count / maxBucket) * 100}%`, background: bucketColor[b.key] }} /></div>
-                  <b className="text-right tl-num">{b.count}</b>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-3.5">
+      {/* 4. What's coming, and the record */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
         <Card>
           <SectionHeading title={t('renewals')} sub={t('renewalsSub')} />
           {I.renewals.length === 0 ? <p className="text-[13px] text-ink-3">{t('noRenewals')}</p> : (

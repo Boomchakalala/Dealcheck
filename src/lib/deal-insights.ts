@@ -41,6 +41,8 @@ export interface Insights {
   categoryScores: Array<{ name: string; score: number; count: number }>
   topSuppliers: Array<{ name: string; spend: number; count: number; saved: number; potential: number; dealId: string }>
   monthly: Array<{ key: string; label: string; amount: number }>
+  /** Savings over the last 6 months: won savings by close month, potential by creation month, plus the running total of saved. */
+  savingsMonthly: Array<{ key: string; label: string; saved: number; potential: number; cumulative: number }>
   renewals: Array<{ id: string; vendor: string; date: Date; daysOut: number; amount: number; saved: number; won: boolean }>
   topWins: Array<{ id: string; vendor: string; category: string; saved: number }>
   closedDeals: Array<{ id: string; vendor: string; category: string; original: number; final: number; saved: number; pct: number; closedAt: string; won: boolean }>
@@ -125,6 +127,26 @@ export function computeInsights(rows: EnrichedDeal[], baseCurrency: Currency, no
   }
   const monthly = [...monthMap.entries()].sort(([a], [b]) => a.localeCompare(b)).slice(-6).map(([key, v]) => ({ key, ...v }))
 
+  // savings over time: a fixed 6-month window ending now, so empty months still show
+  const monthKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+  const savMap = new Map<string, { label: string; saved: number; potential: number }>()
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    savMap.set(monthKey(d), { label: d.toLocaleDateString('en-US', { month: 'short' }), saved: 0, potential: 0 })
+  }
+  for (const r of won) {
+    const k = monthKey(new Date(r.deal.closed_at || r.deal.updated_at))
+    const e = savMap.get(k); if (e) e.saved += r.achieved
+  }
+  for (const r of active) {
+    const k = monthKey(new Date(r.deal.created_at))
+    const e = savMap.get(k); if (e) e.potential += r.potential
+  }
+  // Wins closed before the window still count towards the running total.
+  const windowStart = [...savMap.keys()][0]
+  let cumulative = won.filter((r) => monthKey(new Date(r.deal.closed_at || r.deal.updated_at)) < windowStart).reduce((s, r) => s + r.achieved, 0)
+  const savingsMonthly = [...savMap.entries()].map(([key, v]) => { cumulative += v.saved; return { key, ...v, cumulative } })
+
   // renewals
   const renewals = rows
     .filter((r) => r.renewal && r.renewal.getTime() > now.getTime())
@@ -186,6 +208,7 @@ export function computeInsights(rows: EnrichedDeal[], baseCurrency: Currency, no
     categoryScores,
     topSuppliers,
     monthly,
+    savingsMonthly,
     renewals: renewals.slice(0, 5),
     topWins,
     closedDeals,

@@ -29,7 +29,7 @@ export default async function DemoHomePage({ searchParams }: { searchParams: Pro
       <PageHeader
         title={t('title')}
         sub={t('demoSub', { n: rows.length, spend: fmtCompact(insights.totalSpend, 'EUR') })}
-        actions={<Btn href="/login?from=demo" variant="primary" size="sm">{t('demoStartOwn')}</Btn>}
+        actions={<Btn href="/login?from=demo" variant="ghost" size="sm">{t('demoStartOwn')}</Btn>}
       >
         <StatRow className="mt-3.5">
           <StatTile hi tone="money" label={t('kpiSaved')} value={fmtMoney(insights.savingsAchieved, 'EUR')} sub={t('kpiSavedSub', { n: insights.wonCount })} />

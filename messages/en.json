@@ -1496,7 +1496,17 @@
     "colOriginal": "Original",
     "colFinal": "Final",
     "colSaved": "Saved",
-    "colClosed": "Closed"
+    "colClosed": "Closed",
+    "overview": "Savings overview",
+    "overviewSub": "Last 6 months",
+    "savedToDate": "Saved to date",
+    "inPipeline": "In pipeline",
+    "inPipelineSub": "{n, plural, one {# active deal} other {# active deals}}",
+    "avgSaving": "Avg saving per win",
+    "legendSaved": "Saved that month",
+    "legendCumulative": "Running total",
+    "legendPotential": "Potential identified",
+    "noSavingsYet": "Close a deal as won and your savings start showing here."
   },
   "dealPage": {
     "crumbDeals": "Deals",

@@ -1496,7 +1496,17 @@
     "colOriginal": "Initial",
     "colFinal": "Final",
     "colSaved": "Économisé",
-    "colClosed": "Clôturé"
+    "colClosed": "Clôturé",
+    "overview": "Vue d’ensemble des économies",
+    "overviewSub": "6 derniers mois",
+    "savedToDate": "Économisé à ce jour",
+    "inPipeline": "En cours",
+    "inPipelineSub": "{n, plural, one {# dossier actif} other {# dossiers actifs}}",
+    "avgSaving": "Économie moyenne par dossier gagné",
+    "legendSaved": "Économisé ce mois",
+    "legendCumulative": "Cumul",
+    "legendPotential": "Potentiel identifié",
+    "noSavingsYet": "Clôturez un dossier comme gagné et vos économies apparaîtront ici."
   },
   "dealPage": {
     "crumbDeals": "Dossiers",
