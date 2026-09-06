@@ -25,7 +25,7 @@ export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'e
 
   // ── Savings chart geometry (SVG, no library) ─────────────────────────────
   const S = I.savingsMonthly
-  const W = 560, H = 190, padL = 44, padR = 12, padT = 14, padB = 26
+  const W = 560, H = 190, padL = 44, padR = 12, padT = 26, padB = 26
   const innerW = W - padL - padR, innerH = H - padT - padB
   const maxBar = Math.max(...S.map((m) => Math.max(m.saved, m.potential)), 1)
   const maxCum = Math.max(...S.map((m) => m.cumulative), 1)
@@ -83,7 +83,7 @@ export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'e
                   <polyline points={linePts} fill="none" stroke="var(--tl-ink)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
                   {S.map((m, i) => <circle key={m.key} cx={cx(i)} cy={yCum(m.cumulative)} r={i === S.length - 1 ? 4 : 2.5} fill={i === S.length - 1 ? 'var(--tl-ink)' : 'var(--tl-surface)'} stroke="var(--tl-ink)" strokeWidth="2" />)}
                   {/* Running-total label: sits left of the last point so it never collides with the top gridline. */}
-                  {S.length > 0 && <text x={cx(S.length - 1) - 9} y={Math.max(padT + 10, yCum(S[S.length - 1].cumulative)) + 4} textAnchor="end" fontSize="10.5" fontWeight="700" fill="var(--tl-ink)" fontFamily="var(--font-geist-sans)">{fmtCompact(S[S.length - 1].cumulative, cur)}</text>}
+                  {S.length > 0 && <text x={cx(S.length - 1) + 4} y={yCum(S[S.length - 1].cumulative) - 9} textAnchor="end" fontSize="10.5" fontWeight="700" fill="var(--tl-ink)" fontFamily="var(--font-geist-sans)">{fmtCompact(S[S.length - 1].cumulative, cur)}</text>}
                 </svg>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-[11.5px] text-ink-2">
                   <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px] bg-green" />{t('legendSaved')}</span>
