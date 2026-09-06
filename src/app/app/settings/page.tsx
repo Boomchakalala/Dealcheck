@@ -62,8 +62,8 @@ export default async function SettingsPage() {
     <>
       <SettingsClient
         email={user.email || ''}
-        firstName={profile?.first_name || ''}
-        lastName={profile?.last_name || ''}
+        firstName={(profile?.contact_name || '').trim().split(/\s+/)[0] || ''}
+        lastName={(profile?.contact_name || '').trim().split(/\s+/).slice(1).join(' ')}
         plan={plan}
         planLabel={planLabel}
         usageCount={profile?.usage_count || 0}

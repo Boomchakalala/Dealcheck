@@ -11,15 +11,17 @@ export async function POST(request: Request) {
 
     const { firstName, lastName } = await request.json()
 
+    // profiles has one name column, contact_name (no first_name/last_name — verified
+    // against information_schema). The form keeps two fields; we store them joined.
+    const contactName = [firstName, lastName].map((s: unknown) => (typeof s === 'string' ? s.trim() : '')).filter(Boolean).join(' ') || null
+
     const { error } = await supabase
       .from('profiles')
-      .update({
-        first_name: firstName || null,
-        last_name: lastName || null,
-      } as any)
+      .update({ contact_name: contactName })
       .eq('id', user.id)
 
     if (error) {
+      console.error('[TermLift] profile update failed:', error.message)
       return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
     }
 
