@@ -1301,16 +1301,16 @@
     "trust3": "~2 min",
     "logosCap": "Conçu pour les devis de fournisseurs comme",
     "shot": {
-      "url": "termlift.com/app/deal/cloudstore",
-      "type": "Renouvellement",
-      "verdict": "Poussez plus loin",
-      "sub": "Bonnes conditions de base, 7 800 €/an à aller chercher",
+      "url": "termlift.com/app/deal/atlassian",
+      "type": "Extension",
+      "verdict": "D'abord le périmètre, ensuite le prix",
+      "sub": "Bon produit, 15 145 $ à aller chercher",
       "pushFor": "À demander",
       "leverage": "Vos leviers",
-      "ask1": "Plafonner l'indexation à 3 %",
-      "ask2": "Remise fidélité de 10 %",
-      "lev1": "Prépaiement sur 3 ans = leur trésorerie",
-      "lev2": "Deux alternatives crédibles"
+      "ask1": "120 sièges Premium + 80 Standard",
+      "ask2": "Remise volume de 8 %",
+      "lev1": "Une extension de 67 %, c'est leur croissance",
+      "lev2": "L'usage montre qui ne fait que consulter"
     },
     "how": {
       "eyebrow": "Comment ça marche",
@@ -1327,18 +1327,18 @@
       "s3title": "Négociez vous-même",
       "s3body": "Un e-mail prêt à envoyer, dans le ton qui convient à la relation. Importez la réponse du fournisseur et obtenez le tour 2.",
       "s4tag": "Option · {pct} % des économies",
-      "s4title": "Ou confiez-la à TermLift",
+      "s4title": "Ou laissez TermLift s'en charger",
       "s4body": "À tout moment, passez-nous la main. Un négociateur mène les échanges, vous validez le résultat. Pas d'économies, pas de frais.",
       "addon": "À tout moment"
     },
     "who": {
       "eyebrow": "Pour qui",
-      "title": "Vous avez reçu le devis. Vous n'êtes pas un service achats.",
+      "title": "Pas de service achats ? Vous en avez un maintenant.",
       "lead": "Fondateurs, responsables opérations, office managers, premiers acheteurs. TermLift vous donne ce qu'un grand compte a d'office : un chiffre à défendre, les mots pour le dire, et quelqu'un pour le faire à votre place si vous préférez.",
       "p1": "SaaS, logistique, prestations, IT — tout devis avec un total dessus",
       "p2": "À partir d'un PDF, d'une capture d'écran ou d'un e-mail collé",
       "p3": "Fichiers supprimés après extraction, systématiquement",
-      "imgAlt": "Photo — la personne qui a reçu le devis",
+      "imgAlt": "Capture — l'espace TermLift avec six dossiers fournisseurs",
       "imgHint": "Fondateur ou responsable ops à son bureau. Vrai bureau, pas de sourire de banque d'images."
     },
     "tour": {
@@ -1359,7 +1359,7 @@
       "t2b3": "Tour 2, 3… sur le même dossier",
       "t2img": "Capture — section e-mail",
       "t3k": "Étape 4",
-      "t3title": "Ou confiez-le à un négociateur",
+      "t3title": "Ou laissez TermLift s'en charger pour vous",
       "t3body": "Vous voyez chaque changement de statut — envoyé, examiné, en négociation, offre reçue — et rien n'est conclu sans vous.",
       "t3b1": "Une seule personne responsable de votre dossier",
       "t3b2": "Vous validez le résultat",
@@ -1375,8 +1375,8 @@
       "saved": "{pct} économisés"
     },
     "quote": {
-      "text": "« J'ai envoyé l'e-mail en ton direct le mardi. Le vendredi, l'indexation était plafonnée et nous avions 10 % de remise. Je n'aurais jamais su quoi demander. »",
-      "cite": "Responsable ops, éditeur SaaS de 60 personnes · renouvellement CloudStore, 23 k€ économisés sur la durée",
+      "text": "« J'ai envoyé l'e-mail en ton direct le mardi. Le vendredi, 80 sièges étaient passés en Standard et nous avions 8 % sur le reste. Je n'aurais jamais su quoi demander. »",
+      "cite": "Responsable IT, scale-up de 200 personnes · extension Atlassian, 15 k$ économisés",
       "imgAlt": "Photo"
     },
     "neg": {

@@ -1,0 +1,31 @@
+{
+  "landing": {
+    "shot": {
+      "url": "termlift.com/app/deal/atlassian",
+      "type": "Extension",
+      "verdict": "D'abord le périmètre, ensuite le prix",
+      "sub": "Bon produit, 15 145 $ à aller chercher",
+      "pushFor": "À demander",
+      "leverage": "Vos leviers",
+      "ask1": "120 sièges Premium + 80 Standard",
+      "ask2": "Remise volume de 8 %",
+      "lev1": "Une extension de 67 %, c'est leur croissance",
+      "lev2": "L'usage montre qui ne fait que consulter"
+    },
+    "how": {
+      "s4title": "Ou laissez TermLift s'en charger"
+    },
+    "who": {
+      "title": "Pas de service achats ? Vous en avez un maintenant.",
+      "imgAlt": "Capture — l'espace TermLift avec six dossiers fournisseurs"
+    },
+    "tour": {
+      "t3title": "Ou laissez TermLift s'en charger pour vous"
+    },
+    "quote": {
+      "text": "« J'ai envoyé l'e-mail en ton direct le mardi. Le vendredi, 80 sièges étaient passés en Standard et nous avions 8 % sur le reste. Je n'aurais jamais su quoi demander. »",
+      "cite": "Responsable IT, scale-up de 200 personnes · extension Atlassian, 15 k$ économisés",
+      "imgAlt": "Photo"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "landing": {
+    "shot": {
+      "url": "termlift.com/app/deal/atlassian",
+      "type": "Expansion",
+      "verdict": "Fix the shape, then the price",
+      "sub": "Right product, $15,145 on the table",
+      "pushFor": "Push for",
+      "leverage": "Your leverage",
+      "ask1": "120 Premium + 80 Standard seats",
+      "ask2": "8% volume discount",
+      "lev1": "A 67% expansion is their growth story",
+      "lev2": "Usage data shows who only views"
+    },
+    "how": {
+      "s4title": "Or let TermLift handle it"
+    },
+    "who": {
+      "title": "No procurement team? Now you have one.",
+      "imgAlt": "Screenshot — the TermLift workspace with six vendor deals"
+    },
+    "tour": {
+      "t3title": "Or let TermLift handle it for you"
+    },
+    "quote": {
+      "text": "“I sent the Direct email on Tuesday. By Friday, 80 seats were on Standard and we had 8% off the rest. I'd never have known to ask.”",
+      "cite": "Head of IT, 200-person scale-up · Atlassian expansion, $15k saved",
+      "imgAlt": "Photo"
+    }
+  }
+}

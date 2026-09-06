@@ -4,7 +4,7 @@ import { ArrowRight, Check } from 'lucide-react'
 import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import Image from 'next/image'
-import { Btn, Chip, ImageSlot, ScoreRing, StageRail } from '@/components/system'
+import { Btn, Chip, ScoreRing, StageRail } from '@/components/system'
 import { LogoStrip } from '@/components/LogoStrip'
 
 /** A product screenshot in a soft device frame — same treatment for every picture on the page. */
@@ -51,9 +51,9 @@ export default async function LandingPage() {
   ]
 
   const tours = [
-    { k: t('tour.t1k'), title: t('tour.t1title'), body: t('tour.t1body'), bullets: [t('tour.t1b1'), t('tour.t1b2'), t('tour.t1b3')], img: t('tour.t1img'), src: '/landing/tour-playbook.png', w: 1120, h: 709, flip: false },
-    { k: t('tour.t2k'), title: t('tour.t2title'), body: t('tour.t2body'), bullets: [t('tour.t2b1'), t('tour.t2b2'), t('tour.t2b3')], img: t('tour.t2img'), src: '/landing/tour-email.png', w: 1120, h: 606, flip: true },
-    { k: t('tour.t3k'), title: t('tour.t3title'), body: t('tour.t3body'), bullets: [t('tour.t3b1'), t('tour.t3b2'), t('tour.t3b3')], img: t('tour.t3img'), src: '/landing/tour-negotiate.png', w: 840, h: 716, flip: false },
+    { k: t('tour.t1k'), title: t('tour.t1title'), body: t('tour.t1body'), bullets: [t('tour.t1b1'), t('tour.t1b2'), t('tour.t1b3')], img: t('tour.t1img'), src: '/landing/tour-playbook-v3.png', w: 1104, h: 839, flip: false },
+    { k: t('tour.t2k'), title: t('tour.t2title'), body: t('tour.t2body'), bullets: [t('tour.t2b1'), t('tour.t2b2'), t('tour.t2b3')], img: t('tour.t2img'), src: '/landing/tour-email-v3.png', w: 1120, h: 606, flip: true },
+    { k: t('tour.t3k'), title: t('tour.t3title'), body: t('tour.t3body'), bullets: [t('tour.t3b1'), t('tour.t3b2'), t('tour.t3b3')], img: t('tour.t3img'), src: '/landing/tour-negotiate-v3.png', w: 840, h: 716, flip: false },
   ]
 
   const wrap = 'max-w-[1120px] mx-auto px-5 sm:px-7'
@@ -73,7 +73,7 @@ export default async function LandingPage() {
             <p className="text-[15.5px] leading-[1.5] text-ink-2 max-w-[48ch] mt-4">{t('lead')}</p>
             <div className="flex flex-wrap items-center gap-4 mt-5">
               <Btn href="/try" variant="primary" size="lg">{t('ctaPrimary')}</Btn>
-              <Link href="/demo" className="text-[13.5px] font-semibold text-ink-2 hover:text-ink inline-flex items-center gap-1.5 no-underline transition-colors">
+              <Link href="/demo/deal/demo-atlassian" className="text-[13.5px] font-semibold text-ink-2 hover:text-ink inline-flex items-center gap-1.5 no-underline transition-colors">
                 {t('ctaSecondary')} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -91,7 +91,7 @@ export default async function LandingPage() {
           <Shot url={t('shot.url')}>
             <div className="p-4 flex flex-col gap-3">
               <div className="flex items-center gap-3.5">
-                <ScoreRing score={62} size={72} />
+                <ScoreRing score={48} size={72} />
                 <div className="min-w-0">
                   <div className="flex gap-1.5 mb-1"><Chip>{t('shot.type')}</Chip><Chip tone="green">{ladder('full')}</Chip></div>
                   <div className="font-display font-bold text-[17px] leading-tight">{t('shot.verdict')}</div>
@@ -103,7 +103,7 @@ export default async function LandingPage() {
                 <div className="rounded-xl border border-green-line bg-green-soft px-3.5 py-3">
                   <p className="tl-label text-green-deep mb-2">{t('shot.pushFor')}</p>
                   <ol className="m-0 p-0 list-none flex flex-col gap-2 text-[13px]">
-                    {[[t('shot.ask1'), '€6,000'], [t('shot.ask2'), '€1,800']].map(([a, v], i) => (
+                    {[[t('shot.ask1'), '$11,088'], [t('shot.ask2'), '$4,057']].map(([a, v], i) => (
                       <li key={a} className="flex items-start gap-2">
                         <span className="w-[18px] h-[18px] rounded-full bg-green text-white tl-label text-[10px] grid place-items-center shrink-0 mt-px">{i + 1}</span>
                         <span className="flex-1">{a}</span>
@@ -147,7 +147,7 @@ export default async function LandingPage() {
       {/* ═══ WHO IT'S FOR — photo slot ═══ */}
       <section className="py-12 sm:py-14">
         <div className={`${wrap} grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-10 items-center`}>
-          <Frame src="/landing/who-home.png" alt={t('who.imgAlt')} width={1220} height={900} />
+          <Frame src="/landing/who-home-v3.png" alt={t('who.imgAlt')} width={1220} height={660} />
           <div>
             <Eyebrow>{t('who.eyebrow')}</Eyebrow>
             <h2 className="font-display font-extrabold text-[26px] sm:text-[32px] leading-[1.08] tracking-[-0.03em] max-w-[24ch] mt-2.5">{t('who.title')}</h2>
@@ -192,8 +192,8 @@ export default async function LandingPage() {
             {t('wins.title', { count: SHOWCASE_COUNT, total: Math.round(SHOWCASE_TOTAL_EUR / 1000) })}
           </h2>
           <p className="text-[15px] text-ink-2 max-w-[56ch] mt-2.5 leading-[1.5]">{t('wins.lead')}</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-6">
-            {SHOWCASE_CARDS.slice(0, 3).map((d) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+            {SHOWCASE_CARDS.map((d) => (
               <Link key={d.id} href={`/demo/deal/${d.id}`} className="bg-surface border border-line rounded-[14px] overflow-hidden no-underline hover:border-[#C9D3CE] hover:shadow-[0_20px_40px_-24px_rgba(16,26,23,0.3)] transition-all">
                 <div className="px-4 py-3 border-b border-line flex justify-between items-center font-display font-bold text-[14px]">{d.vendor}<span className="tl-label text-ink-3">{d.cat}</span></div>
                 <div className="p-4 grid grid-cols-[1fr_auto_1fr] gap-2.5 items-end">
@@ -209,7 +209,7 @@ export default async function LandingPage() {
             ))}
           </div>
           <figure className="mt-6 m-0 bg-surface border border-line rounded-[16px] px-6 py-5 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-5 items-center">
-            <ImageSlot alt={t('quote.imgAlt')} ratio="1 / 1" className="w-14 h-14 !min-h-0 !p-0 [&_p]:hidden" rounded="rounded-full" />
+            <div aria-label={t('quote.imgAlt')} className="w-14 h-14 rounded-full bg-green-soft border border-green-line grid place-items-center font-display font-bold text-[16px] text-green-deep">MR</div>
             <div>
               <blockquote className="m-0 font-display font-semibold text-[16px] sm:text-[18px] leading-[1.35] tracking-[-0.01em]">{t('quote.text')}</blockquote>
               <figcaption className="text-[12.5px] text-ink-2 mt-2">{t('quote.cite')}</figcaption>

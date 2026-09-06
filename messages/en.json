@@ -1301,16 +1301,16 @@
     "trust3": "~2 min",
     "logosCap": "Built for quotes from vendors like",
     "shot": {
-      "url": "termlift.com/app/deal/cloudstore",
-      "type": "Renewal",
-      "verdict": "Push harder",
-      "sub": "Good base terms, €7,800/yr on the table",
+      "url": "termlift.com/app/deal/atlassian",
+      "type": "Expansion",
+      "verdict": "Fix the shape, then the price",
+      "sub": "Right product, $15,145 on the table",
       "pushFor": "Push for",
       "leverage": "Your leverage",
-      "ask1": "Cap escalator at 3%",
-      "ask2": "10% loyalty discount",
-      "lev1": "3-year prepay = their cash",
-      "lev2": "Two credible alternatives"
+      "ask1": "120 Premium + 80 Standard seats",
+      "ask2": "8% volume discount",
+      "lev1": "A 67% expansion is their growth story",
+      "lev2": "Usage data shows who only views"
     },
     "how": {
       "eyebrow": "How it works",
@@ -1327,18 +1327,18 @@
       "s3title": "Negotiate it yourself",
       "s3body": "A ready-to-send email in the tone that fits the relationship. Upload the vendor's reply and get round 2.",
       "s4tag": "Add-on · {pct}% of savings",
-      "s4title": "Or hand it to TermLift",
+      "s4title": "Or let TermLift handle it",
       "s4body": "At any point, hand the deal over. A negotiator runs the back-and-forth, you approve the outcome. No savings, no fee.",
       "addon": "Any time"
     },
     "who": {
       "eyebrow": "Who it's for",
-      "title": "You got the quote. You're not a procurement team.",
+      "title": "No procurement team? Now you have one.",
       "lead": "Founders, ops leads, office managers, first-time buyers. TermLift gives you what an enterprise buyer has by default: a number to push for, the words to say, and someone to do it for you if you'd rather not.",
       "p1": "SaaS, logistics, services, IT — any quote with a total on it",
       "p2": "Works from a PDF, a screenshot, or a pasted email",
       "p3": "Files deleted after extraction, every time",
-      "imgAlt": "Photo — the person who got the quote",
+      "imgAlt": "Screenshot — the TermLift workspace with six vendor deals",
       "imgHint": "Founder or ops lead at their desk. Real office, not stock-smiley."
     },
     "tour": {
@@ -1359,7 +1359,7 @@
       "t2b3": "Round 2, 3… on the same deal",
       "t2img": "Screenshot — email section",
       "t3k": "Step 4",
-      "t3title": "Or hand it to a negotiator",
+      "t3title": "Or let TermLift handle it for you",
       "t3body": "You see every status change — submitted, reviewed, negotiating, offer received — and nothing is agreed without you.",
       "t3b1": "One person owns your deal",
       "t3b2": "You approve the outcome",
@@ -1375,8 +1375,8 @@
       "saved": "{pct} saved"
     },
     "quote": {
-      "text": "“I sent the Direct email on Tuesday. By Friday the escalator was capped and we had a 10% discount. I'd never have known to ask.”",
-      "cite": "Ops lead, 60-person SaaS company · CloudStore renewal, €23k saved over term",
+      "text": "“I sent the Direct email on Tuesday. By Friday, 80 seats were on Standard and we had 8% off the rest. I'd never have known to ask.”",
+      "cite": "Head of IT, 200-person scale-up · Atlassian expansion, $15k saved",
       "imgAlt": "Photo"
     },
     "neg": {
