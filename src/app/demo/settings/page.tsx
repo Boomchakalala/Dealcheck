@@ -23,13 +23,13 @@ function OptionCard({ selected, onClick, title, desc, icon: Icon }: OptionCardPr
   return (
     <button
       onClick={onClick}
-      className={`p-3.5 rounded-xl border-2 transition-all text-left ${
-        selected ? 'border-emerald-500 bg-emerald-50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'
+      className={`p-3.5 rounded-[10px] border-2 transition-all text-left ${
+        selected ? 'border-green bg-green-soft ' : 'border-line bg-white hover:border-[#C9D3CE]'
       }`}
     >
-      {Icon && <Icon className={`w-4 h-4 mb-1.5 ${selected ? 'text-emerald-600' : 'text-slate-500'}`} />}
-      <p className={`text-[13px] font-bold ${selected ? 'text-emerald-700' : 'text-slate-900'}`} style={{ fontFamily: 'Sora, sans-serif' }}>{title}</p>
-      {desc && <p className="text-[11.5px] text-slate-500 mt-0.5 leading-snug">{desc}</p>}
+      {Icon && <Icon className={`w-4 h-4 mb-1.5 ${selected ? 'text-green-deep' : 'text-ink-3'}`} />}
+      <p className={`text-[13px] font-bold ${selected ? 'text-green-deep' : 'text-ink'} font-display`}>{title}</p>
+      {desc && <p className="text-[11.5px] text-ink-3 mt-0.5 leading-snug">{desc}</p>}
     </button>
   )
 }
@@ -48,29 +48,29 @@ export default function DemoSettingsPage() {
   }
 
   return (
-    <div className="-mx-5 sm:-mx-8 -mt-8 bg-slate-50 min-h-screen">
+    <div className="-mx-5 sm:-mx-8 -mt-8 bg-ground min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-7">
-        <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Settings</h1>
-        <p className="text-[13px] text-slate-500 mt-0.5">Tune how TermLift negotiates on your behalf</p>
+      <div className="bg-white border-b border-line px-5 sm:px-8 py-7">
+        <h1 className="text-[20px] sm:text-[26px] font-bold text-ink font-display">Settings</h1>
+        <p className="text-[13px] text-ink-3 mt-0.5">Tune how TermLift negotiates on your behalf</p>
       </div>
 
       <div className="px-5 sm:px-8 py-6 max-w-3xl">
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 md:p-8 shadow-sm">
+        <div className="bg-white border border-line rounded-[14px] p-4 sm:p-6 md:p-8 ">
           <div className="flex items-center gap-3 mb-4 sm:mb-6">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-              <Handshake className="w-5 h-5 text-emerald-600" />
+            <div className="w-10 h-10 rounded-[10px] bg-green-soft flex items-center justify-center">
+              <Handshake className="w-5 h-5 text-green-deep" />
             </div>
             <div>
-              <h2 className="text-[18px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Negotiation preferences</h2>
-              <p className="text-[12.5px] text-slate-500">Every analysis is tailored to these settings</p>
+              <h2 className="text-[18px] font-bold text-ink font-display">Negotiation preferences</h2>
+              <p className="text-[12.5px] text-ink-3">Every analysis is tailored to these settings</p>
             </div>
           </div>
 
           <div className="space-y-5 sm:space-y-7">
             {/* Top priority */}
             <div>
-              <p className="text-[12px] font-medium text-slate-500 mb-3 flex items-center gap-1.5">
+              <p className="text-[12px] font-medium text-ink-3 mb-3 flex items-center gap-1.5">
                 <Target className="w-3.5 h-3.5" />Top priority
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -82,7 +82,7 @@ export default function DemoSettingsPage() {
 
             {/* Email tone */}
             <div>
-              <p className="text-[12px] font-medium text-slate-500 mb-3 flex items-center gap-1.5">
+              <p className="text-[12px] font-medium text-ink-3 mb-3 flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5" />Default email tone
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -94,7 +94,7 @@ export default function DemoSettingsPage() {
 
             {/* Negotiation style */}
             <div>
-              <p className="text-[12px] font-medium text-slate-500 mb-3 flex items-center gap-1.5">
+              <p className="text-[12px] font-medium text-ink-3 mb-3 flex items-center gap-1.5">
                 <Swords className="w-3.5 h-3.5" />Negotiation style
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -106,7 +106,7 @@ export default function DemoSettingsPage() {
 
             {/* Payment terms */}
             <div>
-              <p className="text-[12px] font-medium text-slate-500 mb-3">Payment terms preference</p>
+              <p className="text-[12px] font-medium text-ink-3 mb-3">Payment terms preference</p>
               <div className="grid grid-cols-2 gap-2.5">
                 <OptionCard selected={payment === 'no_preference'} onClick={() => setPayment('no_preference')} title="No preference" />
                 <OptionCard selected={payment === 'net_30'} onClick={() => setPayment('net_30')} title="Net 30" />
@@ -117,7 +117,7 @@ export default function DemoSettingsPage() {
 
             {/* Auto-renewal */}
             <div>
-              <p className="text-[12px] font-medium text-slate-500 mb-3">Auto-renewal clauses</p>
+              <p className="text-[12px] font-medium text-ink-3 mb-3">Auto-renewal clauses</p>
               <div className="grid grid-cols-2 gap-2.5">
                 <OptionCard selected={autoRenewal === 'fine'} onClick={() => setAutoRenewal('fine')} title="Fine with it" desc="No issue with auto-renewal" />
                 <OptionCard selected={autoRenewal === 'prefer_opt_in'} onClick={() => setAutoRenewal('prefer_opt_in')} title="Manual control" desc="Want to opt in each time" />
@@ -126,23 +126,23 @@ export default function DemoSettingsPage() {
 
             {/* Company */}
             <div>
-              <p className="text-[12px] font-medium text-slate-500 mb-3 flex items-center gap-1.5">
+              <p className="text-[12px] font-medium text-ink-3 mb-3 flex items-center gap-1.5">
                 <Building2 className="w-3.5 h-3.5" />Company
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <input readOnly value="Acme Corp" className="px-3 py-2.5 text-[13px] border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-medium" />
-                <input readOnly value="51-200" className="px-3 py-2.5 text-[13px] border border-slate-200 rounded-lg bg-slate-50 text-slate-700" />
-                <input readOnly value="SaaS" className="px-3 py-2.5 text-[13px] border border-slate-200 rounded-lg bg-slate-50 text-slate-700" />
+                <input readOnly value="Acme Corp" className="px-3 py-2.5 text-[13px] border border-line rounded-lg bg-ground text-ink-2 font-medium" />
+                <input readOnly value="51-200" className="px-3 py-2.5 text-[13px] border border-line rounded-lg bg-ground text-ink-2" />
+                <input readOnly value="SaaS" className="px-3 py-2.5 text-[13px] border border-line rounded-lg bg-ground text-ink-2" />
               </div>
             </div>
 
             {/* Save area */}
-            <div className="pt-4 border-t border-slate-100">
+            <div className="pt-4 border-t border-line-2">
               {showSavePrompt ? (
-                <div className="flex items-center justify-between gap-3 p-4 rounded-xl bg-emerald-50 border-2 border-emerald-300">
+                <div className="flex items-center justify-between gap-3 p-4 rounded-[10px] bg-green-soft border-2 border-green-line">
                   <div className="flex-1">
-                    <p className="text-[13.5px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>Sign up to save these preferences</p>
-                    <p className="text-[12px] text-slate-600 mt-0.5">Your negotiation profile carries into every quote you analyse.</p>
+                    <p className="text-[13.5px] font-bold text-ink font-display">Sign up to save these preferences</p>
+                    <p className="text-[12px] text-ink-2 mt-0.5">Your negotiation profile carries into every quote you analyse.</p>
                   </div>
                   <Link
                     href="/login?from=demo"
@@ -155,7 +155,7 @@ export default function DemoSettingsPage() {
               ) : (
                 <button
                   onClick={triggerSave}
-                  className="px-5 py-2.5 text-[14px] font-semibold rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+                  className="px-5 py-2.5 text-[14px] font-semibold rounded-[10px] bg-ink text-white hover:bg-ink transition-colors"
                 >
                   Save preferences
                 </button>

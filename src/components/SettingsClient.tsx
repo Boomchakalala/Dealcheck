@@ -140,12 +140,12 @@ export function SettingsClient({
   }
 
   const bgColorMap: Record<string, string> = {
-    emerald: 'bg-emerald-500/10', blue: 'bg-blue-500/10', amber: 'bg-amber-500/10',
-    red: 'bg-red-500/10', purple: 'bg-purple-500/10', slate: 'bg-slate-500/10',
+    emerald: 'bg-green/10', blue: 'bg-blue-500/10', amber: 'bg-amber-500/10',
+    red: 'bg-red-500/10', purple: 'bg-purple-500/10', slate: 'bg-ink-3/10',
   }
   const textColorMap: Record<string, string> = {
-    emerald: 'text-emerald-500', blue: 'text-blue-500', amber: 'text-amber-500',
-    red: 'text-red-500', purple: 'text-purple-500', slate: 'text-slate-500',
+    emerald: 'text-green-deep', blue: 'text-blue-500', amber: 'text-amber-500',
+    red: 'text-red-500', purple: 'text-purple-500', slate: 'text-ink-3',
   }
 
   const current = sectionMeta[activeSection]
@@ -159,12 +159,12 @@ export function SettingsClient({
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
 
         {/* Mobile nav — dropdown select (avoids clipped horizontal scroll) */}
-        <div className="flex-shrink-0 bg-white px-4 py-3 border-b border-slate-200 md:hidden">
+        <div className="flex-shrink-0 bg-white px-4 py-3 border-b border-line md:hidden">
           <div className="flex gap-2">
             <select
               value={activeSection}
               onChange={(e) => setActiveSection(e.target.value as Section)}
-              className="flex-1 px-3 py-2.5 text-[13px] border border-slate-200 rounded-xl bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
+              className="flex-1 px-3 py-2.5 text-[13px] border border-line rounded-[10px] bg-white text-ink-2 focus:outline-none  focus:border-green/30 focus:border-green transition-all"
             >
               {navGroups.flatMap(group =>
                 group.items.map(item => (
@@ -174,7 +174,7 @@ export function SettingsClient({
             </select>
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-1.5 px-3 py-2.5 text-[12px] font-medium text-slate-500 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-2.5 text-[12px] font-medium text-ink-3 border border-line rounded-[10px] hover:bg-surface-2 transition-all whitespace-nowrap"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -190,7 +190,7 @@ export function SettingsClient({
         <div className="hidden md:flex md:flex-col w-[220px] flex-shrink-0 bg-surface px-3 py-4 border-r border-line justify-between">
           <div>{navGroups.map((group) => (
             <div key={group.label}>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2 pt-2">{group.label}</p>
+              <p className="text-[10px] font-bold text-ink-3 uppercase tracking-wider mb-2 px-2 pt-2">{group.label}</p>
               <nav className="flex flex-col space-y-0.5">
                 {group.items.map((item) => {
                   const isDanger = (item as any).isDanger
@@ -217,7 +217,7 @@ export function SettingsClient({
                       }`} />
                       {item.name}
                       {badge && (
-                        <span className="ml-auto text-[9px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                        <span className="ml-auto text-[9px] font-bold text-green-deep bg-green/10 px-1.5 py-0.5 rounded">
                           {badge}
                         </span>
                       )}
@@ -229,9 +229,9 @@ export function SettingsClient({
           ))}</div>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-[13px] font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-all text-left mt-2"
+            className="flex items-center gap-2.5 w-full px-3 py-2 rounded-[10px] text-[13px] font-medium text-ink-3 hover:bg-surface-2 hover:text-ink-2 transition-all text-left mt-2"
           >
-            <svg className="w-4 h-4 flex-shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-4 h-4 flex-shrink-0 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
@@ -245,10 +245,10 @@ export function SettingsClient({
           <div className={`bg-surface border ${activeSection === 'danger' ? 'border-risk-line' : 'border-line'} rounded-[14px] p-4 sm:p-5 max-w-[860px]`}>
             {/* Section header */}
             <div className="flex items-center gap-3 mb-5">
-              <div className={`w-9 h-9 rounded-xl ${bgColorMap[current.color]} flex items-center justify-center`}>
+              <div className={`w-9 h-9 rounded-[10px] ${bgColorMap[current.color]} flex items-center justify-center`}>
                 <current.icon className={`w-[18px] h-[18px] ${textColorMap[current.color]}`} />
               </div>
-              <h3 className="text-[14px] font-bold uppercase tracking-wide text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{current.title}</h3>
+              <h3 className="text-[14px] font-bold uppercase tracking-wide text-ink font-display">{current.title}</h3>
             </div>
 
             {/* ═══ PROFILE ═══ */}
@@ -256,17 +256,17 @@ export function SettingsClient({
               <div className="space-y-6">
                 {/* Avatar + info */}
                 <div className="flex items-center gap-5">
-                  <div className="w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 text-2xl font-bold text-white shadow-md">
+                  <div className="w-20 h-20 rounded-full bg-green flex items-center justify-center flex-shrink-0 text-2xl font-bold text-white shadow-md">
                     {avatarInitial}
                   </div>
                   <div>
-                    <h4 className="text-[15px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>
+                    <h4 className="text-[15px] font-bold text-ink font-display">
                       {firstName || lastName ? `${firstName} ${lastName}`.trim() : email.split('@')[0]}
                     </h4>
-                    <p className="text-[12px] text-slate-500 mt-0.5">{email}</p>
+                    <p className="text-[12px] text-ink-3 mt-0.5">{email}</p>
                     <div className="flex items-center gap-2 mt-2">
                       {isAdmin && <span className="text-[11px] font-bold text-white bg-ink px-2 py-0.5 rounded-full">Admin</span>}
-                      <span className="text-[11px] text-slate-400">{t('settingsClient.memberSince', { date: memberSince })}</span>
+                      <span className="text-[11px] text-ink-3">{t('settingsClient.memberSince', { date: memberSince })}</span>
                     </div>
                   </div>
                 </div>
@@ -274,29 +274,29 @@ export function SettingsClient({
                 {/* Name fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[12px] font-medium text-slate-500 mb-1.5 block">{t('settingsClient.firstName')}</label>
-                    <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder={t('settingsClient.firstName')} className="w-full px-4 py-3 text-[13px] border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all" />
+                    <label className="text-[12px] font-medium text-ink-3 mb-1.5 block">{t('settingsClient.firstName')}</label>
+                    <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder={t('settingsClient.firstName')} className="w-full px-4 py-3 text-[13px] border border-line rounded-[10px] focus:outline-none  focus:border-green/30 focus:border-green transition-all" />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-slate-500 mb-1.5 block">{t('settingsClient.lastName')}</label>
-                    <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder={t('settingsClient.lastName')} className="w-full px-4 py-3 text-[13px] border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all" />
+                    <label className="text-[12px] font-medium text-ink-3 mb-1.5 block">{t('settingsClient.lastName')}</label>
+                    <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder={t('settingsClient.lastName')} className="w-full px-4 py-3 text-[13px] border border-line rounded-[10px] focus:outline-none  focus:border-green/30 focus:border-green transition-all" />
                   </div>
                 </div>
-                <button onClick={handleSaveName} disabled={nameSaving} className="px-4 py-2 text-[12px] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors disabled:opacity-50">
+                <button onClick={handleSaveName} disabled={nameSaving} className="px-4 py-2 text-[12px] font-semibold text-white bg-green hover:bg-green-deep rounded-[10px] transition-colors disabled:opacity-50">
                   {nameSaved ? <span className="flex items-center gap-1"><Check className="w-3 h-3" />{t('settingsClient.saved')}</span> : nameSaving ? t('settingsClient.saving') : t('settingsClient.saveName')}
                 </button>
 
                 {/* Email + password */}
-                <div className="pt-4 border-t border-slate-100">
+                <div className="pt-4 border-t border-line-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[12px] font-medium text-slate-500">{t('settingsClient.email')}</p>
-                      <p className="text-[13px] text-slate-700 mt-0.5">{email}</p>
+                      <p className="text-[12px] font-medium text-ink-3">{t('settingsClient.email')}</p>
+                      <p className="text-[13px] text-ink-2 mt-0.5">{email}</p>
                     </div>
                     {resetSent ? (
-                      <span className="text-[12px] text-emerald-700 font-medium">{t('settingsClient.resetEmailSent')}</span>
+                      <span className="text-[12px] text-green-deep font-medium">{t('settingsClient.resetEmailSent')}</span>
                     ) : (
-                      <button onClick={handlePasswordReset} disabled={resetLoading} className="text-[12px] font-medium text-emerald-600 hover:text-emerald-700 transition-colors disabled:opacity-50">
+                      <button onClick={handlePasswordReset} disabled={resetLoading} className="text-[12px] font-medium text-green-deep hover:text-green-deep transition-colors disabled:opacity-50">
                         {resetLoading ? t('settingsClient.sending') : t('settingsClient.sendResetEmail')}
                       </button>
                     )}
@@ -304,43 +304,43 @@ export function SettingsClient({
                 </div>
 
                 {/* Usage stats */}
-                <div className="pt-5 border-t border-slate-100">
-                  <p className="text-[12px] font-bold text-slate-900 uppercase tracking-wide mb-4">{t('settingsClient.usage')}</p>
+                <div className="pt-5 border-t border-line-2">
+                  <p className="text-[12px] font-bold text-ink uppercase tracking-wide mb-4">{t('settingsClient.usage')}</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <div className="bg-ground rounded-[10px] p-4 border border-line">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center"><FileText className="w-3.5 h-3.5 text-slate-500" /></div>
-                        <p className="text-[11px] text-slate-400">{t('settingsClient.analysesTotal')}</p>
+                        <div className="w-7 h-7 rounded-lg bg-surface-2 flex items-center justify-center"><FileText className="w-3.5 h-3.5 text-ink-3" /></div>
+                        <p className="text-[11px] text-ink-3">{t('settingsClient.analysesTotal')}</p>
                       </div>
-                      <p className="text-[22px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{dealCount}</p>
+                      <p className="text-[22px] font-bold text-ink font-display">{dealCount}</p>
                     </div>
-                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <div className="bg-ground rounded-[10px] p-4 border border-line">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center"><BarChart3 className="w-3.5 h-3.5 text-slate-500" /></div>
-                        <p className="text-[11px] text-slate-400">{t('settingsClient.roundsCreated')}</p>
+                        <div className="w-7 h-7 rounded-lg bg-surface-2 flex items-center justify-center"><BarChart3 className="w-3.5 h-3.5 text-ink-3" /></div>
+                        <p className="text-[11px] text-ink-3">{t('settingsClient.roundsCreated')}</p>
                       </div>
-                      <p className="text-[22px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{roundCount}</p>
+                      <p className="text-[22px] font-bold text-ink font-display">{roundCount}</p>
                     </div>
-                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <div className="bg-ground rounded-[10px] p-4 border border-line">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center"><Zap className="w-3.5 h-3.5 text-emerald-500" /></div>
-                        <p className="text-[11px] text-slate-400">{t('settingsClient.activeDeals')}</p>
+                        <div className="w-7 h-7 rounded-lg bg-green-soft flex items-center justify-center"><Zap className="w-3.5 h-3.5 text-green-deep" /></div>
+                        <p className="text-[11px] text-ink-3">{t('settingsClient.activeDeals')}</p>
                       </div>
-                      <p className="text-[22px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{activeDeals}</p>
+                      <p className="text-[22px] font-bold text-ink font-display">{activeDeals}</p>
                     </div>
-                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <div className="bg-ground rounded-[10px] p-4 border border-line">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /></div>
-                        <p className="text-[11px] text-slate-400">{t('settingsClient.closedDeals')}</p>
+                        <div className="w-7 h-7 rounded-lg bg-green-soft flex items-center justify-center"><CheckCircle2 className="w-3.5 h-3.5 text-green-deep" /></div>
+                        <p className="text-[11px] text-ink-3">{t('settingsClient.closedDeals')}</p>
                       </div>
-                      <p className="text-[22px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{closedDeals}</p>
+                      <p className="text-[22px] font-bold text-ink font-display">{closedDeals}</p>
                     </div>
-                    <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
+                    <div className="bg-green-soft rounded-[10px] p-4 border border-green-line">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center"><TrendingUp className="w-3.5 h-3.5 text-white" /></div>
-                        <p className="text-[11px] text-emerald-600">{locale === 'fr' ? '\u00c9conomies' : 'Savings'}</p>
+                        <div className="w-7 h-7 rounded-lg bg-green flex items-center justify-center"><TrendingUp className="w-3.5 h-3.5 text-white" /></div>
+                        <p className="text-[11px] text-green-deep">{locale === 'fr' ? '\u00c9conomies' : 'Savings'}</p>
                       </div>
-                      <p className="text-[22px] font-bold text-emerald-700" style={{ fontFamily: 'Sora, sans-serif' }}>{totalSavings}</p>
+                      <p className="text-[22px] font-bold text-green-deep font-display">{totalSavings}</p>
                     </div>
                   </div>
                 </div>
@@ -364,18 +364,18 @@ export function SettingsClient({
               <div className="space-y-6">
                 {/* Currency */}
                 <div>
-                  <p className="text-[12px] font-medium text-slate-500 mb-3">{t('settingsClient.baseCurrency')}</p>
-                  <p className="text-[11.5px] text-slate-400 mb-3">{t('settingsClient.baseCurrencyDesc')}</p>
+                  <p className="text-[12px] font-medium text-ink-3 mb-3">{t('settingsClient.baseCurrency')}</p>
+                  <p className="text-[11.5px] text-ink-3 mb-3">{t('settingsClient.baseCurrencyDesc')}</p>
                   <div className="flex flex-wrap gap-2">
                     {currencies.map((c) => (
                       <button
                         key={c.val}
                         onClick={() => handleCurrencyChange(c.val)}
                         disabled={currencySaving}
-                        className={`px-3.5 py-2 rounded-xl text-[12px] font-semibold transition-all ${
+                        className={`px-3.5 py-2 rounded-[10px] text-[12px] font-semibold transition-all ${
                           selectedCurrency === c.val
-                            ? 'bg-emerald-600 text-white shadow-sm'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            ? 'bg-green text-white '
+                            : 'bg-surface-2 text-ink-2 hover:bg-line-2'
                         }`}
                       >
                         {c.label}
@@ -386,23 +386,23 @@ export function SettingsClient({
 
                 {/* Language */}
                 <div>
-                  <p className="text-[12px] font-medium text-slate-500 mb-3">{t('settingsClient.language')}</p>
+                  <p className="text-[12px] font-medium text-ink-3 mb-3">{t('settingsClient.language')}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {[{ val: 'en', flag: '\uD83C\uDDEC\uD83C\uDDE7', name: 'English' }, { val: 'fr', flag: '\uD83C\uDDEB\uD83C\uDDF7', name: 'Francais' }].map((l) => (
                       <button
                         key={l.val}
                         onClick={() => handleLanguageChange(l.val)}
-                        className={`flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${
+                        className={`flex items-center gap-3 p-3.5 rounded-[10px] border-2 transition-all ${
                           locale === l.val
-                            ? 'border-emerald-500 bg-emerald-500/5'
-                            : 'border-slate-200 hover:border-slate-300'
+                            ? 'border-green bg-green/5'
+                            : 'border-line hover:border-[#C9D3CE]'
                         }`}
                       >
                         <span className="text-xl">{l.flag}</span>
                         <div className="text-left">
-                          <p className={`text-[13px] font-semibold ${locale === l.val ? 'text-emerald-700' : 'text-slate-700'}`}>{l.name}</p>
+                          <p className={`text-[13px] font-semibold ${locale === l.val ? 'text-green-deep' : 'text-ink-2'}`}>{l.name}</p>
                         </div>
-                        {locale === l.val && <Check className="w-4 h-4 text-emerald-500 ml-auto" />}
+                        {locale === l.val && <Check className="w-4 h-4 text-green-deep ml-auto" />}
                       </button>
                     ))}
                   </div>
@@ -415,7 +415,7 @@ export function SettingsClient({
               <div className="space-y-7">
                 {/* Payment terms */}
                 <div>
-                  <p className="text-[12px] font-medium text-slate-500 mb-3">{t('settingsClient.paymentTerms')}</p>
+                  <p className="text-[12px] font-medium text-ink-3 mb-3">{t('settingsClient.paymentTerms')}</p>
                   <div className="grid grid-cols-2 gap-2.5">
                     {[
                       { val: 'no_preference', label: t('settingsClient.noPreference') },
@@ -430,7 +430,7 @@ export function SettingsClient({
 
                 {/* Top priority */}
                 <div>
-                  <p className="text-[12px] font-medium text-slate-500 mb-3">{t('settingsClient.topPriority')}</p>
+                  <p className="text-[12px] font-medium text-ink-3 mb-3">{t('settingsClient.topPriority')}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     {[
                       { val: 'lowest_price', label: t('settingsClient.lowestPrice'), icon: Zap },
@@ -444,7 +444,7 @@ export function SettingsClient({
 
                 {/* Auto-renewal */}
                 <div>
-                  <p className="text-[12px] font-medium text-slate-500 mb-3">{t('settingsClient.autoRenewal')}</p>
+                  <p className="text-[12px] font-medium text-ink-3 mb-3">{t('settingsClient.autoRenewal')}</p>
                   <div className="grid grid-cols-2 gap-2.5">
                     <SelectCard selected={negPrefs.auto_renewal === 'fine'} onClick={() => setNegPrefs({ ...negPrefs, auto_renewal: 'fine' })} title={t('settingsClient.autoRenewalFine')} desc="No issue with auto-renewal clauses" />
                     <SelectCard selected={negPrefs.auto_renewal === 'prefer_opt_in'} onClick={() => setNegPrefs({ ...negPrefs, auto_renewal: 'prefer_opt_in' })} title={t('settingsClient.autoRenewalOptIn')} desc="Want manual renewal control" />
@@ -453,8 +453,8 @@ export function SettingsClient({
 
                 {/* Contract term strategy */}
                 <div>
-                  <p className="text-[12px] font-medium text-slate-500 mb-1">Contract term strategy</p>
-                  <p className="text-[11px] text-slate-400 mb-3">Controls whether the AI suggests extending the quoted contract term as a negotiation lever.</p>
+                  <p className="text-[12px] font-medium text-ink-3 mb-1">Contract term strategy</p>
+                  <p className="text-[11px] text-ink-3 mb-3">Controls whether the AI suggests extending the quoted contract term as a negotiation lever.</p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     <SelectCard
                       selected={negPrefs.contract_term_strategy === 'match_quote'}
@@ -480,8 +480,8 @@ export function SettingsClient({
                 {/* Email tone (NEW) */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <p className="text-[12px] font-medium text-slate-500">Default email tone</p>
-                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">NEW</span>
+                    <p className="text-[12px] font-medium text-ink-3">Default email tone</p>
+                    <span className="text-[10px] font-bold text-green-deep bg-green/10 px-1.5 py-0.5 rounded">NEW</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     {[
@@ -497,8 +497,8 @@ export function SettingsClient({
                 {/* Negotiation style (NEW) */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <p className="text-[12px] font-medium text-slate-500">Negotiation style</p>
-                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">NEW</span>
+                    <p className="text-[12px] font-medium text-ink-3">Negotiation style</p>
+                    <span className="text-[10px] font-bold text-green-deep bg-green/10 px-1.5 py-0.5 rounded">NEW</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     {[
@@ -514,18 +514,18 @@ export function SettingsClient({
                 {/* Company info (NEW) */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <p className="text-[12px] font-medium text-slate-500">Company information</p>
-                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">NEW</span>
+                    <p className="text-[12px] font-medium text-ink-3">Company information</p>
+                    <span className="text-[10px] font-bold text-green-deep bg-green/10 px-1.5 py-0.5 rounded">NEW</span>
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <label className="text-[11px] font-medium text-slate-400 mb-1 block">Company name</label>
-                      <input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Acme Corp" className="w-full px-4 py-3 text-[13px] border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all" />
+                      <label className="text-[11px] font-medium text-ink-3 mb-1 block">Company name</label>
+                      <input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Acme Corp" className="w-full px-4 py-3 text-[13px] border border-line rounded-[10px] focus:outline-none  focus:border-green/30 focus:border-green transition-all" />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[11px] font-medium text-slate-400 mb-1 block">Company size</label>
-                        <select value={companySize} onChange={e => setCompanySize(e.target.value)} className="w-full px-4 py-3 text-[13px] border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all bg-white">
+                        <label className="text-[11px] font-medium text-ink-3 mb-1 block">Company size</label>
+                        <select value={companySize} onChange={e => setCompanySize(e.target.value)} className="w-full px-4 py-3 text-[13px] border border-line rounded-[10px] focus:outline-none  focus:border-green/30 focus:border-green transition-all bg-white">
                           <option value="">Select...</option>
                           <option value="1-10">1-10</option>
                           <option value="11-50">11-50</option>
@@ -535,8 +535,8 @@ export function SettingsClient({
                         </select>
                       </div>
                       <div>
-                        <label className="text-[11px] font-medium text-slate-400 mb-1 block">Industry</label>
-                        <select value={industry} onChange={e => setIndustry(e.target.value)} className="w-full px-4 py-3 text-[13px] border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all bg-white">
+                        <label className="text-[11px] font-medium text-ink-3 mb-1 block">Industry</label>
+                        <select value={industry} onChange={e => setIndustry(e.target.value)} className="w-full px-4 py-3 text-[13px] border border-line rounded-[10px] focus:outline-none  focus:border-green/30 focus:border-green transition-all bg-white">
                           <option value="">Select...</option>
                           <option value="technology">Technology</option>
                           <option value="finance">Finance</option>
@@ -554,31 +554,31 @@ export function SettingsClient({
                 {/* Email signature (NEW) */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <p className="text-[12px] font-medium text-slate-500">Email signature</p>
-                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">NEW</span>
+                    <p className="text-[12px] font-medium text-ink-3">Email signature</p>
+                    <span className="text-[10px] font-bold text-green-deep bg-green/10 px-1.5 py-0.5 rounded">NEW</span>
                   </div>
                   <div className="grid grid-cols-2 gap-3 mb-3">
                     <div>
-                      <label className="text-[11px] font-medium text-slate-400 mb-1 block">Name</label>
-                      <input value={sigName} onChange={e => setSigName(e.target.value)} className="w-full px-4 py-3 text-[13px] border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all" />
+                      <label className="text-[11px] font-medium text-ink-3 mb-1 block">Name</label>
+                      <input value={sigName} onChange={e => setSigName(e.target.value)} className="w-full px-4 py-3 text-[13px] border border-line rounded-[10px] focus:outline-none  focus:border-green/30 focus:border-green transition-all" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-medium text-slate-400 mb-1 block">Job title</label>
-                      <input value={sigTitle} onChange={e => setSigTitle(e.target.value)} placeholder="Procurement Manager" className="w-full px-4 py-3 text-[13px] border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all" />
+                      <label className="text-[11px] font-medium text-ink-3 mb-1 block">Job title</label>
+                      <input value={sigTitle} onChange={e => setSigTitle(e.target.value)} placeholder="Procurement Manager" className="w-full px-4 py-3 text-[13px] border border-line rounded-[10px] focus:outline-none  focus:border-green/30 focus:border-green transition-all" />
                     </div>
                   </div>
-                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                    <p className="text-[11px] text-slate-400 mb-1">Preview</p>
-                    <div className="text-[13px] text-slate-600 leading-relaxed">
+                  <div className="bg-ground rounded-[10px] p-4 border border-line-2">
+                    <p className="text-[11px] text-ink-3 mb-1">Preview</p>
+                    <div className="text-[13px] text-ink-2 leading-relaxed">
                       <p>Best regards,</p>
-                      <p className="font-semibold text-slate-800 mt-1">{sigName || 'Your name'}</p>
-                      {sigTitle && <p className="text-slate-500">{sigTitle}</p>}
-                      {companyName && <p className="text-slate-500">{companyName}</p>}
+                      <p className="font-semibold text-ink mt-1">{sigName || 'Your name'}</p>
+                      {sigTitle && <p className="text-ink-3">{sigTitle}</p>}
+                      {companyName && <p className="text-ink-3">{companyName}</p>}
                     </div>
                   </div>
                 </div>
 
-                <button onClick={handleSavePrefs} disabled={prefsSaving} className="px-5 py-2.5 text-[12px] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors disabled:opacity-50">
+                <button onClick={handleSavePrefs} disabled={prefsSaving} className="px-5 py-2.5 text-[12px] font-semibold text-white bg-green hover:bg-green-deep rounded-[10px] transition-colors disabled:opacity-50">
                   {prefsSaved ? <span className="flex items-center gap-1"><Check className="w-3 h-3" />{t('settingsClient.saved')}</span> : prefsSaving ? t('settingsClient.saving') : t('settingsClient.savePreferences')}
                 </button>
               </div>
@@ -593,7 +593,7 @@ export function SettingsClient({
                   <ToggleRow label="Deal activity alerts (when rounds complete)" description="" value={dealAlerts} onChange={setDealAlerts} />
                   <ToggleRow label="Product updates & tips" description="" value={notifProductUpdates} onChange={setNotifProductUpdates} />
                 </div>
-                <p className="text-[11px] text-slate-400">Notifications are sent to {email}</p>
+                <p className="text-[11px] text-ink-3">Notifications are sent to {email}</p>
               </div>
             )}
 
@@ -604,8 +604,8 @@ export function SettingsClient({
                   <ToggleRow label={t('settingsClient.saveExtractedText')} description={t('settingsClient.saveExtractedTextDesc')} value={saveExtractedText} onChange={setSaveExtractedText} />
                   <ToggleRow label={t('settingsClient.receiveEmails')} description={t('settingsClient.receiveEmailsDesc')} value={productEmails} onChange={setProductEmails} />
                 </div>
-                <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                <div className="bg-ground rounded-[10px] p-4 border border-line-2">
+                  <p className="text-[11px] text-ink-3 leading-relaxed">
                     Your data is encrypted at rest and in transit. Contract text is processed for analysis and discarded unless you enable text storage above. We never share your data with third parties.
                   </p>
                 </div>
@@ -615,15 +615,15 @@ export function SettingsClient({
             {/* ═══ DANGER ZONE ═══ */}
             {activeSection === 'danger' && (
               <div className="space-y-4">
-                <div className="bg-red-50 rounded-xl p-4 border border-red-200">
+                <div className="bg-risk-soft rounded-[10px] p-4 border border-risk-line">
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-9 h-9 rounded-[10px] bg-red-500/10 flex items-center justify-center flex-shrink-0">
                       <AlertTriangle className="w-[18px] h-[18px] text-red-500" />
                     </div>
                     <div>
-                      <p className="text-[13px] font-semibold text-red-800">{t('settingsClient.deleteAccount')}</p>
-                      <p className="text-[11px] text-red-600/70 mt-1 leading-relaxed">{t('settingsClient.dangerZoneDesc')}</p>
-                      <button onClick={() => setShowDeleteModal(true)} className="mt-3 px-4 py-2 text-[12px] font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors">
+                      <p className="text-[13px] font-semibold text-risk">{t('settingsClient.deleteAccount')}</p>
+                      <p className="text-[11px] text-risk/70 mt-1 leading-relaxed">{t('settingsClient.dangerZoneDesc')}</p>
+                      <button onClick={() => setShowDeleteModal(true)} className="mt-3 px-4 py-2 text-[12px] font-semibold text-white bg-red-500 hover:bg-red-600 rounded-[10px] transition-colors">
                         {t('settingsClient.deleteAccount')}
                       </button>
                     </div>
@@ -638,26 +638,26 @@ export function SettingsClient({
       {/* Delete modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => !deleteLoading && setShowDeleteModal(false)}>
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 border border-slate-200 shadow-lg" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-[14px] max-w-md w-full p-6 border border-line shadow-lg" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-[10px] bg-red-500/10 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-red-500" />
               </div>
-              <p className="text-[16px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{t('settingsClient.deleteModalTitle')}</p>
+              <p className="text-[16px] font-bold text-ink font-display">{t('settingsClient.deleteModalTitle')}</p>
             </div>
-            <p className="text-[13px] text-slate-500 mb-2">{t('settingsClient.deleteWillDelete')}</p>
-            <ul className="text-[13px] text-slate-500 mb-4 space-y-1 ml-3">
+            <p className="text-[13px] text-ink-3 mb-2">{t('settingsClient.deleteWillDelete')}</p>
+            <ul className="text-[13px] text-ink-3 mb-4 space-y-1 ml-3">
               <li>- {t('settingsClient.deleteBullet1', { dealCount, roundCount })}</li>
               <li>- {t('settingsClient.deleteBullet2')}</li>
               <li>- {t('settingsClient.deleteBullet3')}</li>
             </ul>
-            <p className="text-[13px] font-semibold text-red-600 mb-4">{t('settingsClient.deleteCannotUndo')}</p>
-            {deleteError && <div className="mb-3 p-3 bg-red-50 rounded-xl text-[12px] text-red-600 border border-red-200">{deleteError}</div>}
+            <p className="text-[13px] font-semibold text-risk mb-4">{t('settingsClient.deleteCannotUndo')}</p>
+            {deleteError && <div className="mb-3 p-3 bg-risk-soft rounded-[10px] text-[12px] text-risk border border-risk-line">{deleteError}</div>}
             <div className="flex items-center gap-3">
-              <button onClick={() => setShowDeleteModal(false)} disabled={deleteLoading} className="flex-1 px-4 py-2.5 text-[13px] font-medium rounded-xl text-slate-700 disabled:opacity-50 border border-slate-200 hover:bg-slate-50 transition-colors">
+              <button onClick={() => setShowDeleteModal(false)} disabled={deleteLoading} className="flex-1 px-4 py-2.5 text-[13px] font-medium rounded-[10px] text-ink-2 disabled:opacity-50 border border-line hover:bg-surface-2 transition-colors">
                 {t('settingsClient.cancel')}
               </button>
-              <button onClick={handleDeleteAccount} disabled={deleteLoading} className="flex-1 px-4 py-2.5 text-[13px] font-semibold rounded-xl bg-red-500 hover:bg-red-600 text-white disabled:opacity-50 flex items-center justify-center gap-1.5 transition-colors">
+              <button onClick={handleDeleteAccount} disabled={deleteLoading} className="flex-1 px-4 py-2.5 text-[13px] font-semibold rounded-[10px] bg-red-500 hover:bg-red-600 text-white disabled:opacity-50 flex items-center justify-center gap-1.5 transition-colors">
                 {deleteLoading ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />{t('settingsClient.deleting')}</> : t('settingsClient.yesDelete')}
               </button>
             </div>
@@ -673,24 +673,24 @@ function SelectCard({ selected, onClick, title, desc, icon: Icon }: { selected: 
   return (
     <button
       onClick={onClick}
-      className={`text-left p-4 rounded-xl border-2 transition-all w-full ${
+      className={`text-left p-4 rounded-[10px] border-2 transition-all w-full ${
         selected
-          ? 'border-emerald-500 bg-emerald-500/5 ring-1 ring-emerald-500/20'
-          : 'border-slate-200 hover:border-slate-300 bg-white'
+          ? 'border-green bg-green/5 ring-1 /20'
+          : 'border-line hover:border-[#C9D3CE] bg-white'
       }`}
     >
       <div className="flex items-start gap-3">
         {Icon && (
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${selected ? 'bg-emerald-500/10' : 'bg-slate-100'}`}>
-            <Icon className={`w-4 h-4 ${selected ? 'text-emerald-500' : 'text-slate-400'}`} />
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${selected ? 'bg-green/10' : 'bg-surface-2'}`}>
+            <Icon className={`w-4 h-4 ${selected ? 'text-green-deep' : 'text-ink-3'}`} />
           </div>
         )}
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className={`text-[13px] font-semibold ${selected ? 'text-emerald-700' : 'text-slate-700'}`}>{title}</span>
-            {selected && <Check className="w-3.5 h-3.5 text-emerald-500" />}
+            <span className={`text-[13px] font-semibold ${selected ? 'text-green-deep' : 'text-ink-2'}`}>{title}</span>
+            {selected && <Check className="w-3.5 h-3.5 text-green-deep" />}
           </div>
-          {desc && <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{desc}</p>}
+          {desc && <p className="text-[11px] text-ink-3 mt-0.5 leading-relaxed">{desc}</p>}
         </div>
       </div>
     </button>
@@ -699,20 +699,20 @@ function SelectCard({ selected, onClick, title, desc, icon: Icon }: { selected: 
 
 function RadioCard({ title, value, onChange, options }: { title: string; value: string; onChange: (v: string) => void; options: { val: string; label: string }[] }) {
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-      <p className="text-[12px] font-medium text-slate-500 uppercase mb-4 tracking-wide">{title}</p>
+    <div className="bg-white rounded-[14px] p-6 border border-line ">
+      <p className="text-[12px] font-medium text-ink-3 uppercase mb-4 tracking-wide">{title}</p>
       {options.map((opt) => (
         <button
           key={opt.val}
           onClick={() => onChange(opt.val)}
-          className={`w-full flex items-center gap-2.5 p-3 rounded-xl mb-2 last:mb-0 transition-all text-left border-2 ${
-            value === opt.val ? 'bg-emerald-500/5 border-emerald-500' : 'border-slate-200'
+          className={`w-full flex items-center gap-2.5 p-3 rounded-[10px] mb-2 last:mb-0 transition-all text-left border-2 ${
+            value === opt.val ? 'bg-green/5 border-green' : 'border-line'
           }`}
         >
           <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ border: `1.5px solid ${value === opt.val ? '#059669' : '#E2E8F0'}`, backgroundColor: value === opt.val ? '#059669' : 'transparent' }}>
             {value === opt.val && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
           </div>
-          <span className={`text-[13px] ${value === opt.val ? 'text-slate-900 font-medium' : 'text-slate-700'}`}>{opt.label}</span>
+          <span className={`text-[13px] ${value === opt.val ? 'text-ink font-medium' : 'text-ink-2'}`}>{opt.label}</span>
         </button>
       ))}
     </div>
@@ -721,14 +721,14 @@ function RadioCard({ title, value, onChange, options }: { title: string; value: 
 
 function ToggleRow({ label, description, value, onChange }: { label: string; description: string; value: boolean; onChange: (v: boolean) => void }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-1 border-b border-slate-100 last:border-0">
+    <div className="flex items-center justify-between gap-4 py-1 border-b border-line-2 last:border-0">
       <div className="flex-1">
-        <p className="text-[13px] text-slate-700">{label}</p>
-        {description && <p className="text-[11px] text-slate-400 mt-0.5">{description}</p>}
+        <p className="text-[13px] text-ink-2">{label}</p>
+        {description && <p className="text-[11px] text-ink-3 mt-0.5">{description}</p>}
       </div>
       <button
         onClick={() => onChange(!value)}
-        className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors ${value ? 'bg-emerald-500' : 'bg-slate-300'}`}
+        className={`relative flex-shrink-0 w-11 h-6 rounded-full transition-colors ${value ? 'bg-green' : 'bg-ink-3'}`}
       >
         <span className={`absolute top-[3px] inline-block w-[18px] h-[18px] rounded-full bg-white shadow-md transition-transform ${value ? 'translate-x-[23px]' : 'translate-x-[3px]'}`} />
       </button>

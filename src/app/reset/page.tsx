@@ -20,10 +20,10 @@ export default function ResetPage() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-slate-900 mb-4">
+        <h1 className="text-2xl font-bold text-ink mb-4">
           ✅ Counter Reset
         </h1>
-        <p className="text-slate-600">
+        <p className="text-ink-2">
           Redirecting to homepage...
         </p>
       </div>

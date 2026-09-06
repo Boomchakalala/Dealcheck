@@ -114,21 +114,21 @@ export default function AppHelpPage() {
             {/* Category header */}
             {!isSearching && (
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+                <div className="w-10 h-10 rounded-[10px] bg-green-soft flex items-center justify-center text-green-deep">
                   {currentCat.icon}
                 </div>
                 <div>
-                  <h2 className="text-[20px] font-bold text-slate-900" style={{ fontFamily: 'Sora, sans-serif' }}>{currentCat.name}</h2>
-                  <p className="text-[13px] text-slate-500">{currentCat.sub}</p>
+                  <h2 className="text-[20px] font-bold text-ink font-display">{currentCat.name}</h2>
+                  <p className="text-[13px] text-ink-3">{currentCat.sub}</p>
                 </div>
               </div>
             )}
             {isSearching && (
               <div className="flex items-center justify-between mb-6">
-                <p className="text-[14px] font-semibold text-slate-700">
+                <p className="text-[14px] font-semibold text-ink-2">
                   {filteredFaqs.length} result{filteredFaqs.length !== 1 ? 's' : ''} for &ldquo;{search}&rdquo;
                 </p>
-                <button onClick={() => setSearch('')} className="text-[13px] text-emerald-600 font-medium hover:underline">
+                <button onClick={() => setSearch('')} className="text-[13px] text-green-deep font-medium hover:underline">
                   Clear
                 </button>
               </div>
@@ -143,33 +143,33 @@ export default function AppHelpPage() {
                 return (
                   <div
                     key={key}
-                    className={`${i < filteredFaqs.length - 1 ? 'border-b border-slate-100' : ''}`}
+                    className={`${i < filteredFaqs.length - 1 ? 'border-b border-line-2' : ''}`}
                   >
                     <button
                       onClick={() => toggleItem(key)}
-                      className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
+                      className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-surface-2 transition-colors"
                     >
                       <div className="pr-4">
                         {isSearching && itemCat && (
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{itemCat.name}</span>
+                          <span className="text-[10px] font-bold text-ink-3 uppercase tracking-wider block mb-1">{itemCat.name}</span>
                         )}
-                        <span className="text-[14px] font-semibold text-slate-900">{item.q}</span>
+                        <span className="text-[14px] font-semibold text-ink">{item.q}</span>
                       </div>
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${isOpen ? 'bg-emerald-100' : 'bg-slate-100'}`}>
-                        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180 text-emerald-600' : 'text-slate-400'}`} />
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${isOpen ? 'bg-green-soft' : 'bg-surface-2'}`}>
+                        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180 text-green-deep' : 'text-ink-3'}`} />
                       </div>
                     </button>
                     {isOpen && (
                       <div className="px-6 pb-5">
-                        <p className="text-[14px] text-slate-600 leading-relaxed">{item.a}</p>
+                        <p className="text-[14px] text-ink-2 leading-relaxed">{item.a}</p>
                       </div>
                     )}
                   </div>
                 )
               }) : (
                 <div className="px-6 py-12 text-center">
-                  <p className="text-[14px] text-slate-400">No results for &ldquo;{search}&rdquo;</p>
-                  <button onClick={() => setSearch('')} className="text-[13px] text-emerald-600 font-medium mt-2 hover:underline">Clear search</button>
+                  <p className="text-[14px] text-ink-3">No results for &ldquo;{search}&rdquo;</p>
+                  <button onClick={() => setSearch('')} className="text-[13px] text-green-deep font-medium mt-2 hover:underline">Clear search</button>
                 </div>
               )}
             </div>
@@ -177,12 +177,12 @@ export default function AppHelpPage() {
             {/* Still have questions */}
             <div className="bg-surface border border-line rounded-[14px] p-5 mt-4 flex flex-wrap gap-3 items-center justify-between">
               <div>
-                <p className="text-[15px] font-bold text-slate-900 mb-1">Still have questions?</p>
-                <p className="text-[13px] text-slate-500">We&apos;re here to help &mdash; reach out anytime</p>
+                <p className="text-[15px] font-bold text-ink mb-1">Still have questions?</p>
+                <p className="text-[13px] text-ink-3">We&apos;re here to help &mdash; reach out anytime</p>
               </div>
               <a
                 href="mailto:hello@termlift.com"
-                className="inline-flex items-center gap-2 text-[13px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-5 py-2.5 rounded-xl hover:bg-emerald-100 transition-colors"
+                className="inline-flex items-center gap-2 text-[13px] font-semibold text-green-deep bg-green-soft border border-green-line px-5 py-2.5 rounded-[10px] hover:bg-green-soft transition-colors"
               >
                 <Mail className="w-4 h-4" />hello@termlift.com
               </a>

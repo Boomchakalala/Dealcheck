@@ -3,8 +3,6 @@ export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
-const sora = "'Sora', sans-serif"
-const mono = "'JetBrains Mono', monospace"
 
 function fmtUsd(n: number) {
   return `$${n.toFixed(n < 1 ? 4 : 2)}`
@@ -63,98 +61,98 @@ export default async function AiUsagePage() {
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold text-slate-900 mb-1" style={{ fontFamily: sora }}>AI usage & cost</h1>
-      <p className="text-[13px] text-slate-500 mb-6">
+      <h1 className="text-2xl font-bold text-ink mb-1 font-display">AI usage & cost</h1>
+      <p className="text-[13px] text-ink-3 mb-6">
         Estimated from real token usage on every Claude call (see lib/ai-cost.ts for the rate card). Last 7 days, up to 500 most recent calls.
       </p>
 
       {/* Aggregate stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-        <div className="bg-white border border-slate-200 rounded-xl p-4">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Cost today</p>
-          <p className="text-[20px] font-bold text-slate-900" style={{ fontFamily: sora }}>{fmtUsd(costToday)}</p>
+        <div className="bg-white border border-line rounded-[10px] p-4">
+          <p className="text-[10px] font-bold text-ink-3 uppercase tracking-wider mb-1">Cost today</p>
+          <p className="text-[20px] font-bold text-ink font-display">{fmtUsd(costToday)}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Cost, last 7 days</p>
-          <p className="text-[20px] font-bold text-slate-900" style={{ fontFamily: sora }}>{fmtUsd(cost7d)}</p>
+        <div className="bg-white border border-line rounded-[10px] p-4">
+          <p className="text-[10px] font-bold text-ink-3 uppercase tracking-wider mb-1">Cost, last 7 days</p>
+          <p className="text-[20px] font-bold text-ink font-display">{fmtUsd(cost7d)}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Avg cost / deal</p>
-          <p className="text-[20px] font-bold text-slate-900" style={{ fontFamily: sora }}>{fmtUsd(avgCostPerDeal)}</p>
+        <div className="bg-white border border-line rounded-[10px] p-4">
+          <p className="text-[10px] font-bold text-ink-3 uppercase tracking-wider mb-1">Avg cost / deal</p>
+          <p className="text-[20px] font-bold text-ink font-display">{fmtUsd(avgCostPerDeal)}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Failed calls, 7d</p>
-          <p className="text-[20px] font-bold text-slate-900" style={{ fontFamily: sora }}>{failures7d}</p>
+        <div className="bg-white border border-line rounded-[10px] p-4">
+          <p className="text-[10px] font-bold text-ink-3 uppercase tracking-wider mb-1">Failed calls, 7d</p>
+          <p className="text-[20px] font-bold text-ink font-display">{failures7d}</p>
         </div>
       </div>
 
       {highestCostDeal && (
-        <p className="text-[13px] text-slate-500 mb-6">
-          Highest-cost deal (7d): <span className="font-semibold text-slate-800">{highestCostDeal.label}</span> — {fmtUsd(highestCostDeal.cost)} across {highestCostDeal.calls} calls.
+        <p className="text-[13px] text-ink-3 mb-6">
+          Highest-cost deal (7d): <span className="font-semibold text-ink">{highestCostDeal.label}</span> — {fmtUsd(highestCostDeal.cost)} across {highestCostDeal.calls} calls.
         </p>
       )}
 
       {/* Per-action breakdown */}
-      <h2 className="text-[13px] font-bold text-slate-900 uppercase tracking-wide mb-3">By action</h2>
-      <div className="overflow-x-auto rounded-xl border border-slate-200 mb-8">
+      <h2 className="text-[13px] font-bold text-ink uppercase tracking-wide mb-3">By action</h2>
+      <div className="overflow-x-auto rounded-[10px] border border-line mb-8">
         <table className="w-full text-[13px]">
-          <thead className="bg-slate-50">
+          <thead className="bg-ground">
             <tr>
-              <th className="text-left py-2 px-3 font-semibold text-slate-500">Action</th>
-              <th className="text-right py-2 px-3 font-semibold text-slate-500">Calls</th>
-              <th className="text-right py-2 px-3 font-semibold text-slate-500">Input tok</th>
-              <th className="text-right py-2 px-3 font-semibold text-slate-500">Output tok</th>
-              <th className="text-right py-2 px-3 font-semibold text-slate-500">Cost</th>
+              <th className="text-left py-2 px-3 font-semibold text-ink-3">Action</th>
+              <th className="text-right py-2 px-3 font-semibold text-ink-3">Calls</th>
+              <th className="text-right py-2 px-3 font-semibold text-ink-3">Input tok</th>
+              <th className="text-right py-2 px-3 font-semibold text-ink-3">Output tok</th>
+              <th className="text-right py-2 px-3 font-semibold text-ink-3">Cost</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-line-2">
             {actionRows.map(a => (
               <tr key={a.action}>
-                <td className="py-2 px-3 text-slate-800" style={{ fontFamily: mono }}>{a.action}</td>
-                <td className="py-2 px-3 text-right text-slate-600">{a.calls}</td>
-                <td className="py-2 px-3 text-right text-slate-600">{a.inputTok.toLocaleString()}</td>
-                <td className="py-2 px-3 text-right text-slate-600">{a.outputTok.toLocaleString()}</td>
-                <td className="py-2 px-3 text-right font-semibold text-slate-900">{fmtUsd(a.cost)}</td>
+                <td className="py-2 px-3 text-ink" style={{ fontFamily: "var(--font-jetbrains), monospace" }}>{a.action}</td>
+                <td className="py-2 px-3 text-right text-ink-2">{a.calls}</td>
+                <td className="py-2 px-3 text-right text-ink-2">{a.inputTok.toLocaleString()}</td>
+                <td className="py-2 px-3 text-right text-ink-2">{a.outputTok.toLocaleString()}</td>
+                <td className="py-2 px-3 text-right font-semibold text-ink">{fmtUsd(a.cost)}</td>
               </tr>
             ))}
             {actionRows.length === 0 && (
-              <tr><td colSpan={5} className="py-6 text-center text-slate-400">No AI calls recorded yet.</td></tr>
+              <tr><td colSpan={5} className="py-6 text-center text-ink-3">No AI calls recorded yet.</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
       {/* Recent calls */}
-      <h2 className="text-[13px] font-bold text-slate-900 uppercase tracking-wide mb-3">Recent calls</h2>
-      <div className="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 className="text-[13px] font-bold text-ink uppercase tracking-wide mb-3">Recent calls</h2>
+      <div className="overflow-x-auto rounded-[10px] border border-line">
         <table className="w-full text-[12.5px]">
-          <thead className="bg-slate-50">
+          <thead className="bg-ground">
             <tr>
-              <th className="text-left py-2 px-3 font-semibold text-slate-500">Time</th>
-              <th className="text-left py-2 px-3 font-semibold text-slate-500">Action</th>
-              <th className="text-left py-2 px-3 font-semibold text-slate-500">Deal</th>
-              <th className="text-left py-2 px-3 font-semibold text-slate-500">Model</th>
-              <th className="text-right py-2 px-3 font-semibold text-slate-500">Tokens (in/out)</th>
-              <th className="text-right py-2 px-3 font-semibold text-slate-500">Cost</th>
-              <th className="text-right py-2 px-3 font-semibold text-slate-500">Latency</th>
-              <th className="text-center py-2 px-3 font-semibold text-slate-500">OK</th>
+              <th className="text-left py-2 px-3 font-semibold text-ink-3">Time</th>
+              <th className="text-left py-2 px-3 font-semibold text-ink-3">Action</th>
+              <th className="text-left py-2 px-3 font-semibold text-ink-3">Deal</th>
+              <th className="text-left py-2 px-3 font-semibold text-ink-3">Model</th>
+              <th className="text-right py-2 px-3 font-semibold text-ink-3">Tokens (in/out)</th>
+              <th className="text-right py-2 px-3 font-semibold text-ink-3">Cost</th>
+              <th className="text-right py-2 px-3 font-semibold text-ink-3">Latency</th>
+              <th className="text-center py-2 px-3 font-semibold text-ink-3">OK</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-line-2">
             {rows.slice(0, 200).map(r => (
-              <tr key={r.id} className={!r.success ? 'bg-red-50/40' : ''}>
-                <td className="py-1.5 px-3 text-slate-400 whitespace-nowrap" style={{ fontFamily: mono }}>{new Date(r.created_at).toLocaleString()}</td>
-                <td className="py-1.5 px-3 text-slate-700" style={{ fontFamily: mono }}>{r.action}</td>
-                <td className="py-1.5 px-3 text-slate-600 truncate max-w-[160px]">{(r as any).deals?.vendor || (r as any).deals?.title || (r.deal_id ? r.deal_id.slice(0, 8) : '—')}</td>
-                <td className="py-1.5 px-3 text-slate-500 whitespace-nowrap">{r.model}</td>
-                <td className="py-1.5 px-3 text-right text-slate-600 whitespace-nowrap">{(r.input_tokens ?? '—')}/{(r.output_tokens ?? '—')}</td>
-                <td className="py-1.5 px-3 text-right font-medium text-slate-900">{r.estimated_cost_usd != null ? fmtUsd(r.estimated_cost_usd) : '—'}</td>
-                <td className="py-1.5 px-3 text-right text-slate-400">{r.latency_ms != null ? `${r.latency_ms}ms` : '—'}</td>
+              <tr key={r.id} className={!r.success ? 'bg-risk-soft/40' : ''}>
+                <td className="py-1.5 px-3 text-ink-3 whitespace-nowrap" style={{ fontFamily: "var(--font-jetbrains), monospace" }}>{new Date(r.created_at).toLocaleString()}</td>
+                <td className="py-1.5 px-3 text-ink-2" style={{ fontFamily: "var(--font-jetbrains), monospace" }}>{r.action}</td>
+                <td className="py-1.5 px-3 text-ink-2 truncate max-w-[160px]">{(r as any).deals?.vendor || (r as any).deals?.title || (r.deal_id ? r.deal_id.slice(0, 8) : '—')}</td>
+                <td className="py-1.5 px-3 text-ink-3 whitespace-nowrap">{r.model}</td>
+                <td className="py-1.5 px-3 text-right text-ink-2 whitespace-nowrap">{(r.input_tokens ?? '—')}/{(r.output_tokens ?? '—')}</td>
+                <td className="py-1.5 px-3 text-right font-medium text-ink">{r.estimated_cost_usd != null ? fmtUsd(r.estimated_cost_usd) : '—'}</td>
+                <td className="py-1.5 px-3 text-right text-ink-3">{r.latency_ms != null ? `${r.latency_ms}ms` : '—'}</td>
                 <td className="py-1.5 px-3 text-center">{r.success ? '✓' : '✗'}</td>
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={8} className="py-6 text-center text-slate-400">No AI calls recorded yet.</td></tr>
+              <tr><td colSpan={8} className="py-6 text-center text-ink-3">No AI calls recorded yet.</td></tr>
             )}
           </tbody>
         </table>

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function DemoLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-25 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-ground via-slate-25 to-white">
       <AppSidebar
         userEmail={DEMO_USER_EMAIL}
         isUpgraded={true}
@@ -28,13 +28,13 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
 
       <main className="min-h-screen transition-all duration-200 md:ml-[var(--sidebar-width,210px)]">
         {/* Sticky demo banner */}
-        <div className="sticky top-0 z-30 border-b border-emerald-200 bg-white/95 backdrop-blur-md shadow-[0_2px_8px_-4px_rgba(15,23,42,0.08)]">
+        <div className="sticky top-0 z-30 border-b border-green-line bg-white/95 backdrop-blur-md shadow-[0_2px_8px_-4px_rgba(15,23,42,0.08)]">
           <div className="max-w-6xl mx-auto px-5 sm:px-8 py-2.5 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
-              <Sparkles className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-              <span className="text-[12.5px] sm:text-[13.5px] text-slate-700 truncate">
+              <Sparkles className="w-4 h-4 text-green-deep flex-shrink-0" />
+              <span className="text-[12.5px] sm:text-[13.5px] text-ink-2 truncate">
                 <span className="font-semibold">You&apos;re exploring TermLift</span>
-                <span className="hidden sm:inline text-slate-500"> with sample data — sign up to use it with your own quotes.</span>
+                <span className="hidden sm:inline text-ink-3"> with sample data — sign up to use it with your own quotes.</span>
               </span>
             </div>
             <Link

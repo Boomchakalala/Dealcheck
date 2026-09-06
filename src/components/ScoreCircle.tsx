@@ -13,9 +13,9 @@ export function ScoreCircle({
   score,
   size = 100,
   strokeWidth = 7,
-  trackClass = 'stroke-slate-100',
-  ringClass = 'stroke-emerald-500',
-  textClass = 'text-emerald-700',
+  trackClass = 'stroke-line-2',
+  ringClass = 'stroke-green',
+  textClass = 'text-green-deep',
   showOutOf = true,
   label,
 }: ScoreCircleProps) {
@@ -46,7 +46,7 @@ export function ScoreCircle({
           {score}
         </span>
         {showOutOf && (
-          <span className="text-slate-400 font-medium leading-none mt-0.5"
+          <span className="text-ink-3 font-medium leading-none mt-0.5"
             style={{ fontSize: size * 0.1 }}
           >
             {label || '/ 100'}

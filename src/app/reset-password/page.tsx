@@ -69,7 +69,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-ground to-white flex flex-col">
       {/* Header */}
       <div className="border-b border-line bg-surface px-5 h-14 flex items-center">
         <Logo />
@@ -81,13 +81,13 @@ function ResetPasswordForm() {
           {/* Success: password updated */}
           {updated && (
             <div className="text-center">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="w-7 h-7 text-emerald-600" />
+              <div className="w-14 h-14 rounded-[14px] bg-green-soft flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-7 h-7 text-green-deep" />
               </div>
-              <h1 className="text-xl font-bold text-slate-900 mb-2">
+              <h1 className="text-xl font-bold text-ink mb-2">
                 {t('login.password') === 'Mot de passe' ? 'Mot de passe mis à jour' : 'Password updated'}
               </h1>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-ink-3">
                 {t('login.password') === 'Mot de passe' ? 'Redirection vers votre compte...' : 'Redirecting to your account...'}
               </p>
             </div>
@@ -96,39 +96,39 @@ function ResetPasswordForm() {
           {/* Step 2: Set new password (user clicked email link) */}
           {isRecovery && !updated && (
             <>
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">
+              <h1 className="text-2xl font-bold text-ink mb-2">
                 {t('login.password') === 'Mot de passe' ? 'Nouveau mot de passe' : 'Set new password'}
               </h1>
-              <p className="text-sm text-slate-500 mb-6">
+              <p className="text-sm text-ink-3 mb-6">
                 {t('login.password') === 'Mot de passe' ? 'Choisissez un nouveau mot de passe pour votre compte.' : 'Choose a new password for your account.'}
               </p>
               <form onSubmit={handleUpdatePassword} className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700 mb-1.5 block">
+                  <label className="text-sm font-medium text-ink-2 mb-1.5 block">
                     {t('login.password') === 'Mot de passe' ? 'Nouveau mot de passe' : 'New password'}
                   </label>
                   <input
                     type="password" required minLength={6} value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder={t('login.passwordPlaceholder')}
-                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3.5 py-2.5 text-sm border border-line rounded-[10px] focus:outline-none  focus:border-green focus:border-green"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700 mb-1.5 block">
+                  <label className="text-sm font-medium text-ink-2 mb-1.5 block">
                     {t('login.password') === 'Mot de passe' ? 'Confirmer le mot de passe' : 'Confirm password'}
                   </label>
                   <input
                     type="password" required minLength={6} value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder={t('login.passwordPlaceholder')}
-                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3.5 py-2.5 text-sm border border-line rounded-[10px] focus:outline-none  focus:border-green focus:border-green"
                   />
                 </div>
-                {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">{error}</p>}
+                {error && <p className="text-sm text-risk bg-risk-soft border border-risk-line rounded-[10px] p-3">{error}</p>}
                 <button
                   type="submit" disabled={loading}
-                  className="w-full px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                  className="w-full px-6 py-3 text-sm font-semibold rounded-[10px] bg-green text-white hover:bg-green-deep disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{t('login.password') === 'Mot de passe' ? 'Mettre à jour' : 'Update password'} <ArrowRight className="w-4 h-4" /></>}
                 </button>
@@ -139,32 +139,32 @@ function ResetPasswordForm() {
           {/* Step 1: Request reset email */}
           {!isRecovery && !sent && (
             <>
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">
+              <h1 className="text-2xl font-bold text-ink mb-2">
                 {t('login.password') === 'Mot de passe' ? 'Mot de passe oublié' : 'Forgot password'}
               </h1>
-              <p className="text-sm text-slate-500 mb-6">
+              <p className="text-sm text-ink-3 mb-6">
                 {t('login.password') === 'Mot de passe' ? 'Entrez votre email et nous vous enverrons un lien de réinitialisation.' : 'Enter your email and we\'ll send you a reset link.'}
               </p>
               <form onSubmit={handleRequestReset} className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700 mb-1.5 block">{t('login.email')}</label>
+                  <label className="text-sm font-medium text-ink-2 mb-1.5 block">{t('login.email')}</label>
                   <input
                     type="email" required value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('login.emailPlaceholder')}
-                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    className="w-full px-3.5 py-2.5 text-sm border border-line rounded-[10px] focus:outline-none  focus:border-green focus:border-green"
                   />
                 </div>
-                {error && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">{error}</p>}
+                {error && <p className="text-sm text-risk bg-risk-soft border border-risk-line rounded-[10px] p-3">{error}</p>}
                 <button
                   type="submit" disabled={loading}
-                  className="w-full px-6 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                  className="w-full px-6 py-3 text-sm font-semibold rounded-[10px] bg-green text-white hover:bg-green-deep disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>{t('login.password') === 'Mot de passe' ? 'Envoyer le lien' : 'Send reset link'} <ArrowRight className="w-4 h-4" /></>}
                 </button>
               </form>
               <div className="mt-6 text-center">
-                <Link href="/login" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
+                <Link href="/login" className="text-sm text-ink-3 hover:text-ink transition-colors">
                   &larr; {t('login.password') === 'Mot de passe' ? 'Retour à la connexion' : 'Back to sign in'}
                 </Link>
               </div>
@@ -174,18 +174,18 @@ function ResetPasswordForm() {
           {/* Step 1 success: email sent */}
           {!isRecovery && sent && (
             <div className="text-center">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="w-7 h-7 text-emerald-600" />
+              <div className="w-14 h-14 rounded-[14px] bg-green-soft flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-7 h-7 text-green-deep" />
               </div>
-              <h1 className="text-xl font-bold text-slate-900 mb-2">
+              <h1 className="text-xl font-bold text-ink mb-2">
                 {t('login.password') === 'Mot de passe' ? 'Email envoyé' : 'Check your email'}
               </h1>
-              <p className="text-sm text-slate-500 mb-6">
+              <p className="text-sm text-ink-3 mb-6">
                 {t('login.password') === 'Mot de passe'
                   ? `Nous avons envoyé un lien de réinitialisation à ${email}`
                   : `We've sent a reset link to ${email}`}
               </p>
-              <Link href="/login" className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors">
+              <Link href="/login" className="text-sm font-medium text-green-deep hover:text-green-deep transition-colors">
                 &larr; {t('login.password') === 'Mot de passe' ? 'Retour à la connexion' : 'Back to sign in'}
               </Link>
             </div>

@@ -69,10 +69,10 @@ export function EmailGenerator({ roundId, defaultControls }: EmailGeneratorProps
   }
 
   return (
-    <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6">
+    <div className="space-y-6 rounded-lg border border-line bg-white p-6">
       <div>
-        <h3 className="text-lg font-semibold text-gray-900">Generate Email</h3>
-        <p className="mt-1 text-sm text-gray-600">
+        <h3 className="text-lg font-semibold text-ink">Generate Email</h3>
+        <p className="mt-1 text-sm text-ink-2">
           Customize the tone and approach for your supplier email
         </p>
       </div>
@@ -141,19 +141,19 @@ export function EmailGenerator({ roundId, defaultControls }: EmailGeneratorProps
       </Button>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-lg border border-risk-line bg-risk-soft p-4 text-sm text-risk">
           {error}
         </div>
       )}
 
       {generatedEmail && (
-        <div className="space-y-4 rounded-lg border border-emerald-200 bg-emerald-50 p-6">
+        <div className="space-y-4 rounded-lg border border-green-line bg-green-soft p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <div className="text-xs font-medium uppercase tracking-wide text-emerald-700">
+              <div className="text-xs font-medium uppercase tracking-wide text-green-deep">
                 Subject
               </div>
-              <div className="mt-1 font-medium text-gray-900">{generatedEmail.subject}</div>
+              <div className="mt-1 font-medium text-ink">{generatedEmail.subject}</div>
             </div>
             <CopyButton
               text={generatedEmail.subject}
@@ -167,9 +167,9 @@ export function EmailGenerator({ roundId, defaultControls }: EmailGeneratorProps
             />
           </div>
 
-          <div className="border-t border-emerald-200 pt-4">
+          <div className="border-t border-green-line pt-4">
             <div className="flex items-start justify-between">
-              <div className="text-xs font-medium uppercase tracking-wide text-emerald-700">
+              <div className="text-xs font-medium uppercase tracking-wide text-green-deep">
                 Email Body
               </div>
               <CopyButton
@@ -183,12 +183,12 @@ export function EmailGenerator({ roundId, defaultControls }: EmailGeneratorProps
                 }}
               />
             </div>
-            <div className="mt-3 whitespace-pre-wrap rounded-lg bg-white p-4 text-sm text-gray-900">
+            <div className="mt-3 whitespace-pre-wrap rounded-lg bg-white p-4 text-sm text-ink">
               {generatedEmail.body}
             </div>
           </div>
 
-          <div className="text-xs text-emerald-700">
+          <div className="text-xs text-green-deep">
             You can regenerate this email with different settings as many times as you need.
           </div>
         </div>

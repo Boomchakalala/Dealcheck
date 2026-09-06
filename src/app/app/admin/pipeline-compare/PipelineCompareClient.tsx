@@ -25,9 +25,9 @@ type NewResult = {
 }
 
 const SEVERITY_COLOR: Record<string, string> = {
-  high: 'text-red-600 bg-red-50 border-red-200',
-  medium: 'text-amber-600 bg-amber-50 border-amber-200',
-  low: 'text-slate-500 bg-slate-50 border-slate-200',
+  high: 'text-risk bg-risk-soft border-risk-line',
+  medium: 'text-warn bg-warn-soft border-warn-line',
+  low: 'text-ink-3 bg-ground border-line',
 }
 
 export function PipelineCompareClient() {
@@ -72,38 +72,38 @@ export function PipelineCompareClient() {
         <select
           value={dealType}
           onChange={(e) => setDealType(e.target.value as 'New' | 'Renewal')}
-          className="text-[13px] border border-slate-300 rounded-lg px-3 py-1.5"
+          className="text-[13px] border border-line rounded-lg px-3 py-1.5"
         >
           <option value="New">New</option>
           <option value="Renewal">Renewal</option>
         </select>
-        {elapsedMs != null && <span className="text-[12px] text-slate-400">Last run: {(elapsedMs / 1000).toFixed(1)}s</span>}
+        {elapsedMs != null && <span className="text-[12px] text-ink-3">Last run: {(elapsedMs / 1000).toFixed(1)}s</span>}
       </div>
       <textarea
         value={extractedText}
         onChange={(e) => setExtractedText(e.target.value)}
         placeholder="Paste the raw quote text here..."
-        className="w-full h-48 border border-slate-300 rounded-lg p-3 text-[13px] font-mono mb-3"
+        className="w-full h-48 border border-line rounded-lg p-3 text-[13px] font-mono mb-3"
       />
       <button
         onClick={runCompare}
         disabled={loading || extractedText.trim().length < 10}
-        className="px-5 py-2 rounded-lg bg-slate-900 text-white text-[13px] font-semibold disabled:opacity-40"
+        className="px-5 py-2 rounded-lg bg-ink text-white text-[13px] font-semibold disabled:opacity-40"
       >
         {loading ? 'Running both pipelines...' : 'Run comparison'}
       </button>
 
-      {error && <p className="mt-4 text-[13px] text-red-600">{error}</p>}
+      {error && <p className="mt-4 text-[13px] text-risk">{error}</p>}
 
       {(oldResult || newResult) && (
         <div className="grid grid-cols-2 gap-6 mt-8">
           <ResultColumn title="OLD — analyzeDeal() monolith">
             {oldResult?.error ? (
-              <p className="text-[13px] text-red-600">{oldResult.error}</p>
+              <p className="text-[13px] text-risk">{oldResult.error}</p>
             ) : (
               <>
                 <ScoreRow score={oldResult?.score} label={oldResult?.score_label} />
-                <p className="text-[12px] text-slate-500 mb-2">
+                <p className="text-[12px] text-ink-3 mb-2">
                   {oldResult?.red_flags?.length ?? 0} red flags · {oldResult?.watchItems?.length ?? 0} watch items
                 </p>
                 {oldResult?.red_flags?.map((f, i) => (
@@ -115,14 +115,14 @@ export function PipelineCompareClient() {
 
           <ResultColumn title="NEW — Step 1/2/3 pipeline">
             {newResult?.error ? (
-              <p className="text-[13px] text-red-600">{newResult.error}</p>
+              <p className="text-[13px] text-risk">{newResult.error}</p>
             ) : (
               <>
                 <ScoreRow score={newResult?.score?.overall} label={newResult?.scoreLabel ?? undefined} />
-                <p className="text-[12px] text-slate-500 mb-1">
+                <p className="text-[12px] text-ink-3 mb-1">
                   Category: {newResult?.classification?.quote_type} · {newResult?.classification?.deal_size_bracket} · leverage {newResult?.classification?.leverage_level}
                 </p>
-                <p className="text-[12px] text-slate-500 mb-2">
+                <p className="text-[12px] text-ink-3 mb-2">
                   {newResult?.redFlags?.filter((f) => f.verified).length ?? 0} verified
                   {' '}({(newResult?.redFlags?.length ?? 0) - (newResult?.redFlags?.filter((f) => f.verified).length ?? 0)} rejected by Step 3)
                 </p>
@@ -140,8 +140,8 @@ export function PipelineCompareClient() {
 
 function ResultColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="border border-slate-200 rounded-xl p-4">
-      <h2 className="text-[13px] font-bold text-slate-900 mb-3 uppercase tracking-wide">{title}</h2>
+    <div className="border border-line rounded-[10px] p-4">
+      <h2 className="text-[13px] font-bold text-ink mb-3 uppercase tracking-wide">{title}</h2>
       {children}
     </div>
   )
@@ -150,23 +150,23 @@ function ResultColumn({ title, children }: { title: string; children: React.Reac
 function ScoreRow({ score, label }: { score?: number; label?: string }) {
   if (score == null) return null
   return (
-    <p className="text-[15px] font-bold text-slate-900 mb-1">
-      Score: {score} <span className="font-normal text-[12px] text-slate-500">— {label}</span>
+    <p className="text-[15px] font-bold text-ink mb-1">
+      Score: {score} <span className="font-normal text-[12px] text-ink-3">— {label}</span>
     </p>
   )
 }
 
 function FlagRow({ type, severity, issue, tag, rejected, rejectNote }: { type: string; severity: string; issue: string; tag?: string; rejected?: boolean; rejectNote?: string }) {
   return (
-    <div className={`text-[12.5px] border rounded-lg px-2.5 py-2 mb-1.5 ${rejected ? 'opacity-50 border-slate-200' : SEVERITY_COLOR[severity] || 'border-slate-200'}`}>
+    <div className={`text-[12.5px] border rounded-lg px-2.5 py-2 mb-1.5 ${rejected ? 'opacity-50 border-line' : SEVERITY_COLOR[severity] || 'border-line'}`}>
       <div className="flex items-center gap-1.5 mb-0.5">
         <span className="font-bold uppercase text-[10px]">{severity}</span>
-        <span className="text-slate-400">·</span>
-        <span className="text-[11px] text-slate-500">{type}</span>
+        <span className="text-ink-3">·</span>
+        <span className="text-[11px] text-ink-3">{type}</span>
         {rejected && <span className="text-[10px] font-bold text-red-500 ml-auto">REJECTED</span>}
       </div>
       <p>{issue}</p>
-      {tag && <p className="text-[10px] text-slate-400 mt-0.5">source: {tag}</p>}
+      {tag && <p className="text-[10px] text-ink-3 mt-0.5">source: {tag}</p>}
       {rejected && rejectNote && <p className="text-[10px] text-red-500 mt-0.5">{rejectNote}</p>}
     </div>
   )

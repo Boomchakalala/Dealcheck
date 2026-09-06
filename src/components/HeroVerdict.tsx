@@ -21,7 +21,7 @@ export function HeroVerdict({ text, className }: { text: string; className?: str
       {hasMore && (
         <button
           onClick={() => setOpen(!open)}
-          className="mt-1.5 inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+          className="mt-1.5 inline-flex items-center gap-1 text-[12px] font-semibold text-green-deep hover:text-green-deep transition-colors"
         >
           {open ? 'Show less' : 'Show full assessment'}
           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />

@@ -9,13 +9,13 @@ export function LanguageSwitcher({ variant = 'default' }: { variant?: 'default' 
   return (
     <button
       onClick={() => setLocale(isFr ? 'en' : 'fr')}
-      className="relative inline-flex items-center w-[72px] h-[32px] rounded-full bg-slate-100 border border-slate-200 hover:border-slate-300 transition-all cursor-pointer p-0.5 flex-shrink-0"
+      className="relative inline-flex items-center w-[72px] h-[32px] rounded-full bg-surface-2 border border-line hover:border-[#C9D3CE] transition-all cursor-pointer p-0.5 flex-shrink-0"
       title={isFr ? 'Switch to English' : 'Passer en français'}
       aria-label={isFr ? 'Switch to English' : 'Passer en français'}
     >
       {/* Sliding indicator */}
       <div
-        className={`absolute top-0.5 w-[32px] h-[28px] rounded-full bg-white shadow-sm border border-slate-200 transition-all duration-200 ease-in-out ${
+        className={`absolute top-0.5 w-[32px] h-[28px] rounded-full bg-white  border border-line transition-all duration-200 ease-in-out ${
           isFr ? 'left-[36px]' : 'left-0.5'
         }`}
       />

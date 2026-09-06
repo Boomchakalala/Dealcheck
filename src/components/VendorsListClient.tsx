@@ -33,7 +33,7 @@ export function VendorsListClient({ rows }: { rows: VendorRow[] }) {
       <PageBody>
         {rows.length === 0 ? (
           <div className="py-16 text-center border border-dashed border-line rounded-[14px] bg-surface">
-            <span className="w-11 h-11 rounded-xl bg-ground grid place-items-center mx-auto mb-3"><Building2 className="w-5 h-5 text-ink-3" /></span>
+            <span className="w-11 h-11 rounded-[10px] bg-ground grid place-items-center mx-auto mb-3"><Building2 className="w-5 h-5 text-ink-3" /></span>
             <p className="text-[15px] font-semibold text-ink">{t('vendorsPage.emptyTitle')}</p>
             <p className="text-[13px] text-ink-2 mt-1 max-w-[46ch] mx-auto">{t('vendorsPage.emptyBody')}</p>
           </div>

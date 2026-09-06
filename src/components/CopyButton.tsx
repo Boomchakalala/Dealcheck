@@ -37,7 +37,7 @@ export function CopyButton({ text, label = 'Copy', variant = 'outline', onCopy }
       size="sm"
       className={cn(
         "gap-2",
-        copied && "bg-emerald-50 text-emerald-700 border-emerald-200"
+        copied && "bg-green-soft text-green-deep border-green-line"
       )}
     >
       {copied ? (
