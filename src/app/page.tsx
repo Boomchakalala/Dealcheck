@@ -191,7 +191,7 @@ export default async function LandingPage() {
           <h2 className="font-display font-extrabold text-[26px] sm:text-[32px] leading-[1.08] tracking-[-0.03em] max-w-[24ch] mt-2.5">
             {t('wins.title', { count: SHOWCASE_COUNT, total: Math.round(SHOWCASE_TOTAL_EUR / 1000) })}
           </h2>
-          <p className="text-[15px] text-ink-2 max-w-[56ch] mt-2.5 leading-[1.5]">{t('wins.lead')}</p>
+          <p className="text-[15px] text-ink-2 max-w-[56ch] mt-2.5 leading-[1.5]">{t('wins.lead', { count: SHOWCASE_COUNT })}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
             {SHOWCASE_CARDS.map((d) => (
               <Link key={d.id} href={`/demo/deal/${d.id}`} className="bg-surface border border-line rounded-[14px] overflow-hidden no-underline hover:border-[#C9D3CE] hover:shadow-[0_20px_40px_-24px_rgba(16,26,23,0.3)] transition-all">
