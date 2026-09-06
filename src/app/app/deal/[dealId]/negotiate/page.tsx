@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { getTranslations } from 'next-intl/server'
 import { FileCheck, PhoneCall, Calendar } from 'lucide-react'
 import { NegotiationRequestForm } from '@/components/NegotiationRequestForm'
@@ -18,14 +19,16 @@ export default async function NegotiateDealPage({ params }: { params: Promise<{ 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const [{ data: deal }, { data: existingRequest }] = await Promise.all([
+  const [{ data: deal }, { data: existingRequest }, { data: profile }] = await Promise.all([
     supabase.from('deals').select('*, rounds (*)').eq('id', dealId).eq('user_id', user.id).single(),
     supabase.from('negotiation_requests').select('id').eq('deal_id', dealId).eq('user_id', user.id).maybeSingle(),
+    supabase.from('profiles').select('contact_name, locale').eq('id', user.id).maybeSingle(),
   ])
   if (!deal) notFound()
 
   const t = await getTranslations('negotiateRequest')
   const dp = await getTranslations('dealPage')
+  const locale = (await cookies()).get('termlift_lang')?.value || 'en'
   const vendor = getVendorName(deal as DealLike)
   const crumbs = [{ label: dp('crumbDeals'), href: '/app' }, { label: vendor, href: `/app/deal/${dealId}` }, { label: t('crumb') }]
 
@@ -72,6 +75,12 @@ export default async function NegotiateDealPage({ params }: { params: Promise<{ 
   }
   const dealTypeText = dealTypeInference.type !== 'unknown' ? dealTypeLabel(dealTypeInference.type) : null
   const hasStoredDocument = !!latestRound?.extracted_text
+  // What the user already told the email generator on this deal — never make them retype it.
+  const emailCtx = (latestOutput as DealOutput | undefined)?.email_context
+  const walkAwayText = emailCtx?.walkAwayFlexibility === 'can_walk' ? (locale === 'fr' ? 'Nous pouvons changer de fournisseur' : 'We can walk away from this vendor')
+    : emailCtx?.walkAwayFlexibility === 'prefer_stay' ? (locale === 'fr' ? 'Nous préférons rester si possible' : 'We would prefer to stay if reasonably possible')
+    : emailCtx?.walkAwayFlexibility === 'flexible' ? (locale === 'fr' ? 'Flexibles' : 'Flexible')
+    : ''
 
   const steps = [
     { icon: FileCheck, label: t('step1'), sub: t('step1sub') },
@@ -106,24 +115,31 @@ export default async function NegotiateDealPage({ params }: { params: Promise<{ 
               defaultDealTypeConfidence={dealTypeInference.confidence}
               analysisContext={analysisContext}
               hasStoredDocument={hasStoredDocument}
+              defaultObjective={emailCtx?.negotiationObjective || ''}
+              defaultWalkAway={walkAwayText}
+              defaultCompetitor={emailCtx?.competingQuote || ''}
+              defaultContactName={profile?.contact_name || ''}
+              feePercent={NEGOTIATION_FEE_PERCENT}
+              locale={locale}
             />
           </div>
-          <div className="flex flex-col gap-3.5 lg:sticky lg:top-4">
+          {/* One card: the three steps and the fee, together. */}
+          <div className="lg:sticky lg:top-4">
             <Card>
               <SectionHeading title={t('howTitle')} />
               <div className="flex flex-col gap-3">
-                {steps.map((s) => (
+                {steps.map((s, i) => (
                   <div key={s.label} className="flex items-center gap-2.5">
-                    <span className="w-7 h-7 rounded-lg bg-green-soft text-green-deep grid place-items-center shrink-0"><s.icon className="w-3.5 h-3.5" /></span>
-                    <div className="min-w-0"><p className="text-[12.5px] font-semibold text-ink">{s.label}</p><p className="text-[11.5px] text-ink-2">{s.sub}</p></div>
+                    <span className="w-7 h-7 rounded-lg bg-green-soft text-green-deep grid place-items-center shrink-0 tl-label text-[11px]">{i + 1}</span>
+                    <div className="min-w-0"><p className="text-[13px] font-semibold text-ink">{s.label}</p><p className="text-[12px] text-ink-2">{s.sub}</p></div>
                   </div>
                 ))}
               </div>
+              <div className="mt-4 pt-4 border-t border-line-2">
+                <p className="font-display font-bold text-[22px] leading-tight tl-num text-ink">{NEGOTIATION_FEE_PERCENT}%<span className="font-sans text-[13px] text-ink-2 font-normal ml-1.5">{t('feeUnit')}</span></p>
+                <p className="text-[12.5px] text-ink-2 mt-1 leading-relaxed">{t('feeNote')}</p>
+              </div>
             </Card>
-            <div className="rounded-[14px] bg-ink text-white px-4 py-3.5">
-              <p className="font-display font-bold text-[22px] leading-tight tl-num">{NEGOTIATION_FEE_PERCENT}%<span className="font-sans text-[13px] text-[#A9B7B1] font-normal ml-1.5">{t('feeUnit')}</span></p>
-              <p className="text-[12px] text-[#A9B7B1] mt-1">{t('feeNote')}</p>
-            </div>
           </div>
         </div>
       </PageBody>
