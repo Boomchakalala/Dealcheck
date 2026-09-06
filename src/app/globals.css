@@ -151,9 +151,11 @@ a:active, button:active, [role="button"]:active {
   opacity: 0.72;
 }
 
-/* Better touch targets on mobile */
+/* Better touch targets on mobile — real buttons and button-shaped links only.
+   Inline text links (breadcrumbs, "Forgot password?") must keep their line box,
+   or they sit 10px above the text next to them. */
 @media (max-width: 640px) {
-  a, button {
+  button, [role="button"], a.inline-flex {
     min-height: 44px;
     min-width: 44px;
   }
