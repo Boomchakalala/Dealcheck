@@ -17,11 +17,6 @@
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
   </url>
-  <url>
-    <loc>https://www.termlift.com/example</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.termlift.com/example"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.termlift.com/example"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.termlift.com/example"/>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>

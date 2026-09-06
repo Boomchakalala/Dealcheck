@@ -44,9 +44,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
     // A failed run reverts deep_analysis_status to 'idle' (see catch block
     // below), so without this check a bad document could be retried
     // indefinitely, each retry burning a fresh expensive call.
-    const { data: limitProfile } = await supabase.from('profiles').select('plan, is_admin').eq('id', user.id).single()
+    const { data: limitProfile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
     if (!limitProfile?.is_admin) {
-      const rateLimit = await checkRateLimit(user.id, (limitProfile?.plan || 'free') as string)
+      const rateLimit = await checkRateLimit(user.id)
       if (!rateLimit.allowed) {
         return NextResponse.json({ error: rateLimit.message || 'Rate limit exceeded' }, { status: 429 })
       }

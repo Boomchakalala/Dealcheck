@@ -1,5 +1,6 @@
 'use client'
 
+import { NEGOTIATION_FEE_PERCENT, NEGOTIATION_FEE_MINIMUM_EUR, deepAnalysisPriceLabel, earlyAccessUntilLabel } from '@/lib/pricing'
 import { useState } from 'react'
 import Link from 'next/link'
 import { MarketingHeader } from '@/components/MarketingHeader'
@@ -61,8 +62,8 @@ const faqData: Record<Section, { title: string; sub: string; items: { q: string;
     sub: 'Pricing and account management',
     items: [
       { q: "Is analyzing a quote free?", a: 'Yes — analyze a quote with no signup required, and no credit card. Create an account to save deals and keep going from there.' },
-      { q: 'How much does Deep Analysis cost?', a: "We haven't finalized Deep Analysis pricing yet. For now it's included once you've started an analysis on a deal — we'll be upfront here before that changes." },
-      { q: 'What does it cost to have TermLift negotiate for me?', a: "Nothing upfront. If you'd rather hand the negotiation over, our fee is a success-based percentage of the savings we help you achieve — no savings, no fee." },
+      { q: 'How much does Deep Analysis cost?', a: `${deepAnalysisPriceLabel()} per deal, one time — it covers the full playbook, the emails and every round on that deal. During early access (until ${earlyAccessUntilLabel('en')}) it is free, and the first Deep Analysis on any account stays free after that.` },
+      { q: 'What does it cost to have TermLift negotiate for me?', a: `Nothing upfront. If you'd rather hand the negotiation over, our fee is ${NEGOTIATION_FEE_PERCENT}% of the verified savings with a €${NEGOTIATION_FEE_MINIMUM_EUR} minimum, invoiced after the signed deal — no savings, no fee.` },
       { q: 'Can I delete my account?', a: "Yes. Go to your profile settings and choose 'Delete account.' All your data — saved deals, analysis history, account info — is permanently removed. This cannot be undone." },
     ],
   },

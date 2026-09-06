@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import { AddRoundForm } from './AddRoundForm'
 import { DealWorkspace } from '@/components/deal/DealWorkspace'
-import type { Plan } from '@/lib/tiers'
 import type { DealOutput, DealOutputV2 } from '@/types'
 import { stripAdvancedOutput, stripFlagDetailForQuick, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
 import { hasDeepContent } from '@/lib/deep-analysis-status'
@@ -20,13 +19,12 @@ export default async function DealPage({ params }: { params: Promise<{ dealId: s
   if (!user) redirect('/login')
 
   const [{ data: profile }, { data: deal }, { data: negotiationRequest }] = await Promise.all([
-    supabase.from('profiles').select('plan, is_admin').eq('id', user.id).single(),
+    supabase.from('profiles').select('is_admin').eq('id', user.id).single(),
     supabase.from('deals').select('*, rounds (*)').eq('id', dealId).eq('user_id', user.id).single(),
     supabase.from('negotiation_requests').select('id, status, negotiation_objective, walk_away_notes, competitor_context').eq('deal_id', dealId).eq('user_id', user.id).maybeSingle(),
   ])
   if (!deal) notFound()
 
-  const userPlan = (profile?.plan || 'free') as Plan
   const isAdmin = !!profile?.is_admin
   const showFullPlaybook = isAdmin || SHOW_FULL_NEGOTIATION_PLAYBOOK
 
@@ -55,7 +53,6 @@ export default async function DealPage({ params }: { params: Promise<{ dealId: s
       deal={clientDeal}
       latestOutputOverride={latestOutput}
       messages={{ en: enMessages as unknown as Record<string, string>, fr: frMessages as unknown as Record<string, string> }}
-      userPlan={userPlan}
       isAdmin={isAdmin}
       showFullPlaybook={showFullPlaybook}
       negotiationRequest={negotiationRequest ?? null}

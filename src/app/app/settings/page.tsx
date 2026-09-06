@@ -48,8 +48,6 @@ export default async function SettingsPage() {
   }, 0)
 
   const baseCurrency = (profile?.base_currency || 'EUR') as Currency
-  const plan = profile?.plan || 'free'
-  const planLabel = plan === 'essentials' ? 'Essentials' : plan === 'pro' ? 'Pro' : plan === 'business' ? 'Business' : 'Starter'
 
   const createdAt = new Date(user.created_at)
   const now = new Date()
@@ -64,8 +62,6 @@ export default async function SettingsPage() {
         email={user.email || ''}
         firstName={(profile?.contact_name || '').trim().split(/\s+/)[0] || ''}
         lastName={(profile?.contact_name || '').trim().split(/\s+/).slice(1).join(' ')}
-        plan={plan}
-        planLabel={planLabel}
         usageCount={profile?.usage_count || 0}
         dealCount={allDeals.length}
         activeDeals={activeDeals.length}

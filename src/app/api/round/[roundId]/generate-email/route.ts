@@ -27,13 +27,13 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: profile } = await supabase.from('profiles').select('plan, is_admin').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
     if (!profile?.is_admin && !SHOW_FULL_NEGOTIATION_PLAYBOOK) {
       return NextResponse.json({ error: 'Email drafting is now handled by TermLift as part of the negotiation service.' }, { status: 403 })
     }
 
     if (!profile?.is_admin) {
-      const rateLimit = await checkRateLimit(user.id, (profile?.plan || 'free') as string)
+      const rateLimit = await checkRateLimit(user.id)
       if (!rateLimit.allowed) {
         return NextResponse.json({ error: rateLimit.message || 'Rate limit exceeded' }, { status: 429 })
       }

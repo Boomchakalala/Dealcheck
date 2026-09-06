@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import { AppPage, PageHeader } from '@/components/system'
-import { FREE_ANALYSIS_LIMIT } from '@/lib/tiers'
+import { FREE_ANALYSIS_LIMIT } from '@/lib/pricing'
 import { NEGOTIATION_FEE_PERCENT } from '@/lib/pricing'
 
 interface NegotiationPrefs {
@@ -22,7 +22,7 @@ interface NegotiationPrefs {
 }
 
 interface SettingsClientProps {
-  email: string; firstName: string; lastName: string; plan: string; planLabel: string
+  email: string; firstName: string; lastName: string
   usageCount: number; dealCount: number; activeDeals: number; closedDeals: number; roundCount: number
   isAdmin: boolean; baseCurrency: string; totalSavings: string; memberSince: string; joinedAgo: string
   locale: string; negotiationPreferences?: NegotiationPrefs | null

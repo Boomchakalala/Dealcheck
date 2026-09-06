@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { MarketingHeader } from '@/components/MarketingHeader'
 import { MarketingFooter } from '@/components/MarketingFooter'
 import { Btn, StageRail } from '@/components/system'
-import { NEGOTIATION_FEE_PERCENT, FULL_ANALYSIS_PRICE, FULL_ANALYSIS_EMAIL_REGEN_LIMIT } from '@/lib/pricing'
-import { FREE_ANALYSIS_LIMIT } from '@/lib/tiers'
+import { NEGOTIATION_FEE_PERCENT, NEGOTIATION_FEE_MINIMUM_EUR, FULL_ANALYSIS_EMAIL_REGEN_LIMIT, FREE_ANALYSIS_LIMIT, deepAnalysisPriceLabel, earlyAccessUntilLabel, isEarlyAccess } from '@/lib/pricing'
 
 export const metadata: Metadata = {
   title: 'Pricing',
@@ -27,14 +26,15 @@ export default async function PricingPage() {
   const t = await getTranslations('pricingPage')
   const pct = NEGOTIATION_FEE_PERCENT
 
-  // Never show an invented Deep Analysis price (see lib/pricing.ts).
-  const fullPrice = FULL_ANALYSIS_PRICE.needsConfirmation || FULL_ANALYSIS_PRICE.amount == null
-    ? null
-    : `${FULL_ANALYSIS_PRICE.currency === 'EUR' ? '€' : ''}${FULL_ANALYSIS_PRICE.amount}`
+  const locale = await getLocale()
+  const fullPrice = deepAnalysisPriceLabel()
+  const early = isEarlyAccess()
+  const untilLabel = earlyAccessUntilLabel(locale)
 
   // Dynamic keys — next-intl's typed `t` can't infer them, so go through a loose signature.
   const tt = t as unknown as (key: string, values?: Record<string, string | number>) => string
-  const faqs = [1, 2, 3, 4, 5].map((i) => ({ q: tt(`faq${i}q`), a: tt(`faq${i}a`, { pct }) }))
+  const faqValues = { pct, price: fullPrice, date: untilLabel, min: `€${NEGOTIATION_FEE_MINIMUM_EUR}` }
+  const faqs = [1, 2, 3, 4, 5].map((i) => ({ q: tt(`faq${i}q`), a: tt(`faq${i}a`, faqValues) }))
 
   const card = 'bg-surface border border-line rounded-[16px] p-5 flex flex-col gap-3 text-left'
 
@@ -64,11 +64,12 @@ export default async function PricingPage() {
             <div className={`${card} border-green shadow-[0_20px_50px_-30px_rgba(29,185,84,0.5)]`}>
               <span className="tl-label text-green-deep">{t('step23')}</span>
               <h3 className="font-display font-bold text-[19px]">{t('full.title')}</h3>
-              <div className="font-display font-extrabold text-[30px] tracking-[-0.03em] tl-num">
-                {fullPrice ?? <span className="text-[22px] text-ink-2">—</span>}
-                <span className="font-sans text-[13px] font-medium text-ink-2 tracking-normal ml-2">{t('full.unit')}</span>
+              <div className="font-display font-extrabold text-[30px] tracking-[-0.03em] tl-num flex items-baseline flex-wrap gap-x-2">
+                {early ? <s className="text-ink-3 font-bold decoration-[2px]">{fullPrice}</s> : fullPrice}
+                {early && <span className="text-[13px] font-bold text-green-deep bg-green-soft border border-green-line rounded-full px-2.5 py-0.5 tracking-normal font-sans">{t('full.freeNow', { date: untilLabel })}</span>}
+                <span className="font-sans text-[13px] font-medium text-ink-2 tracking-normal basis-full">{t('full.unit')}</span>
               </div>
-              {!fullPrice && <p className="text-[12px] text-ink-3 italic -mt-1">{t('full.tbc')}</p>}
+              {early && <p className="text-[12px] text-ink-2 -mt-1">{t('full.early', { date: untilLabel })}</p>}
               <ul className="m-0 p-0 list-none flex flex-col gap-2">
                 <Feature>{t('full.f1')}</Feature><Feature>{t('full.f2')}</Feature><Feature>{t('full.f3')}</Feature>
                 <Feature>{t('full.f4', { n: FULL_ANALYSIS_EMAIL_REGEN_LIMIT })}</Feature><Feature>{t('full.f5')}</Feature>

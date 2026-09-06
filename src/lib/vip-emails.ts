@@ -1,4 +1,4 @@
-// VIP email list — grants admin + Pro plan on first auth callback.
+// VIP email list — grants admin on first auth callback.
 // Idempotent: runs every callback but only writes when email matches.
 
 const VIP_EMAILS = new Set([
@@ -15,6 +15,6 @@ export async function applyVipStatus(
   if (!VIP_EMAILS.has(email.toLowerCase())) return
   await supabase
     .from('profiles')
-    .update({ is_admin: true, plan: 'pro' })
+    .update({ is_admin: true })
     .eq('id', userId)
 }

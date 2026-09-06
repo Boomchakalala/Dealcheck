@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { AddRoundSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/claude'
 import { checkRateLimit } from '@/lib/rate-limit'
-import { FREE_ANALYSIS_LIMIT, ESSENTIALS_MONTHLY_LIMIT } from '@/lib/tiers'
+import { checkFreeQuota } from '@/lib/pricing'
 import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
 import { MAX_ROUNDS_PER_DEAL } from '@/lib/ai-limits'
 import { runWithAiContext } from '@/lib/ai-telemetry'
@@ -59,7 +59,7 @@ export async function POST(
     // Get user profile and check usage limit
     const { data: profile } = await supabase
       .from('profiles')
-      .select('usage_count, plan, is_admin, negotiation_preferences')
+      .select('usage_count, is_admin, negotiation_preferences')
       .eq('id', user.id)
       .single()
 
@@ -67,41 +67,18 @@ export async function POST(
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    // Rate limiting and plan enforcement (admins bypass)
+    // Rate limiting and free-quota enforcement (admins bypass)
     if (!profile.is_admin) {
-      const plan = (profile.plan || 'free') as string
-      const rateLimit = await checkRateLimit(user.id, plan)
-
+      const rateLimit = await checkRateLimit(user.id)
       if (!rateLimit.allowed) {
         return NextResponse.json(
           { error: rateLimit.message || 'Rate limit exceeded', remaining: rateLimit.remaining, resetAt: rateLimit.resetAt },
           { status: 429 }
         )
       }
-
-      if (plan === 'free') {
-        if (profile.usage_count >= FREE_ANALYSIS_LIMIT) {
-          return NextResponse.json(
-            { error: `You've used all ${FREE_ANALYSIS_LIMIT} of your free analyses. Contact us if you need to analyze more deals.` },
-            { status: 403 }
-          )
-        }
-      } else if (plan === 'essentials') {
-        // Monthly analysis limit
-        const startOfMonth = new Date()
-        startOfMonth.setDate(1)
-        startOfMonth.setHours(0, 0, 0, 0)
-        const { count: monthlyCount } = await supabase
-          .from('rounds')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .gte('created_at', startOfMonth.toISOString())
-        if ((monthlyCount || 0) >= ESSENTIALS_MONTHLY_LIMIT) {
-          return NextResponse.json(
-            { error: `Essentials plan limited to ${ESSENTIALS_MONTHLY_LIMIT} analyses per month. Upgrade to Pro (\u20AC129/mo) for unlimited.` },
-            { status: 403 }
-          )
-        }
+      const quota = checkFreeQuota(profile.usage_count || 0)
+      if (!quota.allowed) {
+        return NextResponse.json({ error: quota.message }, { status: 403 })
       }
     }
 

@@ -6,11 +6,10 @@ import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Mail, Sparkles, Lo
 import Link from 'next/link'
 import { normalizeAmount, formatCurrency, parseMoney } from '@/lib/currency'
 import type { DealOutput } from '@/types'
-import type { Plan } from '@/lib/tiers'
 import { getCanOffer } from '@/lib/email-asks'
 import { hasDeepContent as computeHasDeepContent } from '@/lib/deep-analysis-status'
 import { MarketBenchmark } from '@/components/deal/MarketBenchmark'
-import { NEGOTIATION_FEE_PERCENT, FULL_ANALYSIS_EMAIL_REGEN_LIMIT } from '@/lib/pricing'
+import { NEGOTIATION_FEE_PERCENT, FULL_ANALYSIS_EMAIL_REGEN_LIMIT, deepAnalysisPriceNote } from '@/lib/pricing'
 import { TONE_LABELS, type EmailTone } from '@/lib/tone-recommend'
 import { getFlagSeverity } from '@/lib/deal-metrics'
 import { Btn, Card, Chip, GateCard } from '@/components/system'
@@ -44,7 +43,6 @@ interface DealScrollViewProps {
   closedAt: string | null
   whatChanged: string[] | null
   originalTotal: string | undefined
-  userPlan: Plan
   isAdmin: boolean
   addRoundForm: React.ReactNode
   messages: Record<string, Record<string, string>>
@@ -540,7 +538,7 @@ export function DealScrollView(props: DealScrollViewProps) {
               tone="green"
               eyebrow={fr ? 'Étape 2 · Analyse approfondie' : 'Step 2 · Deep Analysis'}
               title={fr ? 'Débloquer le plan, les demandes et le benchmark' : 'Unlock the playbook, the asks and the benchmark'}
-              body={<>{fr ? "Quoi demander pour chaque point, votre levier, l'ordre des demandes, les positions de repli et la comparaison au marché — puis l'e-mail. Environ deux minutes." : 'What to ask for on every flag, your leverage, the order to push in, fallback positions and the market comparison — then the email. About two minutes.'}{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
+              body={<>{fr ? "Quoi demander pour chaque point, votre levier, l'ordre des demandes, les positions de repli et la comparaison au marché — puis l'e-mail. Environ deux minutes." : 'What to ask for on every flag, your leverage, the order to push in, fallback positions and the market comparison — then the email. About two minutes.'}<span className="block mt-1.5 font-semibold text-green-deep">{deepAnalysisPriceNote(locale)}</span>{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
               action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? "Lancer l'analyse approfondie" : 'Run Deep Analysis')}</Btn>}
             />
           )}
@@ -552,7 +550,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                 eyebrow={fr ? 'TermLift négocie · option' : 'TermLift negotiates · add-on'}
                 title={fr ? 'Vous préférez ne rien faire de tout ça ?' : 'Prefer not to do any of this?'}
                 body={fr ? `Passez-nous la main dès maintenant. Un négociateur mène les échanges avec ${o?.vendor || 'le fournisseur'}, vous validez chaque résultat. ${NEGOTIATION_FEE_PERCENT} % des économies vérifiées, rien si nous ne vous faisons pas économiser.` : `Hand it over right now. A negotiator runs the back-and-forth with ${o?.vendor || 'the vendor'}, you approve every outcome. ${NEGOTIATION_FEE_PERCENT}% of verified savings, nothing if we don't save you money.`}
-                action={<Btn href={negotiateHref} variant="ink">{fr ? 'Confier à TermLift' : 'Let TermLift negotiate'}</Btn>}
+                action={<Btn href={negotiateHref} variant="ink">{fr ? 'Demander une négociation TermLift' : 'Request TermLift negotiation'}</Btn>}
               />
             </div>
           )}
@@ -755,7 +753,7 @@ export function DealScrollView(props: DealScrollViewProps) {
               eyebrow={fr ? 'TermLift négocie · option' : 'TermLift negotiates · add-on'}
               title={fr ? "Vous préférez ne pas l'envoyer vous-même ?" : "Don't want to send it yourself?"}
               body={fr ? `Nous reprenons le plan et menons les échanges avec ${o?.vendor || 'le fournisseur'}. Vous validez chaque résultat. ${NEGOTIATION_FEE_PERCENT} % des économies vérifiées, rien si nous ne vous faisons pas économiser.` : `We take the playbook from here and run the back-and-forth with ${o?.vendor || 'the vendor'}. You approve every outcome. ${NEGOTIATION_FEE_PERCENT}% of verified savings, nothing if we don't save you money.`}
-              action={<Btn href={negotiateHref} variant="ink">{fr ? 'Confier à TermLift' : 'Let TermLift negotiate'}</Btn>}
+              action={<Btn href={negotiateHref} variant="ink">{fr ? 'Demander une négociation TermLift' : 'Request TermLift negotiation'}</Btn>}
             />
           </div>
         )}

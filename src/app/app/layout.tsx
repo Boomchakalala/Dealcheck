@@ -8,12 +8,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect('/login')
 
   const [{ data: profile }, { data: notifications }, { data: requests }] = await Promise.all([
-    supabase.from('profiles').select('usage_count, plan, is_admin').eq('id', user.id).single(),
+    supabase.from('profiles').select('usage_count, is_admin').eq('id', user.id).single(),
     supabase.from('notifications').select('id, type, title, body, link, read_at, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(30),
     supabase.from('negotiation_requests').select('deal_id, status').eq('user_id', user.id),
   ])
 
-  const isPaid = profile?.plan === 'essentials' || profile?.plan === 'pro' || profile?.plan === 'business'
   const isAdmin = profile?.is_admin || false
 
   // Badge = negotiations where TermLift is waiting on the user. Nothing else counts.
@@ -23,10 +22,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-ground">
       <AppSidebar
         userEmail={user.email || 'user@example.com'}
-        isUpgraded={isPaid}
+        isUpgraded={false}
         usageCount={profile?.usage_count || 0}
         isAdmin={isAdmin}
-        plan={profile?.plan || 'free'}
         notifications={notifications || []}
         needsYou={needsYou}
       />

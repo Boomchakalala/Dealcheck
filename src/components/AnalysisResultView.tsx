@@ -34,7 +34,6 @@ export function AnalysisResultView({ output }: AnalysisResultViewProps) {
       mode="trial"
       deal={deal}
       messages={{ en: enMessages as unknown as Record<string, string>, fr: frMessages as unknown as Record<string, string> }}
-      userPlan="pro"
       isAdmin={false}
       showFullPlaybook={false}
     />

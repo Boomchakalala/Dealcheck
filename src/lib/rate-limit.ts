@@ -13,27 +13,17 @@ export interface RateLimitResult {
   message?: string
 }
 
-// Rate limits by tier
-const FREE_LIMITS: RateLimitConfig = {
-  hourlyLimit: 5,
-  dailyLimit: 5,
-}
-
-const ESSENTIALS_LIMITS: RateLimitConfig = {
+// One abuse ceiling for every account — there are no tiers. Admins bypass at the caller.
+const LIMITS: RateLimitConfig = {
   hourlyLimit: 5,
   dailyLimit: 10,
 }
 
-const PRO_LIMITS: RateLimitConfig = {
-  hourlyLimit: 10,
-  dailyLimit: 30,
-}
-
-export async function checkRateLimit(userId: string, plan: string = 'free'): Promise<RateLimitResult> {
+export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
   const supabase = await createClient()
   const now = new Date()
 
-  const limits = plan === 'pro' || plan === 'business' ? PRO_LIMITS : plan === 'essentials' ? ESSENTIALS_LIMITS : FREE_LIMITS
+  const limits = LIMITS
 
   // Count analyses in the last hour
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
@@ -97,15 +87,7 @@ export async function getUserUsage(userId: string): Promise<{
   const supabase = await createClient()
   const now = new Date()
 
-  // Get user's plan
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('plan')
-    .eq('id', userId)
-    .single()
-
-  const plan = profile?.plan || 'free'
-  const limits = plan === 'pro' || plan === 'business' ? PRO_LIMITS : plan === 'essentials' ? ESSENTIALS_LIMITS : FREE_LIMITS
+  const limits = LIMITS
 
   // Count hourly usage
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)

@@ -12,7 +12,7 @@ Local development on Windows (not a cloud sandbox). Project lives at `C:\Users\k
 - Tailwind CSS v4
 - Supabase (Auth + Postgres, via `@supabase/ssr`)
 - OpenAI API (GPT-4o) for analysis; `@anthropic-ai/sdk` also present
-- Stripe for billing, PostHog for analytics
+- PostHog for analytics. No billing yet: Deep Analysis is priced in `src/lib/pricing.ts` and free during early access; the old Stripe subscription tiers were removed 2026-09-06
 - File processing: pdf-parse, pdfjs-dist, mammoth, tesseract.js (OCR)
 - Tests: Vitest
 

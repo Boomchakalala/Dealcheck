@@ -18,9 +18,9 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: closeProfile } = await supabase.from('profiles').select('plan, is_admin').eq('id', user.id).single()
+    const { data: closeProfile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
     if (!closeProfile?.is_admin) {
-      const rateLimit = await checkRateLimit(user.id, (closeProfile?.plan || 'free') as string)
+      const rateLimit = await checkRateLimit(user.id)
       if (!rateLimit.allowed) {
         return NextResponse.json({ error: rateLimit.message || 'Rate limit exceeded' }, { status: 429 })
       }

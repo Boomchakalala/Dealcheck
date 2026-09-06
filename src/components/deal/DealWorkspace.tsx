@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useState, type ReactNode } from 'react'
 import { useI18n } from '@/i18n/context'
 import { cn } from '@/lib/utils'
-import type { Plan } from '@/lib/tiers'
 import type { DealOutput } from '@/types'
 import { DealScrollView } from '@/components/DealScrollView'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
@@ -38,7 +37,6 @@ interface DealWorkspaceProps {
   mode: 'app' | 'demo' | 'trial'
   /** Flat message dictionaries DealScrollView still reads from (src/i18n/*.json). */
   messages: Record<string, Record<string, string>>
-  userPlan: Plan
   isAdmin: boolean
   showFullPlaybook: boolean
   negotiationRequest?: NegotiationRequestLite | null
@@ -53,7 +51,7 @@ interface DealWorkspaceProps {
  * changes with the stage), stage rail, verdict, stat tiles, then the existing
  * analysis sections, then the hand-off gate. Shared by /app, /demo and /try.
  */
-export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFullPlaybook, negotiationRequest, addRoundForm, inferredDealType, latestOutputOverride }: DealWorkspaceProps) {
+export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook, negotiationRequest, addRoundForm, inferredDealType, latestOutputOverride }: DealWorkspaceProps) {
   const { t, locale } = useI18n()
   // Captured once per mount so render stays pure (react-compiler rule).
   const [now] = useState(() => Date.now())
@@ -208,7 +206,6 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
                 originalTotal={originalTotal}
                 roundCount={sortedRounds.length}
                 whatChanged={deal.what_changed ?? null}
-                userPlan={userPlan}
                 isAdmin={isAdmin}
               />
             )}
@@ -313,7 +310,6 @@ export function DealWorkspace({ deal, mode, messages, userPlan, isAdmin, showFul
             closedAt={deal.closed_at ?? null}
             whatChanged={deal.what_changed ?? null}
             originalTotal={originalTotal}
-            userPlan={userPlan}
             isAdmin={isAdmin}
             showFullPlaybook={showFullPlaybook}
             negotiateHref={negotiateHref}

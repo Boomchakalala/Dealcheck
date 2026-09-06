@@ -9,14 +9,13 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { NotificationBell, type NotificationItem } from '@/components/NotificationBell'
 import { useT } from '@/i18n/context'
 import { cn } from '@/lib/utils'
-import { FREE_ANALYSIS_LIMIT } from '@/lib/tiers'
+import { FREE_ANALYSIS_LIMIT } from '@/lib/pricing'
 
 interface AppSidebarProps {
   userEmail: string
   isUpgraded: boolean
   usageCount: number
   isAdmin: boolean
-  plan?: string
   /** '/app' for the real app, '/demo' for the demo. */
   linkBase?: string
   demoMode?: boolean

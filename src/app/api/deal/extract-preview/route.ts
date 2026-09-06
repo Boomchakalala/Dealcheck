@@ -32,12 +32,12 @@ export async function POST(request: Request) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('plan, is_admin')
+      .select('is_admin')
       .eq('id', user.id)
       .single()
 
     if (!profile?.is_admin) {
-      const rateLimit = await checkRateLimit(user.id, (profile?.plan || 'free') as string)
+      const rateLimit = await checkRateLimit(user.id)
       if (!rateLimit.allowed) {
         return NextResponse.json({ error: rateLimit.message || 'Rate limit exceeded' }, { status: 429 })
       }

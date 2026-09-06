@@ -12,7 +12,7 @@ import { TrialImporter } from '@/components/home/TrialImporter'
 import { buildHomeRows } from '@/lib/home-rows'
 import { enrichDeals, computeInsights } from '@/lib/deal-insights'
 import { fmtCompact, fmtMoney, type DealLike } from '@/lib/deal-metrics'
-import { FREE_ANALYSIS_LIMIT } from '@/lib/tiers'
+import { FREE_ANALYSIS_LIMIT, isEarlyAccess, deepAnalysisPriceNote } from '@/lib/pricing'
 import type { Currency } from '@/lib/currency'
 import { cn } from '@/lib/utils'
 
@@ -32,7 +32,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const locale = await getLocale()
 
   const [{ data: profile }, { data: deals, error: dealsError }, { data: requests, error: requestsError }] = await Promise.all([
-    supabase.from('profiles').select('usage_count, plan, is_admin, base_currency').eq('id', user.id).single(),
+    supabase.from('profiles').select('usage_count, is_admin, base_currency').eq('id', user.id).single(),
     supabase.from('deals').select('*, rounds (id, output_json, round_number, status, created_at)').eq('user_id', user.id).order('updated_at', { ascending: false }),
     supabase.from('negotiation_requests').select('deal_id, status').eq('user_id', user.id),
   ])
@@ -42,11 +42,12 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   if (requestsError) throw new Error(`Home: negotiation_requests query failed — ${requestsError.message}`)
 
   const allDeals = (deals || []) as unknown as DealLike[]
-  const isPaid = ['essentials', 'pro', 'business'].includes(profile?.plan || '')
   const isAdmin = !!profile?.is_admin
   const usageCount = profile?.usage_count || 0
   const remaining = Math.max(0, FREE_ANALYSIS_LIMIT - usageCount)
-  const atLimit = !isPaid && !isAdmin && usageCount >= FREE_ANALYSIS_LIMIT
+  const atLimit = !isAdmin && usageCount >= FREE_ANALYSIS_LIMIT
+  const earlyAccess = isEarlyAccess()
+  const priceNote = deepAnalysisPriceNote(locale)
   const baseCurrency = ((profile?.base_currency as Currency) || 'EUR') as Currency
 
   const reqByDeal = new Map<string, string>()
@@ -116,9 +117,11 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       </PageHeader>
 
       <PageBody>
-        {!isPaid && !isAdmin && (
-          atLimit ? (
-            <GateCard tone="warn" eyebrow={t('usageEyebrow')} title={t('usageLimitTitle')} body={t('usageLimitBody')} action={<Btn href="/contact" variant="ink" size="sm">{t('usageContact')}</Btn>} />
+        {!isAdmin && (
+          atLimit && earlyAccess ? (
+            <GateCard tone="neutral" eyebrow={t('usageEyebrow')} title={t('usageEarlyTitle')} body={t('usageEarlyBody', { note: priceNote })} action={<Btn href="/app/new" variant="primary" size="sm">{t('usageNew')}</Btn>} />
+          ) : atLimit ? (
+            <GateCard tone="warn" eyebrow={t('usageEyebrow')} title={t('usageLimitTitle')} body={t('usageLimitBody', { note: priceNote })} action={<Btn href="/contact" variant="ink" size="sm">{t('usageContact')}</Btn>} />
           ) : remaining <= 1 ? (
             <GateCard tone="neutral" eyebrow={t('usageEyebrow')} title={t('usageLeftTitle', { n: remaining })} body={t('usageLeftBody')} />
           ) : null

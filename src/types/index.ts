@@ -11,7 +11,7 @@ export type Database = {
           first_name: string | null
           last_name: string | null
           created_at: string
-          plan: 'free' | 'essentials' | 'pro' | 'business'
+          plan: string | null // legacy column, unused since 2026-09-06
           usage_count: number
           is_admin: boolean
           base_currency: string | null
@@ -27,7 +27,7 @@ export type Database = {
           first_name?: string | null
           last_name?: string | null
           created_at?: string
-          plan?: 'free' | 'essentials' | 'pro' | 'business'
+          plan?: string | null
           usage_count?: number
           is_admin?: boolean
           base_currency?: string | null
@@ -43,7 +43,7 @@ export type Database = {
           first_name?: string | null
           last_name?: string | null
           created_at?: string
-          plan?: 'free' | 'essentials' | 'pro' | 'business'
+          plan?: string | null
           usage_count?: number
           is_admin?: boolean
           base_currency?: string | null

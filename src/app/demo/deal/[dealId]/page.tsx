@@ -21,7 +21,6 @@ export default async function DemoDealPage({ params }: { params: Promise<{ dealI
       mode="demo"
       deal={{ ...deal, deal_type: null, savings_percent: null }}
       messages={{ en: enMessages as unknown as Record<string, string>, fr: frMessages as unknown as Record<string, string> }}
-      userPlan="pro"
       isAdmin={false}
       showFullPlaybook
       addRoundForm={

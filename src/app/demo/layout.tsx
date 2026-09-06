@@ -21,7 +21,6 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
         isUpgraded={true}
         usageCount={demoProfile.usage_count}
         isAdmin={false}
-        plan={demoProfile.plan}
         linkBase="/demo"
         demoMode={true}
       />

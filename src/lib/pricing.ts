@@ -1,55 +1,102 @@
 /**
- * Central source of truth for commercial/pricing values that are quoted in
- * more than one place in the app. Legacy monthly-subscription prices/limits
- * still live in lib/tiers.ts (and lib/stripe.ts for the Stripe price IDs) —
- * that system is dormant in the live product (see MVP model below) but kept
- * intact for a possible future teams/enterprise use case. This file is the
- * source of truth for the CURRENT deal-based MVP commercial model.
+ * Single source of truth for TermLift's commercial model. Everything that
+ * quotes a price, a limit or a fee reads from here — no literals elsewhere.
+ *
+ * The model (decided 2026-09-06):
+ *   Step 1  Quick analysis      free, FREE_ANALYSIS_LIMIT per account (+1 anonymous per IP per day on /try)
+ *   Step 2  Deep Analysis       one-time, per deal — DEEP_ANALYSIS_PRICE_EUR
+ *                               · free while EARLY_ACCESS is on (dated)
+ *                               · the first Deep Analysis on any account is always free
+ *   Step 3  Negotiate yourself  included with Deep Analysis
+ *   Add-on  TermLift negotiates NEGOTIATION_FEE_PERCENT of verified savings, NEGOTIATION_FEE_MINIMUM_EUR minimum
+ *
+ * There is no subscription. The old Starter / Essentials / Pro / Business tiers
+ * and their Stripe subscription flow were removed on 2026-09-06; `profiles.plan`
+ * is a dead column that nothing reads any more.
  */
 
 export const CURRENCY = 'EUR'
 
-/**
- * The negotiation service's fee — a percentage of the savings TermLift
- * negotiates, charged only when a deal closes with real savings. This was
- * already the canonical, approved rate before this file existed (see
- * app/deal/[dealId]/negotiate/page.tsx and app/pricing/page.tsx) — this
- * constant doesn't set the number, it just gives every place that quotes it
- * one place to read it from instead of a repeated literal `20`.
- */
-export const NEGOTIATION_FEE_PERCENT = 20
+/** Quick analyses per account, lifetime. Deep Analysis, emails and rounds on existing deals never count. */
+export const FREE_ANALYSIS_LIMIT = 4
+
+/** Deep Analysis list price, one-time per deal. */
+export const DEEP_ANALYSIS_PRICE_EUR = 79
 
 /**
- * Deep Analysis — a one-time purchase per deal that unlocks the full
- * negotiation workspace for that specific quote (deeper commercial
- * analysis, negotiation levers, recommended asks, strategy, Round 1 prep,
- * and negotiation email generation).
- *
- * NO PRICE HAS BEEN CONFIRMED. `amount: null` is deliberate, not a bug —
- * do not replace it with an invented number. `needsConfirmation: true` is
- * the flag any pricing-page/CTA code must check before ever rendering a
- * dollar figure for Deep Analysis; while it's true, the product must show
- * neutral "one-time purchase" / "pricing to be confirmed" language instead
- * of a number, and must NOT actually block/charge for the feature — that
- * would mean collecting money against a price nobody approved. Functionally,
- * Deep Analysis stays accessible today (same as before this change); only
- * the entitlement bookkeeping and messaging are new. See
- * lib/deep-analysis-status.ts's hasDeepContent() for how "has this deal
- * unlocked Deep Analysis" is actually represented — it reuses the existing
- * deep_analysis_status field rather than a new purchase table, since running
- * Deep Analysis is currently the entire unlock action (no payment exists
- * yet to gate it further).
+ * Early access: every Deep Analysis is free until this date (inclusive).
+ * Extend the date or flip `enabled` — nothing else needs to change. While it
+ * is on, nothing charges and the free quick-analysis limit does not block new
+ * deals either (a new deal past the limit *is* a Deep Analysis, and those are
+ * free right now).
  */
-export const FULL_ANALYSIS_PRICE = {
-  amount: null as number | null, // e.g. 49 once approved — DO NOT set a placeholder number here
-  currency: CURRENCY,
-  unit: 'per_deal' as const,
-  needsConfirmation: true,
+export const EARLY_ACCESS = {
+  enabled: true,
+  until: '2026-10-31',
 } as const
 
-/**
- * Flat cap on email regenerations per round, now that email generation is
- * part of what Deep Analysis unlocks rather than a subscription-tier perk.
- * This is an abuse safeguard, not a paywall — same limit for every user.
- */
+/** The first Deep Analysis on any account stays free after early access. */
+export const FIRST_DEEP_ANALYSIS_FREE = true
+
+/** The negotiation service's fee — a percentage of verified savings, charged only when a deal closes with savings. */
+export const NEGOTIATION_FEE_PERCENT = 20
+
+/** Floor on the negotiation fee, so a €2k saving is still worth a negotiator's week. Quoted in the FAQ, invoiced after the signed deal. */
+export const NEGOTIATION_FEE_MINIMUM_EUR = 500
+
+/** Flat cap on email regenerations per round — an abuse safeguard, not a paywall. */
 export const FULL_ANALYSIS_EMAIL_REGEN_LIMIT = 3
+
+/** Kept for existing imports; Deep Analysis is priced now. */
+export const FULL_ANALYSIS_PRICE = {
+  amount: DEEP_ANALYSIS_PRICE_EUR,
+  currency: CURRENCY,
+  unit: 'per_deal' as const,
+} as const
+
+export function isEarlyAccess(now: Date = new Date()): boolean {
+  if (!EARLY_ACCESS.enabled) return false
+  return now.toISOString().slice(0, 10) <= EARLY_ACCESS.until
+}
+
+/** "31 October 2026" / "31 octobre 2026" */
+export function earlyAccessUntilLabel(locale: string = 'en'): string {
+  const d = new Date(EARLY_ACCESS.until + 'T12:00:00Z')
+  return d.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+/** "€79" */
+export function deepAnalysisPriceLabel(): string {
+  return `€${DEEP_ANALYSIS_PRICE_EUR}`
+}
+
+/**
+ * One sentence for gates and cards: what Deep Analysis costs right now.
+ * EN: "€79 per deal · free during early access until 31 October 2026."
+ */
+export function deepAnalysisPriceNote(locale: string = 'en'): string {
+  const fr = locale === 'fr'
+  const price = deepAnalysisPriceLabel()
+  if (isEarlyAccess()) {
+    return fr
+      ? `${price} par dossier · gratuit pendant l'accès anticipé jusqu'au ${earlyAccessUntilLabel('fr')}.`
+      : `${price} per deal · free during early access until ${earlyAccessUntilLabel('en')}.`
+  }
+  return fr
+    ? `${price} par dossier${FIRST_DEEP_ANALYSIS_FREE ? ' · la première est offerte' : ''}.`
+    : `${price} per deal${FIRST_DEEP_ANALYSIS_FREE ? ' · your first one is free' : ''}.`
+}
+
+/**
+ * Server-side quota check for creating a new analysis (new deal, imported
+ * trial, or a new round). Admins are checked by the caller, not here.
+ */
+export function checkFreeQuota(usageCount: number): { allowed: boolean; message?: string } {
+  if (usageCount < FREE_ANALYSIS_LIMIT) return { allowed: true }
+  // Past the free quick analyses a new deal is a Deep Analysis — free while early access is on.
+  if (isEarlyAccess()) return { allowed: true }
+  return {
+    allowed: false,
+    message: `You've used your ${FREE_ANALYSIS_LIMIT} free quick analyses. Each further deal is a Deep Analysis at ${deepAnalysisPriceLabel()} — payment is coming soon; contact us to continue in the meantime.`,
+  }
+}

@@ -10,7 +10,6 @@ export interface DemoProfile {
   first_name: string
   last_name: string
   email: string
-  plan: 'starter' | 'essentials' | 'pro'
   usage_count: number
   is_admin: false
   base_currency: 'EUR'
@@ -26,7 +25,6 @@ export const demoProfile: DemoProfile = {
   first_name: 'Sample',
   last_name: 'Account',
   email: DEMO_USER_EMAIL,
-  plan: 'pro',
   usage_count: 6,
   is_admin: false,
   base_currency: 'EUR',
