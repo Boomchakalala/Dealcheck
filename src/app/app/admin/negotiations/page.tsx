@@ -3,11 +3,12 @@ export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Briefcase, ChevronRight, Calendar, Flag } from 'lucide-react'
+import { Flag } from 'lucide-react'
+import { AppPage, PageHeader, PageBody, Chip, Table, TableHead, TableRow, HideM, NameCell } from '@/components/system'
+import { isClosedStatus, needsAdminAction, statusLabel, statusTone } from '@/lib/negotiation-status'
+import { cn } from '@/lib/utils'
 
-const sora = "'Sora', sans-serif"
-
-type NegotiationRequestRow = {
+type Row = {
   id: string
   vendor: string | null
   status: string
@@ -16,113 +17,88 @@ type NegotiationRequestRow = {
   renewal_date: string | null
   next_action: string | null
   created_at: string
+  updated_at: string | null
   profiles: { email: string } | null
   deals: { vendor: string | null; title: string | null } | null
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  new: 'New',
-  reviewing: 'Reviewing',
-  waiting_for_client_info: 'Waiting for client info',
-  ready_to_negotiate: 'Ready to negotiate',
-  negotiating: 'Negotiating',
-  offer_received: 'Offer received',
-  closed_won: 'Closed — won',
-  closed_lost: 'Closed — lost',
-}
+type Filter = 'action' | 'active' | 'closed' | 'all'
+const COLS = 'minmax(0,2fr) 1.3fr 1.5fr 1fr minmax(0,1.6fr)'
 
-const STATUS_COLOR: Record<string, string> = {
-  new: 'bg-slate-100 text-slate-700 border-slate-200',
-  reviewing: 'bg-amber-100 text-amber-700 border-amber-200',
-  waiting_for_client_info: 'bg-amber-100 text-amber-700 border-amber-200',
-  ready_to_negotiate: 'bg-blue-100 text-blue-700 border-blue-200',
-  negotiating: 'bg-blue-100 text-blue-700 border-blue-200',
-  offer_received: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  closed_won: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  closed_lost: 'bg-red-100 text-red-700 border-red-200',
-}
-
-export default async function AdminNegotiationsPage() {
+export default async function AdminNegotiationsPage({ searchParams }: { searchParams: Promise<{ f?: string }> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
-
   const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
   if (!profile?.is_admin) redirect('/app')
+
+  const sp = await searchParams
+  const filter: Filter = (['action', 'active', 'closed', 'all'] as Filter[]).includes(sp.f as Filter) ? (sp.f as Filter) : 'active'
 
   const { data: requests } = await supabase
     .from('negotiation_requests')
     .select('*, profiles(email), deals(vendor, title)')
     .order('created_at', { ascending: false })
+  const rows = (requests || []) as unknown as Row[]
 
-  const rows = (requests || []) as unknown as NegotiationRequestRow[]
-  const newCount = rows.filter(r => r.status === 'new').length
-  const inProgressCount = rows.filter(r => !['new', 'closed_won', 'closed_lost'].includes(r.status)).length
-  const closedWonCount = rows.filter(r => r.status === 'closed_won').length
+  const counts = {
+    action: rows.filter((r) => needsAdminAction(r.status)).length,
+    active: rows.filter((r) => !isClosedStatus(r.status)).length,
+    closed: rows.filter((r) => isClosedStatus(r.status)).length,
+    all: rows.length,
+  }
+  const visible = rows
+    .filter((r) => filter === 'all' ? true : filter === 'closed' ? isClosedStatus(r.status) : filter === 'action' ? needsAdminAction(r.status) : !isClosedStatus(r.status))
+    // The ones waiting on TermLift float to the top; then most recently touched.
+    .sort((a, b) => Number(needsAdminAction(b.status)) - Number(needsAdminAction(a.status)) || (b.updated_at || b.created_at).localeCompare(a.updated_at || a.created_at))
+
+  const filters: Array<{ key: Filter; label: string; count: number }> = [
+    { key: 'action', label: 'Needs action', count: counts.action },
+    { key: 'active', label: 'Active', count: counts.active },
+    { key: 'closed', label: 'Closed', count: counts.closed },
+    { key: 'all', label: 'All', count: counts.all },
+  ]
+  const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  // Server component: one clock read per request is fine (the purity lint targets client renders).
+  // eslint-disable-next-line react-hooks/purity
+  const nowMs = Date.now()
+  const daysTo = (d: string) => Math.ceil((new Date(d).getTime() - nowMs) / 86400000)
 
   return (
-    <div className="-mx-5 sm:-mx-8 -mt-8 bg-slate-50 min-h-screen">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-7">
-        <div className="flex items-center justify-between gap-4 mb-5">
-          <div>
-            <h1 className="text-[20px] sm:text-[26px] font-bold text-slate-900" style={{ fontFamily: sora }}>Negotiation requests</h1>
-            <p className="text-[13px] text-slate-500 mt-0.5">{rows.length} total{newCount > 0 ? ` · ${newCount} new` : ''}{inProgressCount > 0 ? ` · ${inProgressCount} in progress` : ''}{closedWonCount > 0 ? ` · ${closedWonCount} closed — won` : ''}</p>
-          </div>
+    <AppPage>
+      <PageHeader title="Negotiation requests" sub={`${counts.all} total · ${counts.action} need action · ${counts.active} active · ${counts.closed} closed`} />
+      <PageBody>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {filters.map((f) => (
+            <Link key={f.key} href={`/app/admin/negotiations?f=${f.key}`} className={cn('h-8 px-3 rounded-lg text-[12.5px] font-semibold border transition-colors no-underline inline-flex items-center gap-1.5', filter === f.key ? 'bg-ink border-ink text-white' : 'bg-surface border-line text-ink-2 hover:border-[#C9D3CE]')}>
+              {f.label}{f.count > 0 && <span className={cn('tl-label text-[10px] px-1.5 py-0.5 rounded-md', filter === f.key ? 'bg-white/15 text-white' : f.key === 'action' ? 'bg-risk-soft text-risk' : 'bg-line-2 text-ink-2')}>{f.count}</span>}
+            </Link>
+          ))}
         </div>
-      </div>
 
-      <div className="px-5 sm:px-8 py-6">
-        {rows.length === 0 ? (
-          <div className="text-center py-20 bg-white border border-slate-200 rounded-2xl shadow-sm">
-            <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
-              <Briefcase className="w-6 h-6 text-slate-400" />
+        <Table>
+          <TableHead cols={COLS}><span>Vendor</span><span>Status</span><span>Client</span><span>Deadline</span><span>Next action</span></TableHead>
+          {visible.length === 0 && (
+            <div className="px-4 py-10 text-center">
+              <p className="text-[14px] font-semibold text-ink">{filter === 'action' ? 'Nothing waiting on you.' : 'No requests here.'}</p>
+              <p className="text-[12.5px] text-ink-2 mt-0.5">{rows.length === 0 ? "They'll show up the moment a client submits one." : 'Try another filter.'}</p>
             </div>
-            <p className="text-[15px] text-slate-600 font-semibold mb-1">No negotiation requests yet</p>
-            <p className="text-[13px] text-slate-400">They&apos;ll show up here the moment a client submits one.</p>
-          </div>
-        ) : (
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-            {/* column header (desktop) */}
-            <div className="hidden md:grid grid-cols-[2fr_1.3fr_1fr_1fr_1.6fr_auto] gap-4 px-5 py-2.5 border-b border-slate-100 bg-slate-50/60 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-              <span>Vendor</span>
-              <span>Status</span>
-              <span>Client</span>
-              <span>Deadline</span>
-              <span>Next action</span>
-              <span className="w-4" />
-            </div>
-
-            <div className="divide-y divide-slate-100">
-              {rows.map((r) => (
-                <Link key={r.id} href={`/app/admin/negotiations/${r.id}`} className="block group">
-                  <div className="md:grid md:grid-cols-[2fr_1.3fr_1fr_1fr_1.6fr_auto] md:items-center gap-4 px-5 py-3.5 hover:bg-slate-50 transition-colors">
-                    <div className="min-w-0">
-                      <p className="text-[14px] font-semibold text-slate-900 truncate group-hover:text-emerald-700 transition-colors">{r.vendor || r.deals?.vendor || 'Unknown vendor'}</p>
-                      <p className="text-[11.5px] text-slate-400">{r.source === 'post_analysis' ? 'From analysis' : 'Direct'} &middot; {r.current_total || '—'}</p>
-                    </div>
-                    <div className="mt-1.5 md:mt-0">
-                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md border ${STATUS_COLOR[r.status] || 'bg-slate-100 text-slate-700 border-slate-200'}`} style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                        {STATUS_LABEL[r.status] || r.status}
-                      </span>
-                    </div>
-                    <p className="hidden md:block text-[13px] text-slate-600 truncate">{r.profiles?.email || 'Unknown user'}</p>
-                    <p className="hidden md:block text-[13px] text-slate-500">
-                      {r.renewal_date ? (
-                        <span className="inline-flex items-center gap-1"><Calendar className="w-3 h-3" />{new Date(r.renewal_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                      ) : '—'}
-                    </p>
-                    <p className="hidden md:flex items-center gap-1 text-[13px] text-emerald-700 font-medium truncate">
-                      {r.next_action ? <><Flag className="w-3 h-3 flex-shrink-0" /> <span className="truncate">{r.next_action}</span></> : <span className="text-slate-300">—</span>}
-                    </p>
-                    <ChevronRight className="hidden md:block w-4 h-4 text-slate-300 group-hover:text-emerald-500 transition-colors" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+          )}
+          {visible.map((r) => {
+            const closed = isClosedStatus(r.status)
+            const days = r.renewal_date ? daysTo(r.renewal_date) : null
+            return (
+              <TableRow key={r.id} cols={COLS} href={`/app/admin/negotiations/${r.id}`}>
+                <NameCell name={r.vendor || r.deals?.vendor || 'Unknown vendor'} sub={`${r.source === 'post_analysis' ? 'From analysis' : 'Direct'} · ${r.current_total || '—'}`} />
+                <div className="min-w-0"><Chip tone={statusTone(r.status)} mono>{statusLabel(r.status)}</Chip></div>
+                <HideM className="text-[12.5px] text-ink-2 truncate">{r.profiles?.email || 'Unknown user'}</HideM>
+                <HideM className={cn('text-[12.5px] tl-num', days != null && !closed && days <= 14 ? 'text-warn font-semibold' : 'text-ink-2')}>{r.renewal_date ? `${fmtDate(r.renewal_date)}${days != null && !closed && days >= 0 ? ` · ${days}d` : ''}` : '—'}</HideM>
+                <HideM className="text-[12.5px] text-ink truncate">{r.next_action ? <span className="inline-flex items-center gap-1.5"><Flag className="w-3 h-3 text-green-deep shrink-0" /><span className="truncate">{r.next_action}</span></span> : <span className="text-ink-3">—</span>}</HideM>
+              </TableRow>
+            )
+          })}
+        </Table>
+      </PageBody>
+    </AppPage>
   )
 }

@@ -3,45 +3,38 @@ export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Mail, Building2, FileText, Paperclip, Target } from 'lucide-react'
+import { FileText, ExternalLink } from 'lucide-react'
 import { NegotiationStatusControl } from '@/components/NegotiationStatusControl'
 import { NegotiationAdminWorkspace } from '@/components/NegotiationAdminWorkspace'
+import { AppPage, PageHeader, PageBody, Btn, Card, Chip, StatRow, StatTile } from '@/components/system'
 import { detectCurrency, formatCurrency } from '@/lib/currency'
 import { dealTypeLabel, type InferredDealType } from '@/lib/deal-type-inference'
+import { isClosedStatus, statusLabel, statusTone } from '@/lib/negotiation-status'
 
-const sora = "'Sora', sans-serif"
-const fieldClass = 'text-[14px] text-slate-900 font-medium'
-const labelClass = 'text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1'
-
-function Field({ label, value }: { label: string; value: React.ReactNode }) {
+function Field({ label, value, wide }: { label: string; value: React.ReactNode; wide?: boolean }) {
   if (!value) return null
   return (
-    <div>
-      <p className={labelClass}>{label}</p>
-      <p className={fieldClass}>{value}</p>
+    <div className={wide ? 'sm:col-span-2' : undefined}>
+      <p className="tl-label text-ink-3">{label}</p>
+      <div className="text-[13.5px] text-ink mt-0.5 leading-relaxed">{value}</div>
     </div>
   )
 }
 
-function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function Section({ title, children, right }: { title: string; children: React.ReactNode; right?: React.ReactNode }) {
   return (
-    <div>
-      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
-      <p className={`text-[18px] sm:text-[20px] font-bold ${accent ? 'text-emerald-700' : 'text-slate-900'}`} style={{ fontFamily: sora }}>{value}</p>
-    </div>
+    <Card>
+      <div className="flex items-center justify-between gap-3 mb-3"><p className="tl-label text-ink-3">{title}</p>{right}</div>
+      {children}
+    </Card>
   )
 }
 
-export default async function AdminNegotiationDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default async function AdminNegotiationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
-
   const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
   if (!profile?.is_admin) redirect('/app')
 
@@ -50,176 +43,134 @@ export default async function AdminNegotiationDetailPage({
     .select('*, profiles(email), deals(id, vendor, title, status)')
     .eq('id', id)
     .single()
-
   if (!r) notFound()
 
   let documentUrl: string | null = null
   if (r.document_path) {
-    const { data: signed } = await supabase.storage
-      .from('negotiation-documents')
-      .createSignedUrl(r.document_path, 60 * 10) // 10 min
+    const { data: signed } = await supabase.storage.from('negotiation-documents').createSignedUrl(r.document_path, 60 * 10)
     documentUrl = signed?.signedUrl || null
   }
 
-  const isClosed = r.status === 'closed_won' || r.status === 'closed_lost'
+  const closed = isClosedStatus(r.status)
   const currency = detectCurrency(r.current_total || '')
+  const vendor = r.vendor || r.deals?.vendor || 'Unknown vendor'
+  const ac = r.analysis_context as { verdict?: string | null; potentialSavings?: number | null; targetPriceLow?: number | null; targetPriceHigh?: number | null; currency?: string | null; topRedFlags?: string[] } | null
+  const acCurrency = (ac?.currency || currency) as Parameters<typeof formatCurrency>[1]
+  const fmtLong = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  const fmtShort = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  // eslint-disable-next-line react-hooks/purity
+  const nowMs = Date.now()
+  const daysTo = r.renewal_date ? Math.ceil((new Date(r.renewal_date).getTime() - nowMs) / 86400000) : null
+  const hasClientContext = !!(r.negotiation_objective || r.walk_away_notes || r.competitor_context || r.seat_or_usage_notes || r.notes)
 
   return (
-    <div className="-mx-5 sm:-mx-8 -mt-8 bg-slate-50 min-h-screen">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-5 sm:px-8 py-7">
-        <Link href="/app/admin/negotiations" className="inline-flex items-center gap-1.5 text-[13px] text-slate-400 hover:text-emerald-600 transition-colors mb-4">
-          <ArrowLeft className="w-3.5 h-3.5" /> All requests
-        </Link>
+    <AppPage>
+      <PageHeader
+        crumbs={[{ label: 'Negotiations', href: '/app/admin/negotiations' }, { label: vendor }]}
+        title={vendor}
+        sub={`${r.source === 'post_analysis' ? 'From an analysis' : 'Submitted directly'} · requested ${fmtLong(r.created_at)} · ${r.profiles?.email || 'unknown client'}`}
+        actions={<div className="flex items-center gap-2"><Chip tone={statusTone(r.status)} mono>{statusLabel(r.status)}</Chip>{r.deals?.id && <Btn href={`/app/deal/${r.deals.id}`} variant="ghost" size="sm">View analysis <ExternalLink className="w-3.5 h-3.5" /></Btn>}</div>}
+      />
+      <PageBody>
+        {/* 1. Where it is, and how to move it */}
+        <NegotiationStatusControl requestId={r.id} currentStatus={r.status} currentTotal={r.current_total} />
 
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
-          <div>
-            <h1 className="text-[22px] sm:text-[28px] font-bold text-slate-900 mb-1" style={{ fontFamily: sora }}>{r.vendor || r.deals?.vendor || 'Unknown vendor'}</h1>
-            <p className="text-[12.5px] text-slate-400">
-              {r.source === 'post_analysis' ? 'From an existing analysis' : 'Submitted directly'} &middot; {new Date(r.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-            </p>
-          </div>
-          <NegotiationStatusControl requestId={r.id} currentStatus={r.status} currentTotal={r.current_total} />
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 max-w-2xl">
-          <Stat label="Current spend" value={r.current_total || '—'} />
-          <Stat label="Deadline" value={r.renewal_date ? new Date(r.renewal_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'} />
-          {isClosed ? (
+        {/* 2. The numbers that frame the case */}
+        <StatRow>
+          <StatTile label="Current spend" value={r.current_total || '—'} sub={r.category || undefined} />
+          {closed ? (
             <>
-              <Stat label="Final total" value={r.final_total != null ? formatCurrency(Number(r.final_total), currency) : '—'} />
-              <Stat label="Savings" value={r.savings_amount != null ? formatCurrency(Number(r.savings_amount), currency) : '—'} accent />
+              <StatTile label="Final total" value={r.final_total != null ? formatCurrency(Number(r.final_total), currency) : '—'} />
+              <StatTile label="Savings" tone="money" hi value={r.savings_amount != null ? formatCurrency(Number(r.savings_amount), currency) : '—'} sub={r.savings_percent != null ? `${Number(r.savings_percent).toFixed(1)}% below the quote` : undefined} />
             </>
           ) : (
             <>
-              <Stat label="Source" value={r.source === 'post_analysis' ? 'From analysis' : 'Direct'} />
-              <Stat label="Next action" value={r.next_action || '—'} accent={!!r.next_action} />
+              <StatTile label="Potential savings" tone="money" value={ac?.potentialSavings ? formatCurrency(ac.potentialSavings, acCurrency) : '—'} sub="from the analysis" />
+              <StatTile label="Target price" value={ac?.targetPriceLow != null && ac?.targetPriceHigh != null ? `${formatCurrency(ac.targetPriceLow, acCurrency)}–${formatCurrency(ac.targetPriceHigh, acCurrency)}` : '—'} sub="from the analysis" />
             </>
           )}
-        </div>
-      </div>
+          <StatTile label="Deadline" tone={daysTo != null && !closed && daysTo >= 0 && daysTo <= 14 ? 'warn' : 'neutral'} value={r.renewal_date ? fmtShort(r.renewal_date) : '—'} sub={daysTo != null && !closed ? (daysTo >= 0 ? `in ${daysTo} days` : `${Math.abs(daysTo)} days ago`) : undefined} />
+        </StatRow>
 
-      <div className="px-5 sm:px-8 py-6 space-y-5 max-w-4xl">
-        {isClosed && r.close_notes && (
-          <section className={`rounded-2xl border-2 p-5 ${r.status === 'closed_won' ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-100 border-slate-200'}`}>
-            <p className={`text-[12px] font-bold uppercase tracking-wide mb-2 ${r.status === 'closed_won' ? 'text-emerald-700' : 'text-slate-500'}`} style={{ fontFamily: 'JetBrains Mono, monospace' }}>Close notes</p>
-            <p className="text-[13.5px] text-slate-700 leading-relaxed">{r.close_notes}</p>
-          </section>
+        {closed && r.close_notes && (
+          <Card className={r.status === 'closed_won' ? 'bg-green-soft border-green-line' : 'bg-surface-2'}>
+            <p className={`tl-label ${r.status === 'closed_won' ? 'text-green-deep' : 'text-ink-3'}`}>Close notes</p>
+            <p className="text-[13.5px] text-ink mt-1 leading-relaxed">{r.close_notes}</p>
+          </Card>
         )}
 
-        {/* Working this case */}
-        <NegotiationAdminWorkspace
-          requestId={r.id}
-          initialAdminNotes={r.admin_notes}
-          initialNextAction={r.next_action}
-          clientEmail={r.profiles?.email || null}
-          vendorContactEmail={r.vendor_contact_email}
-          vendor={r.vendor || r.deals?.vendor || null}
-        />
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-3.5 items-start">
+          {/* Left: the work */}
+          <div className="flex flex-col gap-3.5 min-w-0">
+            <NegotiationAdminWorkspace
+              requestId={r.id}
+              initialAdminNotes={r.admin_notes}
+              initialNextAction={r.next_action}
+              clientEmail={r.profiles?.email || null}
+              vendorContactEmail={r.vendor_contact_email}
+              vendor={vendor}
+            />
 
-        {/* Deal */}
-        <section className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
-            <Building2 className="w-4 h-4 text-slate-500" />
-            <h2 className="text-[13px] font-bold text-slate-900 uppercase tracking-wide">Deal</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 px-5 py-5">
-            <Field label="Vendor" value={r.vendor || r.deals?.vendor} />
-            <Field label="Category" value={r.category} />
-            <Field label="Current spend / value" value={r.current_total} />
-            <Field label="Renewal / decision deadline" value={r.renewal_date ? new Date(r.renewal_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null} />
-            <Field label="Seats / usage" value={r.seat_or_usage_notes} />
-            {r.deal_type && (
-              <Field label="Deal type" value={`${dealTypeLabel(r.deal_type as InferredDealType)}${r.deal_type_confidence === 'low' ? ' (unconfirmed)' : ''}`} />
-            )}
-            {r.deals?.id && (
-              <Field label="Linked analysis" value={<Link href={`/app/deal/${r.deals.id}`} className="text-emerald-600 hover:underline">View original analysis &rarr;</Link>} />
-            )}
-          </div>
-        </section>
-
-        {/* From the analysis — captured at submission time so this is usable without
-            clicking through to the deal. Never includes the raw quote text. */}
-        {r.analysis_context && (r.analysis_context.verdict || r.analysis_context.potentialSavings || r.analysis_context.targetPriceLow) && (
-          <section className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
-              <Target className="w-4 h-4 text-slate-500" />
-              <h2 className="text-[13px] font-bold text-slate-900 uppercase tracking-wide">From the analysis</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 px-5 py-5">
-              {r.analysis_context.verdict && <Field label="Verdict" value={r.analysis_context.verdict} />}
-              {r.analysis_context.potentialSavings && (
-                <Field label="Potential savings" value={formatCurrency(r.analysis_context.potentialSavings, r.analysis_context.currency || detectCurrency(r.current_total || ''))} />
-              )}
-              {r.analysis_context.targetPriceLow != null && r.analysis_context.targetPriceHigh != null && (
-                <Field label="Target price" value={`${formatCurrency(r.analysis_context.targetPriceLow, r.analysis_context.currency || 'USD')}–${formatCurrency(r.analysis_context.targetPriceHigh, r.analysis_context.currency || 'USD')}`} />
-              )}
-              {r.analysis_context.topRedFlags?.length > 0 && (
-                <div className="sm:col-span-2">
-                  <p className={labelClass}>Top red flags</p>
-                  <ul className="text-[13.5px] text-slate-800 space-y-1 mt-1">
-                    {r.analysis_context.topRedFlags.map((f: string, i: number) => <li key={i}>• {f}</li>)}
-                  </ul>
+            {hasClientContext && (
+              <Section title="What the client told us">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-3.5">
+                  <Field label="Objective" value={r.negotiation_objective} wide />
+                  <Field label="Walk-away / room" value={r.walk_away_notes} />
+                  <Field label="Competing quotes" value={r.competitor_context} />
+                  <Field label="Seats / usage" value={r.seat_or_usage_notes} />
+                  <Field label="Notes" value={r.notes ? <span className="whitespace-pre-wrap">{r.notes}</span> : null} wide />
                 </div>
+              </Section>
+            )}
+
+            {ac && (ac.verdict || ac.potentialSavings || ac.targetPriceLow) && (
+              <Section title="From the analysis" right={r.deals?.id ? <Link href={`/app/deal/${r.deals.id}`} className="text-[12.5px] font-semibold text-green-deep hover:underline no-underline">Open the deal →</Link> : undefined}>
+                <div className="grid grid-cols-1 gap-3.5">
+                  <Field label="Verdict" value={ac.verdict} />
+                  {ac.topRedFlags && ac.topRedFlags.length > 0 && (
+                    <div>
+                      <p className="tl-label text-ink-3">Top red flags</p>
+                      <ul className="m-0 mt-1 p-0 list-none flex flex-col gap-1">
+                        {ac.topRedFlags.map((f, i) => <li key={i} className="text-[13px] text-ink leading-snug flex items-start gap-2"><span className="w-1.5 h-1.5 rounded-full bg-risk shrink-0 mt-[7px]" />{f}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </Section>
+            )}
+          </div>
+
+          {/* Right: the facts */}
+          <div className="flex flex-col gap-3.5 min-w-0">
+            <Section title="Contacts">
+              <div className="grid grid-cols-1 gap-3">
+                <Field label="Client" value={<>{r.contact_name ? <span className="font-semibold">{r.contact_name}</span> : null}{r.contact_name && r.profiles?.email ? ' · ' : ''}{r.profiles?.email}{r.contact_phone ? <span className="block text-ink-2">{r.contact_phone}</span> : null}</>} />
+                <Field label="Supplier contact" value={r.vendor_contact_name || r.vendor_contact_email ? <>{r.vendor_contact_name}{r.vendor_contact_name && r.vendor_contact_email ? ' · ' : ''}{r.vendor_contact_email}</> : <span className="text-ink-3">Not provided</span>} />
+              </div>
+            </Section>
+
+            <Section title="Deal">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                <Field label="Vendor" value={vendor} />
+                <Field label="Category" value={r.category} />
+                <Field label="Deal type" value={r.deal_type ? `${dealTypeLabel(r.deal_type as InferredDealType)}${r.deal_type_confidence === 'low' ? ' (unconfirmed)' : ''}` : null} />
+                <Field label="Deadline" value={r.renewal_date ? fmtLong(r.renewal_date) : null} />
+              </div>
+            </Section>
+
+            <Section title="Document">
+              {documentUrl ? (
+                <>
+                  <Btn href={documentUrl} variant="ghost" size="sm"><FileText className="w-3.5 h-3.5" /> View uploaded document</Btn>
+                  <p className="text-[11.5px] text-ink-3 mt-2">Link expires in 10 minutes. Consented {r.document_consent_at ? new Date(r.document_consent_at).toLocaleString('en-US') : 'at an unknown time'}.</p>
+                </>
+              ) : (
+                <p className="text-[12.5px] text-ink-3">No document uploaded{r.deals?.id ? '. The quote text lives on the linked analysis.' : '.'}</p>
               )}
-            </div>
-          </section>
-        )}
-
-        {/* Negotiation context — the fields the quote itself can't know */}
-        {(r.negotiation_objective || r.walk_away_notes || r.competitor_context) && (
-          <section className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
-              <Target className="w-4 h-4 text-slate-500" />
-              <h2 className="text-[13px] font-bold text-slate-900 uppercase tracking-wide">Negotiation context</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 px-5 py-5">
-              <Field label="Objective" value={r.negotiation_objective} />
-              <Field label="Walk-away / alternatives" value={r.walk_away_notes} />
-              <Field label="Competing quotes" value={r.competitor_context} />
-            </div>
-          </section>
-        )}
-
-        {/* Contacts */}
-        <section className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
-            <Mail className="w-4 h-4 text-slate-500" />
-            <h2 className="text-[13px] font-bold text-slate-900 uppercase tracking-wide">Contacts</h2>
+            </Section>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 px-5 py-5">
-            <Field label="Client" value={r.profiles?.email} />
-            <Field label="Client contact name" value={r.contact_name} />
-            <Field label="Client phone" value={r.contact_phone} />
-            <Field label="Supplier contact" value={r.vendor_contact_name && r.vendor_contact_email ? `${r.vendor_contact_name} · ${r.vendor_contact_email}` : (r.vendor_contact_name || r.vendor_contact_email)} />
-          </div>
-        </section>
-
-        {r.notes && (
-          <section className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
-              <FileText className="w-4 h-4 text-slate-500" />
-              <h2 className="text-[13px] font-bold text-slate-900 uppercase tracking-wide">Notes from client</h2>
-            </div>
-            <p className="text-[14px] text-slate-700 leading-relaxed whitespace-pre-wrap px-5 py-5">{r.notes}</p>
-          </section>
-        )}
-
-        {documentUrl && (
-          <section className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100">
-              <Paperclip className="w-4 h-4 text-slate-500" />
-              <h2 className="text-[13px] font-bold text-slate-900 uppercase tracking-wide">Document</h2>
-            </div>
-            <div className="px-5 py-5">
-              <a href={documentUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-slate-200 hover:border-emerald-300 text-[13.5px] font-semibold text-slate-700 no-underline">
-                <FileText className="w-4 h-4" /> View uploaded document
-              </a>
-              <p className="text-[11px] text-slate-400 mt-2">Link expires in 10 minutes. Consented at {r.document_consent_at ? new Date(r.document_consent_at).toLocaleString('en-US') : 'unknown'}.</p>
-            </div>
-          </section>
-        )}
-      </div>
-    </div>
+        </div>
+      </PageBody>
+    </AppPage>
   )
 }
