@@ -1,0 +1,24 @@
+{
+  "negotiationPage": { "waitingReply": "Reply to your negotiator" },
+  "insights": {
+    "opportunities": "Biggest opportunities",
+    "opportunitiesSub": "Money still on the table, and the one ask that unlocks it",
+    "noOpportunities": "Run a Deep Analysis on an active deal and the asks show up here.",
+    "openDeal": "Open deal",
+    "recurring": "What keeps coming up",
+    "recurringSub": "Flag types across your active contracts",
+    "recurringIn": "{n, plural, one {in # deal} other {in # deals}}",
+    "noFlags": "No open flags on active deals.",
+    "scoreByCategory": "Score by category",
+    "scoreByCategorySub": "Where your quotes are weakest",
+    "scoreDeals": "{n, plural, one {# quote} other {# quotes}}"
+  },
+  "vendorsPage": {
+    "statVendors": "Vendors",
+    "statSpend": "Analysed spend",
+    "statSavedAll": "Saved with them",
+    "cardDeals": "{n, plural, one {# deal} other {# deals}}",
+    "lastActivity": "Last activity {d}",
+    "noScore": "No score yet"
+  }
+}

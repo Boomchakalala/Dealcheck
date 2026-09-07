@@ -1,0 +1,24 @@
+{
+  "negotiationPage": { "waitingReply": "Répondre à votre négociateur" },
+  "insights": {
+    "opportunities": "Plus grandes opportunités",
+    "opportunitiesSub": "L'argent encore sur la table, et la demande qui le débloque",
+    "noOpportunities": "Lancez une Analyse approfondie sur un dossier actif et les demandes apparaîtront ici.",
+    "openDeal": "Ouvrir le dossier",
+    "recurring": "Ce qui revient souvent",
+    "recurringSub": "Types d'alertes sur vos contrats actifs",
+    "recurringIn": "{n, plural, one {dans # dossier} other {dans # dossiers}}",
+    "noFlags": "Aucune alerte ouverte sur les dossiers actifs.",
+    "scoreByCategory": "Score par catégorie",
+    "scoreByCategorySub": "Où vos devis sont les plus faibles",
+    "scoreDeals": "{n, plural, one {# devis} other {# devis}}"
+  },
+  "vendorsPage": {
+    "statVendors": "Fournisseurs",
+    "statSpend": "Dépenses analysées",
+    "statSavedAll": "Économisé avec eux",
+    "cardDeals": "{n, plural, one {# dossier} other {# dossiers}}",
+    "lastActivity": "Dernière activité {d}",
+    "noScore": "Pas encore de score"
+  }
+}

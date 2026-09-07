@@ -1311,7 +1311,16 @@
     "legendSaved": "Saved that month",
     "legendCumulative": "Running total",
     "legendPotential": "Potential identified",
-    "noSavingsYet": "Close a deal as won and your savings start showing here."
+    "noSavingsYet": "Close a deal as won and your savings start showing here.",
+    "opportunities": "Biggest opportunities",
+    "opportunitiesSub": "Money still on the table, and the one ask that unlocks it",
+    "noOpportunities": "Run a Deep Analysis on an active deal and the asks show up here.",
+    "openDeal": "Open deal",
+    "recurring": "What keeps coming up",
+    "recurringSub": "Flag types across your active contracts",
+    "recurringIn": "{n, plural, one {in # deal} other {in # deals}}",
+    "noFlags": "No open flags on active deals.",
+    "scoreDeals": "{n, plural, one {# quote} other {# quotes}}"
   },
   "dealPage": {
     "crumbDeals": "Deals",
@@ -1448,7 +1457,8 @@
     "howTitle": "How this works",
     "how1": "A negotiator reviews the deal and confirms scope with you.",
     "how2": "They run the back-and-forth with the vendor. Nothing is agreed without your sign-off.",
-    "how3": "You approve the outcome. The fee is {pct}% of the documented difference between the quote and the signed terms."
+    "how3": "You approve the outcome. The fee is {pct}% of the documented difference between the quote and the signed terms.",
+    "waitingReply": "Reply to your negotiator"
   },
   "vendorsPage": {
     "title": "Vendors",
@@ -1477,7 +1487,13 @@
     "concessionsEmpty": "Concessions you win will be remembered here for your next negotiation.",
     "won": "Won",
     "closed": "Closed",
-    "active": "Active"
+    "active": "Active",
+    "statVendors": "Vendors",
+    "statSpend": "Analysed spend",
+    "statSavedAll": "Saved with them",
+    "cardDeals": "{n, plural, one {# deal} other {# deals}}",
+    "lastActivity": "Last activity {d}",
+    "noScore": "No score yet"
   },
   "settingsPage": {
     "title": "Settings",

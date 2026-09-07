@@ -6,9 +6,8 @@ import { Search, MoreHorizontal, CheckCircle2, Trash2 } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/lib/analytics'
-import { stageChipKey, stageTone } from '@/lib/deal-stage'
 import type { HomeRow } from '@/lib/home-rows'
-import { Chip, ScoreRing, Table, TableHead, TableRow, HideM, NameCell, Btn } from '@/components/system'
+import { ScoreRing, Table, TableHead, TableRow, HideM, NameCell, Btn, StagePips } from '@/components/system'
 import { CloseDealModal } from '@/components/CloseDealModal'
 
 type Filter = 'all' | 'needs' | 'termlift' | 'won'
@@ -112,16 +111,15 @@ export function HomeDealsClient({ rows: initialRows, linkBase = '/app', readOnly
   ]
 
   const renderRow = (r: HomeRow) => {
-    const tone = stageTone(r.stage, { won: r.won, waitingOnClient: r.waitingOnClient, mode: r.mode })
-    const stageLabel = r.won ? t('dealList.won') : r.closed ? t('dealList.noChange') : t(stageChipKey(r.stage, r.mode))
+    const hint = r.waitingOnClient
+      ? <span className="text-warn font-medium">{t('home.hintReply')}</span>
+      : !r.closed && r.needsUnlock
+        ? <span className="text-ink-3 group-hover:text-green-deep transition-colors">{t('home.hintUnlock')}</span>
+        : null
     return (
       <TableRow key={r.id} cols={COLS} href={`${linkBase}/deal/${r.id}`} className={cn('group', deletingId === r.id && 'opacity-50')}>
         <NameCell name={r.vendor} sub={[r.category, r.dealType].filter(Boolean).join(' · ')} />
-        <div className="min-w-0 flex flex-col items-start gap-1">
-          <Chip tone={tone}>{r.stage === 'negotiate' && r.mode === 'self' && r.roundCount > 1 ? `${stageLabel} · R${r.roundCount}` : stageLabel}</Chip>
-          {r.waitingOnClient && <span className="text-[11.5px] text-warn font-medium">{t('home.hintReply')}</span>}
-          {!r.waitingOnClient && r.needsUnlock && <span className="text-[11.5px] text-ink-3 group-hover:text-green-deep transition-colors">{t('home.hintUnlock')}</span>}
-        </div>
+        <StagePips stage={r.stage} mode={r.mode} won={r.won} closed={r.closed} waitingOnClient={r.waitingOnClient} round={r.roundCount} hint={hint} />
         <HideM className="flex items-center gap-2">
           {r.score != null ? <ScoreRing score={r.score} size={28} stroke={3} muted={r.closed && !r.won} /> : <span className="text-ink-3">—</span>}
           <span className="text-[12px] text-ink-2 tl-num">{!r.closed && r.flags > 0 ? t('home.flags', { n: r.flags }) : ''}</span>

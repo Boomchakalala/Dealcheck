@@ -5,7 +5,7 @@
  */
 import { convertCurrency, fetchRates, type Currency } from '@/lib/currency'
 import {
-  type DealLike, getAchievedSavings, getCategory, getDealCurrency, getPotentialSavings, getRedFlagCount,
+  type DealLike, getAchievedSavings, getCategory, getDealCurrency, getLatestOutput, getPotentialSavings, getRedFlagCount,
   getRenewalDate, getScore, getTotalAmount, getVendorName, isClosed, isWon,
 } from '@/lib/deal-metrics'
 
@@ -21,6 +21,10 @@ export interface EnrichedDeal {
   renewal: Date | null
   closed: boolean
   won: boolean
+  /** The single biggest ask from the analysis (must-have first), if any. */
+  topAsk: { ask: string; amount: number } | null
+  /** Red-flag types on the latest round, as the analysis wrote them ("Commercial", "Renewal"…). */
+  flagTypes: string[]
 }
 
 export interface Insights {
@@ -48,6 +52,10 @@ export interface Insights {
   closedDeals: Array<{ id: string; vendor: string; category: string; original: number; final: number; saved: number; pct: number; closedAt: string; won: boolean }>
   /** Active deals that need a nudge: stale (no update ≥ 7 days) or heavy on flags. */
   attention: Array<{ id: string; vendor: string; daysSinceUpdate: number; flags: number; reason: 'stale' | 'flags' }>
+  /** Active deals ranked by money still on the table, each with the one ask that unlocks most of it. */
+  opportunities: Array<{ id: string; vendor: string; category: string; potential: number; ask: string | null; askAmount: number | null; flags: number }>
+  /** Flag types that recur across active deals, and how many deals carry each. */
+  recurringFlags: Array<{ type: string; deals: number; flags: number }>
   scoreBuckets: Array<{ key: '0' | '40' | '60' | '80'; count: number }>
   nextRenewal: { id: string; vendor: string; date: Date; daysOut: number } | null
 }
@@ -70,10 +78,18 @@ export async function enrichDeals(deals: DealLike[], baseCurrency: Currency, con
   return Promise.all(
     deals.map(async (deal) => {
       const cur = getDealCurrency(deal)
-      const [amount, potential, achieved] = await Promise.all([
+      const out = getLatestOutput(deal) as {
+        potential_savings?: { must_have?: Array<{ ask?: string; amount?: number }>; nice_to_have?: Array<{ ask?: string; amount?: number }> }
+        red_flags?: Array<{ type?: string }>
+      }
+      const asks = [...(out.potential_savings?.must_have || []), ...(out.potential_savings?.nice_to_have || [])]
+        .filter((a) => a?.ask && typeof a.amount === 'number' && a.amount > 0)
+        .sort((a, b) => (b.amount || 0) - (a.amount || 0))
+      const [amount, potential, achieved, topAskAmount] = await Promise.all([
         toBase(getTotalAmount(deal), cur, baseCurrency, convert),
         toBase(getPotentialSavings(deal), cur, baseCurrency, convert),
         toBase(getAchievedSavings(deal), cur, baseCurrency, convert),
+        asks[0] ? toBase(Number(asks[0].amount), cur, baseCurrency, convert) : Promise.resolve(0),
       ])
       return {
         deal,
@@ -85,6 +101,8 @@ export async function enrichDeals(deals: DealLike[], baseCurrency: Currency, con
         renewal: getRenewalDate(deal),
         closed: isClosed(deal),
         won: isWon(deal),
+        topAsk: asks[0] ? { ask: String(asks[0].ask), amount: topAskAmount } : null,
+        flagTypes: (out.red_flags || []).map((f) => String(f?.type || '').trim()).filter(Boolean),
       }
     }),
   )
@@ -176,6 +194,29 @@ export function computeInsights(rows: EnrichedDeal[], baseCurrency: Currency, no
     .slice(0, 4)
     .map(({ r, days }) => ({ id: r.deal.id, vendor: r.vendor, daysSinceUpdate: days, flags: r.flags, reason: (r.flags >= 3 ? 'flags' : 'stale') as 'flags' | 'stale' }))
 
+  // opportunities: active deals by money on the table, each with its biggest ask
+  const opportunities = active
+    .filter((r) => r.potential > 0)
+    .sort((a, b) => b.potential - a.potential)
+    .slice(0, 4)
+    .map((r) => ({ id: r.deal.id, vendor: r.vendor, category: r.category, potential: r.potential, ask: r.topAsk?.ask ?? null, askAmount: r.topAsk?.amount ?? null, flags: r.flags }))
+
+  // recurring flags: which flag types show up across active deals
+  const flagMap = new Map<string, { deals: Set<string>; flags: number }>()
+  for (const r of active) {
+    for (const ty of r.flagTypes) {
+      const key = ty.toLowerCase()
+      const e = flagMap.get(key) || { deals: new Set<string>(), flags: 0 }
+      e.deals.add(r.deal.id)
+      e.flags++
+      flagMap.set(key, e)
+    }
+  }
+  const recurringFlags = [...flagMap.entries()]
+    .map(([key, v]) => ({ type: key.replace(/\b\w/g, (c) => c.toUpperCase()), deals: v.deals.size, flags: v.flags }))
+    .sort((a, b) => b.deals - a.deals || b.flags - a.flags)
+    .slice(0, 6)
+
   // score buckets
   const bucket = (lo: number, hi: number) => scored.filter((r) => (r.score as number) >= lo && (r.score as number) < hi).length
   const scoreBuckets: Insights['scoreBuckets'] = [
@@ -213,6 +254,8 @@ export function computeInsights(rows: EnrichedDeal[], baseCurrency: Currency, no
     topWins,
     closedDeals,
     attention,
+    opportunities,
+    recurringFlags,
     scoreBuckets,
     nextRenewal: renewals[0] ? { id: renewals[0].id, vendor: renewals[0].vendor, date: renewals[0].date, daysOut: renewals[0].daysOut } : null,
   }

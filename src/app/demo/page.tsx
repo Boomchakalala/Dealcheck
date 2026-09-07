@@ -31,11 +31,11 @@ export default async function DemoHomePage({ searchParams }: { searchParams: Pro
         sub={t('demoSub', { n: rows.length, spend: fmtCompact(insights.totalSpend, 'EUR') })}
         actions={<Btn href="/login?from=demo" variant="ghost" size="sm">{t('demoStartOwn')}</Btn>}
       >
-        <StatRow className="mt-3.5">
-          <StatTile hi tone="money" label={t('kpiSaved')} value={fmtMoney(insights.savingsAchieved, 'EUR')} sub={t('kpiSavedSub', { n: insights.wonCount })} />
-          <StatTile tone="money" label={t('kpiPipeline')} value={insights.savingsIdentified > 0 ? fmtMoney(insights.savingsIdentified, 'EUR') : '—'} sub={t('kpiPipelineSub', { n: insights.activeCount })} />
-          <StatTile tone={needsYou > 0 ? 'warn' : 'neutral'} label={t('kpiNeeds')} value={needsYou} sub={needsYou ? t('kpiNeedsReply', { n: needsYou }) : t('kpiNeedsNone')} />
-          <StatTile label={t('kpiRenewal')} value={insights.nextRenewal ? dateShort(insights.nextRenewal.date) : '—'} sub={insights.nextRenewal ? t('kpiRenewalSub', { vendor: insights.nextRenewal.vendor, days: insights.nextRenewal.daysOut }) : t('kpiRenewalNone')} />
+        <StatRow flat className="mt-4 pt-4 border-t border-line-2">
+          <StatTile flat tone="money" label={t('kpiSaved')} value={fmtMoney(insights.savingsAchieved, 'EUR')} sub={t('kpiSavedSub', { n: insights.wonCount })} />
+          <StatTile flat tone="money" label={t('kpiPipeline')} value={insights.savingsIdentified > 0 ? fmtMoney(insights.savingsIdentified, 'EUR') : '—'} sub={t('kpiPipelineSub', { n: insights.activeCount })} />
+          <StatTile flat tone={needsYou > 0 ? 'warn' : 'neutral'} label={t('kpiNeeds')} value={needsYou} sub={needsYou ? t('kpiNeedsReply', { n: needsYou }) : t('kpiNeedsNone')} />
+          <StatTile flat label={t('kpiRenewal')} value={insights.nextRenewal ? dateShort(insights.nextRenewal.date) : '—'} sub={insights.nextRenewal ? t('kpiRenewalSub', { vendor: insights.nextRenewal.vendor, days: insights.nextRenewal.daysOut }) : t('kpiRenewalNone')} />
         </StatRow>
         <nav className="flex gap-1 border-b border-line mt-3.5" aria-label="Home tabs">
           <Link href="/demo" className={tabCls(tab === 'deals')}>{t('tabDeals')}</Link>

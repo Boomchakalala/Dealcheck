@@ -68,11 +68,11 @@ export default async function VendorDetailPage({ params }: { params: Promise<{ i
         title={vendor.canonical_name}
         sub={vendor.aliases?.length > 0 ? t('alsoKnown', { names: vendor.aliases.join(', ') }) : undefined}
       >
-        <StatRow className="mt-3.5">
-          <StatTile label={t('statDeals')} value={row.dealCount} />
-          <StatTile label={t('statTotal')} value={formatTotals(row.totalsByCurrency)} />
-          <StatTile tone="money" label={t('statSaved')} value={formatTotals(row.savingsByCurrency)} />
-          <StatTile label={t('statScore')} value={row.avgScore == null ? '—' : <span className="inline-flex items-center gap-2"><ScoreRing score={row.avgScore} size={28} stroke={3} />{row.avgScore}</span>} />
+        <StatRow flat className="mt-4 pt-4 border-t border-line-2">
+          <StatTile flat label={t('statDeals')} value={row.dealCount} />
+          <StatTile flat label={t('statTotal')} value={formatTotals(row.totalsByCurrency) || '—'} />
+          <StatTile flat tone="money" label={t('statSaved')} value={formatTotals(row.savingsByCurrency) || '—'} />
+          <StatTile flat label={t('statScore')} value={row.avgScore == null ? '—' : <span className="inline-flex items-center gap-2.5"><ScoreRing score={row.avgScore} size={30} stroke={3} />{row.avgScore}</span>} />
         </StatRow>
       </PageHeader>
 

@@ -100,11 +100,12 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           </>
         }
       >
-        <StatRow className="mt-3.5">
-          <StatTile hi tone="money" label={t('kpiSaved')} value={insights.savingsAchieved > 0 ? fmtMoney(insights.savingsAchieved, baseCurrency) : '—'} sub={t('kpiSavedSub', { n: insights.wonCount })} />
-          <StatTile tone="money" label={t('kpiPipeline')} value={insights.savingsIdentified > 0 ? fmtMoney(insights.savingsIdentified, baseCurrency) : '—'} sub={t('kpiPipelineSub', { n: insights.activeCount })} />
-          <StatTile tone={needsYou > 0 ? 'warn' : 'neutral'} label={t('kpiNeeds')} value={needsYou} sub={needsSub} />
+        <StatRow flat className="mt-4 pt-4 border-t border-line-2">
+          <StatTile flat tone="money" label={t('kpiSaved')} value={insights.savingsAchieved > 0 ? fmtMoney(insights.savingsAchieved, baseCurrency) : '—'} sub={t('kpiSavedSub', { n: insights.wonCount })} />
+          <StatTile flat tone="money" label={t('kpiPipeline')} value={insights.savingsIdentified > 0 ? fmtMoney(insights.savingsIdentified, baseCurrency) : '—'} sub={t('kpiPipelineSub', { n: insights.activeCount })} />
+          <StatTile flat tone={needsYou > 0 ? 'warn' : 'neutral'} label={t('kpiNeeds')} value={needsYou} sub={needsSub} />
           <StatTile
+            flat
             label={t('kpiRenewal')}
             value={insights.nextRenewal ? dateShort(insights.nextRenewal.date) : '—'}
             sub={insights.nextRenewal ? t('kpiRenewalSub', { vendor: insights.nextRenewal.vendor, days: insights.nextRenewal.daysOut }) : t('kpiRenewalNone')}

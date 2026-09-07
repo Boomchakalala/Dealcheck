@@ -1294,7 +1294,7 @@
     "topSuppliers": "Principaux fournisseurs",
     "topSuppliersSub": "Par dépense analysée",
     "scoreByCategory": "Score par catégorie",
-    "scoreByCategorySub": "Là où vos devis sont les plus faibles",
+    "scoreByCategorySub": "Où vos devis sont les plus faibles",
     "closedDeals": "Dossiers clôturés",
     "closedDealsSub": "Les plus récents d'abord",
     "colVendor": "Fournisseur",
@@ -1311,7 +1311,16 @@
     "legendSaved": "Économisé ce mois",
     "legendCumulative": "Cumul",
     "legendPotential": "Potentiel identifié",
-    "noSavingsYet": "Clôturez un dossier comme gagné et vos économies apparaîtront ici."
+    "noSavingsYet": "Clôturez un dossier comme gagné et vos économies apparaîtront ici.",
+    "opportunities": "Plus grandes opportunités",
+    "opportunitiesSub": "L'argent encore sur la table, et la demande qui le débloque",
+    "noOpportunities": "Lancez une Analyse approfondie sur un dossier actif et les demandes apparaîtront ici.",
+    "openDeal": "Ouvrir le dossier",
+    "recurring": "Ce qui revient souvent",
+    "recurringSub": "Types d'alertes sur vos contrats actifs",
+    "recurringIn": "{n, plural, one {dans # dossier} other {dans # dossiers}}",
+    "noFlags": "Aucune alerte ouverte sur les dossiers actifs.",
+    "scoreDeals": "{n, plural, one {# devis} other {# devis}}"
   },
   "dealPage": {
     "crumbDeals": "Dossiers",
@@ -1448,7 +1457,8 @@
     "howTitle": "Comment ça se passe",
     "how1": "Un négociateur examine le dossier et confirme le périmètre avec vous.",
     "how2": "Il mène les échanges avec le fournisseur. Rien n'est conclu sans votre accord.",
-    "how3": "Vous validez le résultat. Les honoraires représentent {pct} % de l'écart documenté entre le devis et les conditions signées."
+    "how3": "Vous validez le résultat. Les honoraires représentent {pct} % de l'écart documenté entre le devis et les conditions signées.",
+    "waitingReply": "Répondre à votre négociateur"
   },
   "vendorsPage": {
     "title": "Fournisseurs",
@@ -1477,7 +1487,13 @@
     "concessionsEmpty": "Les concessions que vous obtenez seront mémorisées ici pour votre prochaine négociation.",
     "won": "Gagné",
     "closed": "Clôturé",
-    "active": "Actif"
+    "active": "Actif",
+    "statVendors": "Fournisseurs",
+    "statSpend": "Dépenses analysées",
+    "statSavedAll": "Économisé avec eux",
+    "cardDeals": "{n, plural, one {# dossier} other {# dossiers}}",
+    "lastActivity": "Dernière activité {d}",
+    "noScore": "Pas encore de score"
   },
   "settingsPage": {
     "title": "Paramètres",

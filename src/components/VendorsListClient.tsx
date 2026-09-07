@@ -1,22 +1,36 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Link from 'next/link'
 import { Search, Building2 } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import { formatTotals, type VendorRow } from '@/lib/vendor-aggregate'
-import { AppPage, PageHeader, PageBody, Table, TableHead, TableRow, HideM, NameCell, ScoreRing } from '@/components/system'
+import { AppPage, PageHeader, PageBody, StatRow, StatTile, ScoreRing } from '@/components/system'
 
-const COLS = 'minmax(0,2.4fr) 0.6fr 1.1fr 0.8fr 1.1fr 1fr'
+function sumTotals(rows: VendorRow[], key: 'totalsByCurrency' | 'savingsByCurrency'): Record<string, number> {
+  const out: Record<string, number> = {}
+  for (const r of rows) for (const [cur, n] of Object.entries(r[key])) out[cur] = (out[cur] || 0) + n
+  return out
+}
 
+/**
+ * Vendors as cards, biggest spend first. A vendor is a relationship, not a
+ * row: name, what you spend with them, what you've clawed back, how their
+ * quotes score. The header strip totals the lot.
+ */
 export function VendorsListClient({ rows }: { rows: VendorRow[] }) {
   const { t, locale } = useI18n()
   const [q, setQ] = useState('')
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase()
-    if (!term) return rows
-    return rows.filter((r) => r.name.toLowerCase().includes(term) || r.aliases.some((a) => a.toLowerCase().includes(term)))
+    const list = term ? rows.filter((r) => r.name.toLowerCase().includes(term) || r.aliases.some((a) => a.toLowerCase().includes(term))) : rows
+    return [...list].sort((a, b) => Object.values(b.totalsByCurrency).reduce((s, n) => s + n, 0) - Object.values(a.totalsByCurrency).reduce((s, n) => s + n, 0))
   }, [rows, q])
   const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—')
+
+  const totalSpend = formatTotals(sumTotals(rows, 'totalsByCurrency'))
+  const totalSaved = formatTotals(sumTotals(rows, 'savingsByCurrency'))
+  const dealCount = rows.reduce((s, r) => s + r.dealCount, 0)
 
   return (
     <AppPage>
@@ -29,7 +43,16 @@ export function VendorsListClient({ rows }: { rows: VendorRow[] }) {
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('vendorsPage.search')} className="w-full h-9 pl-9 pr-3 rounded-lg border border-line bg-surface text-[13px] placeholder:text-ink-3 focus:outline-none focus:border-green focus:ring-[3px] focus:ring-green/15" />
           </label>
         ) : undefined}
-      />
+      >
+        {rows.length > 0 && (
+          <StatRow flat className="mt-4 pt-4 border-t border-line-2">
+            <StatTile flat label={t('vendorsPage.statVendors')} value={rows.length} sub={t('vendorsPage.cardDeals', { n: dealCount })} />
+            <StatTile flat label={t('vendorsPage.statSpend')} value={totalSpend || '—'} />
+            <StatTile flat tone="money" label={t('vendorsPage.statSavedAll')} value={totalSaved || '—'} />
+            <StatTile flat label={t('vendorsPage.statScore')} value={(() => { const s = rows.filter((r) => r.avgScore != null); return s.length ? Math.round(s.reduce((a, r) => a + (r.avgScore as number), 0) / s.length) : '—' })()} />
+          </StatRow>
+        )}
+      </PageHeader>
       <PageBody>
         {rows.length === 0 ? (
           <div className="py-16 text-center border border-dashed border-line rounded-[14px] bg-surface">
@@ -37,23 +60,36 @@ export function VendorsListClient({ rows }: { rows: VendorRow[] }) {
             <p className="text-[15px] font-semibold text-ink">{t('vendorsPage.emptyTitle')}</p>
             <p className="text-[13px] text-ink-2 mt-1 max-w-[46ch] mx-auto">{t('vendorsPage.emptyBody')}</p>
           </div>
+        ) : filtered.length === 0 ? (
+          <p className="text-center text-[13px] text-ink-3 py-10 border border-dashed border-line rounded-[14px] bg-surface">{t('vendorsPage.noMatch', { q })}</p>
         ) : (
-          <Table>
-            <TableHead cols={COLS}>
-              <span>{t('vendorsPage.colVendor')}</span><span className="text-right">{t('vendorsPage.colDeals')}</span><span className="text-right">{t('vendorsPage.colTotal')}</span><span className="text-right">{t('vendorsPage.colScore')}</span><span className="text-right">{t('vendorsPage.colSaved')}</span><span className="text-right">{t('vendorsPage.colLast')}</span>
-            </TableHead>
-            {filtered.map((v) => (
-              <TableRow key={v.id} cols={COLS} href={`/app/vendors/${v.id}`}>
-                <NameCell name={v.name} sub={v.aliases.length > 0 ? t('vendorsPage.alsoKnown', { names: v.aliases.join(', ') }) : `${v.dealCount} · ${formatTotals(v.totalsByCurrency)}`} />
-                <HideM className="text-right tl-num text-ink-2">{v.dealCount}</HideM>
-                <HideM className="text-right tl-num font-semibold font-display">{formatTotals(v.totalsByCurrency)}</HideM>
-                <HideM className="flex justify-end">{v.avgScore != null ? <ScoreRing score={v.avgScore} size={28} stroke={3} /> : <span className="text-ink-3">—</span>}</HideM>
-                <HideM className="text-right tl-num font-semibold text-green-deep">{formatTotals(v.savingsByCurrency)}</HideM>
-                <HideM className="text-right text-[12.5px] text-ink-3">{fmtDate(v.lastActivity)}</HideM>
-              </TableRow>
-            ))}
-            {filtered.length === 0 && <p className="text-center text-[13px] text-ink-3 py-8">{t('vendorsPage.noMatch', { q })}</p>}
-          </Table>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {filtered.map((v) => {
+              const saved = formatTotals(v.savingsByCurrency)
+              return (
+                <Link key={v.id} href={`/app/vendors/${v.id}`} className="group no-underline bg-surface border border-line rounded-[14px] p-4 flex flex-col gap-3 transition-colors hover:border-[#C9D3CE]">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-display font-bold text-[16px] text-ink leading-tight truncate group-hover:text-green-deep transition-colors">{v.name}</p>
+                      <p className="text-[12px] text-ink-3 mt-0.5 truncate">{v.aliases.length > 0 ? t('vendorsPage.alsoKnown', { names: v.aliases.join(', ') }) : t('vendorsPage.cardDeals', { n: v.dealCount })}</p>
+                    </div>
+                    {v.avgScore != null ? <ScoreRing score={v.avgScore} size={36} stroke={3.5} /> : <span className="tl-label text-ink-3 text-[10px] mt-1">{t('vendorsPage.noScore')}</span>}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-line-2">
+                    <div className="min-w-0">
+                      <p className="tl-label text-ink-3 text-[10px]">{t('vendorsPage.colTotal')}</p>
+                      <p className="font-display font-bold text-[15px] text-ink tl-num mt-0.5 truncate">{formatTotals(v.totalsByCurrency) || '—'}</p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="tl-label text-ink-3 text-[10px]">{t('vendorsPage.colSaved')}</p>
+                      <p className={`font-display font-bold text-[15px] tl-num mt-0.5 truncate ${saved ? 'text-green-deep' : 'text-ink-3'}`}>{saved || '—'}</p>
+                    </div>
+                  </div>
+                  <p className="text-[11.5px] text-ink-3">{t('vendorsPage.cardDeals', { n: v.dealCount })} · {t('vendorsPage.lastActivity', { d: fmtDate(v.lastActivity) })}</p>
+                </Link>
+              )
+            })}
+          </div>
         )}
       </PageBody>
     </AppPage>

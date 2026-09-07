@@ -6,15 +6,14 @@ import { Card, Chip, SectionHeading, Table, TableHead, TableRow, HideM, NameCell
 
 /**
  * Insights tab. Server-rendered, pure — every number comes from computeInsights().
- * Order: the savings story first (numbers + chart), then what needs a nudge,
- * then where the money goes (categories, suppliers), then what's coming
- * (renewals), then the record (wins, closed deals).
+ * Order: the savings story first (numbers + chart), then the money still on
+ * the table and the flags that keep recurring, then where the money goes and
+ * how the quotes score, then what's coming (renewals), then the record.
  */
 export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'en' }: { insights: Insights; linkBase?: string; locale?: string }) {
   const t = await getTranslations('insights')
   const cur = I.baseCurrency
   const maxCat = I.categories[0]?.spend || 1
-  const maxSup = I.topSuppliers[0]?.spend || 1
   const dLocale = locale === 'fr' ? 'fr-FR' : 'en-US'
   const dateFmt = (d: Date | string) => new Date(d).toLocaleDateString(dLocale, { month: 'short', day: 'numeric', year: 'numeric' })
   const avgSaving = I.wonCount ? Math.round(I.savingsAchieved / I.wonCount) : 0
@@ -96,22 +95,49 @@ export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'e
         </div>
       </Card>
 
-      {/* 2. What needs a nudge */}
-      {I.attention.length > 0 && (
+      {/* 2. Money on the table — and what keeps getting in the way */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-3.5">
         <Card>
-          <SectionHeading title={t('attention')} sub={t('attentionSub')} />
-          <div className="divide-y divide-line-2">
-            {I.attention.map((a) => (
-              <Link key={a.id} href={`${linkBase}/deal/${a.id}`} className="grid grid-cols-[1fr_auto] items-center gap-3 py-2 no-underline hover:bg-surface-2 -mx-2 px-2 rounded-lg">
-                <span className="font-semibold text-[13px] truncate">{a.vendor}</span>
-                <Chip tone={a.reason === 'flags' ? 'risk' : 'warn'}>{a.reason === 'flags' ? t('attentionFlags', { n: a.flags }) : t('attentionStale', { n: a.daysSinceUpdate })}</Chip>
-              </Link>
-            ))}
-          </div>
+          <SectionHeading title={t('opportunities')} sub={t('opportunitiesSub')} />
+          {I.opportunities.length === 0 ? <p className="text-[13px] text-ink-3 py-2">{t('noOpportunities')}</p> : (
+            <ol className="m-0 p-0 list-none divide-y divide-line-2">
+              {I.opportunities.map((o, i) => (
+                <li key={o.id}>
+                  <Link href={`${linkBase}/deal/${o.id}`} className="grid grid-cols-[24px_minmax(0,1fr)_auto] items-start gap-3 py-3 no-underline group">
+                    <span className="w-6 h-6 rounded-md bg-ink text-white grid place-items-center font-display font-bold text-[12px] mt-0.5">{i + 1}</span>
+                    <span className="min-w-0">
+                      <span className="flex items-baseline gap-2 min-w-0"><span className="font-semibold text-[13.5px] text-ink truncate group-hover:text-green-deep transition-colors">{o.vendor}</span><span className="text-[11.5px] text-ink-3 truncate">{o.category}</span></span>
+                      {o.ask ? <span className="block text-[12.5px] text-ink-2 leading-snug mt-0.5 line-clamp-2">{o.ask}</span> : o.flags > 0 ? <span className="block text-[12.5px] text-ink-3 mt-0.5">{t('attentionFlags', { n: o.flags })}</span> : null}
+                    </span>
+                    <span className="text-right shrink-0">
+                      <span className="block font-display font-bold text-[15px] text-green-deep tl-num">{fmtCompact(o.potential, cur)}</span>
+                      <span className="block text-[11px] text-ink-3">{t('legendPotential')}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          )}
         </Card>
-      )}
+        <Card>
+          <SectionHeading title={t('recurring')} sub={t('recurringSub')} />
+          {I.recurringFlags.length === 0 ? <p className="text-[13px] text-ink-3 py-2">{t('noFlags')}</p> : (
+            <div className="flex flex-col gap-3">
+              {I.recurringFlags.map((f) => (
+                <div key={f.type}>
+                  <div className="flex justify-between items-baseline text-[13px] mb-1.5 gap-3">
+                    <span className="min-w-0 truncate"><b>{f.type}</b></span>
+                    <span className="text-[12px] text-ink-2 whitespace-nowrap tl-num">{t('recurringIn', { n: f.deals })}</span>
+                  </div>
+                  <Bar pct={(f.deals / Math.max(I.activeCount, 1)) * 100} cls={f.deals >= 2 ? 'bg-risk' : 'bg-warn'} />
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      </div>
 
-      {/* 3. Where the money goes */}
+      {/* 3. Where the money goes, and how good the quotes are */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
         <Card>
           <SectionHeading title={t('spendByCategory')} sub={t('total', { v: fmtCompact(I.totalSpend, cur) })} />
@@ -133,19 +159,16 @@ export async function HomeInsights({ insights: I, linkBase = '/app', locale = 'e
           )}
         </Card>
         <Card>
-          <SectionHeading title={t('topSuppliers')} sub={t('topSuppliersSub')} />
-          {I.topSuppliers.length === 0 ? <p className="text-[13px] text-ink-3">{t('noData')}</p> : (
+          <SectionHeading title={t('scoreByCategory')} sub={t('scoreByCategorySub')} />
+          {I.categoryScores.length === 0 ? <p className="text-[13px] text-ink-3">{t('noData')}</p> : (
             <div className="flex flex-col gap-3">
-              {I.topSuppliers.map((s) => (
-                <div key={s.name}>
+              {I.categoryScores.map((c) => (
+                <div key={c.name}>
                   <div className="flex justify-between items-baseline text-[13px] mb-1.5 gap-3">
-                    <Link href={`${linkBase}/deal/${s.dealId}`} className="min-w-0 truncate no-underline text-ink hover:text-green-deep"><b>{s.name}</b> <span className="text-ink-3 text-[12px]">{t('deals', { n: s.count })}</span></Link>
-                    <span className="tl-num whitespace-nowrap text-[12px]">
-                      {s.saved > 0 && <span className="text-green-deep mr-2">{t('saved', { v: fmtCompact(s.saved, cur) })}</span>}
-                      <b className="text-[13px]">{fmtCompact(s.spend, cur)}</b>
-                    </span>
+                    <span className="min-w-0 truncate"><b>{c.name}</b> <span className="text-ink-3 text-[12px]">{t('scoreDeals', { n: c.count })}</span></span>
+                    <b className={`tl-num text-[13px] ${c.score < 40 ? 'text-risk' : c.score < 60 ? 'text-warn' : 'text-green-deep'}`}>{c.score}</b>
                   </div>
-                  <Bar pct={(s.spend / maxSup) * 100} cls="bg-ink-3" />
+                  <Bar pct={c.score} cls={c.score < 40 ? 'bg-risk' : c.score < 60 ? 'bg-warn' : 'bg-green'} />
                 </div>
               ))}
             </div>
