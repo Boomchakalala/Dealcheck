@@ -254,7 +254,8 @@
     "termsLink": "Terms",
     "privacyLink": "Privacy Policy",
     "and": "and",
-    "backToSite": "Back to termlift.com"
+    "backToSite": "Back to termlift.com",
+    "oauthFailed": "Google sign-in didn't complete. Try again, or use your email and password."
   },
   "app": {
     "dropFirst": "Drop in your first vendor quote",

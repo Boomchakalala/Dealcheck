@@ -17,6 +17,19 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
+  // An OAuth code that lands anywhere but the callback means Supabase fell back
+  // to its Site URL (redirect_to not on the allowlist). Forward it so the
+  // sign-in still completes instead of dying on a page that ignores it.
+  const { pathname, searchParams } = request.nextUrl
+  if (pathname !== '/auth/callback' && !pathname.startsWith('/api') && (searchParams.has('code') || searchParams.has('error_description'))) {
+    const cb = new URL('/auth/callback', request.url)
+    for (const k of ['code', 'error', 'error_description', 'next']) {
+      const v = searchParams.get(k)
+      if (v) cb.searchParams.set(k, v)
+    }
+    return NextResponse.redirect(cb)
+  }
+
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {

@@ -16,9 +16,17 @@ export async function GET(request: Request) {
   const isLocal = process.env.NODE_ENV === 'development'
   const base = isLocal ? origin : forwardedHost ? `https://${forwardedHost}` : origin
 
+  // Supabase sends the provider's failure back on the redirect URL instead of a code.
+  const providerError = searchParams.get('error_description') || searchParams.get('error')
+  if (!code && providerError) {
+    console.error('[auth/callback] provider error:', providerError)
+    return NextResponse.redirect(`${base}/login?error=${encodeURIComponent(providerError)}`)
+  }
+
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) console.error('[auth/callback] exchangeCodeForSession failed:', error.message)
 
     if (!error) {
       // Ensure profile exists for OAuth users
@@ -49,5 +57,6 @@ export async function GET(request: Request) {
   }
 
   // Auth error — redirect to login with error
+  console.error('[auth/callback] no session established', { hasCode: !!code, host: forwardedHost || origin })
   return NextResponse.redirect(`${base}/login?error=auth_failed`)
 }

@@ -254,7 +254,8 @@
     "termsLink": "Conditions",
     "privacyLink": "Politique de confidentialité",
     "and": "et",
-    "backToSite": "Retour sur termlift.com"
+    "backToSite": "Retour sur termlift.com",
+    "oauthFailed": "La connexion Google n'a pas abouti. Réessayez, ou utilisez votre e-mail et votre mot de passe."
   },
   "app": {
     "dropFirst": "Déposez votre premier devis fournisseur",

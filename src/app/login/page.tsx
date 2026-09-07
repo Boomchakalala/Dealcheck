@@ -34,6 +34,14 @@ function LoginForm() {
     if (fromTrial || fromNegotiate) setIsSignUp(true)
   }, [fromTrial, fromNegotiate])
 
+  // The OAuth callback bounces here with ?error= when the exchange fails — say so instead of silently reloading.
+  const authError = searchParams.get('error')
+  useEffect(() => {
+    if (!authError) return
+    setError(authError === 'auth_failed' ? t('login.oauthFailed') : `${t('login.oauthFailed')} (${authError})`)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authError])
+
   useEffect(() => {
     if (isSignUp) trackEvent({ name: 'signup_started', properties: { source: fromTrial ? 'trial' : undefined } })
   }, [isSignUp, fromTrial])
