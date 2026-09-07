@@ -245,10 +245,6 @@
     "noAccount": "Don't have an account? Sign up",
     "terms": "By continuing, you agree to our",
     "panel": {
-      "title": "Your negotiations, saved and ready.",
-      "point1": "Pick up where you left off",
-      "point2": "Track savings across all your deals",
-      "point3": "Access your ready-to-send emails anytime",
       "free": "Free to start. No credit card required."
     },
     "createAccountBtn": "Create account",
@@ -257,7 +253,8 @@
     "confirmEmail": "Check your email for the confirmation link.",
     "termsLink": "Terms",
     "privacyLink": "Privacy Policy",
-    "and": "and"
+    "and": "and",
+    "backToSite": "Back to termlift.com"
   },
   "app": {
     "dropFirst": "Drop in your first vendor quote",

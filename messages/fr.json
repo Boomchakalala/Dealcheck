@@ -245,10 +245,6 @@
     "noAccount": "Pas encore de compte ? S'inscrire",
     "terms": "En continuant, vous acceptez nos",
     "panel": {
-      "title": "Vos négociations, sauvegardées et prêtes.",
-      "point1": "Reprenez là où vous en étiez",
-      "point2": "Suivez vos économies sur tous vos contrats",
-      "point3": "Accédez à vos emails prêts à envoyer à tout moment",
       "free": "Gratuit pour commencer. Sans carte bancaire."
     },
     "createAccountBtn": "Créer un compte",
@@ -257,7 +253,8 @@
     "confirmEmail": "Vérifiez votre email pour le lien de confirmation.",
     "termsLink": "Conditions",
     "privacyLink": "Politique de confidentialité",
-    "and": "et"
+    "and": "et",
+    "backToSite": "Retour sur termlift.com"
   },
   "app": {
     "dropFirst": "Déposez votre premier devis fournisseur",

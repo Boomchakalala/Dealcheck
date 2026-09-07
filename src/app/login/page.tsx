@@ -3,7 +3,7 @@
 import { useState, Suspense, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, ArrowRight, Check } from 'lucide-react'
+import { Loader2, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { trackEvent, identifyUser } from '@/lib/analytics'
 import { useT } from '@/i18n/context'
@@ -86,24 +86,14 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
-      {/* Left — ink panel */}
-      <aside className="hidden lg:flex flex-col bg-ink text-white px-12 py-10">
-        <Logo tone="white" />
-        <h2 className="font-display font-extrabold text-[30px] leading-[1.1] tracking-[-0.03em] max-w-[16ch] mt-16">{t('login.panel.title')}</h2>
-        <ul className="list-none p-0 m-0 mt-6 flex flex-col gap-3 text-[14px] text-[#C4D0CA]">
-          {[t('login.panel.point1'), t('login.panel.point2'), t('login.panel.point3')].map((p) => (
-            <li key={p} className="flex items-start gap-2.5"><Check className="w-4 h-4 text-green shrink-0 mt-0.5" strokeWidth={2.5} />{p}</li>
-          ))}
-        </ul>
-        <p className="mt-auto tl-label text-[#7E8C86]">{t('login.panel.free')}</p>
-      </aside>
-
-      {/* Right — form */}
-      <div className="flex flex-col">
-        <div className="lg:hidden border-b border-line px-5 h-14 flex items-center"><Logo /></div>
-        <main className="flex-1 grid place-items-center px-5 sm:px-8 py-10">
-          <form onSubmit={handleAuth} className="w-full max-w-[360px] flex flex-col gap-3.5">
+    <div className="min-h-screen bg-ground flex flex-col">
+      <header className="h-14 flex items-center px-5 sm:px-7">
+        <Logo />
+        <Link href="/" className="ml-auto text-[13px] font-medium text-ink-2 hover:text-ink no-underline transition-colors">{t('login.backToSite')}</Link>
+      </header>
+      <div className="flex flex-col flex-1">
+        <main className="flex-1 flex flex-col items-center justify-center px-5 sm:px-8 pt-6 pb-16">
+          <form onSubmit={handleAuth} className="w-full max-w-[400px] bg-surface border border-line rounded-[14px] px-6 py-7 sm:px-8 sm:py-8 flex flex-col gap-3.5">
             <div className="mb-1">
               <h1 className="font-display font-bold text-[24px] tracking-[-0.02em] text-ink">{isSignUp ? t('login.createAccount') : t('login.welcome')}</h1>
               <p className="text-[13.5px] text-ink-2 mt-1 leading-relaxed">
@@ -157,6 +147,7 @@ function LoginForm() {
               <Link href="/privacy" className="text-ink-2 underline underline-offset-2 decoration-line hover:text-ink">{t('login.privacyLink')}</Link>.
             </p>
           </form>
+          <p className="tl-label text-ink-3 text-[10px] mt-5">{t('login.panel.free')}</p>
         </main>
       </div>
     </div>
