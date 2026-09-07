@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { AddRoundSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/claude'
+import { compareRounds } from '@/lib/claude/round-delta'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { checkFreeQuota } from '@/lib/pricing'
 import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
@@ -149,6 +150,13 @@ export async function POST(
       undefined,
       (profile as any)?.negotiation_preferences || undefined
     )))
+
+    // Round 2+: what did the vendor's reply actually change? Optional — a
+    // failure here never costs the user the round they just paid a call for.
+    if (nextRoundNumber > 1 && previousOutput) {
+      const delta = await runWithAiContext({ userId: user.id, dealId }, () => compareRounds(previousOutput, output, validated.extractedText, locale))
+      if (delta) (output as Record<string, unknown>).round_delta = delta
+    }
 
     // Create new round
     const { data: round, error: roundError } = await supabase

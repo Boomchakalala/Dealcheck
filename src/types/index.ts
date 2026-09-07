@@ -263,6 +263,19 @@ export type DealOutput = {
   email_context?: EmailContext
   /** Which of the three variants the deterministic recommender picked. */
   email_recommended_tone?: 'neutral' | 'firm' | 'final_push'
+  /** Round 2+: what the vendor's reply changed versus the previous round (written by /api/deal/[id]/round). */
+  round_delta?: RoundDelta
+}
+
+/** What a vendor reply changed versus the previous round — the "Round N, counter proposal" card. */
+export type RoundDelta = {
+  headline: string
+  what_changed: string[]
+  concessions: string[]
+  rejected: string[]
+  new_issues: string[]
+  next_move: string
+  posture: 'accept' | 'push' | 'hold' | 'walk'
 }
 
 export type EmailContext = {
