@@ -453,13 +453,12 @@ export function DealScrollView(props: DealScrollViewProps) {
               const tone: 'risk' | 'warn' | 'neutral' = severity === 'HIGH' ? 'risk' : severity === 'MEDIUM' ? 'warn' : 'neutral'
               const stripe = severity === 'HIGH' ? 'border-l-risk' : severity === 'MEDIUM' ? 'border-l-warn' : 'border-l-line'
               const open = !!openFlags[idx]
-              const money = (String(flag.issue || '').match(/[$€£]\s?\d[\d.,]*(?:\/[a-zA-Z]+)?/) || [])[0]
               return (
                 <div key={idx} className={cn('border-l-[3px]', stripe)}>
                   <button onClick={() => toggleFlag(idx)} className="w-full flex items-start gap-3.5 px-5 py-4 text-left hover:bg-surface-2 transition-colors" aria-expanded={open}>
                     <span className={cn('w-7 h-7 rounded-full text-[12px] font-bold grid place-items-center shrink-0 font-display', severity === 'HIGH' ? 'bg-risk text-white' : severity === 'MEDIUM' ? 'bg-warn text-white' : 'bg-line-2 text-ink-2')}>{pos + 1}</span>
                     <span className="flex-1 min-w-0">
-                      <span className="flex items-center gap-2 flex-wrap mb-1"><Chip tone={tone} mono>{severity}</Chip>{money && <span className="text-[12.5px] font-bold text-green-deep font-display tl-num">{money}</span>}</span>
+                      <span className="flex items-center gap-2 flex-wrap mb-1"><Chip tone={tone} mono>{severity}</Chip></span>
                       <span className="block text-[14px] font-semibold text-ink leading-snug">{flag.issue}</span>
                     </span>
                     <ChevronDown className={cn('w-4 h-4 text-ink-3 shrink-0 mt-1.5 transition-transform', open && 'rotate-180')} />
