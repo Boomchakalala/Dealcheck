@@ -53,6 +53,8 @@ Configured in `.env.local` (see README.md for the full list): Supabase URL/anon/
 - Deal numbers come from `src/lib/deal-metrics.ts` only; Home KPIs/insights from `src/lib/deal-insights.ts`.
 - i18n: live strings are `messages/{en,fr}.json` (nested). Add new copy in both via `scripts/i18n-merge.mjs <fragment> <locale>`. `src/i18n/*.json` is a stale flat copy still read by `DealScrollView` — don't add to it.
 - App pages wrap in `<AppPage>` (full-bleed) → `<PageHeader>` → `<PageBody>`. `/app/dashboard` and `/app/negotiations` redirect into Home tabs/filters.
+- Public pages wrap in `<MarketingPage>` → `<PageHero>` → `<Section>`/`<LegalDoc>` → `<FinalCta>` from `src/components/marketing/MarketingPage.tsx`. Left-aligned, no gradient bands, cards only for separate objects.
+- Blog posts live in `src/lib/blog.ts` / `blog-fr.ts` plus dated batch files (`blog-posts-2026-09.ts`); retired slugs get a 301 in `next.config.ts`. Audience is SaaS, IT & infrastructure, marketing spend — not consumer purchases.
 
 ## Market Benchmark (Deep Analysis, Sept 2026)
 
