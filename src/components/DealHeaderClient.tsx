@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CloseDealModal } from '@/components/CloseDealModal'
-import { Loader2, MoreHorizontal, FileDown, CheckCircle2, RotateCcw } from 'lucide-react'
+import { RecordObservationModal } from '@/components/RecordObservationModal'
+import { Loader2, MoreHorizontal, FileDown, CheckCircle2, RotateCcw, Database } from 'lucide-react'
 import { toast } from 'sonner'
 import { trackEvent } from '@/lib/analytics'
 import { useT } from '@/i18n/context'
@@ -36,6 +37,7 @@ export function DealHeaderClient({ dealId, dealStatus, currentTotal, originalTot
   const [showCloseModal, setShowCloseModal] = useState(false)
   const [reopening, setReopening] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [showRecord, setShowRecord] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -104,6 +106,11 @@ export function DealHeaderClient({ dealId, dealStatus, currentTotal, originalTot
                 {reopening ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5 text-ink-3" />}{reopening ? t('dealHeader.reopening') : t('dealHeader.reopen')}
               </button>
             )}
+            {isAdmin && dealStatus === 'closed_won' && (
+              <button onClick={() => { setOpen(false); setShowRecord(true) }} className={cn(item, 'text-ink hover:bg-ground')}>
+                <Database className="w-3.5 h-3.5 text-ink-3" />Record as benchmark observation
+              </button>
+            )}
             {canExport && (
               <button onClick={() => { setOpen(false); handleExport() }} disabled={exporting} className={cn(item, 'text-ink hover:bg-ground')}>
                 {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5 text-ink-3" />}Export PDF
@@ -113,6 +120,7 @@ export function DealHeaderClient({ dealId, dealStatus, currentTotal, originalTot
         )}
       </div>
 
+      {showRecord && <RecordObservationModal dealId={dealId} onClose={() => setShowRecord(false)} />}
       {showCloseModal && (
         <CloseDealModal
           dealId={dealId}
