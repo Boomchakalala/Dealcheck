@@ -18,7 +18,7 @@ interface NotificationPayload {
  * are safe to call today and start actually sending the moment a key is added.
  * Swap RESEND_FROM_EMAIL once a sending domain is verified with Resend.
  */
-async function sendNotificationEmail(to: string, subject: string, body: string) {
+async function sendNotificationEmail(to: string, subject: string, body: string, replyTo?: string) {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
     console.log(`[email] (inert — no RESEND_API_KEY) would send to ${to}: "${subject}"`)
@@ -37,6 +37,7 @@ async function sendNotificationEmail(to: string, subject: string, body: string) 
         to,
         subject,
         text: body,
+        ...(replyTo ? { reply_to: replyTo } : {}),
       }),
     })
     if (!res.ok) {
@@ -44,6 +45,19 @@ async function sendNotificationEmail(to: string, subject: string, body: string) 
     }
   } catch (err) {
     console.error('[email] Resend send error:', err)
+  }
+}
+
+/**
+ * Emails every admin without writing an in-app notification — for inbound
+ * that has no deal to attach to (the contact form). `replyTo` lets the admin
+ * answer the sender straight from their inbox.
+ */
+export async function emailAdmins(subject: string, body: string, replyTo?: string) {
+  const admin = createAdminClient()
+  const { data: admins } = await admin.from('profiles').select('email').eq('is_admin', true)
+  for (const a of admins || []) {
+    if (a.email) await sendNotificationEmail(a.email, subject, body, replyTo)
   }
 }
 

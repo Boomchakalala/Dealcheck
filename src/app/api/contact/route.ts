@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { emailAdmins } from '@/lib/notifications'
 
 export async function POST(request: Request) {
   try {
@@ -27,6 +28,17 @@ export async function POST(request: Request) {
       } else {
         return NextResponse.json({ error: 'Failed to save message' }, { status: 500 })
       }
+    }
+
+    // Tell the humans. Inert until RESEND_API_KEY is set; never blocks the reply.
+    try {
+      await emailAdmins(
+        `[Contact] ${subject || 'General question'} — ${name.trim()}`,
+        `From: ${name.trim()} <${email.trim()}>\nSubject: ${subject || 'General question'}\n\n${message.trim()}`,
+        email.trim(),
+      )
+    } catch (err) {
+      console.error('Contact email error:', err)
     }
 
     return NextResponse.json({ success: true })
