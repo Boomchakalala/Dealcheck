@@ -1597,7 +1597,7 @@
         "q1": "What do I get back from an analysis?",
         "a1": "First, a fast initial assessment — a deal score, red flags, and an estimate of potential savings, usually in under a minute. From there, the Deep Analysis goes deeper: negotiation levers, recommended asks, priorities, and strategy. Once you have what you need, generate a ready-to-send email yourself or have TermLift negotiate the deal for you.",
         "q2": "What are the email drafts for?",
-        "a2": "They're ready-to-copy replies you can send directly to your supplier once you're ready to act on the analysis. Each one comes in three tones — Friendly, Direct, and Firm. Pick the one that fits your relationship with the supplier and copy it.",
+        "a2": "They're ready-to-copy replies to your supplier, built from the playbook. TermLift writes three variants in one go — Balanced, Firm, and Final push — and opens the one it recommends for your situation. Step to a softer or firmer one if the relationship calls for it, edit anything, then copy or open in your mail app.",
         "q3": "Is the AI always accurate?",
         "a3": "No. AI can miss details, misinterpret terms, or make errors. TermLift is a starting point for negotiation, not the final word. Always review the outputs against your original documents before acting on them. If something looks off, it probably is — trust your judgment."
       },

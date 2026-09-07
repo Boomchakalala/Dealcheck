@@ -42,7 +42,23 @@ export function recommendTone(input: ToneRecommendInput): EmailTone {
 }
 
 export const TONE_LABELS: Record<EmailTone, { en: string; fr: string }> = {
-  neutral: { en: 'Collaborative', fr: 'Collaboratif' },
-  firm: { en: 'Direct', fr: 'Direct' },
+  neutral: { en: 'Balanced', fr: 'Équilibré' },
+  firm: { en: 'Firm', fr: 'Ferme' },
   final_push: { en: 'Final push', fr: 'Dernière relance' },
+}
+
+/** One line on what the recommended variant is trying to do this round — shown above the draft. */
+export const TONE_APPROACH: Record<EmailTone, { en: string; fr: string }> = {
+  neutral: {
+    en: 'Open on the must-have asks, keep the relationship warm, and leave the vendor an easy way to say yes.',
+    fr: 'Ouvrir sur les demandes indispensables, garder la relation cordiale, et laisser au fournisseur une porte facile pour dire oui.',
+  },
+  firm: {
+    en: 'State the asks as conditions, anchor on your leverage, and set a date for their answer.',
+    fr: 'Poser les demandes comme des conditions, s’appuyer sur votre levier, et fixer une date de réponse.',
+  },
+  final_push: {
+    en: 'Make it clear this is the last round: the asks, the deadline, and what happens if they say no.',
+    fr: 'Dire clairement que c’est le dernier tour : les demandes, l’échéance, et ce qui se passe en cas de refus.',
+  },
 }

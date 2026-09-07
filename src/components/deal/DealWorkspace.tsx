@@ -214,6 +214,14 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
         <div className="px-4 sm:px-6 pb-2.5"><StageRail current={stage} hrefs={railHrefs} /></div>
       </div>
 
+      {/* Phone: the header scrolls away, so the one primary action rides above the bottom nav. */}
+      {!isTrial && !isDemo && primary && (
+        <div className="md:hidden fixed left-0 right-0 z-30 px-4 py-2.5 bg-surface/95 backdrop-blur-sm border-t border-line flex gap-2 [&>a]:flex-1 [&>button]:flex-1" style={{ bottom: 'calc(58px + env(safe-area-inset-bottom))' }}>
+          {secondary}
+          {primary}
+        </div>
+      )}
+
       <PageBody className={cn(isTrial && 'pb-4')}>
         {/* ── Verdict ─────────────────────────────────────────── */}
         <div className={cn('rounded-[14px] border px-4 py-4 sm:px-5 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-4 sm:gap-5 items-start', won ? 'bg-green-soft border-green-line' : waitingOnClient ? 'bg-warn-soft border-warn-line' : 'bg-surface border-line')}>

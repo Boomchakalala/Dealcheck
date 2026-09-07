@@ -13,6 +13,8 @@ import { NEGOTIATION_FEE_PERCENT, FULL_ANALYSIS_EMAIL_REGEN_LIMIT, deepAnalysisP
 import { TONE_LABELS, type EmailTone } from '@/lib/tone-recommend'
 import { getFlagSeverity } from '@/lib/deal-metrics'
 import { Btn, Card, Chip, GateCard } from '@/components/system'
+import { TONE_APPROACH } from '@/lib/tone-recommend'
+import type { RoundDelta } from '@/types'
 import { cn } from '@/lib/utils'
 
 interface DealScrollViewProps {
@@ -84,6 +86,41 @@ const scoreBarClass = (pct: number) => (pct >= 60 ? 'bg-green' : pct >= 40 ? 'bg
 const scoreTextClass = (pct: number) => (pct >= 60 ? 'text-green-deep' : pct >= 40 ? 'text-warn' : 'text-risk')
 
 /** Section title with the icon Kevin missed: icon tile + caps heading + one-line sub. */
+/** Round 2+: what the vendor's reply changed. Four short lists and the next move. */
+function RoundDeltaCard({ d, fr }: { d: RoundDelta; fr: boolean }) {
+  const posture = { accept: fr ? 'Accepter' : 'Accept', push: fr ? 'Pousser' : 'Push back', hold: fr ? 'Tenir' : 'Hold', walk: fr ? 'Partir' : 'Walk away' }[d.posture]
+  const postureTone: 'green' | 'warn' | 'neutral' | 'risk' = d.posture === 'accept' ? 'green' : d.posture === 'push' ? 'warn' : d.posture === 'walk' ? 'risk' : 'neutral'
+  const lists: Array<{ title: string; items: string[]; dot: string }> = [
+    { title: fr ? 'Ce qui a changé' : 'What changed', items: d.what_changed, dot: 'bg-ink' },
+    { title: fr ? 'Concessions obtenues' : 'Vendor conceded', items: d.concessions, dot: 'bg-green' },
+    { title: fr ? 'Demandes refusées' : 'Refused or ignored', items: d.rejected, dot: 'bg-risk' },
+    { title: fr ? 'Nouveaux points' : 'New issues introduced', items: d.new_issues, dot: 'bg-warn' },
+  ].filter((l) => l.items.length > 0)
+  return (
+    <Card className="mb-3 flex flex-col gap-3.5">
+      {d.headline && <p className="text-[14.5px] font-semibold text-ink leading-snug">{d.headline}</p>}
+      {lists.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-3">
+          {lists.map((l) => (
+            <div key={l.title}>
+              <p className="tl-label text-ink-3 mb-1.5">{l.title}</p>
+              <ul className="m-0 p-0 list-none flex flex-col gap-1">
+                {l.items.map((it, i) => <li key={i} className="flex items-start gap-2 text-[13px] text-ink-2 leading-snug"><span className={cn('w-1.5 h-1.5 rounded-full shrink-0 mt-[7px]', l.dot)} />{it}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+      {d.next_move && (
+        <div className="rounded-[10px] border border-green-line bg-green-soft px-3.5 py-3">
+          <div className="flex items-center gap-2 mb-1"><span className="tl-label text-green-deep">{fr ? 'Prochain coup recommandé' : 'Recommended next move'}</span><Chip tone={postureTone}>{posture}</Chip></div>
+          <p className="text-[13.5px] text-ink leading-relaxed">{d.next_move}</p>
+        </div>
+      )}
+    </Card>
+  )
+}
+
 function IconHeading({ icon: Icon, title, sub, right, tone = 'neutral', eyebrow }: { icon: typeof Zap; title: React.ReactNode; sub?: React.ReactNode; right?: React.ReactNode; tone?: 'neutral' | 'green' | 'risk' | 'ink'; eyebrow?: React.ReactNode }) {
   const tile = tone === 'green' ? 'bg-green-soft text-green-deep' : tone === 'risk' ? 'bg-risk-soft text-risk' : tone === 'ink' ? 'bg-ink text-white' : 'bg-ground text-ink-2'
   return (
@@ -674,10 +711,22 @@ export function DealScrollView(props: DealScrollViewProps) {
         {!showFullPlaybook ? (
           <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Mail} variant="email" />
         ) : !emailSectionVisible && !demoMode ? (
-          <GateCard tone="neutral" eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'} title={fr ? "Générer l'e-mail de négociation" : 'Generate the negotiation email'} body={fr ? 'Construit à partir du plan ci-dessus, dans le ton qui convient à la relation. Ajoutez ce que le document ne peut pas nous dire.' : 'Built from the playbook above, in the tone that fits the relationship. Add anything the document can’t tell us.'} action={<Btn variant="primary" onClick={openEmailSection}><Mail className="w-4 h-4" />{fr ? "Générer l'e-mail" : 'Generate email'}</Btn>} />
+          <GateCard tone="neutral" eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'} title={fr ? 'Préparez votre négociation' : 'Prepare your negotiation'} body={fr ? `Tour ${sortedRounds.length} : TermLift rédige l'e-mail à partir du plan ci-dessus. Ajoutez d'abord ce que le document ne peut pas nous dire : objectif, budget, alternatives, échéance. Tout est facultatif.` : `Round ${sortedRounds.length}: TermLift writes the email from the playbook above. First, add what the document can’t tell us: objective, budget, alternatives, deadline. All optional.`} action={<Btn variant="primary" onClick={openEmailSection}><Mail className="w-4 h-4" />{fr ? `Préparer le tour ${sortedRounds.length}` : `Prepare Round ${sortedRounds.length}`}</Btn>} />
         ) : (
           <>
-            <IconHeading icon={Mail} tone="ink" eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'} title={fr ? 'E-mail de négociation' : 'Negotiation email'} sub={fr ? "TermLift connaît déjà le devis et la stratégie. Ajoutez ce que le document ne peut pas nous dire." : "TermLift already knows the quote and the strategy. Add any context the document can’t tell us."} />
+            <IconHeading
+              icon={Mail}
+              tone="ink"
+              eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'}
+              title={sortedRounds.length > 1 ? (fr ? `Tour ${sortedRounds.length} — Contre-proposition` : `Round ${sortedRounds.length} — Counter proposal`) : (fr ? 'Tour 1 — Ouverture de la négociation' : 'Round 1 — Initial negotiation')}
+              sub={sortedRounds.length > 1 ? (fr ? 'Ce que la réponse du fournisseur a changé, et la réponse à envoyer.' : "What the vendor's reply changed, and the reply to send.") : (fr ? "TermLift connaît déjà le devis et la stratégie. Ajoutez ce que le document ne peut pas nous dire." : "TermLift already knows the quote and the strategy. Add any context the document can’t tell us.")}
+            />
+
+            {sortedRounds.length > 1 && (o as any)?.round_delta && <RoundDeltaCard d={(o as any).round_delta as RoundDelta} fr={fr} />}
+
+            {hasEmail && (
+              <p className="text-[13px] text-ink-2 mb-2.5 leading-relaxed"><span className="font-semibold text-ink">{fr ? 'Approche recommandée : ' : 'Recommended approach: '}</span>{TONE_APPROACH[toneOrder[recommendedIdx]][fr ? 'fr' : 'en']}</p>
+            )}
 
             {hasEmail && (
               <Card pad={false} className="mb-3">
@@ -709,7 +758,7 @@ export function DealScrollView(props: DealScrollViewProps) {
               <div className="flex flex-col gap-3">
                 <button onClick={() => setShowEmailContext(!showEmailContext)} className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink-2 hover:text-green-deep transition-colors self-start" aria-expanded={showEmailContext}>
                   <Plus className={cn('w-3.5 h-3.5 transition-transform', showEmailContext && 'rotate-45')} />
-                  {fr ? 'Ajouter du contexte de négociation' : 'Add negotiation context'}
+                  {hasEmail ? (fr ? 'Modifier le contexte de négociation' : 'Edit negotiation context') : (fr ? 'Préparer la négociation : objectif, budget, alternatives, échéance' : 'Prepare the negotiation: objective, budget, alternatives, deadline')}
                   {!showEmailContext && <span className="text-[11.5px] font-normal text-ink-3">— {fr ? 'facultatif' : 'optional'}</span>}
                 </button>
                 {showEmailContext && (
@@ -733,7 +782,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                 )}
                 <div className="flex flex-col gap-2">
                   <Btn variant={hasEmail ? 'ghost' : 'primary'} onClick={handleGenerate} disabled={regenerating || remainingRegens <= 0} className="self-start">
-                    {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{fr ? 'Génération…' : 'Generating…'}</> : hasEmail ? <><RotateCcw className="w-4 h-4" />{fr ? 'Régénérer avec ce contexte' : 'Regenerate with this context'}</> : <><Sparkles className="w-4 h-4" />{fr ? "Générer l'e-mail recommandé" : 'Generate recommended email'}</>}
+                    {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{fr ? 'Génération…' : 'Generating…'}</> : hasEmail ? <><RotateCcw className="w-4 h-4" />{fr ? 'Régénérer avec ce contexte' : 'Regenerate with this context'}</> : <><Sparkles className="w-4 h-4" />{fr ? `Générer l'e-mail du tour ${sortedRounds.length}` : `Generate Round ${sortedRounds.length} email`}</>}
                   </Btn>
                   {remainingRegens <= 0 && <p className="text-[12px] text-ink-3">{fr ? 'Limite de régénération atteinte.' : 'Regeneration limit reached.'}</p>}
                   {regenError && <p role="alert" className="text-[13px] text-risk bg-risk-soft border border-risk-line rounded-[10px] px-3.5 py-2.5">{regenError}</p>}
@@ -774,9 +823,12 @@ export function DealScrollView(props: DealScrollViewProps) {
                   return (
                     <li key={round.id} className="grid grid-cols-[22px_1fr] gap-3 pb-4 relative">
                       <span className="w-[22px] h-[22px] rounded-full bg-green text-white tl-label text-[10px] grid place-items-center relative after:content-[''] after:absolute after:top-[22px] after:bottom-[-16px] after:left-[10px] after:w-0.5 after:bg-line">{round.round_number}</span>
-                      <div className="min-w-0 flex flex-wrap items-baseline gap-x-2">
-                        <p className="text-[13px] font-semibold text-ink">{fr ? `Tour ${round.round_number}` : `Round ${round.round_number}`}{round.round_number === 1 ? (fr ? ' — analyse initiale' : ' — initial analysis') : ''}</p>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-baseline gap-x-2">
+                        <p className="text-[13px] font-semibold text-ink">{fr ? `Tour ${round.round_number}` : `Round ${round.round_number}`}{round.round_number === 1 ? (fr ? ' — analyse initiale' : ' — initial analysis') : (fr ? ' — contre-proposition' : ' — counter proposal')}</p>
                         <p className="text-[12px] text-ink-3 tl-num">{[rDate, rTotal ? normalizeAmount(rTotal) : null, rFlags > 0 ? `${rFlags} ${fr ? 'point(s)' : 'flags'}` : null].filter(Boolean).join(' · ')}</p>
+                        </div>
+                        {ro?.round_delta?.headline && <p className="text-[12.5px] text-ink-2 mt-0.5 leading-snug">{ro.round_delta.headline}</p>}
                       </div>
                     </li>
                   )
