@@ -27,7 +27,8 @@
     "newShort": "New",
     "accountShort": "Account",
     "signUpShort": "Sign up",
-    "adminBenchmarks": "Benchmarks (admin)"
+    "adminBenchmarks": "Benchmarks (admin)",
+    "adminShort": "Admin"
   },
   "hero": {
     "badge": "Procurement-grade quote review",

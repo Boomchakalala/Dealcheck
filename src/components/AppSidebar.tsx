@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect, useSyncExternalStore } from 'react'
-import { FileText, Building2, Settings, User, LogOut, HelpCircle, ChevronDown, Globe, PanelLeftClose, PanelLeftOpen, Briefcase, Gauge, Plus, BarChart3 } from 'lucide-react'
+import { FileText, Building2, Settings, User, LogOut, HelpCircle, ChevronDown, Globe, PanelLeftClose, PanelLeftOpen, Briefcase, Gauge, Plus, BarChart3, ShieldCheck } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { NotificationBell, type NotificationItem } from '@/components/NotificationBell'
 import { useT } from '@/i18n/context'
@@ -48,6 +48,7 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, linkBas
   const pathname = usePathname()
   const t = useT()
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showAdminSheet, setShowAdminSheet] = useState(false)
   const collapsed = useSyncExternalStore(subscribe, readCollapsed, () => false)
   const setCollapsed = (v: boolean) => writeCollapsed(v)
 
@@ -188,6 +189,23 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, linkBas
         </div>
       </aside>
 
+      {/* Mobile admin sheet — the admin pages have no other entry point on a phone */}
+      {showAdminSheet && isAdmin && !demoMode && (
+        <div className="md:hidden fixed inset-0 z-40" onClick={() => setShowAdminSheet(false)}>
+          <div className="absolute inset-0 bg-ink/30" />
+          <div className="absolute left-3 right-3 bottom-[72px] bg-surface rounded-[14px] border border-line shadow-lg py-1.5" onClick={(e) => e.stopPropagation()}>
+            <p className="tl-label text-ink-3 px-4 pt-2 pb-1">Admin</p>
+            {workspace.filter((it) => it.href.startsWith('/app/admin')).map((it) => (
+              <Link key={it.href} href={it.href} onClick={() => setShowAdminSheet(false)} className={cn('flex items-center gap-2.5 px-4 py-2.5 text-[14px] font-medium no-underline', isActive(it.href) ? 'text-green-deep' : 'text-ink')}>
+                <it.icon className={cn('w-4 h-4', isActive(it.href) ? 'text-green-deep' : 'text-ink-3')} />
+                <span className="flex-1">{it.label}</span>
+                {(it.badge ?? 0) > 0 && <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-risk text-white text-[10px] font-bold grid place-items-center tl-num">{it.badge}</span>}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Mobile bottom bar */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-line z-40 flex items-center justify-around px-1 py-1 pb-[max(4px,env(safe-area-inset-bottom))]" aria-label="Main">
         {[workspace[0], ...(demoMode ? [] : [workspace[1]])].filter(Boolean).map((it) => {
@@ -202,6 +220,17 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, linkBas
         <Link href={demoMode ? '/login?from=demo' : `${linkBase}/new`} className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10.5px] font-semibold text-ink-3 no-underline">
           <span className="w-5 h-5 rounded-md bg-green text-white grid place-items-center"><Plus className="w-3.5 h-3.5" /></span>{t('nav.newShort')}
         </Link>
+        {isAdmin && !demoMode && (
+          <button
+            type="button"
+            onClick={() => setShowAdminSheet((v) => !v)}
+            aria-expanded={showAdminSheet}
+            className={cn('relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10.5px] font-semibold', pathname.startsWith('/app/admin') || showAdminSheet ? 'text-green-deep' : 'text-ink-3')}
+          >
+            <ShieldCheck className="w-5 h-5" />{t('nav.adminShort')}
+            {adminUnread > 0 && <span className="absolute top-0.5 right-1.5 w-2 h-2 rounded-full bg-risk" />}
+          </button>
+        )}
         <Link href={demoMode ? '/login?from=demo' : `${linkBase}/settings`} className={cn('flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10.5px] font-semibold no-underline', isActive(`${linkBase}/settings`) ? 'text-green-deep' : 'text-ink-3')}>
           <User className="w-5 h-5" />{demoMode ? t('nav.signUpShort') : t('nav.accountShort')}
         </Link>
