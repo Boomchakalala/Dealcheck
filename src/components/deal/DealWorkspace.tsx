@@ -11,6 +11,7 @@ import { HeroVerdict } from '@/components/HeroVerdict'
 import { AppPage, Btn, Chip, GateCard, PageBody, ScoreRing, StageRail, StatRow, StatTile } from '@/components/system'
 import { deriveDealStage, deriveNegotiationMode, stageChipKey, stageTone, type DealStage } from '@/lib/deal-stage'
 import { hasDeepContent, deepAnalysisIsRunning } from '@/lib/deep-analysis-status'
+import { benchmarkRanButUnavailable } from '@/lib/benchmark/visibility'
 import { shortenVendorDisplayName } from '@/lib/vendor-normalize'
 import {
   type DealLike, getCategory, getDealCurrency, getDealType, getFlagSeverity, getLatestRound, getPotentialSavings, getRedFlagCount,
@@ -261,7 +262,7 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
           ) : benchTile ? (
             <StatTile label={t('dealPage.statTargetLabel')} value={benchTile.value} sub={benchTile.sub} />
           ) : targetRange ? (
-            <StatTile label={t('dealPage.statTargetLabel')} value={`${fmtMoney(targetRange.low, currency)}–${fmtMoney(targetRange.high, currency)}`} sub={totalCommitment ? t('dealPage.statTargetSub', { v: normalizeAmount(totalCommitment) }) : undefined} />
+            <StatTile label={t('dealPage.statEstimatedTargetLabel')} value={`${fmtMoney(targetRange.low, currency)}–${fmtMoney(targetRange.high, currency)}`} sub={t('dealPage.statEstimatedTargetSub')} />
           ) : (
             <StatTile label={t('dealPage.statTotal')} value={totalCommitment ? normalizeAmount(totalCommitment) : '—'} sub={[term, latestOutput.snapshot?.billing_payment].filter(Boolean).join(' · ') || undefined} />
           )}
@@ -285,6 +286,11 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
             <StatTile label={t('dealPage.statStarted')} value={dateShort(deal.created_at)} sub={dateFull(deal.created_at)} />
           )}
         </StatRow>
+
+        {/* Full Analysis ran the benchmark engine and it had no comparable observations: say so, once, next to the target. */}
+        {deepDone && benchmarkRanButUnavailable(bench) && (
+          <p className="text-[12.5px] text-ink-3 leading-snug mt-2.5">{t('dealPage.benchNoDataNote')}</p>
+        )}
 
         {isTrial && (
           <GateCard tone="green" eyebrow={t('dealPage.trialEyebrow')} title={t('dealPage.trialTitle')} body={t('dealPage.trialBody')} action={<Btn href="/login?from=trial" variant="primary">{t('dealPage.trialCta')}</Btn>} />

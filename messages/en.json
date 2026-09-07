@@ -1393,7 +1393,10 @@
     "snapRenewal": "Renewal date",
     "snapDeadline": "Signing deadline",
     "statTargetBenchSub": "{pct} vs observed market",
-    "statTargetBenchAt": "at observed market"
+    "statTargetBenchAt": "at observed market",
+    "statEstimatedTargetLabel": "Estimated target",
+    "statEstimatedTargetSub": "Estimated from this quote",
+    "benchNoDataNote": "TermLift doesn’t yet have enough observed pricing data for this vendor. Targets are estimated from the quote and commercial terms."
   },
   "tryPage": {
     "eyebrow": "Step 1 · free · no signup",

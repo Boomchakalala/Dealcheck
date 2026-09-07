@@ -1,0 +1,5 @@
+{ "dealPage": {
+  "statEstimatedTargetLabel": "Estimated target",
+  "statEstimatedTargetSub": "Estimated from this quote",
+  "benchNoDataNote": "TermLift doesn’t yet have enough observed pricing data for this vendor. Targets are estimated from the quote and commercial terms."
+} }

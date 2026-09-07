@@ -135,11 +135,11 @@ describe('runBenchmark', () => {
     expect(MIN_EXACT_COMPARABLES).toBe(3)
   })
 
-  it('no observations → unavailable, category signal still present', () => {
+  it('no observations → unavailable, and no category heuristic anywhere in the result', () => {
     const r = runBenchmark(query(), [])
     expect(r.benchmark_available).toBe(false)
-    expect(r.category_signal?.category).toBe('saas')
-    expect(r.category_signal?.source_label).toMatch(/not observed/)
+    expect(r.category_signal).toBeUndefined()
+    expect(JSON.stringify(r)).not.toMatch(/typical|category model|not observed/i)
     expect(r.sources).toEqual([])
   })
 

@@ -1,0 +1,5 @@
+{ "dealPage": {
+  "statEstimatedTargetLabel": "Cible estimée",
+  "statEstimatedTargetSub": "Estimée à partir de ce devis",
+  "benchNoDataNote": "TermLift ne dispose pas encore d’assez de prix observés pour ce fournisseur. Les cibles sont estimées à partir du devis et des conditions commerciales."
+} }

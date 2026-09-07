@@ -1,11 +1,10 @@
 import type {
-  BenchmarkObservation, BenchmarkQuery, BenchmarkResult, BenchmarkSourceSummary, CategorySignal, ComparableSummary,
+  BenchmarkObservation, BenchmarkQuery, BenchmarkResult, BenchmarkSourceSummary, ComparableSummary,
   PriceType, ScoredObservation, VendorDiscountSignal,
 } from './types'
 import { pickBasis, scoreObservation } from './match'
 import { computeConfidence } from './confidence'
 import { round2 } from './normalize'
-import { CATEGORY_BENCHMARKS, resolveSavingsTarget, type QuoteCategory } from '../category-benchmarks'
 
 export const ENGINE_VERSION = 'benchmark-v1.0'
 
@@ -102,21 +101,6 @@ function vendorDiscountSignal(scored: ScoredObservation[]): VendorDiscountSignal
   }
 }
 
-export function categorySignal(q: BenchmarkQuery): CategorySignal | null {
-  const cat = q.category as QuoteCategory | undefined
-  if (!cat || !(cat in CATEGORY_BENCHMARKS)) return null
-  const bench = CATEGORY_BENCHMARKS[cat]
-  const target = resolveSavingsTarget(bench, { dealSizeBracket: q.deal_size_bracket || 'medium', isRenewal: q.deal_type === 'renewal' })
-  return {
-    category: cat,
-    label: bench.label,
-    typical_discount_low_pct: target.minPct,
-    typical_discount_high_pct: target.maxPct,
-    lever: target.lever,
-    source_label: 'TermLift category model (curated, not observed)',
-  }
-}
-
 const PRICE_TYPE_LABEL: Record<PriceType, string> = {
   executed_contract: 'executed contracts',
   negotiated_offer: 'negotiated offers',
@@ -165,7 +149,9 @@ export function runBenchmark(q: BenchmarkQuery, observations: BenchmarkObservati
   }
 
   const vendor_discount_signal = vendorDiscountSignal(sameVendor)
-  const category_signal = categorySignal(q)
+  // No category-level signal: the curated "typical negotiated savings" table is a
+  // heuristic, not an observation, and its category comes from an unchecked
+  // classifier. Nothing user-facing may be built from it (2026-09-08).
   const sources = summariseSources(sameVendor)
 
   if (exactRaw.length > exactWithValue.length) {
@@ -185,8 +171,7 @@ export function runBenchmark(q: BenchmarkQuery, observations: BenchmarkObservati
     comparable_count: exact.length,
     comparables,
     vendor_discount_signal,
-    category_signal,
-    evidence_summary: buildDirectionalEvidence(exact, sameVendor, vendor_discount_signal, category_signal),
+    evidence_summary: buildDirectionalEvidence(exact, sameVendor, vendor_discount_signal),
     sources,
     limitations: [...limitations, 'No fair-market range is published without enough same-product comparables; any guidance below is directional.'],
     methodology: METHODOLOGY,
@@ -252,7 +237,6 @@ export function runBenchmark(q: BenchmarkQuery, observations: BenchmarkObservati
     comparable_count: exact.length,
     comparables,
     vendor_discount_signal,
-    category_signal,
     evidence_summary: evidence,
     sources,
     limitations,
@@ -261,12 +245,11 @@ export function runBenchmark(q: BenchmarkQuery, observations: BenchmarkObservati
 }
 
 function buildDirectionalEvidence(
-  exact: ScoredObservation[], sameVendor: ScoredObservation[], vendor: VendorDiscountSignal | null, category: CategorySignal | null,
+  exact: ScoredObservation[], sameVendor: ScoredObservation[], vendor: VendorDiscountSignal | null,
 ): string[] {
   const out: string[] = []
   if (exact.length > 0) out.push(`${exact.length} same-product observation${exact.length === 1 ? '' : 's'} on file, too few to publish a range`)
   if (sameVendor.length > exact.length) out.push(`${sameVendor.length - exact.length} other observation${sameVendor.length - exact.length === 1 ? '' : 's'} for this vendor`)
   if (vendor) out.push(`This vendor's observed discounts off list run ${vendor.discount_low_pct}-${vendor.discount_high_pct}% (median ${vendor.discount_median_pct}%, ${vendor.observation_count} observations)`)
-  if (category) out.push(`${category.label}: typical negotiated outcome ${category.typical_discount_low_pct}-${category.typical_discount_high_pct}% via ${category.lever} (${category.source_label})`)
   return out
 }

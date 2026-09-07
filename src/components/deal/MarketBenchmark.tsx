@@ -31,6 +31,8 @@ const PRICE_TYPE_LABEL: Record<string, { en: string; fr: string }> = {
 export function MarketBenchmark({ benchmark: b, interpretation, fmt, locale, showEyebrow = true }: Props) {
   const fr = locale === 'fr'
   const [showSources, setShowSources] = useState(false)
+  // Only a published range is evidence. Anything else is the caller's one-line note, not this section.
+  if (!b.benchmark_available) return null
   const confTone = b.confidence === 'high' ? 'green' : b.confidence === 'medium' ? 'warn' : 'neutral'
   const confLabel = b.confidence === 'high' ? (fr ? 'Confiance élevée' : 'High confidence') : b.confidence === 'medium' ? (fr ? 'Confiance moyenne' : 'Medium confidence') : (fr ? 'Confiance faible' : 'Low confidence')
 
@@ -110,38 +112,7 @@ export function MarketBenchmark({ benchmark: b, interpretation, fmt, locale, sho
 
           <SourcesPanel b={b} fr={fr} open={showSources} onToggle={() => setShowSources(!showSources)} />
         </div>
-      ) : (
-        <div className="bg-surface border border-line rounded-[14px] overflow-hidden">
-          <div className="px-5 py-5">
-            <p className="font-display font-bold text-[15px] text-ink">{fr ? 'Données de benchmark limitées' : 'Limited benchmark data'}</p>
-            <p className="text-[13px] text-ink-2 mt-1 leading-relaxed">{b.reason}</p>
-            <p className="text-[12.5px] text-ink-3 mt-1 leading-relaxed">{fr ? 'Aucune fourchette de prix n’est publiée sans assez d’observations comparables. Les indications ci-dessous sont directionnelles.' : 'No price range is published without enough comparable observations. What follows is directional only.'}</p>
-
-            {(b.vendor_discount_signal || b.category_signal || b.evidence_summary.length > 0) && (
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {b.vendor_discount_signal && (
-                  <div className="rounded-[10px] border border-line bg-ground px-4 py-3">
-                    <p className="tl-label text-ink-3">{fr ? 'Remises observées chez ce fournisseur' : 'Observed discounts at this vendor'}</p>
-                    <p className="font-display font-bold text-[17px] text-ink tl-num mt-0.5">{b.vendor_discount_signal.discount_low_pct}–{b.vendor_discount_signal.discount_high_pct}% <span className="text-[12px] font-normal text-ink-3">{fr ? 'sur prix public' : 'off list'}</span></p>
-                    <p className="text-[12px] text-ink-3 mt-0.5">{fr ? `médiane ${b.vendor_discount_signal.discount_median_pct}% · ${b.vendor_discount_signal.observation_count} observations` : `median ${b.vendor_discount_signal.discount_median_pct}% · ${b.vendor_discount_signal.observation_count} observations`}</p>
-                  </div>
-                )}
-                {b.category_signal && (
-                  <div className="rounded-[10px] border border-line bg-ground px-4 py-3">
-                    <p className="tl-label text-ink-3">{fr ? 'Repère catégorie' : 'Category signal'}</p>
-                    <p className="font-display font-bold text-[17px] text-ink tl-num mt-0.5">{b.category_signal.typical_discount_low_pct}–{b.category_signal.typical_discount_high_pct}% <span className="text-[12px] font-normal text-ink-3">{fr ? 'négociable typiquement' : 'typically negotiable'}</span></p>
-                    <p className="text-[12px] text-ink-3 mt-0.5">{b.category_signal.label} · {b.category_signal.lever}</p>
-                    <p className="text-[11.5px] text-ink-3 mt-1 italic">{b.category_signal.source_label}</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {interpretation?.summary && <p className="text-[13px] text-ink-2 mt-4 leading-relaxed">{interpretation.summary}</p>}
-          </div>
-          <SourcesPanel b={b} fr={fr} open={showSources} onToggle={() => setShowSources(!showSources)} />
-        </div>
-      )}
+      ) : null}
     </section>
   )
 }

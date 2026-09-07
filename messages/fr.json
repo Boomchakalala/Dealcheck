@@ -1393,7 +1393,10 @@
     "snapRenewal": "Date de renouvellement",
     "snapDeadline": "Date limite de signature",
     "statTargetBenchSub": "{pct} vs marché observé",
-    "statTargetBenchAt": "au niveau du marché observé"
+    "statTargetBenchAt": "au niveau du marché observé",
+    "statEstimatedTargetLabel": "Cible estimée",
+    "statEstimatedTargetSub": "Estimée à partir de ce devis",
+    "benchNoDataNote": "TermLift ne dispose pas encore d’assez de prix observés pour ce fournisseur. Les cibles sont estimées à partir du devis et des conditions commerciales."
   },
   "tryPage": {
     "eyebrow": "Étape 1 · gratuit · sans inscription",
