@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { AddRoundSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/claude'
 import { compareRounds } from '@/lib/claude/round-delta'
+import { toStructuredExtraction } from '@/lib/structured-extraction'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { checkFreeQuota } from '@/lib/pricing'
 import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
@@ -168,6 +169,7 @@ export async function POST(
         note: validated.note,
         extracted_text: validated.saveExtractedText ? validated.extractedText : null,
         output_json: output,
+        extracted_data: toStructuredExtraction(output),
         output_markdown: renderMarkdown(output),
         status: 'done',
         model_version: 'claude-sonnet-4',

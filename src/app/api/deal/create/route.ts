@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { textForPersistence } from '@/lib/extract'
 import { CreateDealSchema } from '@/lib/schemas'
 import { analyzeDeal, type ExtractedFacts } from '@/lib/claude'
+import { toStructuredExtraction } from '@/lib/structured-extraction'
 import type { QuoteClassificationType } from '@/lib/schemas'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { checkFreeQuota } from '@/lib/pricing'
@@ -179,6 +180,8 @@ export async function POST(request: Request) {
         // browser's memory. Extracted text only, never the original file.
         extracted_text: persistText,
         output_json: output,
+        // Structured facts from this analysis, kept so an outcome can be compared later without the quote text.
+        extracted_data: toStructuredExtraction(output),
         output_markdown: '', // V1 doesn't need markdown
         status: 'done',
         model_version: 'claude-sonnet-4',

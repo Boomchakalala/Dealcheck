@@ -10,6 +10,7 @@ import { runWithAiContext } from '@/lib/ai-telemetry'
 import { extractBenchmarkInput } from '@/lib/claude/benchmark-input'
 import { computeMarketBenchmark, type BenchmarkRun } from '@/lib/benchmark/service'
 import { clampInterpretation } from '@/lib/benchmark/interpret'
+import { toStructuredExtraction } from '@/lib/structured-extraction'
 import type { BenchmarkInput } from '@/lib/benchmark/types'
 
 export const maxDuration = 120
@@ -185,7 +186,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
 
       const { error: updateError } = await supabase
         .from('rounds')
-        .update({ output_json: merged })
+        .update({ output_json: merged, extracted_data: toStructuredExtraction(merged) })
         .eq('id', round.id)
         .eq('user_id', user.id)
       if (updateError) throw new Error('Failed to save deep analysis')
