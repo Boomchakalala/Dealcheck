@@ -61,6 +61,14 @@ export async function emailAdmins(subject: string, body: string, replyTo?: strin
   }
 }
 
+/** Production origin for links inside emails — an in-app link like `/app/deal/x` is useless in an inbox. */
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.termlift.com').replace(/\/$/, '')
+
+function emailBody(payload: NotificationPayload): string {
+  const body = payload.body || payload.title
+  return payload.link ? `${body}\n\n${SITE_URL}${payload.link}` : body
+}
+
 /** Inserts an in-app notification and (inertly, until configured) emails one user. */
 export async function notifyUser(userId: string, payload: NotificationPayload) {
   const admin = createAdminClient()
@@ -76,7 +84,7 @@ export async function notifyUser(userId: string, payload: NotificationPayload) {
   })
 
   if (profile?.email) {
-    await sendNotificationEmail(profile.email, payload.title, payload.body || payload.title)
+    await sendNotificationEmail(profile.email, payload.title, emailBody(payload))
   }
 }
 
@@ -94,7 +102,7 @@ export async function notifyAdmins(payload: NotificationPayload) {
       link: payload.link || null,
     })
     if (a.email) {
-      await sendNotificationEmail(a.email, payload.title, payload.body || payload.title)
+      await sendNotificationEmail(a.email, payload.title, emailBody(payload))
     }
   }
 }

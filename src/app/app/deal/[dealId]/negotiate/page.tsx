@@ -21,7 +21,7 @@ export default async function NegotiateDealPage({ params }: { params: Promise<{ 
 
   const [{ data: deal }, { data: existingRequest }, { data: profile }] = await Promise.all([
     supabase.from('deals').select('*, rounds (*)').eq('id', dealId).eq('user_id', user.id).single(),
-    supabase.from('negotiation_requests').select('id').eq('deal_id', dealId).eq('user_id', user.id).maybeSingle(),
+    supabase.from('negotiation_requests').select('id').eq('deal_id', dealId).eq('user_id', user.id).not('status', 'in', '(closed_won,closed_lost)').order('created_at', { ascending: false }).limit(1).maybeSingle(),
     supabase.from('profiles').select('contact_name, locale').eq('id', user.id).maybeSingle(),
   ])
   if (!deal) notFound()

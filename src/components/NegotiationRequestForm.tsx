@@ -73,6 +73,7 @@ export function NegotiationRequestForm({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
+  const [submittedId, setSubmittedId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Pure UI state — does not touch submission behavior or the payload shape.
@@ -144,6 +145,7 @@ export function NegotiationRequestForm({
       const res = await fetch('/api/negotiation-requests', { method: 'POST', body: formData })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to submit request')
+      setSubmittedId(typeof data.negotiationRequestId === 'string' ? data.negotiationRequestId : null)
       setSubmitted(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit request')
@@ -160,6 +162,9 @@ export function NegotiationRequestForm({
         <p className="text-[13.5px] text-ink-2 mt-1.5 max-w-[42ch] mx-auto leading-relaxed">
           {fr ? 'Un négociateur examine le dossier et revient vers vous rapidement.' : "A negotiator will review this and follow up with you. You'll hear from us shortly."}
         </p>
+        {submittedId && (
+          <div className="mt-4"><Btn href={`/app/negotiations/${submittedId}`} variant="ink">{fr ? 'Suivre la négociation' : 'Track this negotiation'}</Btn></div>
+        )}
       </div>
     )
   }

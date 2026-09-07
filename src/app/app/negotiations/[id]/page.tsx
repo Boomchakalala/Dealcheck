@@ -73,7 +73,7 @@ export default async function MyNegotiationDetailPage({ params }: { params: Prom
 
       <PageBody>
         {waiting && (
-          <GateCard tone="warn" eyebrow={labels[current]} title={t('waitingTitle')} body={t('waitingBody')} />
+          <GateCard tone="warn" eyebrow={labels[current]} title={t('waitingTitle')} body={t('waitingBody')} action={<Btn href={`mailto:hello@termlift.com?subject=${encodeURIComponent(`${vendor} — ref ${r.id.slice(0, 8)}`)}`} variant="ink">{t('waitingReply')}</Btn>} />
         )}
         {won && (r.savings_amount != null || r.final_total != null) && (
           <div className="rounded-[14px] border border-green-line bg-green-soft px-5 py-4">
