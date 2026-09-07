@@ -59,16 +59,6 @@
     "free": "Gratuit",
     "noCard": "Sans carte bancaire"
   },
-  "builtFor": {
-    "title": "Pas d'équipe achats ? Maintenant si.",
-    "subtitle": "Déposez votre devis et laissez TermLift faire le gros du travail.",
-    "founders": "Fondateurs",
-    "foundersDesc": "Vous signez des contrats SaaS, agence et fournisseurs sans support achats ? TermLift vous montre quoi négocier avant de signer.",
-    "ops": "Ops & responsables BU",
-    "opsDesc": "Les devis fournisseurs atterrissent sur votre bureau. TermLift identifie quoi signaler, quoi demander et où négocier.",
-    "buyers": "Dirigeants PME",
-    "buyersDesc": "Chaque renouvellement est une occasion d'améliorer vos conditions. TermLift vous montre où et vous donne les mots pour le faire."
-  },
   "howItWorks": {
     "title": "Du devis aux économies en 3 étapes",
     "subtitle": "Pas de tableurs, pas d'allers-retours avec le juridique. Juste la clarté sur quoi demander et les mots pour le dire.",
@@ -134,23 +124,6 @@
     "gdprDesc": "Infrastructure hébergée en UE avec conformité totale intégrée dès le premier jour.",
     "learnMore": "En savoir plus sur nos pratiques de sécurité"
   },
-  "social": {
-    "stat1": "8 ans",
-    "stat1Label": "D'expertise achats intégrée",
-    "stat2": "Minutes",
-    "stat2Label": "Du devis au plan de négociation",
-    "stat3": "3 tons",
-    "stat3Label": "D'e-mails prêts à envoyer",
-    "quote1": "Après des années à voir des fondateurs et des responsables ops signer des contrats qu'ils n'auraient pas dû, j'ai construit l'outil que j'aurais voulu qu'ils aient. TermLift, c'est une vraie logique achats — pas de l'IA générique.",
-    "name1": "Le fondateur",
-    "title1": "8 ans dans les achats",
-    "quote2": "La plupart des gens ne surpayent pas parce qu'ils négocient mal. Ils surpayent parce qu'ils ne savent pas quoi chercher. TermLift comble ce vide en quelques minutes.",
-    "name2": "Pourquoi ça existe",
-    "title2": "Le problème qu'on résout",
-    "quote3": "Chaque alerte, chaque demande de négociation, chaque brouillon d'e-mail vient de schémas observés sur des centaines de vrais contrats fournisseurs — pas d'un template de prompt.",
-    "name3": "Comment ça marche",
-    "title3": "Une vraie expertise, pas de l'IA générique"
-  },
   "cta": {
     "title": "Ce devis dans votre boîte mail ? Vous laissez probablement de l'argent sur la table.",
     "subtitle": "Découvrez-le en quelques minutes. Sans inscription, sans engagement, juste un levier de négociation clair et ce qu'il faut demander.",
@@ -180,7 +153,7 @@
     "heroTitle": "Conçu par quelqu'un qui a été de votre côté de la table",
     "heroSubtitle": "TermLift a été créé par un professionnel des achats — pas par une équipe tech qui n'a jamais négocié un contrat.",
     "whyTitle": "Pourquoi TermLift existe",
-    "whyContent": "J'ai passé 8 ans dans les achats à voir la même chose se répéter : un devis fournisseur arrivait chez un fondateur ou un responsable, il le lisait, rien ne sautait aux yeux, et il signait. Pendant ce temps, la clause de renouvellement automatique, l'augmentation annuelle de 8%, les 15 licences inutilisées, tout ça restait là et coûtait de l'argent. TermLift est l'expert achats qui aurait dû être dans la pièce.",
+    "whyContent": "J'ai passé des années côté acheteur à voir la même chose se répéter : un devis fournisseur arrivait chez un fondateur ou un responsable, il le lisait, rien ne sautait aux yeux, et il signait. Pendant ce temps, la clause de renouvellement automatique, l'augmentation annuelle de 8 %, les 15 licences inutilisées, tout ça restait là et coûtait de l'argent. TermLift est l'expert achats qui aurait dû être dans la pièce.",
     "differenceTitle": "Ce qui nous distingue",
     "card1Title": "Une vraie expertise achats",
     "card1Desc": "Chaque alerte, chaque demande de négociation et chaque email est construit sur une expérience réelle en achats. Pas du contenu IA générique.",
@@ -1235,7 +1208,7 @@
     "subtitle": "Conseils achats",
     "backToBlog": "Retour au blog",
     "writtenBy": "Écrit par l'équipe TermLift",
-    "writtenByDesc": "8 ans d'expertise achats, condensés en conseils actionnables.",
+    "writtenByDesc": "Le plan de négociation que TermLift applique à chaque devis, expliqué en français clair.",
     "ctaTitle": "Arrêtez de lire sur la négociation. Passez à l'action.",
     "ctaButton": "Analysez votre premier devis gratuitement",
     "allPosts": "Tous les articles"

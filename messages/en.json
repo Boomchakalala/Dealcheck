@@ -59,16 +59,6 @@
     "free": "Free",
     "noCard": "No credit card needed"
   },
-  "builtFor": {
-    "title": "Built for teams without procurement backup",
-    "subtitle": "8 years of procurement expertise, distilled into every analysis. Drop in your quote. Get instant negotiation leverage.",
-    "founders": "Founders",
-    "foundersDesc": "Signing vendor contracts without procurement support? TermLift shows where to push back before you sign.",
-    "ops": "Ops & BU managers",
-    "opsDesc": "When quotes land on your desk, TermLift highlights what to flag, what to ask for, and where to negotiate.",
-    "buyers": "Small businesses",
-    "buyersDesc": "Every renewal is a chance to improve terms. TermLift helps you spot leverage and push back faster."
-  },
   "howItWorks": {
     "title": "From quote to savings in 3 steps",
     "subtitle": "No spreadsheets, no back-and-forth with legal. Just clarity on what to ask for and the words to say it.",
@@ -134,23 +124,6 @@
     "gdprDesc": "EU-hosted infrastructure with full compliance built in from day one.",
     "learnMore": "Learn more about our security practices"
   },
-  "social": {
-    "stat1": "8 years",
-    "stat1Label": "Of procurement expertise built in",
-    "stat2": "Minutes",
-    "stat2Label": "From quote to negotiation plan",
-    "stat3": "3 tones",
-    "stat3Label": "Ready-to-send email drafts",
-    "quote1": "After years of watching founders and ops managers sign contracts they shouldn't have, I built the tool I wished they'd had. TermLift is real procurement thinking — not generic AI.",
-    "name1": "The founder",
-    "title1": "8 years in procurement",
-    "quote2": "Most people don't overpay because they're bad at negotiation. They overpay because they don't know what to look for. TermLift closes that gap in minutes.",
-    "name2": "Why this exists",
-    "title2": "The problem we solve",
-    "quote3": "Every red flag, every negotiation ask, every email draft comes from patterns seen across hundreds of real vendor contracts — not a prompt template.",
-    "name3": "How it works",
-    "title3": "Real expertise, not generic AI"
-  },
   "cta": {
     "title": "That quote in your inbox? You're probably leaving money on the table.",
     "subtitle": "Find out in minutes. No signup, no commitment, just clear negotiation leverage and what to push back on.",
@@ -180,7 +153,7 @@
     "heroTitle": "Built by someone who's been on your side of the table",
     "heroSubtitle": "TermLift was built by a procurement professional — not a tech team that's never negotiated a contract.",
     "whyTitle": "Why TermLift exists",
-    "whyContent": "I spent 8 years in procurement watching the same thing happen: a vendor quote would land with a founder or a BU manager, they'd read it, nothing would jump out, and they'd sign. Meanwhile the auto-renewal clause, the 8% annual price escalation, the 15 unused seats, all just sat there costing money. TermLift is the procurement expert that should have been in the room.",
+    "whyContent": "I spent years on the buying side watching the same thing happen: a vendor quote would land with a founder or a BU manager, they'd read it, nothing would jump out, and they'd sign. Meanwhile the auto-renewal clause, the 8% annual price escalation, the 15 unused seats, all just sat there costing money. TermLift is the procurement expert that should have been in the room.",
     "differenceTitle": "What makes us different",
     "card1Title": "Real procurement expertise",
     "card1Desc": "Every red flag, negotiation ask, and email draft is built on real procurement experience. Not generic AI output.",
@@ -1235,7 +1208,7 @@
     "subtitle": "Procurement insights",
     "backToBlog": "Back to blog",
     "writtenBy": "Written by the TermLift team",
-    "writtenByDesc": "8 years of procurement expertise, distilled into actionable advice.",
+    "writtenByDesc": "The same playbook TermLift runs on every quote, written out in plain English.",
     "ctaTitle": "Stop reading about negotiation. Start doing it.",
     "ctaButton": "Analyze your first quote free",
     "allPosts": "All posts"
