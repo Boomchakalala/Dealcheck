@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { notifyUser } from '@/lib/notifications'
 import { detectCurrency, formatCurrency } from '@/lib/currency'
+import { deriveCloseOutcome } from '@/lib/close-outcome'
 
 const VALID_STATUSES = [
   'new', 'reviewing', 'waiting_for_client_info', 'ready_to_negotiate',
@@ -23,7 +24,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     }
 
     const body = await request.json()
-    const { status, finalTotal, savingsAmount, savingsPercent, closeNotes, adminNotes, nextAction } = body
+    const { status, finalTotal, documentVerified, closeNotes, adminNotes, nextAction } = body
 
     if (status !== undefined && (typeof status !== 'string' || !VALID_STATUSES.includes(status))) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
@@ -35,11 +36,26 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     const isClosing = status === 'closed_won' || status === 'closed_lost'
     const update: Record<string, unknown> = {}
     if (status !== undefined) update.status = status
+
+    // Same arithmetic as the self-service close: savings derive from the
+    // request's quoted total and the final total the admin entered. A savings
+    // figure in the body is ignored. The admin acts as the confirming person;
+    // `documentVerified: true` means the figure was read off the signed contract.
+    let outcome: ReturnType<typeof deriveCloseOutcome> | null = null
     if (isClosing) {
+      const { data: current } = await supabase.from('negotiation_requests').select('current_total').eq('id', id).single()
+      outcome = deriveCloseOutcome({
+        outcome: status === 'closed_won' ? 'won' : 'lost',
+        initialTotalRaw: current?.current_total ?? null,
+        finalTotalRaw: typeof finalTotal === 'number' || typeof finalTotal === 'string' ? finalTotal : null,
+        finalTotalConfirmed: true,
+        finalTotalEvidence: documentVerified === true ? 'document' : 'manual',
+      })
+      if (!outcome.ok) return NextResponse.json({ error: outcome.error }, { status: 400 })
       update.closed_at = new Date().toISOString()
-      if (typeof finalTotal === 'number') update.final_total = finalTotal
-      if (typeof savingsAmount === 'number') update.savings_amount = savingsAmount
-      if (typeof savingsPercent === 'number') update.savings_percent = savingsPercent
+      update.final_total = outcome.value.finalTotal
+      update.savings_amount = outcome.value.savingsAmount
+      update.savings_percent = outcome.value.savingsPercent
       if (typeof closeNotes === 'string') update.close_notes = closeNotes
     }
     if (typeof adminNotes === 'string') update.admin_notes = adminNotes
@@ -61,16 +77,18 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     // existing dashboard/deal page reflect it via the mechanism they already have.
     // Uses the admin client — the admin isn't the deal's owner, so the deal's own
     // RLS policy (auth.uid() = user_id) would otherwise silently block this write.
-    if (isClosing && updated?.deal_id) {
+    if (isClosing && updated?.deal_id && outcome?.ok) {
       const adminClient = createAdminClient()
       await adminClient
         .from('deals')
         .update({
           status,
           closed_at: update.closed_at,
-          ...(typeof finalTotal === 'number' ? { final_total: finalTotal } : {}),
-          ...(typeof savingsAmount === 'number' ? { savings_amount: savingsAmount } : {}),
-          ...(typeof savingsPercent === 'number' ? { savings_percent: savingsPercent } : {}),
+          initial_total: outcome.value.initialTotal,
+          final_total: outcome.value.finalTotal,
+          final_total_provenance: outcome.value.provenance,
+          savings_amount: outcome.value.savingsAmount,
+          savings_percent: outcome.value.savingsPercent,
           ...(typeof closeNotes === 'string' ? { close_notes: closeNotes } : {}),
         })
         .eq('id', updated.deal_id)
@@ -89,7 +107,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         })
       } else if (isClosing) {
         const won = status === 'closed_won'
-        const savingsAmt = typeof savingsAmount === 'number' ? savingsAmount : null
+        const savingsAmt = outcome?.ok ? outcome.value.savingsAmount : null
         await notifyUser(updated.user_id, {
           type: 'negotiation_closed',
           title: won ? 'Negotiation closed — savings recorded' : 'Negotiation closed',

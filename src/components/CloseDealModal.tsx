@@ -62,6 +62,8 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
 
   const [outcome, setOutcome] = useState<Outcome>('won')
   const [finalTotal, setFinalTotal] = useState('')
+  // The final total only counts once a person confirmed it: typing it, or ticking the box under a prefilled estimate.
+  const [finalConfirmed, setFinalConfirmed] = useState(false)
   const [whatChanged, setWhatChanged] = useState<string[]>([])
   const [notes, setNotes] = useState('')
   const [uploadedFile, setUploadedFile] = useState<string | null>(null)
@@ -70,6 +72,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
   const [closed, setClosed] = useState(false)
   const [closedOutcome, setClosedOutcome] = useState('')
   const [closedSavings, setClosedSavings] = useState('')
+  const [closedPct, setClosedPct] = useState(0)
   const [showManual, setShowManual] = useState(false)
 
   const [aiLoading, setAiLoading] = useState(false)
@@ -80,7 +83,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
   const savingsPercent = originalAmount > 0 && savingsAmount > 0 ? (savingsAmount / originalAmount) * 100 : 0
 
   const isLost = outcome === 'lost'
-  const canSubmit = isLost || (finalTotal.trim() && whatChanged.length > 0)
+  const canSubmit = isLost || (finalTotal.trim() && finalConfirmed && whatChanged.length > 0)
 
   const toggleChange = (id: string) => {
     setWhatChanged(prev => prev.includes(id) ? prev.filter(o => o !== id) : [...prev, id])
@@ -126,7 +129,8 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
       })
       const data = await res.json()
       if (res.ok) {
-        if (data.final_total) setFinalTotal(data.final_total)
+        // A prefilled figure is a suggestion, not an outcome — confirmation resets.
+        if (data.final_total) { setFinalTotal(data.final_total); setFinalConfirmed(false) }
         if (data.what_changed?.length) setWhatChanged(data.what_changed)
         if (data.summary) setNotes(data.summary)
         setAiDone(true)
@@ -146,20 +150,22 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           outcome: outcomeMap[outcome],
-          finalTotal: isLost ? currentTotal : (finalTotal || null),
-          savingsAmount: savingsAmount > 0 ? savingsAmount : null,
-          savingsPercent: savingsPercent > 0 ? savingsPercent : null,
+          finalTotal: isLost ? null : (finalTotal || null),
+          // The server derives savings from initial − final; nothing computed here is sent.
+          finalTotalConfirmed: !isLost && finalConfirmed,
+          finalTotalEvidence: extractedDocText ? 'document' : 'manual',
           whatChanged: whatChanged.length > 0 ? whatChanged : null,
           notes: notes || null,
         }),
       })
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to close deal')
-      }
-      trackEvent({ name: 'deal_closed', properties: { outcome, hasSavings: savingsAmount > 0, savingsAmount: savingsAmount > 0 ? savingsAmount : undefined } })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Failed to close deal')
+      const saved = typeof data.savingsAmount === 'number' ? data.savingsAmount : 0
+      const savedPct = typeof data.savingsPercent === 'number' ? data.savingsPercent : 0
+      trackEvent({ name: 'deal_closed', properties: { outcome, hasSavings: saved > 0, savingsAmount: saved > 0 ? saved : undefined } })
       setClosedOutcome(isLost ? 'Signed at the original terms' : 'Negotiated, improved terms secured')
-      setClosedSavings(savingsAmount > 0 ? formatMoney(savingsAmount, currency) : '')
+      setClosedSavings(saved > 0 ? formatMoney(saved, currency) : '')
+      setClosedPct(savedPct)
       setClosed(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -186,7 +192,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
           <div className="grid grid-cols-3 gap-2.5 mt-5">
             <StatTile label="Original" value={currentTotal || '—'} />
             <StatTile label="Final" value={finalShown} />
-            <StatTile label="Saved" value={closedSavings || '—'} tone={closedSavings ? 'money' : 'neutral'} hi={!!closedSavings} sub={closedSavings && savingsPercent > 0 ? `${savingsPercent.toFixed(1)}%` : undefined} />
+            <StatTile label="Saved" value={closedSavings || '—'} tone={closedSavings ? 'money' : 'neutral'} hi={!!closedSavings} sub={closedSavings && closedPct > 0 ? `${closedPct.toFixed(1)}%` : undefined} />
           </div>
           <div className="flex justify-end gap-2.5 mt-5">
             <Btn variant="ghost" onClick={() => { onSuccess(); onClose() }}>Done</Btn>
@@ -314,15 +320,21 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
                     <input
                       type="text"
                       value={finalTotal}
-                      onChange={(e) => setFinalTotal(e.target.value)}
+                      onChange={(e) => { setFinalTotal(e.target.value); setFinalConfirmed(e.target.value.trim().length > 0) }}
                       placeholder="e.g. €42,000"
                       disabled={loading}
                       className="font-display text-[21px] leading-[1.05] font-bold tracking-[-0.02em] tl-num text-ink w-full bg-transparent outline-none placeholder:text-ink-3 placeholder:font-normal placeholder:text-[15px]"
                     />
                   </div>
                 </div>
+                {finalTotal.trim() && !finalConfirmed && (
+                  <label className="flex items-start gap-2.5 mt-2.5 rounded-[10px] border border-warn-line bg-warn-soft px-3.5 py-3 text-[13px] text-ink cursor-pointer">
+                    <input type="checkbox" checked={finalConfirmed} onChange={(e) => setFinalConfirmed(e.target.checked)} className="mt-0.5" />
+                    <span><b>This is the final total we agreed.</b> The figure above was suggested by TermLift from your documents. Confirm it, or edit it, before closing.</span>
+                  </label>
+                )}
                 {savingsAmount > 0 && (
-                  <StatTile className="mt-2.5" label="Savings captured" value={formatMoney(savingsAmount, currency)} sub={`${savingsPercent.toFixed(1)}% below the original quote`} tone="money" hi />
+                  <StatTile className="mt-2.5" label="Savings captured" value={formatMoney(savingsAmount, currency)} sub={`${savingsPercent.toFixed(1)}% below the original quote · confirmed on close`} tone="money" hi />
                 )}
                 {finalTotal.trim() && finalAmount > 0 && originalAmount > 0 && finalAmount >= originalAmount && (
                   <p className="text-[12px] text-ink-3 mt-2">Final amount is equal to or higher than the original, so no savings will be recorded.</p>
