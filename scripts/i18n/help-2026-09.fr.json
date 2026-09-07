@@ -1,0 +1,73 @@
+{
+  "helpPage": {
+    "badge": "Centre d'aide",
+    "title": "Comment pouvons-nous vous aider ?",
+    "lead": "Tout pour tirer le meilleur de TermLift — devis, résultats, confidentialité, tarifs et dépannage.",
+    "toc": "Sur cette page",
+    "still": {
+      "title": "Encore une question ?",
+      "body": "Nous répondons à chaque e-mail, généralement le jour même.",
+      "cta": "Analyser un devis"
+    },
+    "sections": {
+      "what": {
+        "title": "Ce que fait TermLift",
+        "sub": "Comment fonctionne TermLift et à quoi s'attendre",
+        "q1": "Qu'est-ce que TermLift ?",
+        "a1": "TermLift vous aide à mieux négocier vos contrats fournisseurs. Importez un devis et vous obtenez une première évaluation rapide — le score du dossier, les points d'alerte et les économies potentielles. Ensuite, débloquez l'Analyse approfondie pour les leviers de négociation, les demandes recommandées et la stratégie — puis négociez vous-même, ou confiez la négociation à TermLift.",
+        "q2": "Ce que TermLift N'est PAS",
+        "a2": "TermLift n'est pas un conseil juridique, ni une garantie d'économies, ni un substitut à la lecture de vos contrats. C'est un point de départ qui vous donne du levier et une structure — mais vous devez toujours vérifier les résultats par vous-même et consulter un professionnel pour les décisions juridiques ou financières.",
+        "q3": "Comment fonctionne l'analyse IA ?",
+        "a3": "Le texte est extrait de votre document (PDF, image ou texte collé) et envoyé à l'IA Claude d'Anthropic, spécifiquement paramétrée pour l'analyse achats. Elle lit l'intégralité du contenu, identifie les risques, construit une stratégie de négociation et génère un résultat structuré."
+      },
+      "upload": {
+        "title": "Import de devis",
+        "sub": "Comment faire entrer vos devis fournisseurs dans TermLift",
+        "q1": "Comment importer un devis ?",
+        "a1": "Vous avez quatre options : coller du texte directement dans la zone de texte, importer un fichier PDF, importer une image (PNG, JPG ou WEBP), ou faire une capture d'écran d'une page de tarifs ou d'un e-mail. Glissez-déposez ou cliquez sur la zone d'import de la page d'analyse.",
+        "q2": "Quels formats de fichiers sont acceptés ?",
+        "a2": "PDF, PNG, JPG, WEBP ou texte collé. Taille maximale : 10 Mo. Pour de meilleurs résultats avec les images, assurez-vous que le texte soit clairement lisible.",
+        "q3": "Puis-je analyser un e-mail de fournisseur ?",
+        "a3": "Oui. Copiez simplement le texte de l'e-mail et collez-le dans la zone de saisie. Vous pouvez inclure l'e-mail complet — objet, corps, tableaux de prix, conditions — et TermLift analysera le tout."
+      },
+      "output": {
+        "title": "Résultats d'analyse",
+        "sub": "Ce que vous recevez et comment l'utiliser",
+        "q1": "Que reçoit-on après une analyse ?",
+        "a1": "D'abord une première évaluation rapide — un score, les points d'alerte et une estimation des économies potentielles, généralement en moins d'une minute. Ensuite, l'Analyse approfondie va plus loin : leviers de négociation, demandes recommandées, priorités et stratégie. Une fois prêt, générez vous-même un e-mail prêt à envoyer, ou confiez la négociation à TermLift.",
+        "q2": "À quoi servent les brouillons d'e-mails ?",
+        "a2": "Ce sont des réponses prêtes à copier, à envoyer directement à votre fournisseur quand vous êtes prêt à agir sur l'analyse. Chacune existe en trois tons — Amical, Direct et Ferme. Choisissez celui qui correspond à votre relation avec le fournisseur et copiez-le.",
+        "q3": "L'IA est-elle toujours exacte ?",
+        "a3": "Non. L'IA peut manquer des détails, mal interpréter des termes ou faire des erreurs. TermLift est un point de départ pour la négociation, pas le dernier mot. Vérifiez toujours les résultats par rapport à vos documents originaux avant d'agir. Si quelque chose semble incorrect, faites confiance à votre jugement."
+      },
+      "privacy": {
+        "title": "Confidentialité et données",
+        "sub": "Comment nous traitons vos documents et vos données",
+        "q1": "Mes données sont-elles privées ?",
+        "a1": "Oui. Les fichiers importés sont supprimés immédiatement après l'extraction du texte. Votre texte n'est pas stocké sauf si vous sauvegardez explicitement le dossier dans votre compte. Toutes les données sont chiffrées en transit (TLS) et au repos. Vos documents ne sont jamais utilisés pour l'entraînement de l'IA.",
+        "q2": "Et si j'importe des documents confidentiels ?",
+        "a2": "Traitez TermLift comme tout outil cloud. N'importez pas de documents que vos contrats vous interdisent de partager avec des services tiers. Votre texte est envoyé à l'API d'Anthropic pour traitement. Consultez notre Politique de confidentialité et nos Conditions pour tous les détails."
+      },
+      "billing": {
+        "title": "Compte et tarifs",
+        "sub": "Ce que ça coûte et comment gérer votre compte",
+        "q1": "Analyser un devis est-il gratuit ?",
+        "a1": "Oui — analysez un devis sans inscription et sans carte bancaire. Créez un compte pour sauvegarder vos dossiers et continuer à partir de là.",
+        "q2": "Combien coûte l'Analyse approfondie ?",
+        "a2": "{price} par dossier, en une fois — elle couvre le plan de négociation complet, les e-mails et chaque round sur ce dossier. Pendant l'accès anticipé (jusqu'au {date}) elle est gratuite, et la première Analyse approfondie de chaque compte reste offerte ensuite.",
+        "q3": "Combien coûte une négociation menée par TermLift ?",
+        "a3": "Rien à l'avance. Si vous préférez nous confier la négociation, nos honoraires sont de {pct} % des économies vérifiées, avec un minimum de {min} €, facturés après signature — pas d'économies, pas d'honoraires.",
+        "q4": "Puis-je supprimer mon compte ?",
+        "a4": "Oui. Allez dans vos paramètres de profil et choisissez « Supprimer le compte ». Toutes vos données — dossiers sauvegardés, historique d'analyse, informations de compte — sont définitivement supprimées. Cette action est irréversible."
+      },
+      "trouble": {
+        "title": "Dépannage",
+        "sub": "Problèmes courants et comment les résoudre",
+        "q1": "Que faire si l'analyse échoue ?",
+        "a1": "Essayez de la relancer. Si l'échec persiste, le document est peut-être trop long ou dans un format non pris en charge. Essayez de coller uniquement les sections clés en texte brut. Si le problème persiste, écrivez à hello@termlift.com et nous vous aiderons.",
+        "q2": "L'analyse ne correspond pas à mon document",
+        "a2": "L'IA peut mal interpréter le contenu, surtout à partir d'images ou de PDF complexes avec des tableaux et des petits caractères. Pour de meilleurs résultats, essayez de coller les sections clés en texte brut au lieu d'importer un fichier. Si l'analyse est très éloignée, dites-le-nous à hello@termlift.com pour que nous puissions nous améliorer."
+      }
+    }
+  }
+}
