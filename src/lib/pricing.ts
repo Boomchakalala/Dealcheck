@@ -21,7 +21,7 @@ export const CURRENCY = 'EUR'
 export const FREE_ANALYSIS_LIMIT = 4
 
 /** Deep Analysis list price, one-time per deal. */
-export const DEEP_ANALYSIS_PRICE_EUR = 79
+export const DEEP_ANALYSIS_PRICE_EUR = 29
 
 /**
  * Early access: every Deep Analysis is free until this date (inclusive).
@@ -32,7 +32,7 @@ export const DEEP_ANALYSIS_PRICE_EUR = 79
  */
 export const EARLY_ACCESS = {
   enabled: true,
-  until: '2026-10-31',
+  until: '2026-09-30',
 } as const
 
 /** The first Deep Analysis on any account stays free after early access. */
@@ -59,20 +59,20 @@ export function isEarlyAccess(now: Date = new Date()): boolean {
   return now.toISOString().slice(0, 10) <= EARLY_ACCESS.until
 }
 
-/** "31 October 2026" / "31 octobre 2026" */
+/** "30 September 2026" / "30 septembre 2026" */
 export function earlyAccessUntilLabel(locale: string = 'en'): string {
   const d = new Date(EARLY_ACCESS.until + 'T12:00:00Z')
   return d.toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-/** "€79" */
+/** "€29" */
 export function deepAnalysisPriceLabel(): string {
   return `€${DEEP_ANALYSIS_PRICE_EUR}`
 }
 
 /**
  * One sentence for gates and cards: what Deep Analysis costs right now.
- * EN: "€79 per deal · free during early access until 31 October 2026."
+ * EN: "€29 per deal · free during early access until 30 September 2026."
  */
 export function deepAnalysisPriceNote(locale: string = 'en'): string {
   const fr = locale === 'fr'
