@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { X, Loader2, Upload, FileText, ArrowRight, Sparkles, TrendingDown, Check, Zap, ChevronDown } from 'lucide-react'
+import { X, Loader2, Upload, FileText, Check, TrendingDown } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
 import { detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
-import Link from 'next/link'
+import { Btn, Chip, StatTile } from '@/components/system'
+import { cn } from '@/lib/utils'
 
 interface CloseDealModalProps {
   dealId: string
@@ -37,6 +38,23 @@ const changeOptions = [
   { id: 'Other', label: 'Other' },
 ]
 
+const field =
+  'w-full text-[14px] text-ink bg-surface border border-line rounded-[10px] outline-none transition-colors placeholder:text-ink-3 focus:border-green disabled:opacity-50'
+
+function Label({ children, required, hint }: { children: React.ReactNode; required?: boolean; hint?: string }) {
+  return (
+    <p className="tl-label text-ink-3 mb-2">
+      {children}{required && <span className="text-risk ml-1">*</span>}
+      {hint && <span className="ml-1.5 normal-case tracking-normal font-normal text-ink-3">({hint})</span>}
+    </p>
+  )
+}
+
+/**
+ * Close a deal: outcome, final number, what moved. Stage 4 of the ladder.
+ * One primary button. The "fill from the signed document" path is a plain
+ * upload, not a feature pitch.
+ */
 export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, onSuccess }: CloseDealModalProps) {
   const currency = detectCurrency(currentTotal || '')
   const originalAmount = parseMoneyLocal(currentTotal || '')
@@ -140,7 +158,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
         throw new Error(data.error || 'Failed to close deal')
       }
       trackEvent({ name: 'deal_closed', properties: { outcome, hasSavings: savingsAmount > 0, savingsAmount: savingsAmount > 0 ? savingsAmount : undefined } })
-      setClosedOutcome(isLost ? 'Signed at original terms' : 'Negotiated — improved terms secured')
+      setClosedOutcome(isLost ? 'Signed at the original terms' : 'Negotiated, improved terms secured')
       setClosedSavings(savingsAmount > 0 ? formatMoney(savingsAmount, currency) : '')
       setClosed(true)
     } catch (err) {
@@ -149,398 +167,217 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
     }
   }
 
+  const overlay = 'fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm flex items-center justify-center p-4'
+  const panel = 'bg-surface rounded-[14px] border border-line shadow-[0_24px_60px_-20px_rgba(16,26,23,0.35)] w-full'
+
   // ─── Confirmation screen ───
   if (closed) {
+    const finalShown = isLost ? (currentTotal || '—') : (finalTotal || '—')
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { onSuccess(); onClose() }}>
-        <div className="bg-white rounded-[14px] w-full max-w-[520px] p-8 shadow-2xl text-center" onClick={(e) => e.stopPropagation()}>
-          <div className="w-14 h-14 rounded-full bg-green-soft flex items-center justify-center mx-auto mb-4">
-            <Check className="w-7 h-7 text-green-deep" strokeWidth={2.5} />
-          </div>
-          <h3 className="text-lg font-bold text-ink mb-1">Deal closed</h3>
-          <p className="text-sm text-ink-3 mb-5">{closedOutcome}</p>
-
-          {/* Outcome summary */}
-          <div className="bg-ground rounded-[10px] border border-line-2 p-5 mb-6 text-left space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-ink-3 uppercase tracking-wide">Original quote</span>
-              <span className="text-sm font-semibold text-ink">{currentTotal || '—'}</span>
+      <div className={overlay} onClick={() => { onSuccess(); onClose() }}>
+        <div className={cn(panel, 'max-w-[520px] p-6 sm:p-7')} onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-green-soft text-green-deep grid place-items-center shrink-0"><Check className="w-5 h-5" strokeWidth={2.5} /></div>
+            <div>
+              <h3 className="font-display font-bold text-[17px] leading-tight">Deal closed</h3>
+              <p className="text-[13px] text-ink-2 mt-0.5">{closedOutcome}</p>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-ink-3 uppercase tracking-wide">Final amount</span>
-              <span className="text-sm font-semibold text-ink">{isLost ? (currentTotal || '—') : (finalTotal || '—')}</span>
-            </div>
-            {closedSavings ? (
-              <div className="flex items-center justify-between pt-2 border-t border-line">
-                <span className="text-xs font-semibold text-green-deep uppercase tracking-wide">Savings captured</span>
-                <div className="text-right">
-                  <span className="text-lg font-bold text-green-deep">{closedSavings}</span>
-                  {savingsPercent > 0 && <span className="text-xs font-medium text-green-deep ml-1.5">({savingsPercent.toFixed(1)}%)</span>}
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between pt-2 border-t border-line">
-                <span className="text-xs font-medium text-ink-3 uppercase tracking-wide">Savings</span>
-                <span className="text-sm text-ink-3">No cash savings</span>
-              </div>
-            )}
           </div>
-
-          <Link
-            href="/app/dashboard"
-            onClick={() => { onSuccess(); onClose() }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg bg-green text-white hover:bg-green-deep transition-all"
-          >
-            View in dashboard <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="grid grid-cols-3 gap-2.5 mt-5">
+            <StatTile label="Original" value={currentTotal || '—'} />
+            <StatTile label="Final" value={finalShown} />
+            <StatTile label="Saved" value={closedSavings || '—'} tone={closedSavings ? 'money' : 'neutral'} hi={!!closedSavings} sub={closedSavings && savingsPercent > 0 ? `${savingsPercent.toFixed(1)}%` : undefined} />
+          </div>
+          <div className="flex justify-end gap-2.5 mt-5">
+            <Btn variant="ghost" onClick={() => { onSuccess(); onClose() }}>Done</Btn>
+            <Btn href={`/app/deal/${dealId}/outcome`} variant="primary">View outcome</Btn>
+          </div>
         </div>
       </div>
     )
   }
 
-  // ─── Main modal ───
+  const showFields = !isLost && (showManual || aiDone || !!finalTotal.trim())
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-[14px] w-full max-w-[580px] mx-4 sm:mx-auto shadow-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+    <div className={overlay} onClick={onClose}>
+      <div className={cn(panel, 'max-w-[580px] max-h-[90vh] overflow-y-auto')} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="px-7 py-5 border-b border-line-2 sticky top-0 bg-gradient-to-r from-white via-white to-ground/80 z-10 rounded-t-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-green to-green flex items-center justify-center ">
-                <Check className="w-4.5 h-4.5 text-white" strokeWidth={2.5} />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-ink">Close deal</h3>
-                <p className="text-xs text-ink-3 mt-0.5">Record the final outcome and capture your savings.</p>
-              </div>
-            </div>
-            <button onClick={onClose} className="p-1.5 hover:bg-surface-2 rounded-lg transition-colors">
-              <X className="w-4 h-4 text-ink-3" />
-            </button>
+        <div className="px-5 sm:px-6 py-4 border-b border-line sticky top-0 bg-surface z-10 flex items-start justify-between gap-4">
+          <div>
+            <p className="tl-label text-ink-3">Step 4 · Closed</p>
+            <h3 className="font-display font-bold text-[17px] leading-tight mt-1">Close deal</h3>
+            <p className="text-[12.5px] text-ink-2 mt-0.5">Record the final outcome and what you saved.</p>
           </div>
+          <button onClick={onClose} className="p-1.5 -mr-1.5 rounded-lg text-ink-3 hover:text-ink hover:bg-ground transition-colors" aria-label="Close">
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
-        <div className="px-7 py-6 space-y-6">
-
-          {/* ── Section 1: Outcome type ── */}
+        <div className="px-5 sm:px-6 py-5 flex flex-col gap-6">
+          {/* Outcome */}
           <div>
-            <p className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">Outcome</p>
+            <Label>Outcome</Label>
             <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setOutcome('won')}
-                className={`p-3.5 rounded-[10px] border-2 text-left transition-all ${
-                  outcome === 'won'
-                    ? 'border-green bg-green-soft  shadow-green-soft'
-                    : 'border-line-2 hover:border-line'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center ${outcome === 'won' ? 'bg-green' : 'bg-line-2'}`}>
-                    <Check className="w-3 h-3 text-white" strokeWidth={3} />
-                  </div>
-                  <span className={`text-sm font-semibold ${outcome === 'won' ? 'text-ink' : 'text-ink-2'}`}>Negotiated</span>
-                </div>
-                <p className="text-[10px] text-ink-3 ml-7">You pushed back and improved terms.</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => setOutcome('lost')}
-                className={`p-3.5 rounded-[10px] border-2 text-left transition-all ${
-                  outcome === 'lost'
-                    ? 'border-ink-3 bg-ground '
-                    : 'border-line-2 hover:border-line'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center ${outcome === 'lost' ? 'bg-ink-3' : 'bg-line-2'}`}>
-                    <TrendingDown className="w-3 h-3 text-white" strokeWidth={2.5} />
-                  </div>
-                  <span className={`text-sm font-semibold ${outcome === 'lost' ? 'text-ink' : 'text-ink-2'}`}>Signed as-is</span>
-                </div>
-                <p className="text-[10px] text-ink-3 ml-7">Accepted the original terms.</p>
-              </button>
+              {([
+                { id: 'won' as Outcome, icon: <Check className="w-3.5 h-3.5" strokeWidth={3} />, title: 'Negotiated', sub: 'You pushed back and improved terms.' },
+                { id: 'lost' as Outcome, icon: <TrendingDown className="w-3.5 h-3.5" strokeWidth={2.5} />, title: 'Signed as-is', sub: 'Accepted the original terms.' },
+              ]).map((o) => {
+                const on = outcome === o.id
+                return (
+                  <button
+                    key={o.id}
+                    type="button"
+                    onClick={() => setOutcome(o.id)}
+                    aria-pressed={on}
+                    className={cn('text-left rounded-[10px] border px-3.5 py-3 transition-colors', on ? 'border-ink bg-ground' : 'border-line bg-surface hover:border-[#C9D3CE]')}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className={cn('w-5 h-5 rounded-full grid place-items-center', on ? 'bg-ink text-white' : 'bg-line-2 text-ink-3')}>{o.icon}</span>
+                      <span className={cn('text-[13.5px] font-semibold', on ? 'text-ink' : 'text-ink-2')}>{o.title}</span>
+                    </div>
+                    <p className="text-[11.5px] text-ink-3 mt-1 ml-7">{o.sub}</p>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
-          {/* Signed-as-is summary */}
-          {isLost && currentTotal && (
-            <div className="p-4 bg-ground rounded-[10px] border border-line-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-ink-3 uppercase tracking-wide">Signed at</span>
-                <span className="text-sm font-bold text-ink">{currentTotal}</span>
-              </div>
-              <p className="text-[10px] text-ink-3 mt-1.5">No savings will be recorded for this deal.</p>
-            </div>
+          {/* Signed as-is: just the number, for the record */}
+          {isLost && (
+            <StatTile label="Signed at" value={currentTotal || '—'} sub="No savings will be recorded for this deal." />
           )}
 
-          {/* ── AI Analysis Section (primary path) ── */}
+          {/* Fill from the signed document */}
           {!isLost && !aiDone && (
-            <div className="relative rounded-[14px] border border-green-line bg-gradient-to-br from-green-soft/80 via-white to-green-soft/40 overflow-hidden">
-              {/* Subtle corner accent */}
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-green-soft/60 to-transparent rounded-bl-[4rem] pointer-events-none" />
-
-              <div className="relative p-5">
-                {/* Header row */}
-                <div className="flex items-center gap-3 mb-1">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green to-green flex items-center justify-center ">
-                    <Sparkles className="w-4 h-4 text-white" />
+            <div>
+              <Label>Fill from the signed document</Label>
+              <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp" className="hidden" onChange={handleFileSelect} />
+              {uploadedFile ? (
+                <div className="flex items-center gap-3 rounded-[10px] border border-line bg-ground px-3.5 py-3">
+                  {uploadLoading ? <Loader2 className="w-4 h-4 text-ink-3 animate-spin shrink-0" /> : <FileText className="w-4 h-4 text-ink-3 shrink-0" />}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold text-ink truncate">{uploadedFile}</p>
+                    <p className="text-[11.5px] text-ink-3 mt-0.5">{uploadLoading ? 'Extracting text…' : extractedDocText ? 'Document ready' : 'Processing…'}</p>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-bold text-ink">Let AI do the work</h4>
-                      <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-green-soft text-green-deep rounded-md">Recommended</span>
-                    </div>
-                    <p className="text-[11px] text-ink-3 mt-0.5">Upload the signed contract or let AI compare your rounds to auto-fill everything.</p>
-                  </div>
+                  <button onClick={() => { setUploadedFile(null); setExtractedDocText(null) }} className="p-1 text-ink-3 hover:text-ink rounded transition-colors" aria-label="Remove file">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
                 </div>
-
-                {/* AI action buttons */}
-                <div className="mt-4 space-y-3">
-                  {/* Step 1: Upload signed contract */}
-                  <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp" className="hidden" onChange={handleFileSelect} />
-                  {uploadedFile ? (
-                    <div className="flex items-center gap-3 p-3.5 bg-white rounded-[10px] border border-green-line">
-                      <div className="w-8 h-8 rounded-lg bg-green-soft flex items-center justify-center flex-shrink-0">
-                        {uploadLoading ? <Loader2 className="w-4 h-4 text-green-deep animate-spin" /> : <FileText className="w-4 h-4 text-green-deep" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-ink truncate">{uploadedFile}</p>
-                        <p className="text-[10px] text-green-deep mt-0.5">{uploadLoading ? 'Extracting text...' : extractedDocText ? 'Document ready' : 'Processing...'}</p>
-                      </div>
-                      <button onClick={() => { setUploadedFile(null); setExtractedDocText(null) }} className="p-1 text-ink-3 hover:text-ink-2 rounded transition-colors">
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full flex items-center gap-3 p-3.5 rounded-[10px] border border-dashed border-green-line bg-white hover:bg-green-soft/30 hover:border-green-line transition-all text-left group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-green-soft flex items-center justify-center flex-shrink-0 group-hover:bg-green-soft transition-colors">
-                        <Upload className="w-4 h-4 text-green-deep" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-ink-2">Upload final document</p>
-                        <p className="text-[10px] text-ink-3 mt-0.5">PDF, image, or DOCX of the signed agreement</p>
-                      </div>
-                    </button>
-                  )}
-
-                  {/* Step 2: Launch AI comparison — big green button when doc is ready */}
-                  {extractedDocText && !uploadLoading && (
-                    <button
-                      type="button"
-                      onClick={handleAICalc}
-                      disabled={aiLoading}
-                      className="w-full flex items-center justify-center gap-2.5 p-4 rounded-[10px] bg-green hover:bg-green-deep text-white font-semibold text-sm transition-all  disabled:opacity-60"
-                    >
-                      {aiLoading ? (
-                        <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing document vs original quote...</>
-                      ) : (
-                        <><Sparkles className="w-4 h-4" /> Compare to original quote</>
-                      )}
-                    </button>
-                  )}
-
-                  {/* Fallback: Auto-fill from rounds (when no doc uploaded but 2+ rounds exist) */}
-                  {!extractedDocText && roundCount >= 2 && (
-                    <button
-                      type="button"
-                      onClick={handleAICalc}
-                      disabled={aiLoading}
-                      className="w-full flex items-center gap-3 p-3.5 rounded-[10px] border border-green-line bg-white hover:bg-green-soft/50 hover:border-green-line text-left transition-all group"
-                    >
-                      {aiLoading ? (
-                        <div className="w-8 h-8 rounded-lg bg-green-soft flex items-center justify-center flex-shrink-0">
-                          <Loader2 className="w-4 h-4 text-green-deep animate-spin" />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-lg bg-green-soft flex items-center justify-center flex-shrink-0">
-                          <Zap className="w-4 h-4 text-green-deep" />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-ink">
-                          {aiLoading ? 'Analyzing your rounds...' : 'Or auto-fill from your rounds'}
-                        </p>
-                        <p className="text-[10px] mt-0.5 text-ink-3">Compares Round 1 vs latest round</p>
-                      </div>
-                      {!aiLoading && <ArrowRight className="w-4 h-4 text-green group-hover:text-green-deep flex-shrink-0 transition-colors" />}
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* AI success state */}
-          {aiDone && (
-            <div className="flex items-center gap-3 p-4 rounded-[10px] bg-gradient-to-r from-green-soft to-green-soft/50 border border-green-line">
-              <div className="w-8 h-8 rounded-lg bg-green-soft flex items-center justify-center flex-shrink-0">
-                <Check className="w-4 h-4 text-green-deep" strokeWidth={2.5} />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-green-deep">Fields pre-filled from your negotiation data</p>
-                <p className="text-[10px] text-green-deep mt-0.5">Review the details below and adjust if needed.</p>
-              </div>
-            </div>
-          )}
-
-          {/* ── Manual entry section (collapsible, secondary) ── */}
-          {!isLost && (
-            <>
-              {/* Divider with toggle */}
-              {!aiDone && !showManual && (
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-line-2" />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full flex items-center gap-3 rounded-[10px] border border-dashed border-line bg-surface hover:bg-ground hover:border-[#C9D3CE] px-3.5 py-3 text-left transition-colors"
+                >
+                  <Upload className="w-4 h-4 text-ink-3 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold text-ink">Upload the final document</p>
+                    <p className="text-[11.5px] text-ink-3 mt-0.5">PDF, image or DOCX of the signed agreement. We compare it to the original quote.</p>
                   </div>
-                  <div className="relative flex justify-center">
-                    <button
-                      type="button"
-                      onClick={() => setShowManual(true)}
-                      className="bg-white px-4 py-1 text-[11px] text-ink-3 hover:text-ink-2 font-medium flex items-center gap-1.5 transition-colors"
-                    >
-                      or fill in manually
-                      <ChevronDown className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
+                </button>
               )}
+              <div className="flex flex-wrap items-center gap-2.5 mt-2.5">
+                {extractedDocText && !uploadLoading && (
+                  <Btn variant="primary" onClick={handleAICalc} disabled={aiLoading}>
+                    {aiLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Comparing…</> : 'Compare to original quote'}
+                  </Btn>
+                )}
+                {!extractedDocText && roundCount >= 2 && (
+                  <Btn variant="ghost" onClick={handleAICalc} disabled={aiLoading}>
+                    {aiLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Reading your rounds…</> : 'Auto-fill from your rounds'}
+                  </Btn>
+                )}
+                {!showManual && (
+                  <Btn variant="link" onClick={() => setShowManual(true)} className="text-[12.5px]">or fill in manually</Btn>
+                )}
+              </div>
+            </div>
+          )}
 
-              {/* Manual fields - show if toggled, aiDone, or already has data */}
-              {(showManual || aiDone || finalTotal.trim()) && (
-                <>
-                  {/* ── Financial outcome ── */}
-                  <div>
-                    <p className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">Financial outcome</p>
-                    <div className="grid grid-cols-2 gap-3 mb-3">
-                      <div className="px-3.5 py-3 bg-ground rounded-[10px] border border-line-2">
-                        <p className="text-[10px] font-medium text-ink-3 uppercase tracking-wide mb-1">Original quote</p>
-                        <p className="text-sm font-bold text-ink">{currentTotal || '—'}</p>
-                      </div>
-                      <div className="px-3.5 py-3 bg-white rounded-[10px] border-2 border-green-line focus-within:border-green transition-colors">
-                        <p className="text-[10px] font-medium text-green-deep uppercase tracking-wide mb-1">Final agreed</p>
-                        <input
-                          type="text"
-                          value={finalTotal}
-                          onChange={(e) => setFinalTotal(e.target.value)}
-                          placeholder="Enter final amount"
-                          disabled={loading}
-                          className="text-sm font-bold text-ink w-full bg-transparent focus:outline-none placeholder:text-ink-3 placeholder:font-normal"
-                        />
-                      </div>
-                    </div>
+          {aiDone && (
+            <div className="flex items-center gap-2.5 text-[13px] text-ink-2">
+              <Chip tone="green">Pre-filled</Chip>
+              <span>From your negotiation data. Check the numbers before closing.</span>
+            </div>
+          )}
 
-                    {/* Live savings summary */}
-                    {savingsAmount > 0 && (
-                      <div className="flex items-center justify-between p-3 bg-green-soft rounded-[10px] border border-green-line">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-green-soft flex items-center justify-center">
-                            <TrendingDown className="w-3.5 h-3.5 text-green-deep" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-semibold text-green-deep">Savings captured</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-base font-bold text-green-deep">{formatMoney(savingsAmount, currency)}</span>
-                          <span className="text-xs font-semibold text-green-deep ml-1.5">({savingsPercent.toFixed(1)}%)</span>
-                        </div>
-                      </div>
-                    )}
-                    {finalTotal.trim() && finalAmount > 0 && originalAmount > 0 && finalAmount >= originalAmount && (
-                      <p className="text-[11px] text-ink-3 mt-2">Final amount is equal to or higher than the original — no savings recorded.</p>
-                    )}
-                  </div>
-
-                  {/* ── What changed ── */}
-                  <div>
-                    <p className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
-                      What changed? <span className="text-red-400">*</span>
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {changeOptions.map((opt) => {
-                        const selected = whatChanged.includes(opt.id)
-                        return (
-                          <button
-                            key={opt.id}
-                            type="button"
-                            onClick={() => toggleChange(opt.id)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                              selected
-                                ? 'bg-green-soft border-green-line text-green-deep'
-                                : 'bg-white border-line-2 text-ink-3 hover:border-line hover:text-ink-2'
-                            }`}
-                          >
-                            {selected && <span className="mr-1">&#10003;</span>}
-                            {opt.label}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* ── Notes ── */}
-                  <div>
-                    <p className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
-                      Notes <span className="text-ink-3 font-normal lowercase">(optional)</span>
-                    </p>
-                    <textarea
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      rows={3}
+          {/* Final number + savings */}
+          {showFields && (
+            <>
+              <div>
+                <Label>Financial outcome</Label>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <StatTile label="Original quote" value={currentTotal || '—'} />
+                  <div className="min-w-0 rounded-[14px] border border-green-line bg-surface px-3.5 py-3 flex flex-col gap-1 focus-within:border-green transition-colors">
+                    <span className="tl-label text-green-deep">Final agreed</span>
+                    <input
+                      type="text"
+                      value={finalTotal}
+                      onChange={(e) => setFinalTotal(e.target.value)}
+                      placeholder="e.g. €42,000"
                       disabled={loading}
-                      placeholder="Key wins, concessions, or context for your records..."
-                      className="w-full px-3.5 py-2.5 text-sm border border-line-2 rounded-[10px] resize-none focus:outline-none  focus:border-green focus:border-green placeholder:text-ink-3"
+                      className="font-display text-[21px] leading-[1.05] font-bold tracking-[-0.02em] tl-num text-ink w-full bg-transparent outline-none placeholder:text-ink-3 placeholder:font-normal placeholder:text-[15px]"
                     />
                   </div>
-                </>
-              )}
+                </div>
+                {savingsAmount > 0 && (
+                  <StatTile className="mt-2.5" label="Savings captured" value={formatMoney(savingsAmount, currency)} sub={`${savingsPercent.toFixed(1)}% below the original quote`} tone="money" hi />
+                )}
+                {finalTotal.trim() && finalAmount > 0 && originalAmount > 0 && finalAmount >= originalAmount && (
+                  <p className="text-[12px] text-ink-3 mt-2">Final amount is equal to or higher than the original, so no savings will be recorded.</p>
+                )}
+              </div>
+
+              <div>
+                <Label required>What changed?</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {changeOptions.map((opt) => {
+                    const on = whatChanged.includes(opt.id)
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => toggleChange(opt.id)}
+                        aria-pressed={on}
+                        className={cn(
+                          'inline-flex items-center gap-1.5 h-[26px] px-2.5 rounded-md border text-[12px] font-semibold transition-colors',
+                          on ? 'bg-green-soft border-green-line text-green-deep' : 'bg-surface border-line text-ink-2 hover:border-[#C9D3CE] hover:text-ink',
+                        )}
+                      >
+                        {on && <Check className="w-3 h-3" strokeWidth={3} />}
+                        {opt.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
             </>
           )}
 
-          {/* Notes for signed-as-is */}
-          {isLost && (
+          {/* Notes */}
+          {(showFields || isLost) && (
             <div>
-              <p className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
-                Notes <span className="text-ink-3 font-normal lowercase">(optional)</span>
-              </p>
+              <Label hint="optional">Notes</Label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 disabled={loading}
-                placeholder="Why did you sign at original terms?"
-                className="w-full px-3.5 py-2.5 text-sm border border-line-2 rounded-[10px] resize-none focus:outline-none  focus:border-green focus:border-green placeholder:text-ink-3"
+                placeholder={isLost ? 'Why did you sign at the original terms?' : 'Key wins, concessions, or context for your records…'}
+                className={cn(field, 'px-3 py-2.5 resize-y min-h-[84px]')}
               />
             </div>
           )}
 
-          {error && (
-            <div className="p-3 bg-risk-soft border border-risk-line rounded-[10px] text-sm text-risk">{error}</div>
-          )}
+          {error && <p className="text-[13.5px] text-risk bg-risk-soft border border-risk-line rounded-[10px] px-3.5 py-3">{error}</p>}
 
-          {/* ── Actions ── */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-line-2">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="px-5 py-2.5 text-sm font-semibold rounded-[10px] border border-line-2 text-ink-3 hover:bg-surface-2 hover:text-ink-2 transition-all disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading || !canSubmit}
-              className="px-6 py-2.5 text-sm font-semibold rounded-[10px] bg-gradient-to-b from-green to-green text-white hover:from-green hover:to-green-deep transition-all  shadow-green-line disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none flex items-center gap-2"
-            >
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Closing...</> : 'Close deal'}
-            </button>
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-line">
+            <Btn variant="ghost" onClick={onClose} disabled={loading}>Cancel</Btn>
+            <Btn variant="primary" onClick={handleSubmit} disabled={loading || !canSubmit}>
+              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Closing…</> : 'Close deal'}
+            </Btn>
           </div>
         </div>
       </div>

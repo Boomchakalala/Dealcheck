@@ -3,8 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { Clock } from 'lucide-react'
-
-const sora = "'Sora', sans-serif"
+import { Chip } from '@/components/system'
 
 export interface BlogCard {
   slug: string
@@ -19,30 +18,23 @@ function fmtDate(date: string, locale: string) {
   return new Date(date).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-function CategoryTag({ category }: { category: string }) {
-  return (
-    <span
-      className="inline-flex items-center text-[10.5px] font-bold uppercase tracking-wider text-green-deep bg-green-soft px-2.5 py-1 rounded-md whitespace-nowrap flex-shrink-0"
-      style={{ fontFamily: "var(--font-jetbrains), monospace" }}
-    >
-      {category}
-    </span>
-  )
-}
-
 function MetaRow({ post, locale }: { post: BlogCard; locale: string }) {
   return (
-    <div className="flex items-center gap-3 text-[12px] text-ink-3">
+    <div className="flex items-center gap-2 text-[12px] text-ink-3 tl-num">
       <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" />{post.readTime}</span>
-      <span>·</span>
+      <span aria-hidden>·</span>
       <span>{fmtDate(post.date, locale)}</span>
     </div>
   )
 }
 
+/**
+ * Category pills + featured post + grid. Pills sit on the same left edge as
+ * the cards; cards are flat objects (border, no lift, no gradient).
+ */
 export function BlogIndexClient({ posts, categories, locale }: { posts: BlogCard[]; categories: string[]; locale: string }) {
   const [active, setActive] = useState<string>('all')
-  const showFilters = posts.length >= 6
+  const showFilters = categories.length > 1
 
   const filtered = active === 'all' ? posts : posts.filter((p) => p.category === active)
   const featured = filtered[0]
@@ -51,19 +43,18 @@ export function BlogIndexClient({ posts, categories, locale }: { posts: BlogCard
 
   return (
     <>
-      {/* Category filter pills */}
       {showFilters && (
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
+        <div className="flex flex-wrap items-center gap-2 mb-7" role="tablist" aria-label={locale === 'fr' ? 'Catégories' : 'Categories'}>
           {[{ key: 'all', label: allLabel }, ...categories.map((c) => ({ key: c, label: c }))].map((pill) => {
             const isActive = active === pill.key
             return (
               <button
                 key={pill.key}
+                role="tab"
+                aria-selected={isActive}
                 onClick={() => setActive(pill.key)}
-                className={`px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-colors ${
-                  isActive
-                    ? 'bg-green text-white'
-                    : 'bg-white text-ink-2 border border-line hover:border-green-line hover:text-green-deep'
+                className={`h-8 px-3 rounded-full text-[12.5px] font-semibold border transition-colors ${
+                  isActive ? 'bg-ink text-white border-ink' : 'bg-surface text-ink-2 border-line hover:border-[#C9D3CE] hover:text-ink'
                 }`}
               >
                 {pill.label}
@@ -73,47 +64,28 @@ export function BlogIndexClient({ posts, categories, locale }: { posts: BlogCard
         </div>
       )}
 
-      {/* Featured (most recent) */}
       {featured && (
-        <Link href={`/blog/${featured.slug}`} className="block group no-underline mb-6">
-          <article
-            className="rounded-3xl p-7 sm:p-10 border-2 border-green-line transition-all hover:-translate-y-1 hover:border-green hover:shadow-xl"
-            style={{ background: 'linear-gradient(135deg, rgba(29,185,84,0.07) 0%, rgba(255,255,255,1) 60%)' }}
-          >
+        <Link href={`/blog/${featured.slug}`} className="block group no-underline mb-4">
+          <article className="rounded-[14px] border border-line bg-surface p-6 sm:p-8 transition-colors group-hover:border-[#C9D3CE]">
             <div className="flex items-center gap-3 mb-4 flex-wrap">
-              <CategoryTag category={featured.category} />
+              <Chip tone="green" mono>{featured.category}</Chip>
               <MetaRow post={featured} locale={locale} />
             </div>
-            <h2
-              className="font-bold text-ink mb-3 group-hover:text-green-deep transition-colors"
-              style={{ fontFamily: "var(--font-sora), sans-serif", fontSize: 'clamp(26px, 3.4vw, 40px)', lineHeight: 1.12, letterSpacing: '-0.025em' }}
-            >
-              {featured.title}
-            </h2>
-            <p className="text-[15.5px] sm:text-[16.5px] text-ink-3 leading-relaxed max-w-2xl">{featured.description}</p>
+            <h2 className="font-display font-extrabold text-[26px] sm:text-[32px] leading-[1.08] tracking-[-0.03em] max-w-[26ch] group-hover:text-green-deep transition-colors">{featured.title}</h2>
+            <p className="text-[15px] text-ink-2 leading-[1.55] mt-3 max-w-[64ch]">{featured.description}</p>
           </article>
         </Link>
       )}
 
-      {/* Compact grid */}
       {rest.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {rest.map((post) => (
             <Link key={post.slug} href={`/blog/${post.slug}`} className="block group no-underline">
-              <article className="h-full flex flex-col rounded-[14px] p-6 bg-white border border-line transition-all hover:-translate-y-1 hover:border-green hover:shadow-lg">
-                <div className="mb-3">
-                  <CategoryTag category={post.category} />
-                </div>
-                <h3
-                  className="font-bold text-ink mb-2 group-hover:text-green-deep transition-colors"
-                  style={{ fontFamily: "var(--font-sora), sans-serif", fontSize: 19, lineHeight: 1.25, letterSpacing: '-0.02em' }}
-                >
-                  {post.title}
-                </h3>
-                <p className="text-[14px] text-ink-3 leading-relaxed mb-5 line-clamp-2">{post.description}</p>
-                <div className="mt-auto pt-1">
-                  <MetaRow post={post} locale={locale} />
-                </div>
+              <article className="h-full flex flex-col rounded-[14px] border border-line bg-surface p-5 transition-colors group-hover:border-[#C9D3CE]">
+                <div className="mb-3"><Chip tone="green" mono>{post.category}</Chip></div>
+                <h3 className="font-display font-bold text-[18px] leading-[1.25] tracking-[-0.02em] group-hover:text-green-deep transition-colors">{post.title}</h3>
+                <p className="text-[13.5px] text-ink-2 leading-[1.55] mt-2 mb-4 line-clamp-2">{post.description}</p>
+                <div className="mt-auto"><MetaRow post={post} locale={locale} /></div>
               </article>
             </Link>
           ))}
@@ -121,9 +93,7 @@ export function BlogIndexClient({ posts, categories, locale }: { posts: BlogCard
       )}
 
       {filtered.length === 0 && (
-        <p className="text-center text-[15px] text-ink-3 py-12">
-          {locale === 'fr' ? 'Aucun article dans cette catégorie pour le moment.' : 'No posts in this category yet.'}
-        </p>
+        <p className="text-[14.5px] text-ink-3 py-10">{locale === 'fr' ? 'Aucun article dans cette catégorie pour le moment.' : 'No posts in this category yet.'}</p>
       )}
     </>
   )

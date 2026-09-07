@@ -16,8 +16,8 @@ export function renderMarkdownToHtml(md: string): string {
     // Unordered lists
     .replace(/^- (.+)$/gm, '<li>$1</li>')
     .replace(/(<li>.*<\/li>\n?)+/g, (match) => `<ul>${match}</ul>`)
-    // Paragraphs (double newlines)
-    .replace(/\n\n(?!<)/g, '</p><p>')
+    // Paragraphs (double newlines). Inline tags (<strong>, <a>) can open a paragraph; block tags cannot.
+    .replace(/\n\n(?!<(?:h[1-6]|ul|ol|li|hr|blockquote|p)\b)/g, '</p><p>')
     // Wrap in initial p if needed
     .replace(/^(?!<)/, '<p>')
     .replace(/(?!>)$/, '</p>')

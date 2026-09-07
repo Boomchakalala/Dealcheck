@@ -1,14 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { MarketingHeader } from '@/components/MarketingHeader'
-import { MarketingFooter } from '@/components/MarketingFooter'
 import { Mail, Clock, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { MarketingPage, PageHero, Section } from '@/components/marketing/MarketingPage'
+import { Btn } from '@/components/system'
+
+const EMAIL = 'hello@termlift.com'
+const field =
+  'w-full h-10 px-3 text-[14px] text-ink bg-surface border border-line rounded-[10px] outline-none transition-colors placeholder:text-ink-3 focus:border-green'
 
 export default function ContactPage() {
-  const t = useTranslations()
+  const t = useTranslations('contact')
+  const f = useTranslations('footer')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [subject, setSubject] = useState('General question')
@@ -18,17 +22,19 @@ export default function ContactPage() {
   const [error, setError] = useState<string | null>(null)
 
   const subjectOptions = [
-    { value: 'General question', label: t('contact.subjectGeneral') },
-    { value: 'Feature request', label: t('contact.subjectFeature') },
-    { value: 'Bug report', label: t('contact.subjectBug') },
-    { value: 'Partnership', label: t('contact.subjectPartnership') },
-    { value: 'Press', label: t('contact.subjectPress') },
-    { value: 'Other', label: t('contact.subjectOther') },
+    { value: 'General question', label: t('subjectGeneral') },
+    { value: 'Feature request', label: t('subjectFeature') },
+    { value: 'Bug report', label: t('subjectBug') },
+    { value: 'Partnership', label: t('subjectPartnership') },
+    { value: 'Press', label: t('subjectPress') },
+    { value: 'Other', label: t('subjectOther') },
   ]
+
+  const canSend = !!name.trim() && !!email.trim() && !!message.trim()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim() || !email.trim() || !message.trim()) return
+    if (!canSend) return
     setSending(true)
     setError(null)
     try {
@@ -40,7 +46,7 @@ export default function ContactPage() {
       if (!res.ok) throw new Error()
       setSent(true)
     } catch {
-      setError(t('contact.errorGeneric'))
+      setError(t('errorGeneric'))
     } finally {
       setSending(false)
     }
@@ -52,132 +58,73 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
-      <MarketingHeader />
+    <MarketingPage>
+      <PageHero eyebrow={f('contact')} title={t('title')} lead={t('subtitle')} narrow />
 
-      <main className="flex-1">
-        {/* Hero */}
-        <div className="relative overflow-hidden px-6 pt-20 sm:pt-28 pb-12">
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 700px 340px at 50% 0%, rgba(29,185,84,0.12) 0%, transparent 70%)' }} />
-          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-          <div className="relative max-w-3xl mx-auto text-center">
-            <p className="text-[12px] mb-4 font-bold tracking-widest uppercase" style={{ fontFamily: "var(--font-jetbrains), monospace", color: '#1DB954' }}>
-              {t('footer.contact')}
-            </p>
-            <h1 className="text-ink mb-4" style={{ fontFamily: "var(--font-sora), sans-serif", fontWeight: 800, fontSize: 'clamp(34px, 4.8vw, 52px)', lineHeight: 1.05, letterSpacing: '-0.028em' }}>
-              {t('contact.title')}
-            </h1>
-            <p className="text-[17px] text-ink-3 leading-relaxed max-w-xl mx-auto">
-              {t('contact.subtitle')}
-            </p>
+      <Section>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-10 lg:gap-14 items-start">
+          {/* Form — the one object on the page */}
+          <div className="max-w-[640px]">
+            {sent ? (
+              <div className="rounded-[14px] border border-green-line bg-green-soft px-6 py-8 text-center">
+                <CheckCircle2 className="w-8 h-8 text-green-deep mx-auto mb-3" />
+                <h2 className="font-display font-bold text-[19px] leading-tight">{t('successTitle')}</h2>
+                <p className="text-[14px] text-ink-2 mt-1.5">{t('successDesc')}</p>
+                <Btn variant="link" onClick={handleReset} className="mt-4 text-green-deep">{t('sendAnother')} <ArrowRight className="w-3.5 h-3.5" /></Btn>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <label className="block">
+                    <span className="text-[12.5px] font-semibold text-ink block mb-1.5">{t('name')} <span className="text-risk">*</span></span>
+                    <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder={t('namePlaceholder')} className={field} />
+                  </label>
+                  <label className="block">
+                    <span className="text-[12.5px] font-semibold text-ink block mb-1.5">{t('email')} <span className="text-risk">*</span></span>
+                    <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('emailPlaceholder')} className={field} />
+                  </label>
+                </div>
+                <label className="block">
+                  <span className="text-[12.5px] font-semibold text-ink block mb-1.5">{t('subject')}</span>
+                  <select value={subject} onChange={(e) => setSubject(e.target.value)} className={field}>
+                    {subjectOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="text-[12.5px] font-semibold text-ink block mb-1.5">{t('message')} <span className="text-risk">*</span></span>
+                  <textarea required rows={7} value={message} onChange={(e) => setMessage(e.target.value)} placeholder={t('messagePlaceholder')} className={`${field} h-auto py-2.5 resize-y min-h-[140px]`} />
+                </label>
+                {error && <p className="text-[13.5px] text-risk bg-risk-soft border border-risk-line rounded-[10px] px-3.5 py-3">{error}</p>}
+                <div>
+                  <Btn type="submit" variant="primary" size="lg" disabled={sending || !canSend}>
+                    {sending ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('sending')}</> : <>{t('send')} <ArrowRight className="w-4 h-4" /></>}
+                  </Btn>
+                </div>
+              </form>
+            )}
           </div>
+
+          {/* Other ways in — flat list */}
+          <aside className="lg:pt-1">
+            <dl className="divide-y divide-line border-y border-line">
+              <div className="py-4 flex items-start gap-3">
+                <Mail className="w-4 h-4 text-ink-3 mt-1 shrink-0" />
+                <div>
+                  <dt className="text-[12.5px] font-semibold text-ink">{t('emailLabel')}</dt>
+                  <dd className="text-[14px] mt-0.5"><a href={`mailto:${EMAIL}`} className="text-green-deep font-medium no-underline hover:underline">{EMAIL}</a></dd>
+                </div>
+              </div>
+              <div className="py-4 flex items-start gap-3">
+                <Clock className="w-4 h-4 text-ink-3 mt-1 shrink-0" />
+                <div>
+                  <dt className="text-[12.5px] font-semibold text-ink">{t('responseTime')}</dt>
+                  <dd className="text-[14px] text-ink-2 mt-0.5">{t('responseValue')}</dd>
+                </div>
+              </div>
+            </dl>
+          </aside>
         </div>
-
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 pb-20">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-10">
-
-            {/* Form — 3 cols */}
-            <div className="md:col-span-3">
-              {sent ? (
-                <div className="bg-white rounded-[14px] border-2 border-green-line p-10 text-center ">
-                  <div className="w-16 h-16 rounded-[14px] bg-green-soft flex items-center justify-center mx-auto mb-5">
-                    <CheckCircle2 className="w-8 h-8 text-green-deep" />
-                  </div>
-                  <h3 className="text-xl font-bold text-ink mb-2 font-display">{t('contact.successTitle')}</h3>
-                  <p className="text-sm text-ink-2 mb-6">{t('contact.successDesc')}</p>
-                  <button onClick={handleReset} className="text-sm font-medium text-green-deep hover:text-green-deep transition-colors">
-                    {t('contact.sendAnother')} &rarr;
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="bg-white rounded-[14px] border border-line p-7 sm:p-8  space-y-6">
-                  <div>
-                    <label className="text-sm font-medium text-ink-2 mb-2 block">{t('contact.name')} <span className="text-red-500">*</span></label>
-                    <input
-                      type="text" required value={name} onChange={(e) => setName(e.target.value)}
-                      placeholder={t('contact.namePlaceholder')}
-                      className="w-full px-4 py-3.5 text-sm border border-line rounded-[10px] focus:outline-none  focus:border-green focus:border-transparent transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-ink-2 mb-2 block">{t('contact.email')} <span className="text-red-500">*</span></label>
-                    <input
-                      type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t('contact.emailPlaceholder')}
-                      className="w-full px-4 py-3.5 text-sm border border-line rounded-[10px] focus:outline-none  focus:border-green focus:border-transparent transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-ink-2 mb-2 block">{t('contact.subject')}</label>
-                    <select
-                      value={subject} onChange={(e) => setSubject(e.target.value)}
-                      className="w-full px-4 py-3.5 text-sm border border-line rounded-[10px] bg-white focus:outline-none  focus:border-green focus:border-transparent transition-all"
-                    >
-                      {subjectOptions.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-ink-2 mb-2 block">{t('contact.message')} <span className="text-red-500">*</span></label>
-                    <textarea
-                      required rows={7} value={message} onChange={(e) => setMessage(e.target.value)}
-                      placeholder={t('contact.messagePlaceholder')}
-                      className="w-full px-4 py-3.5 text-sm border border-line rounded-[10px] resize-none focus:outline-none  focus:border-green focus:border-transparent transition-all"
-                    />
-                  </div>
-                  {error && <p className="text-sm text-risk bg-risk-soft border border-risk-line rounded-[10px] p-4">{error}</p>}
-                  <button
-                    type="submit" disabled={sending || !name.trim() || !email.trim() || !message.trim()}
-                    className="w-full px-6 py-4 text-sm font-bold rounded-[10px] bg-green text-white hover:bg-green hover:-translate-y-0.5 transition-all shadow-[0_8px_24px_-6px_rgba(29,185,84,0.45)] hover:shadow-[0_12px_32px_-8px_rgba(29,185,84,0.55)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2"
-                  >
-                    {sending ? <><Loader2 className="w-4 h-4 animate-spin" /> {t('contact.sending')}</> : <>{t('contact.send')} <ArrowRight className="w-4 h-4" /></>}
-                  </button>
-                </form>
-              )}
-            </div>
-
-            {/* Info cards — 2 cols */}
-            <div className="md:col-span-2 space-y-4">
-              <div className="bg-white rounded-[14px] border border-line p-6 hover:border-green-line hover:shadow-md transition-all">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-green-soft flex items-center justify-center flex-shrink-0 text-green-deep">
-                    <Mail className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-[15px] font-bold text-ink font-display">{t('contact.emailLabel')}</h3>
-                </div>
-                <a href="mailto:hello@termlift.com" className="text-[13.5px] text-green-deep hover:text-green-deep font-medium transition-colors">
-                  hello@termlift.com
-                </a>
-              </div>
-
-              <div className="bg-white rounded-[14px] border border-line p-6 hover:border-green-line hover:shadow-md transition-all">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-green-soft flex items-center justify-center flex-shrink-0 text-green-deep">
-                    <Clock className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-[15px] font-bold text-ink font-display">{t('contact.responseTime')}</h3>
-                </div>
-                <p className="text-[13.5px] text-ink-3">{t('contact.responseValue')}</p>
-              </div>
-
-              <div className="bg-white rounded-[14px] border border-line p-6 hover:border-green-line hover:shadow-md transition-all">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-surface-2 flex items-center justify-center flex-shrink-0 text-ink-3">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                  </div>
-                  <h3 className="text-[15px] font-bold text-ink font-display">{t('contact.linkedinLabel')}</h3>
-                </div>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-[13.5px] text-green-deep hover:text-green-deep font-medium transition-colors">
-                  LinkedIn &rarr;
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      <MarketingFooter />
-    </div>
+      </Section>
+    </MarketingPage>
   )
 }

@@ -1,14 +1,14 @@
-'use client'
-
+import type { Metadata } from 'next'
 import { NEGOTIATION_FEE_PERCENT, NEGOTIATION_FEE_MINIMUM_EUR, deepAnalysisPriceLabel, earlyAccessUntilLabel } from '@/lib/pricing'
-import { useState } from 'react'
-import Link from 'next/link'
-import { MarketingHeader } from '@/components/MarketingHeader'
-import { MarketingFooter } from '@/components/MarketingFooter'
-import { Info, Upload, CheckCircle2, Lock, CreditCard, Shield, Plus, ArrowRight } from 'lucide-react'
+import { Info, Upload, CheckCircle2, Lock, CreditCard, Shield, Plus } from 'lucide-react'
+import { MarketingPage, PageHero, Section, wrap } from '@/components/marketing/MarketingPage'
+import { Btn } from '@/components/system'
+import { cn } from '@/lib/utils'
 
-const sora = "'Sora', sans-serif"
-const green = '#1DB954'
+export const metadata: Metadata = {
+  title: 'Help & FAQ',
+  alternates: { canonical: 'https://www.termlift.com/help' },
+}
 
 type Section = 'what' | 'upload' | 'output' | 'privacy' | 'billing' | 'trouble'
 
@@ -78,99 +78,72 @@ const faqData: Record<Section, { title: string; sub: string; items: { q: string;
 }
 
 export default function HelpPage() {
-  const [openItems, setOpenItems] = useState<Record<string, boolean>>({})
-  const toggleItem = (key: string) => setOpenItems(prev => ({ ...prev, [key]: !prev[key] }))
-
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <MarketingHeader />
+    <MarketingPage>
+      <PageHero
+        eyebrow="Help center"
+        title="How can we help?"
+        lead="Everything you need to get the most out of TermLift — quotes, output, privacy, pricing, and fixes."
+        narrow
+      />
 
-      <main className="flex-1">
-        {/* ─── HERO ─────────────────────────────────────── */}
-        <section className="relative px-6 pt-20 sm:pt-28 pb-14 overflow-hidden bg-[#FAFAF7] border-b border-line-2">
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 700px 340px at 50% 0%, rgba(29,185,84,0.12) 0%, transparent 70%)' }} />
-          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-          <div className="relative max-w-3xl mx-auto text-center">
-            <p className="text-[12px] mb-4 font-bold tracking-widest uppercase" style={{ fontFamily: "var(--font-jetbrains), monospace", color: green }}>Help center</p>
-            <h1 className="text-ink mb-4" style={{ fontFamily: "var(--font-sora), sans-serif", fontWeight: 800, fontSize: 'clamp(34px, 4.8vw, 52px)', lineHeight: 1.05, letterSpacing: '-0.028em' }}>
-              How can we help?
-            </h1>
-            <p className="text-[17px] text-ink-3 leading-relaxed max-w-xl mx-auto">
-              Everything you need to get the most out of TermLift — quotes, output, privacy, billing, and fixes.
-            </p>
-          </div>
-        </section>
+      <section className="py-10 sm:py-12">
+        <div className={cn(wrap, 'grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-10 lg:gap-14 items-start')}>
+          {/* Jump nav — sticky on desktop */}
+          <nav className="hidden lg:block sticky top-[72px]" aria-label="Sections">
+            <p className="tl-label text-ink-3 text-[10px] mb-3">On this page</p>
+            <ol className="m-0 p-0 list-none flex flex-col gap-1">
+              {sections.map((s) => (
+                <li key={s.key}>
+                  <a href={`#${s.key}`} className="flex items-center gap-2 text-[13px] text-ink-2 hover:text-ink no-underline py-0.5 leading-snug">
+                    <span className="text-ink-3">{s.icon}</span>{s.name}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
 
-        {/* ─── FAQ SECTIONS ─────────────────────────────── */}
-        <section className="px-6 pb-16">
-          <div className="max-w-3xl mx-auto space-y-12">
+          {/* FAQ groups */}
+          <div className="max-w-[72ch] flex flex-col gap-10">
             {sections.map((section) => {
               const data = faqData[section.key]
               return (
-                <div key={section.key}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(29,185,84,0.12)', color: green }}>
-                      {section.icon}
-                    </div>
-                    <div>
-                      <h2 className="text-[19px] font-bold text-ink leading-tight font-display">{data.title}</h2>
-                      <p className="text-[12.5px] text-ink-3">{data.sub}</p>
-                    </div>
+                <div key={section.key} id={section.key} className="scroll-mt-20">
+                  <div className="flex items-baseline justify-between gap-3 mb-3">
+                    <h2 className="tl-h3 text-ink">{data.title}</h2>
+                    <span className="text-[12.5px] text-ink-2 hidden sm:inline">{data.sub}</span>
                   </div>
-                  <div className="rounded-[14px] border border-line overflow-hidden divide-y divide-line-2">
-                    {data.items.map((item, i) => {
-                      const key = `${section.key}-${i}`
-                      const isOpen = !!openItems[key]
-                      return (
-                        <div key={key}>
-                          <button
-                            onClick={() => toggleItem(key)}
-                            className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left hover:bg-surface-2/70 transition-colors"
-                          >
-                            <span className="text-[14px] font-semibold text-ink">{item.q}</span>
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${isOpen ? 'bg-green-soft text-green-deep' : 'bg-surface-2 text-ink-3'}`}>
-                              <Plus className="w-3.5 h-3.5 transition-transform" style={{ transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)' }} />
-                            </div>
-                          </button>
-                          {isOpen && (
-                            <p className="px-5 pb-4 -mt-1 text-[13.5px] text-ink-3 leading-relaxed">{item.a}</p>
-                          )}
-                        </div>
-                      )
-                    })}
+                  <div className="border-y border-line divide-y divide-line">
+                    {data.items.map((item, i) => (
+                      <details key={i} className="group">
+                        <summary className="flex items-center justify-between gap-4 py-3.5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                          <span className="text-[14.5px] font-semibold text-ink leading-snug">{item.q}</span>
+                          <Plus className="w-4 h-4 text-ink-3 shrink-0 transition-transform group-open:rotate-45" />
+                        </summary>
+                        <p className="text-[14px] text-ink-2 leading-[1.6] pb-4 -mt-1 max-w-[64ch]">{item.a}</p>
+                      </details>
+                    ))}
                   </div>
                 </div>
               )
             })}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ─── STILL HAVE QUESTIONS ─────────────────────── */}
-        <section className="px-6 pb-20">
-          <div className="max-w-3xl mx-auto">
-            <div className="rounded-[14px] border-2 border-green-line p-7 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5" style={{ background: 'linear-gradient(135deg, rgba(29,185,84,0.06) 0%, rgba(255,255,255,1) 100%)' }}>
-              <div>
-                <h3 className="text-[18px] font-bold text-ink mb-1 font-display">Still have questions?</h3>
-                <p className="text-[13.5px] text-ink-3">We&apos;re here to help — reach out anytime.</p>
-              </div>
-              <div className="flex gap-2.5 flex-shrink-0">
-                <a href="mailto:hello@termlift.com" className="text-[13px] font-semibold px-4 py-2.5 rounded-[10px] border border-line text-ink-2 bg-white hover:border-[#C9D3CE] transition-colors">
-                  hello@termlift.com
-                </a>
-                <Link
-                  href="/try"
-                  className="inline-flex items-center gap-1.5 text-[13px] font-bold px-4 py-2.5 rounded-[10px] text-white transition-all hover:-translate-y-0.5"
-                  style={{ background: green, boxShadow: '0 8px 24px -6px rgba(29,185,84,0.45)' }}
-                >
-                  Analyze a quote <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
+      {/* Still stuck — one flat band */}
+      <Section tone="ground">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+          <div>
+            <h2 className="font-display font-extrabold text-[22px] sm:text-[26px] leading-[1.08] tracking-[-0.03em]">Still have questions?</h2>
+            <p className="text-[14.5px] text-ink-2 mt-1.5">We answer every email, usually the same day.</p>
           </div>
-        </section>
-      </main>
-
-      <MarketingFooter />
-    </div>
+          <div className="flex flex-wrap gap-2.5 shrink-0">
+            <Btn href="mailto:hello@termlift.com" variant="ghost" size="lg">hello@termlift.com</Btn>
+            <Btn href="/try" variant="primary" size="lg">Analyse a quote</Btn>
+          </div>
+        </div>
+      </Section>
+    </MarketingPage>
   )
 }

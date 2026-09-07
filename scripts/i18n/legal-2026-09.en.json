@@ -1,0 +1,38 @@
+{
+  "legal": {
+    "toc": "On this page",
+    "lastUpdated": "Last updated {date}",
+    "quickSummary": "In short"
+  },
+  "termsPage": {
+    "lead": "The plain-language agreement between you and TermLift. Read the short version first, then the details.",
+    "s2Item1": "You upload a document or paste its text (a quote, contract, proposal or renewal notice)",
+    "s2Nego": "If you ask for it, TermLift can also run the negotiation with the vendor on your behalf. That service is priced in section 5 and confirmed in writing for each deal before we start.",
+    "s5Intro": "There is no subscription. You pay per deal, and only for the steps you use.",
+    "s5QuickTitle": "Quick analysis — free",
+    "s5QuickDesc": "{limit} quick analyses per account, plus one without an account. No card required.",
+    "s5DeepTitle": "Deep Analysis — {price} per deal",
+    "s5DeepDesc": "A one-time fee per deal. It covers the full negotiation playbook, the email drafts and every follow-up round on that deal. During early access, until {date}, every Deep Analysis is free. After that, the first Deep Analysis on any account stays free.",
+    "s5NegoTitle": "TermLift negotiates — {pct}% of verified savings",
+    "s5NegoDesc": "No upfront fee. If you ask TermLift to run the negotiation, our fee is {pct}% of the savings verified against the original quote, with a €{min} minimum, invoiced after the deal is signed. No savings, no fee. The scope and the savings baseline are confirmed in writing before we start.",
+    "s5Item1": "Prices are in euros and exclude VAT where it applies.",
+    "s5Item2": "Deep Analysis is paid when you request it. Because the analysis is delivered immediately, it is not refundable once delivered, except where the law says otherwise.",
+    "s5Item3": "While billing is not yet enabled on your account we may provide Deep Analysis free of charge. That does not oblige us to keep doing so.",
+    "s5Item4": "Negotiation fees are invoiced with 30-day payment terms.",
+    "s5Item5": "We may change prices with at least 30 days' notice. A change never applies to a Deep Analysis you have already paid for, or to a negotiation already under way.",
+    "s8Item2": "We may suspend or terminate your account if you violate these Terms or do not pay an invoice",
+    "s8Item4": "On termination your right to use the service ends immediately. Deep Analysis results you have paid for stay available to export for 30 days",
+    "s9Item4": "TermLift is not liable for the actions or failures of third-party services (Anthropic, Supabase, Vercel and similar)."
+  },
+  "privacyPage": {
+    "lead": "What we collect, where it goes, and how to get it deleted. No tracking pixels, no data brokers, no surprises.",
+    "s2Account3": "How many analyses you have run",
+    "s2PaymentInfo": "Payment and invoicing:",
+    "s2Payment1": "We do not collect card details inside the product today",
+    "s2Payment2": "If you use the negotiation service we keep what an invoice needs: company name, address and VAT number",
+    "s3Item2": "Manage your account and apply the free-analysis limit",
+    "s3Item3": "Invoice the negotiation service where you have asked for it",
+    "s3Item7": "Run the negotiation on your behalf where you have asked for it. That means sharing the relevant deal details with the vendor, and only what that negotiation needs",
+    "s8Text": "Your data may be processed in the United States and other countries where our service providers (Anthropic, Supabase, Vercel) operate. For transfers of personal data outside the European Economic Area and the United Kingdom we rely on Standard Contractual Clauses approved by the European Commission."
+  }
+}

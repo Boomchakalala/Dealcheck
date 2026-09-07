@@ -19,6 +19,9 @@ const nextConfig: NextConfig = {
     return [
       { source: '/example', destination: '/demo', permanent: true },
       { source: '/example/:path*', destination: '/demo/:path*', permanent: true },
+      // Retired blog posts (2026-09): off-topic for the SaaS / IT / marketing audience.
+      { source: '/blog/how-to-negotiate-car-purchase', destination: '/blog', permanent: true },
+      { source: '/blog/what-to-check-before-signing-equipment-lease', destination: '/blog', permanent: true },
     ]
   },
 

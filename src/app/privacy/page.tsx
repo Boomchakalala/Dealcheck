@@ -1,254 +1,161 @@
-'use client'
+import type { Metadata } from 'next'
+import { getTranslations, getLocale } from 'next-intl/server'
+import { MarketingPage, PageHero, LegalDoc, Callout } from '@/components/marketing/MarketingPage'
 
-import { MarketingHeader } from '@/components/MarketingHeader'
-import { MarketingFooter } from '@/components/MarketingFooter'
-import { Shield } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  alternates: { canonical: 'https://www.termlift.com/privacy' },
+}
 
-export default function PrivacyPage() {
-  const t = useTranslations()
+/** Bump when the wording changes — this is the date shown on the page. */
+const LAST_UPDATED = '2026-09-07'
+const EMAIL = 'hello@termlift.com'
+
+export default async function PrivacyPage() {
+  const t = await getTranslations('privacyPage')
+  const l = await getTranslations('legal')
+  const locale = await getLocale()
+  const updated = new Date(LAST_UPDATED + 'T12:00:00Z').toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  const mail = <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+
+  const providers = [
+    { name: t('s4Anthropic'), desc: t('s4AnthropicDesc'), link: 'https://www.anthropic.com/privacy' },
+    { name: t('s4Supabase'), desc: t('s4SupabaseDesc') },
+    { name: t('s4Vercel'), desc: t('s4VercelDesc') },
+    { name: t('s4PostHog'), desc: t('s4PostHogDesc') },
+  ]
+
+  const sections = [
+    {
+      id: 'who',
+      title: t('s1Title'),
+      body: (
+        <>
+          <p>{t('s1p1')}</p>
+          <p>{t('s1Contact')} {mail}</p>
+        </>
+      ),
+    },
+    {
+      id: 'collect',
+      title: t('s2Title'),
+      body: (
+        <>
+          <h3>{t('s2AccountInfo')}</h3>
+          <ul><li>{t('s2Account1')}</li><li>{t('s2Account2')}</li><li>{t('s2Account3')}</li></ul>
+          <h3>{t('s2DealData')}</h3>
+          <ul><li>{t('s2Deal1')}</li><li>{t('s2Deal2')}</li><li>{t('s2Deal3')}</li></ul>
+          <h3>{t('s2PaymentInfo')}</h3>
+          <ul><li>{t('s2Payment1')}</li><li>{t('s2Payment2')}</li></ul>
+          <h3>{t('s2AutoCollected')}</h3>
+          <ul><li>{t('s2Auto1')}</li><li>{t('s2Auto2')}</li></ul>
+        </>
+      ),
+    },
+    {
+      id: 'use',
+      title: t('s3Title'),
+      body: (
+        <ul>
+          {(['s3Item1', 's3Item2', 's3Item3', 's3Item4', 's3Item5', 's3Item6', 's3Item7'] as const).map((k) => <li key={k}>{t(k)}</li>)}
+        </ul>
+      ),
+    },
+    {
+      id: 'share',
+      title: t('s4Title'),
+      body: (
+        <>
+          <p>{t('s4Intro')}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 my-4">
+            {providers.map((p) => (
+              <div key={p.name} className="rounded-[12px] border border-line bg-surface px-4 py-3.5">
+                <p className="font-display font-bold text-ink text-[14.5px] leading-tight !my-0">{p.name}</p>
+                <p className="text-[13px] text-ink-2 leading-[1.5] !mt-1 !mb-0">
+                  {p.desc}
+                  {p.link && <> <a href={p.link} target="_blank" rel="noopener noreferrer">{locale === 'fr' ? 'Politique de confidentialité' : 'Privacy policy'}</a></>}
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
+      ),
+    },
+    {
+      id: 'retention',
+      title: t('s5Title'),
+      body: (
+        <>
+          <ul>
+            <li><strong>{t('s5Item1Prefix')}</strong> {t('s5Item1')}</li>
+            <li><strong>{t('s5Item2Prefix')}</strong> {t('s5Item2')}</li>
+            <li><strong>{t('s5Item3Prefix')}</strong> {t('s5Item3')}</li>
+            <li><strong>{t('s5Item4Prefix')}</strong> {t('s5Item4')}</li>
+          </ul>
+          <p>{t('s5Note')}</p>
+        </>
+      ),
+    },
+    {
+      id: 'cookies',
+      title: t('s6Title'),
+      body: (
+        <>
+          <p>{t('s6Intro')}</p>
+          <h3>{t('s6Session')}</h3>
+          <ul><li>{t('s6Session1')}</li><li>{t('s6Session2')}</li></ul>
+          <h3>{t('s6Analytics')}</h3>
+          <ul><li>{t('s6Analytics1')}</li><li>{t('s6Analytics2')}</li></ul>
+          <h3>{t('s6WhatWeDoNot')}</h3>
+          <ul><li>{t('s6Not1')}</li><li>{t('s6Not2')}</li><li>{t('s6Not3')}</li></ul>
+        </>
+      ),
+    },
+    {
+      id: 'rights',
+      title: t('s7Title'),
+      body: (
+        <>
+          <p>{t('s7Intro')}</p>
+          <ul>
+            <li><strong>{t('s7Access')}</strong> {t('s7AccessDesc')}</li>
+            <li><strong>{t('s7Delete')}</strong> {t('s7DeleteDesc')}</li>
+            <li><strong>{t('s7Correct')}</strong> {t('s7CorrectDesc')}</li>
+            <li><strong>{t('s7Export')}</strong> {t('s7ExportDesc')}</li>
+            <li><strong>{t('s7Object')}</strong> {t('s7ObjectDesc')}</li>
+          </ul>
+          <p>{t('s7Contact', { email: EMAIL })}</p>
+        </>
+      ),
+    },
+    { id: 'transfers', title: t('s8Title'), body: <p>{t('s8Text')}</p> },
+    { id: 'children', title: t('s9Title'), body: <p>{t('s9Text')}</p> },
+    { id: 'changes', title: t('s10Title'), body: <p>{t('s10Text')}</p> },
+    {
+      id: 'contact',
+      title: t('s11Title'),
+      body: (
+        <ul>
+          <li><strong>{t('s11Privacy')}</strong> {mail}</li>
+          <li><strong>{t('s11Data')}</strong> {mail}</li>
+          <li><strong>{t('s11General')}</strong> {mail}</li>
+        </ul>
+      ),
+    },
+  ]
+
+  const intro = (
+    <Callout tone="green" title={l('quickSummary')} className="!mt-0 mb-8 max-w-[68ch]">
+      <ul className="!my-0 pl-5 list-disc [&_li]:my-1 [&_li::marker]:text-green-deep">
+        {(['summary1', 'summary2', 'summary3', 'summary4', 'summary5'] as const).map((k) => <li key={k}>{t(k)}</li>)}
+      </ul>
+    </Callout>
+  )
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      {/* Header */}
-      <MarketingHeader />
-
-      <main className="flex-1">
-        <div className="relative overflow-hidden px-6 pt-20 sm:pt-24 pb-12 bg-[#FAFAF7] border-b border-line-2">
-          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 600px 280px at 50% 0%, rgba(29,185,84,0.10) 0%, transparent 70%)' }} />
-          <div className="absolute inset-0 opacity-[0.025] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#0f172a 1px, transparent 1px), linear-gradient(90deg, #0f172a 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-          <div className="relative max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 mb-5">
-              <Shield className="w-4 h-4 text-green-deep" />
-              <span className="text-[12px] font-bold tracking-widest uppercase text-green-deep" style={{ fontFamily: "var(--font-jetbrains), monospace" }}>{t('privacyPage.badge')}</span>
-            </div>
-            <h1 className="text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif", fontWeight: 800, fontSize: 'clamp(32px, 4.5vw, 48px)', lineHeight: 1.06, letterSpacing: '-0.028em' }}>
-              {t('privacyPage.title')}
-            </h1>
-            <p className="text-[13px] text-ink-3">{t('privacyPage.lastUpdated')}</p>
-          </div>
-        </div>
-
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 py-12 pb-20">
-          <div className="space-y-10 text-sm text-ink-2 leading-relaxed">
-
-            {/* Quick Summary box */}
-            <div className="rounded-[10px] border border-green-line/60 bg-gradient-to-br from-green-soft/40 to-white p-6">
-              <p className="font-semibold text-ink mb-3">{t('privacyPage.quickSummary')}</p>
-              <ul className="space-y-2 text-sm">
-                {[
-                  t('privacyPage.summary1'),
-                  t('privacyPage.summary2'),
-                  t('privacyPage.summary3'),
-                  t('privacyPage.summary4'),
-                  t('privacyPage.summary5'),
-                ].map((item, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className="text-green-deep">•</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s1Title')}</h2>
-              <p className="mb-2">
-                {t('privacyPage.s1p1')}
-              </p>
-              <p className="text-xs text-ink-2">
-                {t('privacyPage.s1Contact')}{' '}
-                <a href="mailto:hello@termlift.com" className="text-green-deep hover:underline">hello@termlift.com</a>
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s2Title')}</h2>
-
-              <div className="space-y-4">
-                <div>
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s2AccountInfo')}</p>
-                  <ul className="space-y-1 text-sm ml-4">
-                    <li>• {t('privacyPage.s2Account1')}</li>
-                    <li>• {t('privacyPage.s2Account2')}</li>
-                    <li>• {t('privacyPage.s2Account3')}</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s2DealData')}</p>
-                  <ul className="space-y-1 text-sm ml-4">
-                    <li>• {t('privacyPage.s2Deal1')}</li>
-                    <li>• {t('privacyPage.s2Deal2')}</li>
-                    <li>• {t('privacyPage.s2Deal3')}</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s2PaymentInfo')}</p>
-                  <ul className="space-y-1 text-sm ml-4">
-                    <li>• {t('privacyPage.s2Payment1')}</li>
-                    <li>• {t('privacyPage.s2Payment2')}</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s2AutoCollected')}</p>
-                  <ul className="space-y-1 text-sm ml-4">
-                    <li>• {t('privacyPage.s2Auto1')}</li>
-                    <li>• {t('privacyPage.s2Auto2')}</li>
-                  </ul>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s3Title')}</h2>
-              <ul className="space-y-2 ml-4">
-                <li>• {t('privacyPage.s3Item1')}</li>
-                <li>• {t('privacyPage.s3Item2')}</li>
-                <li>• {t('privacyPage.s3Item3')}</li>
-                <li>• {t('privacyPage.s3Item4')}</li>
-                <li>• {t('privacyPage.s3Item5')}</li>
-                <li>• {t('privacyPage.s3Item6')}</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s4Title')}</h2>
-              <p className="mb-4">{t('privacyPage.s4Intro')}</p>
-
-              <div className="space-y-3">
-                <div className="bg-ground rounded-lg border border-line p-4">
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s4Anthropic')}</p>
-                  <p className="text-sm">{t('privacyPage.s4AnthropicDesc')}{' '}
-                    <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer" className="text-green-deep hover:underline">privacy policy</a>
-                  </p>
-                </div>
-
-                <div className="bg-ground rounded-lg border border-line p-4">
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s4Supabase')}</p>
-                  <p className="text-sm">{t('privacyPage.s4SupabaseDesc')}</p>
-                </div>
-
-                <div className="bg-ground rounded-lg border border-line p-4">
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s4Vercel')}</p>
-                  <p className="text-sm">{t('privacyPage.s4VercelDesc')}</p>
-                </div>
-
-                <div className="bg-ground rounded-lg border border-line p-4">
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s4PostHog')}</p>
-                  <p className="text-sm">{t('privacyPage.s4PostHogDesc')}</p>
-                </div>
-
-                <div className="bg-ground rounded-lg border border-line p-4">
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s4Stripe')}</p>
-                  <p className="text-sm">{t('privacyPage.s4StripeDesc')}</p>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s5Title')}</h2>
-              <ul className="space-y-2 ml-4">
-                <li>• <span className="font-medium">{t('privacyPage.s5Item1Prefix')}</span> {t('privacyPage.s5Item1')}</li>
-                <li>• <span className="font-medium">{t('privacyPage.s5Item2Prefix')}</span> {t('privacyPage.s5Item2')}</li>
-                <li>• <span className="font-medium">{t('privacyPage.s5Item3Prefix')}</span> {t('privacyPage.s5Item3')}</li>
-                <li>• <span className="font-medium">{t('privacyPage.s5Item4Prefix')}</span> {t('privacyPage.s5Item4')}</li>
-              </ul>
-              <p className="mt-3 text-sm">{t('privacyPage.s5Note')}</p>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s6Title')}</h2>
-              <p className="mb-3">{t('privacyPage.s6Intro')}</p>
-              <div className="space-y-4">
-                <div>
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s6Session')}</p>
-                  <ul className="space-y-1 text-sm ml-4">
-                    <li>• {t('privacyPage.s6Session1')}</li>
-                    <li>• {t('privacyPage.s6Session2')}</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s6Analytics')}</p>
-                  <ul className="space-y-1 text-sm ml-4">
-                    <li>• {t('privacyPage.s6Analytics1')}</li>
-                    <li>• {t('privacyPage.s6Analytics2')}</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="font-medium text-ink mb-1">{t('privacyPage.s6WhatWeDoNot')}</p>
-                  <ul className="space-y-1 text-sm ml-4">
-                    <li>• {t('privacyPage.s6Not1')}</li>
-                    <li>• {t('privacyPage.s6Not2')}</li>
-                    <li>• {t('privacyPage.s6Not3')}</li>
-                  </ul>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s7Title')}</h2>
-              <p className="mb-3">{t('privacyPage.s7Intro')}</p>
-              <ul className="space-y-2 ml-4">
-                <li>• <span className="font-medium">{t('privacyPage.s7Access')}</span> {t('privacyPage.s7AccessDesc')}</li>
-                <li>• <span className="font-medium">{t('privacyPage.s7Delete')}</span> {t('privacyPage.s7DeleteDesc')}</li>
-                <li>• <span className="font-medium">{t('privacyPage.s7Correct')}</span> {t('privacyPage.s7CorrectDesc')}</li>
-                <li>• <span className="font-medium">{t('privacyPage.s7Export')}</span> {t('privacyPage.s7ExportDesc')}</li>
-                <li>• <span className="font-medium">{t('privacyPage.s7Object')}</span> {t('privacyPage.s7ObjectDesc')}</li>
-              </ul>
-              <p className="mt-3 text-sm">
-                {t('privacyPage.s7Contact', { email: 'hello@termlift.com' })}
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s8Title')}</h2>
-              <p>
-                {t('privacyPage.s8Text')}
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s9Title')}</h2>
-              <p>
-                {t('privacyPage.s9Text')}
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s10Title')}</h2>
-              <p>
-                {t('privacyPage.s10Text')}
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold text-ink mb-3" style={{ fontFamily: "var(--font-sora), sans-serif" }}>{t('privacyPage.s11Title')}</h2>
-              <div className="bg-ground rounded-lg border border-line p-5">
-                <p className="text-sm">
-                  <span className="font-medium">{t('privacyPage.s11Privacy')}</span>{' '}
-                  <a href="mailto:hello@termlift.com" className="text-green-deep hover:underline">hello@termlift.com</a>
-                </p>
-                <p className="text-sm mt-1">
-                  <span className="font-medium">{t('privacyPage.s11Data')}</span>{' '}
-                  <a href="mailto:hello@termlift.com" className="text-green-deep hover:underline">hello@termlift.com</a>
-                </p>
-                <p className="text-sm mt-1">
-                  <span className="font-medium">{t('privacyPage.s11General')}</span>{' '}
-                  <a href="mailto:hello@termlift.com" className="text-green-deep hover:underline">hello@termlift.com</a>
-                </p>
-              </div>
-            </section>
-
-          </div>
-        </div>
-      </main>
-
-      <MarketingFooter />
-    </div>
+    <MarketingPage>
+      <PageHero eyebrow={t('badge')} title={t('title')} lead={t('lead')} meta={l('lastUpdated', { date: updated })} narrow />
+      <LegalDoc sections={sections} tocLabel={l('toc')} intro={intro} />
+    </MarketingPage>
   )
 }
