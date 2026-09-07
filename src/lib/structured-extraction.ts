@@ -38,6 +38,7 @@ type AnalysisLike = {
   snapshot?: { vendor_product?: string | null; term?: string | null; total_commitment?: string | null; currency?: string | null; billing_payment?: string | null; pricing_model?: string | null; deal_type?: string | null } | null
   classification?: { quote_type?: string | null; deal_size_bracket?: string | null } | null
   benchmark_input?: { quantity?: number | null; unit_price?: number | null; list_unit_price?: number | null; term_months?: number | null } | null
+  quote_facts?: { quantity?: number | null; unit_price?: number | null; list_unit_price?: number | null; term_months?: number | null; pricing_metric?: string | null; main_line_description?: string | null; checks?: { unit_price?: string } } | null
 }
 
 const str = (v: unknown): string | null => (typeof v === 'string' && v.trim() && !/^(not specified|unknown|n\/a)$/i.test(v.trim()) ? v.trim() : null)
@@ -52,6 +53,9 @@ export function toStructuredExtraction(output: unknown, now = new Date()): Struc
   const currency = str(s.currency)?.toUpperCase() ?? (money?.currency ? String(money.currency).toUpperCase() : null)
   const termRaw = str(s.term)
   const bi = o.benchmark_input || null
+  // Validated facts from the extraction call come first; the Full Analysis extractor is the fallback.
+  const qf = o.quote_facts || null
+  const qfUnit = qf && qf.checks?.unit_price !== 'dropped' ? num(qf.unit_price) : null
 
   const out: StructuredExtraction = {
     version: 1,
@@ -64,12 +68,12 @@ export function toStructuredExtraction(output: unknown, now = new Date()): Struc
     deal_size_bracket: str(o.classification?.deal_size_bracket),
     deal_type: str(s.deal_type),
     total_commitment: { raw: totalRaw, amount, currency },
-    term: { raw: termRaw, months: num(bi?.term_months) ?? termToMonths(termRaw) },
+    term: { raw: termRaw, months: num(qf?.term_months) ?? num(bi?.term_months) ?? termToMonths(termRaw) },
     pricing_model: str(s.pricing_model),
     billing: str(s.billing_payment),
-    quantity: num(bi?.quantity),
-    unit_price: num(bi?.unit_price),
-    list_price: num(bi?.list_unit_price),
+    quantity: num(qf?.quantity) ?? num(bi?.quantity),
+    unit_price: qfUnit ?? num(bi?.unit_price),
+    list_price: num(qf?.list_unit_price) ?? num(bi?.list_unit_price),
     missing: [],
   }
   const checks: Array<[string, unknown]> = [

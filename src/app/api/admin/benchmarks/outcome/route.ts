@@ -26,7 +26,7 @@ async function loadFacts(dealId: string) {
   const { data: deal } = await admin.from('deals').select(DEAL_COLUMNS).eq('id', dealId).single()
   if (!deal) return null
   const { data: round } = await admin.from('rounds').select('output_json, extracted_data').eq('deal_id', dealId).order('round_number', { ascending: false }).limit(1).maybeSingle()
-  const output = (round?.output_json || {}) as { snapshot?: { currency?: string; total_commitment?: string }; benchmark_input?: BenchmarkInput | null }
+  const output = (round?.output_json || {}) as { snapshot?: { currency?: string; total_commitment?: string }; benchmark_input?: BenchmarkInput | null; quote_facts?: unknown }
   const extraction = (round?.extracted_data as StructuredExtraction | null) ?? null
   const currency = extraction?.total_commitment.currency || output.snapshot?.currency || null
   const products = deal.vendor ? await loadProducts(vendorKey(deal.vendor)) : []
@@ -42,7 +42,10 @@ async function loadFacts(dealId: string) {
     output.benchmark_input ?? null,
     products,
   )
-  return { status: deal.status as string, provenance, mapping, extractionPresent: !!extraction, benchmarkInputPresent: !!output.benchmark_input }
+  // Analysed before validated quote facts existed (2026-09-08): the stored total was never
+  // cross-checked against printed line totals, so it must be verified by hand before ingestion.
+  const historical = !output.quote_facts
+  return { status: deal.status as string, provenance, mapping, extractionPresent: !!extraction, benchmarkInputPresent: !!output.benchmark_input, historical }
 }
 
 export async function GET(request: Request) {
@@ -53,8 +56,8 @@ export async function GET(request: Request) {
   const facts = await loadFacts(dealId)
   if (!facts) return NextResponse.json({ error: 'Deal not found' }, { status: 404 })
   if (facts.status !== 'closed_won') return NextResponse.json({ error: 'Only deals closed as won can become observations' }, { status: 409 })
-  const { mapping, provenance, extractionPresent, benchmarkInputPresent } = facts
-  return NextResponse.json({ mapping, provenance: provenance ?? 'inferred', maxVerification: verificationForProvenance(provenance).level, extractionPresent, benchmarkInputPresent })
+  const { mapping, provenance, extractionPresent, benchmarkInputPresent, historical } = facts
+  return NextResponse.json({ mapping, provenance: provenance ?? 'inferred', maxVerification: verificationForProvenance(provenance).level, extractionPresent, benchmarkInputPresent, historical })
 }
 
 /**

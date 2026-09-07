@@ -16,7 +16,7 @@ const field = 'w-full h-9 px-3 text-[13px] text-ink bg-surface border border-lin
 const TIER_LABEL: Record<string, string> = { inferred: 'Inferred', user_confirmed: 'User-confirmed', document_verified: 'Document-verified' }
 const LEVEL_LABEL: Record<string, string> = { unverified: 'unverified', plausible: 'plausible', verified: 'verified' }
 
-type Preview = { mapping: OutcomeMapping; provenance: string; maxVerification: 'unverified' | 'plausible' | 'verified'; extractionPresent: boolean; benchmarkInputPresent: boolean }
+type Preview = { mapping: OutcomeMapping; provenance: string; maxVerification: 'unverified' | 'plausible' | 'verified'; extractionPresent: boolean; benchmarkInputPresent: boolean; historical?: boolean }
 
 /**
  * Admin review before a closed-won deal becomes one benchmark observation.
@@ -88,6 +88,9 @@ export function RecordObservationModal({ dealId, onClose }: Props) {
                 <span>→ saved as <b className="text-ink">{LEVEL_LABEL[preview.maxVerification]}</b>. The tier comes from how the final total was established and cannot be raised here.</span>
               </div>
 
+              {preview.historical && (
+                <p className="text-[13px] text-ink bg-warn-soft border border-warn-line rounded-[10px] px-3.5 py-3"><b>Historical deal.</b> Analysed before quote totals were cross-checked against printed line totals. Verify the initial quote and final price against the source document by hand before saving.</p>
+              )}
               {preview.mapping.blockers.length > 0 && (
                 <p className="text-[13.5px] text-risk bg-risk-soft border border-risk-line rounded-[10px] px-3.5 py-3">Cannot build an observation: missing {preview.mapping.blockers.join(', ')}. Reopen the deal and close it with a confirmed final total.</p>
               )}

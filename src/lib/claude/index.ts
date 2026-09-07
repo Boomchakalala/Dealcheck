@@ -28,6 +28,7 @@ import { classifyQuote } from './classify'
 import { extractFinancialFacts, type ExtractedFacts } from './extract'
 import { analyzeFastCore } from './fast-analyze'
 import { validateTotalCommitment } from './validate-total'
+import { buildQuoteFacts, reconcileTotalWithLines } from '@/lib/quote-facts'
 import { DealOutputSchema, type DealOutputType, type QuoteClassificationType } from '../schemas'
 import { computeScores, normalizeExtraction, scoreLabel } from '../scoring'
 import { parseMoney, normalizeAmount } from '../currency'
@@ -94,6 +95,19 @@ export async function analyzeDeal(
       rawFacts.total_commitment = validation.total
       console.log('[TermLift] Step 1b: Total overridden to:', validation.total)
     }
+    // ─── Step 1c: Cross-check the total against printed line totals ───
+    // Overrides only when the document itself prints the line sum as a total; otherwise records the discrepancy.
+    const lineCheck = reconcileTotalWithLines(rawFacts.total_commitment, rawFacts.printed_line_totals, extractedText)
+    if (lineCheck.corrected) {
+      rawFacts.total_commitment = lineCheck.total
+      console.warn('[TermLift] Step 1c: Total corrected from printed line totals:', lineCheck.note)
+    } else if (lineCheck.note) {
+      console.warn('[TermLift] Step 1c:', lineCheck.note)
+    }
+    // Validated structured facts — the only place quantity / unit price / list price are trusted.
+    const quoteFacts = buildQuoteFacts(rawFacts)
+    if (lineCheck.note) quoteFacts.notes.push(lineCheck.note)
+    if (lineCheck.corrected) quoteFacts.checks.total = 'corrected'
 
     // ─── Step 2: FAST core analysis ───
     // Deliberately trimmed sibling of analyzeDealFacts() (see fast-analyze.ts) —
@@ -204,6 +218,9 @@ export async function analyzeDeal(
       // instead of re-running classifyQuote() — same non-schema attach
       // pattern as everything else above.
       classification,
+      // Validated commercial facts (lib/quote-facts.ts) — persisted with the
+      // round so outcomes can be compared later without the quote text.
+      quote_facts: quoteFacts,
       deep_analysis_status: 'idle' as const,
     }
     console.log(`[TermLift timing] Step 4 (validate + score, in-process, no DB): ${Date.now() - assembleStart}ms`)

@@ -8,6 +8,7 @@ import type { QuoteClassificationType } from '@/lib/schemas'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { runWithAiContext } from '@/lib/ai-telemetry'
 import { extractBenchmarkInput } from '@/lib/claude/benchmark-input'
+import { benchmarkInputFromQuoteFacts, quoteFactsSufficient } from '@/lib/benchmark/from-quote-facts'
 import { computeMarketBenchmark, type BenchmarkRun } from '@/lib/benchmark/service'
 import { clampInterpretation } from '@/lib/benchmark/interpret'
 import { toStructuredExtraction } from '@/lib/structured-extraction'
@@ -128,10 +129,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
         // Any failure here is logged and Deep Analysis proceeds without a benchmark.
         let benchmarkInput: BenchmarkInput | null = null
         let benchmarkRun: BenchmarkRun | null = null
-        try {
-          benchmarkInput = await extractBenchmarkInput(round.extracted_text, output.snapshot || {})
-        } catch (e) {
-          console.warn('[TermLift] Benchmark input extraction failed (continuing without):', e instanceof Error ? e.message : e)
+        // Quote facts validated at analysis time come first — no extra call.
+        // The Haiku extractor runs only when they lack the numbers it would add.
+        benchmarkInput = benchmarkInputFromQuoteFacts(output.quote_facts)
+        if (!quoteFactsSufficient(output.quote_facts)) {
+          try {
+            const fallback = await extractBenchmarkInput(round.extracted_text, output.snapshot || {})
+            benchmarkInput = benchmarkInput
+              ? { ...fallback, quantity: benchmarkInput.quantity ?? fallback.quantity, unit_price: benchmarkInput.unit_price ?? fallback.unit_price, unit_price_period: benchmarkInput.unit_price ? benchmarkInput.unit_price_period : fallback.unit_price_period, term_months: benchmarkInput.term_months ?? fallback.term_months, list_unit_price: benchmarkInput.list_unit_price ?? fallback.list_unit_price, pricing_metric: benchmarkInput.pricing_metric ?? fallback.pricing_metric, extraction_notes: [benchmarkInput.extraction_notes, fallback.extraction_notes].filter(Boolean).join(' · ') }
+              : fallback
+          } catch (e) {
+            console.warn('[TermLift] Benchmark input extraction failed (continuing without):', e instanceof Error ? e.message : e)
+          }
         }
         try {
           benchmarkRun = await computeMarketBenchmark({

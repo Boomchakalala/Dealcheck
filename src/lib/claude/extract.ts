@@ -31,6 +31,19 @@ EXTRACT THESE FIELDS:
 11. renewal_date: If stated, otherwise omit
 12. signing_deadline: If stated, otherwise omit
 
+STRUCTURED COMMERCIAL FACTS (optional — copy printed figures only, never compute):
+13. main_line: the single highest-value priced line as PRINTED on the document, if the document itemises lines:
+   - description: the line's own wording
+   - quantity: the printed quantity or seat/user/unit count as a JSON number
+   - unit_price: the printed unit price as a JSON number, no currency symbol, no thousands separators
+   - unit_period: what that unit price covers, exactly one of "month", "year", "term", "one_time" ("term" = the price covers the whole contract term)
+   - list_unit_price: the printed list / catalogue / undiscounted unit price for that line as a JSON number, ONLY if the document prints one
+   - line_total: the printed total for that line as a JSON number
+   Omit any sub-field that is not printed. Omit main_line entirely if the document shows only one total with no lines.
+14. printed_line_totals: JSON array of every per-line total printed on the document (numbers). Omit if there are no itemised lines.
+15. term_months: the contract length in whole months as a JSON number, ONLY if the document states a duration ("24 months", "3 years", "annual" = 12). Omit if not stated.
+16. pricing_metric: exactly one of "per_seat_month", "per_seat_year", "per_host_month", "per_host_year", "per_gb_month", "per_unit", "per_hour", "flat_annual", "flat_total". Omit if unclear.
+
 Return ONLY valid JSON:
 {
   "vendor": "Company Name",
@@ -45,7 +58,11 @@ Return ONLY valid JSON:
   "deal_type": "Renewal",
   "contact_name": "Sarah",
   "renewal_date": "March 15, 2026",
-  "signing_deadline": "February 28, 2026"
+  "signing_deadline": "February 28, 2026",
+  "main_line": { "description": "Enterprise plan, per user", "quantity": 120, "unit_price": 11.35, "unit_period": "month", "list_unit_price": 15, "line_total": 16344 },
+  "printed_line_totals": [16344],
+  "term_months": 12,
+  "pricing_metric": "per_seat_month"
 }
 
 RULES:
@@ -53,7 +70,8 @@ RULES:
 - Do NOT invent, assume, or calculate values not present
 - If a field is not stated, omit it from the output
 - For total_commitment: if you cannot determine it, set to the stated amount with the currency symbol
-- NEVER multiply a stated total by the term length`
+- NEVER multiply a stated total by the term length
+- Numeric fields (quantity, unit_price, list_unit_price, line_total, printed_line_totals, term_months) must be plain JSON numbers copied from the document, never derived`
 
 export interface ExtractedFacts {
   vendor: string
@@ -69,6 +87,19 @@ export interface ExtractedFacts {
   contact_name?: string
   renewal_date?: string
   signing_deadline?: string
+  // ── Structured commercial facts (2026-09-08). Raw model output; only
+  //    lib/quote-facts.ts turns these into trusted values.
+  main_line?: {
+    description?: string
+    quantity?: number
+    unit_price?: number
+    unit_period?: 'month' | 'year' | 'term' | 'one_time'
+    list_unit_price?: number
+    line_total?: number
+  }
+  printed_line_totals?: number[]
+  term_months?: number
+  pricing_metric?: string
 }
 
 export async function extractFinancialFacts(

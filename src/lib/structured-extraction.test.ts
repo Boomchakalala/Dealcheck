@@ -36,6 +36,18 @@ describe('toStructuredExtraction', () => {
     expect(x.missing).toEqual(['list_price'])
   })
 
+  it('prefers validated quote_facts over the Full Analysis extractor, and ignores a dropped unit price', () => {
+    const withFacts = { ...output, quote_facts: { quantity: 750, unit_price: 34.91, list_unit_price: 56.4, term_months: 24, pricing_metric: 'per_seat_year', checks: { unit_price: 'verified' } }, benchmark_input: { quantity: 700, unit_price: 99, list_unit_price: null, term_months: 12 } }
+    const x = toStructuredExtraction(withFacts)
+    expect(x.quantity).toBe(750)
+    expect(x.unit_price).toBe(34.91)
+    expect(x.list_price).toBe(56.4)
+    expect(x.term.months).toBe(24)
+    const dropped = toStructuredExtraction({ ...output, quote_facts: { quantity: 750, unit_price: 1737.5, checks: { unit_price: 'dropped' } } })
+    expect(dropped.unit_price).toBeNull()
+    expect(dropped.quantity).toBe(750)
+  })
+
   it('never carries names or free text about people', () => {
     const json = JSON.stringify(toStructuredExtraction(output))
     expect(json).not.toMatch(/Jane|Kevin|contact|description/)

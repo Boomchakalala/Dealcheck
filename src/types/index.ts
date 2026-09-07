@@ -252,6 +252,8 @@ export type DealOutput = {
   // ── Market Benchmark (Deep Analysis only; all optional, absent on older deals) ──
   /** Structured facts pulled from the quote for benchmark matching. */
   benchmark_input?: import('@/lib/benchmark/types').BenchmarkInput
+  /** Validated structured commercial facts from the quote (lib/quote-facts.ts). Written by the analysis pipeline on every round. */
+  quote_facts?: import('@/lib/quote-facts').QuoteFacts
   /** Deterministic engine output — the source of truth for every benchmark number shown. */
   market_benchmark?: import('@/lib/benchmark/types').BenchmarkResult
   /** The query the engine ran (reproducibility). */
