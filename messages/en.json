@@ -20,15 +20,16 @@
     "account": "Account",
     "collapse": "Collapse",
     "expand": "Expand sidebar",
-    "adminNegotiations": "Negotiations (admin)",
-    "adminAiUsage": "AI usage (admin)",
+    "adminNegotiations": "Negotiations",
+    "adminAiUsage": "AI usage",
     "freeUsed": "{used} of {limit} free analyses used",
     "demoSignup": "Sign up to use it for real",
     "newShort": "New",
     "accountShort": "Account",
     "signUpShort": "Sign up",
-    "adminBenchmarks": "Benchmarks (admin)",
-    "adminShort": "Admin"
+    "adminBenchmarks": "Benchmarks",
+    "adminShort": "Admin",
+    "admin": "Admin"
   },
   "hero": {
     "badge": "Procurement-grade quote review",
@@ -773,7 +774,8 @@
       "f4": "Ready-to-send email, tone-matched, {n} regenerations",
       "f5": "Unlimited rounds on this deal",
       "cta": "Start with a free analysis",
-      "early": "Early access: every Deep Analysis is free until {date}. After that, your first one stays free."
+      "early": "Early access: every Deep Analysis is free until {date}. After that, your first one stays free.",
+      "freeNow": "Free until {date}"
     },
     "faqTitle": "Pricing FAQ",
     "eyebrow": "Pricing",
@@ -803,7 +805,17 @@
       "cta": "Request a negotiation"
     },
     "foot": "{n} free quick analyses per account. Quote files are read in memory and never stored.",
-    "faqEyebrow": "Common questions"
+    "faqEyebrow": "Common questions",
+    "faq1q": "Is the quick analysis really free?",
+    "faq1a": "Yes. Every account gets free quick analyses: the deal score, every red flag with its severity, the savings range and what is already solid. No card, no trial clock.",
+    "faq2q": "What does Deep Analysis cost?",
+    "faq2a": "{price} per deal, one time. It covers the full negotiation playbook, must-have and nice-to-have asks with fallbacks, the ready-to-send email with regenerations, and every later round on that deal. During early access, until {date}, it is free, and your first Deep Analysis stays free after that.",
+    "faq3q": "How is the negotiation service priced?",
+    "faq3a": "Success-based: {pct}% of the savings TermLift verifies against your original quote, with a minimum of {min}. No savings, no fee. Nothing is agreed with the vendor without your approval.",
+    "faq4q": "Do I need a credit card to start?",
+    "faq4a": "No. Quick analyses and, during early access, Deep Analysis need no payment details. The negotiation service is invoiced after the deal closes.",
+    "faq5q": "Can I stop at any step?",
+    "faq5a": "Yes. Every deal moves along the same ladder and you can stop wherever you like: read the quick analysis, unlock Deep Analysis on the deals that matter, negotiate yourself, or hand one deal to TermLift. You can also delete any deal or your whole account at any time."
   },
   "privacyPage": {
     "badge": "Legal",

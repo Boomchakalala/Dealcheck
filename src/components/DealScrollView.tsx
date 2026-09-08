@@ -156,6 +156,7 @@ export function DealScrollView(props: DealScrollViewProps) {
     hasNegotiationRequest = false,
     savedNegotiationContext,
     fullAnalysis,
+    flowPhase,
   } = props
 
   const o = latestOutput as DealOutput
@@ -633,7 +634,7 @@ export function DealScrollView(props: DealScrollViewProps) {
               </div>
 
               {/* Savings impact */}
-              {(savingsData.mustHave.length > 0 || savingsData.niceToHave.length > 0) && (() => {
+              {savingsData.total > 0 && (savingsData.mustHave.length > 0 || savingsData.niceToHave.length > 0) && (() => {
                 const dealTotalNum = parseMoney(totalCommitment || '0').amount
                 const afterAmt = Math.max(0, dealTotalNum - savingsData.total)
                 const pct = dealTotalNum > 0 ? Math.min(Math.round((savingsData.total / dealTotalNum) * 100), 50) : 0
@@ -707,7 +708,8 @@ export function DealScrollView(props: DealScrollViewProps) {
       )}
 
       {/* ═══ 3. EMAIL — Step 3. Rendered only once step 2 exists (trial keeps its teaser). ═══ */}
-      {(stepsUnlocked || !showFullPlaybook) && (
+      {/* While TermLift runs the negotiation the self-serve email prep is not the next step; an email already generated stays visible. */}
+      {(stepsUnlocked || !showFullPlaybook) && !(flowPhase === 'termlift' && !hasEmail) && (
       <section id="email-section" className="scroll-mt-[196px]">
         {!showFullPlaybook ? (
           <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Mail} variant="email" />
@@ -732,10 +734,15 @@ export function DealScrollView(props: DealScrollViewProps) {
                   ? { amount: prev.vendor_offer.amount as number, currency: prev.vendor_offer.currency as string | null }
                   : { amount: (prev.extracted_data?.total_commitment?.amount as number | undefined) ?? (prev.output_json?.snapshot?.total_commitment ? parseMoney(String(prev.output_json.snapshot.total_commitment)).amount || null : null), currency: (prev.extracted_data?.total_commitment?.currency as string | undefined) ?? (prev.output_json?.snapshot?.currency as string | undefined) ?? null })
                 : null
-              return (
+              // A recorded figure earns its own card; the "record it" prompt alone does not.
+              return latest.vendor_offer?.amount != null ? (
                 <Card className="mb-3 py-3">
                   <VendorOfferField roundId={latest.id} offer={latest.vendor_offer ?? null} previous={prevFigure} fr={fr} />
                 </Card>
+              ) : (
+                <div className="mb-3 px-1">
+                  <VendorOfferField roundId={latest.id} offer={latest.vendor_offer ?? null} previous={prevFigure} fr={fr} />
+                </div>
               )
             })()}
             {sortedRounds.length > 1 && (o as any)?.round_delta && <RoundDeltaCard d={(o as any).round_delta as RoundDelta} fr={fr} />}
@@ -764,7 +771,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                   <span className="tl-label text-ink-3 shrink-0">{fr ? 'Objet' : 'Subject'}</span>
                   <input type="text" value={emailSubjects[emailTab]} onChange={(e) => { const n = [...emailSubjects]; n[emailTab] = e.target.value; setEmailSubjects(n) }} className="flex-1 min-w-0 text-[13.5px] font-semibold text-ink bg-transparent border-none focus:outline-none p-0" />
                 </div>
-                <textarea value={emailBodies[emailTab]} onChange={(e) => { const n = [...emailBodies]; n[emailTab] = e.target.value; setEmailBodies(n) }} rows={14} className="w-full text-[13.5px] text-ink leading-[1.65] bg-surface px-5 py-4 border-0 resize-y focus:outline-none focus:bg-surface-2" />
+                <textarea value={emailBodies[emailTab]} onChange={(e) => { const n = [...emailBodies]; n[emailTab] = e.target.value; setEmailBodies(n) }} rows={8} className="w-full min-h-[200px] field-sizing-content text-[13.5px] text-ink leading-[1.65] bg-surface px-5 py-4 border-0 resize-y focus:outline-none focus:bg-surface-2" />
                 <div className="px-5 py-3 border-t border-line flex flex-wrap items-center gap-2">
                   <Btn variant="primary" size="sm" onClick={() => { setCopiedEmail(true); navigator.clipboard.writeText(emailBodies[emailTab]); setTimeout(() => setCopiedEmail(false), 2000) }}>{copiedEmail ? <><CheckCircle2 className="w-3.5 h-3.5" />{fr ? 'Copié' : 'Copied'}</> : <><Copy className="w-3.5 h-3.5" />{fr ? 'Copier l’e-mail' : 'Copy email'}</>}</Btn>
                   <Btn variant="ghost" size="sm" onClick={() => { window.location.href = `mailto:?subject=${encodeURIComponent(emailSubjects[emailTab])}&body=${encodeURIComponent(emailBodies[emailTab])}` }}><Send className="w-3.5 h-3.5" />{t('output.openInEmailClient')}</Btn>

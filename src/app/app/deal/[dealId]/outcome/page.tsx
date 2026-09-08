@@ -107,13 +107,13 @@ export default async function OutcomePage({ params }: { params: Promise<{ dealId
             {wins.length === 0 ? <p className="text-[13px] text-ink-3">{t('noWins')}</p> : (
               <div className="flex flex-col gap-2">
                 {wins.map((w, i) => (
-                  <div key={i} className="flex items-start gap-3 rounded-[10px] border border-line bg-surface-2 px-3.5 py-3">
+                  <div key={i} className="flex flex-wrap sm:flex-nowrap items-start gap-3 rounded-[10px] border border-line bg-surface-2 px-3.5 py-3">
                     <CheckCircle2 className="w-4 h-4 text-green-deep shrink-0 mt-0.5" />
                     <div className="flex-1 min-w-0">
                       <Chip tone={CAT_TONE[w.category] || 'neutral'} mono className="mb-1.5">{w.category}</Chip>
                       <p className="text-[13px] text-ink font-medium leading-snug break-words">{w.description}</p>
                     </div>
-                    {w.financial_impact && <span className="font-display font-bold text-[13px] text-green-deep shrink-0 tl-num">{w.financial_impact}</span>}
+                    {w.financial_impact && <span className="font-display font-bold text-[13px] text-green-deep shrink-0 tl-num basis-full pl-7 sm:basis-auto sm:pl-0 sm:max-w-[40%] sm:text-right">{w.financial_impact}</span>}
                   </div>
                 ))}
               </div>

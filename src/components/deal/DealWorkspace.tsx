@@ -404,12 +404,9 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
         )}
 
         {/* ── TermLift negotiation status (only when a request exists; the offer itself lives inside step 3) ── */}
-        {!isTrial && !closed && openRequest && (
-          waitingOnClient ? (
-            <GateCard tone="warn" eyebrow={t('dealPage.handoffWaitingEyebrow')} title={t('dealPage.handoffWaitingTitle')} body={t('dealPage.handoffWaitingBody')} action={<Btn href={negotiationPageHref} variant="ink">{t('dealPage.handoffOpen')}</Btn>} />
-          ) : (
-            <GateCard tone="neutral" eyebrow={t('dealPage.handoffWaitingEyebrow')} title={t('dealPage.handoffActiveTitle')} body={t('dealPage.handoffActiveBody')} action={<Btn href={negotiationPageHref} variant="ghost">{t('dealPage.handoffOpen')}</Btn>} />
-          )
+        {/* The active-handoff state is already the NextActionCard at the top; only "waiting on you" earns a second card. */}
+        {!isTrial && !closed && openRequest && waitingOnClient && (
+          <GateCard tone="warn" eyebrow={t('dealPage.handoffWaitingEyebrow')} title={t('dealPage.handoffWaitingTitle')} body={t('dealPage.handoffWaitingBody')} action={<Btn href={negotiationPageHref} variant="ink">{t('dealPage.handoffOpen')}</Btn>} />
         )}
         {isTrial && (
           <GateCard tone="green" title={t('dealPage.trialKeepTitle')} body={t('dealPage.trialKeepBody')} action={<Btn href="/login?from=trial" variant="primary">{t('dealPage.trialCta')}</Btn>} />

@@ -65,10 +65,13 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, linkBas
   const workspace: Item[] = [
     { href: linkBase, icon: FileText, label: t('nav.deals'), badge: needsYou, tone: 'warn' },
     ...(demoMode ? [] : [{ href: `${linkBase}/vendors`, icon: Building2, label: t('nav.vendors') }]),
-    ...(isAdmin && !demoMode ? [{ href: '/app/admin/negotiations', icon: Briefcase, label: t('nav.adminNegotiations'), badge: adminUnread, tone: 'risk' as const }] : []),
-    ...(isAdmin && !demoMode ? [{ href: '/app/admin/ai-usage', icon: Gauge, label: t('nav.adminAiUsage') }] : []),
-    ...(isAdmin && !demoMode ? [{ href: '/app/admin/benchmarks', icon: BarChart3, label: t('nav.adminBenchmarks') }] : []),
   ]
+  // Admin tools get their own section so the labels no longer need an "(admin)" suffix that truncated at 220px.
+  const admin: Item[] = isAdmin && !demoMode ? [
+    { href: '/app/admin/negotiations', icon: Briefcase, label: t('nav.adminNegotiations'), badge: adminUnread, tone: 'risk' as const },
+    { href: '/app/admin/ai-usage', icon: Gauge, label: t('nav.adminAiUsage') },
+    { href: '/app/admin/benchmarks', icon: BarChart3, label: t('nav.adminBenchmarks') },
+  ] : []
   const account: Item[] = [
     { href: `${linkBase}/settings`, icon: Settings, label: t('nav.settings') },
     { href: demoMode ? '/help' : `${linkBase}/help`, icon: HelpCircle, label: t('nav.help') },
@@ -130,6 +133,12 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, linkBas
           {!collapsed && <p className="tl-label text-ink-3 px-2.5 mb-1.5 text-[10px]">{t('nav.workspace')}</p>}
           {workspace.map((it) => <NavLink key={it.href} item={it} />)}
         </nav>
+        {admin.length > 0 && (
+          <nav className={cn('mt-5 space-y-0.5', collapsed ? 'px-2' : 'px-3')} aria-label="Admin">
+            {!collapsed && <p className="tl-label text-ink-3 px-2.5 mb-1.5 text-[10px]">{t('nav.admin')}</p>}
+            {admin.map((it) => <NavLink key={it.href} item={it} />)}
+          </nav>
+        )}
         <nav className={cn('mt-5 space-y-0.5', collapsed ? 'px-2' : 'px-3')} aria-label="Account">
           {!collapsed && <p className="tl-label text-ink-3 px-2.5 mb-1.5 text-[10px]">{t('nav.account')}</p>}
           {account.map((it) => <NavLink key={it.href} item={it} />)}
@@ -194,8 +203,8 @@ export function AppSidebar({ userEmail, isUpgraded, usageCount, isAdmin, linkBas
         <div className="md:hidden fixed inset-0 z-40" onClick={() => setShowAdminSheet(false)}>
           <div className="absolute inset-0 bg-ink/30" />
           <div className="absolute left-3 right-3 bottom-[72px] bg-surface rounded-[14px] border border-line shadow-lg py-1.5" onClick={(e) => e.stopPropagation()}>
-            <p className="tl-label text-ink-3 px-4 pt-2 pb-1">Admin</p>
-            {workspace.filter((it) => it.href.startsWith('/app/admin')).map((it) => (
+            <p className="tl-label text-ink-3 px-4 pt-2 pb-1">{t('nav.admin')}</p>
+            {admin.map((it) => (
               <Link key={it.href} href={it.href} onClick={() => setShowAdminSheet(false)} className={cn('flex items-center gap-2.5 px-4 py-2.5 text-[14px] font-medium no-underline', isActive(it.href) ? 'text-green-deep' : 'text-ink')}>
                 <it.icon className={cn('w-4 h-4', isActive(it.href) ? 'text-green-deep' : 'text-ink-3')} />
                 <span className="flex-1">{it.label}</span>

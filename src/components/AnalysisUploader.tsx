@@ -304,10 +304,10 @@ export function AnalysisUploader({
             <button
               onClick={() => setShowContextField(!showContextField)}
               disabled={analyzing}
-              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink-3 hover:text-green-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-left text-[13px] font-semibold text-ink-3 hover:text-green-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Plus className={`w-3.5 h-3.5 transition-transform ${showContextField ? 'rotate-45' : ''}`} />
-              Add context
+              <span className="whitespace-nowrap">Add context</span>
               {!showContextField && <span className="text-[11px] font-normal text-ink-3">— optional, anything the AI can&apos;t see in the quote</span>}
             </button>
             {showContextField && (

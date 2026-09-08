@@ -388,7 +388,7 @@ export function SettingsClient({
                 <div>
                   <p className="text-[12px] font-medium text-ink-3 mb-3">{t('settingsClient.language')}</p>
                   <div className="grid grid-cols-2 gap-3">
-                    {[{ val: 'en', flag: '\uD83C\uDDEC\uD83C\uDDE7', name: 'English' }, { val: 'fr', flag: '\uD83C\uDDEB\uD83C\uDDF7', name: 'Francais' }].map((l) => (
+                    {[{ val: 'en', flag: '\uD83C\uDDEC\uD83C\uDDE7', name: 'English' }, { val: 'fr', flag: '\uD83C\uDDEB\uD83C\uDDF7', name: 'Français' }].map((l) => (
                       <button
                         key={l.val}
                         onClick={() => handleLanguageChange(l.val)}

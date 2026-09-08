@@ -20,15 +20,16 @@
     "account": "Compte",
     "collapse": "Réduire",
     "expand": "Déployer le menu",
-    "adminNegotiations": "Négociations (admin)",
-    "adminAiUsage": "Usage IA (admin)",
+    "adminNegotiations": "Négociations",
+    "adminAiUsage": "Usage IA",
     "freeUsed": "{used} analyse(s) gratuite(s) sur {limit} utilisée(s)",
     "demoSignup": "Créer un compte pour l'utiliser vraiment",
     "newShort": "Nouveau",
     "accountShort": "Compte",
     "signUpShort": "S'inscrire",
-    "adminBenchmarks": "Benchmarks (admin)",
-    "adminShort": "Admin"
+    "adminBenchmarks": "Benchmarks",
+    "adminShort": "Admin",
+    "admin": "Admin"
   },
   "hero": {
     "badge": "Votre expert achats, en un clic",
@@ -773,7 +774,8 @@
       "f4": "E-mail prêt à envoyer, dans le bon ton, {n} régénérations",
       "f5": "Tours illimités sur ce dossier",
       "cta": "Commencer par une analyse gratuite",
-      "early": "Accès anticipé : chaque Analyse approfondie est gratuite jusqu’au {date}. Ensuite, la première reste offerte."
+      "early": "Accès anticipé : chaque Analyse approfondie est gratuite jusqu’au {date}. Ensuite, la première reste offerte.",
+      "freeNow": "Gratuit jusqu’au {date}"
     },
     "faqTitle": "FAQ tarifs",
     "eyebrow": "Tarifs",
@@ -803,7 +805,17 @@
       "cta": "Demander une négociation"
     },
     "foot": "{n} analyses rapides gratuites par compte. Les fichiers de devis sont lus en mémoire et jamais stockés.",
-    "faqEyebrow": "Questions fréquentes"
+    "faqEyebrow": "Questions fréquentes",
+    "faq1q": "L’analyse rapide est-elle vraiment gratuite ?",
+    "faq1a": "Oui. Chaque compte dispose d’analyses rapides gratuites : le score du contrat, chaque point de vigilance avec sa gravité, la fourchette d’économies et ce qui est déjà solide. Pas de carte, pas d’essai à durée limitée.",
+    "faq2q": "Combien coûte l’Analyse approfondie ?",
+    "faq2a": "{price} par contrat, en une fois. Elle couvre le plan de négociation complet, les demandes indispensables et souhaitables avec leurs replis, l’e-mail prêt à envoyer avec ses régénérations, et chaque tour suivant sur ce contrat. Pendant l’accès anticipé, jusqu’au {date}, elle est gratuite, et votre première Analyse approfondie le reste ensuite.",
+    "faq3q": "Comment est facturé le service de négociation ?",
+    "faq3a": "Au succès : {pct} % des économies que TermLift vérifie par rapport à votre devis initial, avec un minimum de {min}. Pas d’économies, pas d’honoraires. Rien n’est conclu avec le fournisseur sans votre accord.",
+    "faq4q": "Faut-il une carte bancaire pour commencer ?",
+    "faq4a": "Non. Les analyses rapides et, pendant l’accès anticipé, l’Analyse approfondie ne demandent aucun moyen de paiement. Le service de négociation est facturé après la clôture du dossier.",
+    "faq5q": "Puis-je m’arrêter à n’importe quelle étape ?",
+    "faq5a": "Oui. Chaque contrat suit la même échelle et vous vous arrêtez où vous voulez : lire l’analyse rapide, débloquer l’Analyse approfondie sur les contrats qui comptent, négocier vous-même, ou confier un contrat à TermLift. Vous pouvez aussi supprimer n’importe quel contrat ou votre compte à tout moment."
   },
   "privacyPage": {
     "badge": "Juridique",

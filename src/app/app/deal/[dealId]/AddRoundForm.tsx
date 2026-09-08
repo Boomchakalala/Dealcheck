@@ -132,7 +132,7 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
   const currentText = extractedText || pastedText
 
   return (
-    <Card className="p-0 border-2 border-line border-l-4 border-l-green overflow-hidden">
+    <Card className="p-0 overflow-hidden">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
