@@ -1,0 +1,14 @@
+{
+  "dealPage": {
+    "primaryRunFull": "Unlock Full Analysis",
+    "primaryRunning": "Full Analysis running…",
+    "primaryEmail": "Prepare Round 1",
+    "primaryUploadReply": "Add vendor response",
+    "closeAside": "Agreement reached?",
+    "closeAsideCta": "Close the deal",
+    "serviceEyebrow": "TermLift negotiates · success-based",
+    "serviceTitle": "Rather not handle this yourself?",
+    "serviceBody": "A TermLift negotiator runs the back-and-forth with {vendor} and you approve every outcome. Success-based: you pay a share of verified savings, and nothing if we don’t save you money.",
+    "serviceCta": "Let TermLift negotiate it for you"
+  }
+}

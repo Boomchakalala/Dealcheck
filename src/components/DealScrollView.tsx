@@ -10,7 +10,7 @@ import { getCanOffer } from '@/lib/email-asks'
 import { hasDeepContent as computeHasDeepContent } from '@/lib/deep-analysis-status'
 import { MarketBenchmark } from '@/components/deal/MarketBenchmark'
 import { shouldRenderBenchmark } from '@/lib/benchmark/visibility'
-import { NEGOTIATION_FEE_PERCENT, FULL_ANALYSIS_EMAIL_REGEN_LIMIT, deepAnalysisPriceNote } from '@/lib/pricing'
+import { FULL_ANALYSIS_EMAIL_REGEN_LIMIT, deepAnalysisPriceNote } from '@/lib/pricing'
 import { TONE_LABELS, type EmailTone } from '@/lib/tone-recommend'
 import { getFlagSeverity } from '@/lib/deal-metrics'
 import { Btn, Card, Chip, GateCard } from '@/components/system'
@@ -69,6 +69,10 @@ interface DealScrollViewProps {
   }
   /** Redesign: the workspace header owns the primary CTA, so the trailing "Next step" card is redundant. */
   hideNextStep?: boolean
+  /** Full Analysis run, owned by the workspace so every CTA on the page triggers the same request. */
+  fullAnalysis?: { loading: boolean; error: string | null; run: () => void }
+  /** Where the guided flow says the deal is (lib/negotiation-flow.ts). */
+  flowPhase?: import('@/lib/negotiation-flow').FlowPhase
 }
 
 // ─── helpers ──────────────────────────────────────────────
@@ -151,6 +155,7 @@ export function DealScrollView(props: DealScrollViewProps) {
     negotiateHref = `/app/deal/${dealId}/negotiate`,
     hasNegotiationRequest = false,
     savedNegotiationContext,
+    fullAnalysis,
   } = props
 
   const o = latestOutput as DealOutput
@@ -159,30 +164,36 @@ export function DealScrollView(props: DealScrollViewProps) {
   const router = useRouter()
   const fr = locale === 'fr'
 
-  // ── deep analysis (on-demand enrichment) ──
+  // ── Full Analysis (on-demand enrichment) ──
   const deepAnalysisStatus = (o as any)?.deep_analysis_status as 'idle' | 'running' | 'done' | undefined
   // Shared with the server-rendered hero (page.tsx) so both branch on the
   // exact same signal — see lib/deep-analysis-status.ts for the legacy-deal
-  // reasoning behind this formula.
-  const hasDeepContent = computeHasDeepContent(o)
-  // Seeded from server truth so a page load/refresh mid-run (another tab,
-  // or this one) shows the in-progress state immediately instead of the
-  // idle CTA — no polling added, so it won't self-clear if that other
-  // session's run finishes without this page refreshing again.
-  const [deepAnalysisLoading, setDeepAnalysisLoading] = useState(deepAnalysisStatus === 'running')
-  const [deepAnalysisError, setDeepAnalysisError] = useState<string | null>(null)
+  // reasoning behind this formula. Entitlement is per deal: once Full Analysis
+  // ran on any round, later rounds (vendor replies analysed at quick depth)
+  // inherit it, and the playbook is read from the round that carries it.
+  const deepRound = sortedRounds.find((r: any) => computeHasDeepContent(r?.output_json))
+  const hasDeepContent = computeHasDeepContent(o) || !!deepRound
+  /** Source of the strategy sections (asks, leverage, savings, benchmark): the latest output when it has them, else the round Full Analysis ran on. */
+  const pb = (computeHasDeepContent(o) ? o : (deepRound?.output_json as DealOutput | undefined) ?? o) as DealOutput
+  // The run itself is owned by DealWorkspace (header, next-step card and this
+  // gate all trigger the same request); a standalone render falls back to local state.
+  const [localDeepLoading, setLocalDeepLoading] = useState(deepAnalysisStatus === 'running')
+  const [localDeepError, setLocalDeepError] = useState<string | null>(null)
+  const deepAnalysisLoading = fullAnalysis ? fullAnalysis.loading : localDeepLoading
+  const deepAnalysisError = fullAnalysis ? fullAnalysis.error : localDeepError
   const handleDeepAnalysis = async () => {
-    if (deepAnalysisLoading || deepAnalysisStatus === 'done') return
-    setDeepAnalysisLoading(true); setDeepAnalysisError(null)
+    if (fullAnalysis) return fullAnalysis.run()
+    if (localDeepLoading || deepAnalysisStatus === 'done') return
+    setLocalDeepLoading(true); setLocalDeepError(null)
     try {
       const res = await fetch(`/api/deal/${dealId}/deep-analysis`, { method: 'POST' })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Deep analysis failed')
+      if (!res.ok) throw new Error(data.error || 'Full Analysis failed')
       router.refresh()
     } catch (err) {
-      setDeepAnalysisError(err instanceof Error ? err.message : 'Deep analysis failed')
+      setLocalDeepError(err instanceof Error ? err.message : 'Full Analysis failed')
     } finally {
-      setDeepAnalysisLoading(false)
+      setLocalDeepLoading(false)
     }
   }
 
@@ -198,7 +209,7 @@ export function DealScrollView(props: DealScrollViewProps) {
 
   // ── savings data ──────────────────────────
   const savingsData = useMemo(() => {
-    const ps = o?.potential_savings as any
+    const ps = pb?.potential_savings as any
     if (!ps) return { total: 0, mustHave: [] as any[], niceToHave: [] as any[] }
     if (ps.must_have !== undefined) {
       const mh = (ps.must_have || []).map((i: any) => ({ ask: i.ask, amount: typeof i.amount === 'number' ? i.amount : parseMoney(String(i.amount || '0')).amount, rationale: i.rationale || '' }))
@@ -211,7 +222,7 @@ export function DealScrollView(props: DealScrollViewProps) {
       return { total: mh.reduce((s: number, i: any) => s + (i.amount || 0), 0), mustHave: mh, niceToHave: nth }
     }
     return { total: 0, mustHave: [], niceToHave: [] }
-  }, [o?.potential_savings])
+  }, [pb?.potential_savings])
 
   // ── email state ───────────────────────────
   const bizDate = getNextBusinessDate()
@@ -251,7 +262,8 @@ export function DealScrollView(props: DealScrollViewProps) {
   // quote/analysis can't reliably know. Objective and competing-quote
   // prefill from an existing negotiation_requests row for this deal where
   // available (Part 6); nothing here is persisted anywhere new.
-  const [showEmailContext, setShowEmailContext] = useState(false)
+  // The preparation panel is open by default until a first email exists; after that it folds behind "Edit negotiation context".
+  const [showEmailContext, setShowEmailContext] = useState(!o?.email_drafts?.neutral?.body)
   const [negotiationObjective, setNegotiationObjective] = useState(savedCtx?.negotiationObjective || savedNegotiationContext?.objective || '')
   const [budgetCeiling, setBudgetCeiling] = useState(savedCtx?.budgetCeiling || '')
   const [competingQuote, setCompetingQuote] = useState(savedCtx?.competingQuote || savedNegotiationContext?.competitorContext || '')
@@ -267,11 +279,10 @@ export function DealScrollView(props: DealScrollViewProps) {
   // Step 2 and 3 content only exists once Deep Analysis ran (or, for legacy deals, once
   // negotiation activity exists). Before that the page ends at the single Step 2 gate.
   const stepsUnlocked = hasDeepContent || hasNegotiationActivity
-  // Email section starts collapsed to a single entry CTA unless an email
-  // already exists (a prior visit already generated one).
-  const [emailSectionOpened, setEmailSectionOpened] = useState(false)
-  const emailSectionVisible = emailSectionOpened || hasEmail
-  const openEmailSection = () => { setEmailSectionOpened(true) }
+  // The vendor-response form is the obvious next step once an email has gone out; before
+  // that it stays behind a small link (a reply can arrive by phone or from a call).
+  const [revealAddRound, setRevealAddRound] = useState(false)
+  const anyRoundEmailed = sortedRounds.some((r: any) => !!r?.output_json?.email_drafts?.neutral?.body)
 
   const handleGenerate = async () => {
     if (demoMode || !latestRoundId || remainingRegens <= 0) return
@@ -288,8 +299,8 @@ export function DealScrollView(props: DealScrollViewProps) {
           totalCommitment: o?.snapshot?.total_commitment,
           term: o?.snapshot?.term,
           currency: dealCurrency,
-          mustHaveAsks: o?.what_to_ask_for?.must_have || [],
-          niceToHaveAsks: o?.what_to_ask_for?.nice_to_have || [],
+          mustHaveAsks: pb?.what_to_ask_for?.must_have || [],
+          niceToHaveAsks: pb?.what_to_ask_for?.nice_to_have || [],
           redFlagAsks: (o?.red_flags || []).map((f: any) => f.what_to_ask_for).filter(Boolean),
           canOffer: getCanOffer(o),
           conclusion: o?.quick_read?.conclusion,
@@ -298,7 +309,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           targetPriceLow: (o as any)?.target_price_range?.low,
           targetPriceHigh: (o as any)?.target_price_range?.high,
           potentialSavingsTotal: savingsData.total > 0 ? fmtSav(savingsData.total) : undefined,
-          leverageYouHave: o?.negotiation_plan?.leverage_you_have || [],
+          leverageYouHave: pb?.negotiation_plan?.leverage_you_have || [],
           paymentTerms: o?.snapshot?.billing_payment,
           pricingModel: o?.snapshot?.pricing_model,
           leverageLevel: (o as any)?.classification?.leverage_level,
@@ -311,13 +322,13 @@ export function DealScrollView(props: DealScrollViewProps) {
           internalDeadline: internalDeadline.trim() || undefined,
           // Market Benchmark (deterministic engine + clamped model target). Internal numbers —
           // the route tells the model how (not) to voice them.
-          benchmarkAvailable: !!(o as any)?.market_benchmark?.benchmark_available,
-          benchmarkTarget: (o as any)?.benchmark_interpretation?.target_price != null ? fmtSav((o as any).benchmark_interpretation.target_price) : undefined,
-          benchmarkOpeningAsk: (o as any)?.benchmark_interpretation?.opening_ask != null ? fmtSav((o as any).benchmark_interpretation.opening_ask) : undefined,
-          benchmarkFairLow: (o as any)?.market_benchmark?.benchmark_available ? fmtSav((o as any).market_benchmark.fair_market_low) : undefined,
-          benchmarkFairHigh: (o as any)?.market_benchmark?.benchmark_available ? fmtSav((o as any).market_benchmark.fair_market_high) : undefined,
-          benchmarkConfidence: (o as any)?.market_benchmark?.confidence,
-          benchmarkPositionPct: (o as any)?.market_benchmark?.benchmark_available ? (o as any).market_benchmark.quote_vs_market_percent : undefined,
+          benchmarkAvailable: !!(pb as any)?.market_benchmark?.benchmark_available,
+          benchmarkTarget: (pb as any)?.benchmark_interpretation?.target_price != null ? fmtSav((pb as any).benchmark_interpretation.target_price) : undefined,
+          benchmarkOpeningAsk: (pb as any)?.benchmark_interpretation?.opening_ask != null ? fmtSav((pb as any).benchmark_interpretation.opening_ask) : undefined,
+          benchmarkFairLow: (pb as any)?.market_benchmark?.benchmark_available ? fmtSav((pb as any).market_benchmark.fair_market_low) : undefined,
+          benchmarkFairHigh: (pb as any)?.market_benchmark?.benchmark_available ? fmtSav((pb as any).market_benchmark.fair_market_high) : undefined,
+          benchmarkConfidence: (pb as any)?.market_benchmark?.confidence,
+          benchmarkPositionPct: (pb as any)?.market_benchmark?.benchmark_available ? (pb as any).market_benchmark.quote_vs_market_percent : undefined,
         }),
       })
       const data = await res.json()
@@ -472,7 +483,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           title={`${t('output.redFlags')} · ${sortedFlags.length}`}
           sub={hasDeepContent || demoMode
             ? (fr ? 'Chaque point inclut quoi demander et une position de repli' : 'Each issue includes what to ask for and a fallback position')
-            : (fr ? 'Ouvrez un point pour voir pourquoi il compte. Les demandes et positions de repli arrivent avec l’analyse approfondie.' : 'Open an issue to see why it matters. The asks and fallback positions come with Deep Analysis.')}
+            : (fr ? 'Ouvrez un point pour voir pourquoi il compte. Les demandes et positions de repli arrivent avec l’analyse complète.' : 'Open an issue to see why it matters. The asks and fallback positions come with Full Analysis.')}
           right={
             <>
               {hasDeepContent && <Chip tone="green"><CheckCircle2 className="w-3 h-3" />{fr ? 'Analyse détaillée prête' : 'Detailed analysis ready'}</Chip>}
@@ -515,8 +526,8 @@ export function DealScrollView(props: DealScrollViewProps) {
                           /* Quick stage: the ask + fallback were stripped server-side (lib/negotiation-gating.ts). */
                           <p className="mt-3.5 flex items-center gap-2 text-[12.5px] text-ink-3">
                             <Lock className="w-3.5 h-3.5 shrink-0" />
-                            {fr ? 'La demande et la position de repli pour ce point arrivent avec l’analyse approfondie.' : 'The ask and fallback position for this issue come with Deep Analysis.'}
-                            {showFullPlaybook && <a href="#deep-analysis" className="text-green-deep font-medium no-underline hover:underline">{fr ? "Lancer l'analyse approfondie" : 'Run Deep Analysis'}</a>}
+                            {fr ? 'La demande et la position de repli pour ce point arrivent avec l’analyse complète.' : 'The ask and fallback position for this issue come with Full Analysis.'}
+                            {showFullPlaybook && <a href="#deep-analysis" className="text-green-deep font-medium no-underline hover:underline">{fr ? 'Débloquer l’analyse complète' : 'Unlock Full Analysis'}</a>}
                           </p>
                         ) : null}
                       </div>
@@ -535,16 +546,16 @@ export function DealScrollView(props: DealScrollViewProps) {
         )}
 
         {/* Worth noting — deep-only minor items */}
-        {hasDeepContent && Array.isArray((o as any)?.watchItems) && (o as any).watchItems.length > 0 && (
+        {hasDeepContent && Array.isArray((pb as any)?.watchItems) && (pb as any).watchItems.length > 0 && (
           <Card pad={false} className="mt-3">
             <button onClick={() => setShowWatch(!showWatch)} className="w-full flex items-center justify-between gap-3 px-4 py-2.5 text-left hover:bg-surface-2 transition-colors" aria-expanded={showWatch}>
-              <span className="flex items-center gap-2 text-[13px] font-semibold text-ink-2"><Eye className="w-3.5 h-3.5 text-ink-3" />{showWatch ? (fr ? 'À noter' : 'Worth noting') : `${fr ? 'Afficher' : 'Show'} ${(o as any).watchItems.length} ${fr ? 'point(s) mineur(s)' : `minor item${(o as any).watchItems.length === 1 ? '' : 's'}`}`}</span>
+              <span className="flex items-center gap-2 text-[13px] font-semibold text-ink-2"><Eye className="w-3.5 h-3.5 text-ink-3" />{showWatch ? (fr ? 'À noter' : 'Worth noting') : `${fr ? 'Afficher' : 'Show'} ${(pb as any).watchItems.length} ${fr ? 'point(s) mineur(s)' : `minor item${(pb as any).watchItems.length === 1 ? '' : 's'}`}`}</span>
               <ChevronDown className={cn('w-4 h-4 text-ink-3 shrink-0 transition-transform', showWatch && 'rotate-180')} />
             </button>
             <div className="grid transition-[grid-template-rows] duration-200 ease-out" style={{ gridTemplateRows: showWatch ? '1fr' : '0fr' }}>
               <div className="overflow-hidden">
                 <ul className="m-0 px-4 pb-3.5 pt-0.5 list-none flex flex-col gap-1.5">
-                  {(o as any).watchItems.map((w: any, i: number) => (
+                  {(pb as any).watchItems.map((w: any, i: number) => (
                     <li key={i} className="text-[13px] text-ink-2 leading-snug flex items-start gap-2"><span className="text-ink-3 shrink-0">•</span>{w.description}</li>
                   ))}
                 </ul>
@@ -566,7 +577,7 @@ export function DealScrollView(props: DealScrollViewProps) {
         </Card>
       )}
 
-      {/* ═══ THE ONE GATE — Step 2, at the end of everything step 1 unlocked. Nothing below it until Deep Analysis runs. ═══ */}
+      {/* ═══ THE ONE GATE — Step 2, at the end of everything step 1 unlocked. Nothing below it until Full Analysis runs. ═══ */}
       {!demoMode && !hasDeepContent && (
         <div id="deep-analysis" className="scroll-mt-[196px]">
           {deepAnalysisLoading ? (
@@ -574,23 +585,11 @@ export function DealScrollView(props: DealScrollViewProps) {
           ) : (
             <GateCard
               tone="green"
-              eyebrow={fr ? 'Étape 2 · Analyse approfondie' : 'Step 2 · Deep Analysis'}
-              title={fr ? 'Débloquer le plan, les demandes et le benchmark' : 'Unlock the playbook, the asks and the benchmark'}
-              body={<>{fr ? "Quoi demander pour chaque point, votre levier, l'ordre des demandes, les positions de repli et la comparaison au marché — puis l'e-mail. Environ deux minutes." : 'What to ask for on every flag, your leverage, the order to push in, fallback positions and the market comparison — then the email. About two minutes.'}<span className="block mt-1.5 font-semibold text-green-deep">{deepAnalysisPriceNote(locale)}</span>{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
-              action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? "Lancer l'analyse approfondie" : 'Run Deep Analysis')}</Btn>}
+              eyebrow={fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Full Analysis'}
+              title={fr ? 'Construisez votre stratégie de négociation' : 'Build your negotiation strategy'}
+              body={<>{fr ? 'Obtenez l’analyse complète, les positions cibles, les replis, le plan de négociation et la séquence de négociation prête à envoyer. Environ deux minutes.' : 'Get the complete analysis, target positions, fallbacks, negotiation plan and ready-to-send negotiation sequence. About two minutes.'}<span className="block mt-1.5 font-semibold text-green-deep">{deepAnalysisPriceNote(locale)}</span>{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
+              action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? 'Débloquer l’analyse complète' : 'Unlock Full Analysis')}</Btn>}
             />
-          )}
-          {/* The add-on: skip the whole ladder and hand it over right now. Neutral card, ink button — visible, but never the green primary. */}
-          {showFullPlaybook && !hasNegotiationRequest && !isClosed && (
-            <div className="mt-3">
-              <GateCard
-                tone="neutral"
-                eyebrow={fr ? 'TermLift négocie · option' : 'TermLift negotiates · add-on'}
-                title={fr ? 'Vous préférez ne rien faire de tout ça ?' : 'Prefer not to do any of this?'}
-                body={fr ? `Passez-nous la main dès maintenant. Un négociateur mène les échanges avec ${o?.vendor || 'le fournisseur'}, vous validez chaque résultat. ${NEGOTIATION_FEE_PERCENT} % des économies vérifiées, rien si nous ne vous faisons pas économiser.` : `Hand it over right now. A negotiator runs the back-and-forth with ${o?.vendor || 'the vendor'}, you approve every outcome. ${NEGOTIATION_FEE_PERCENT}% of verified savings, nothing if we don't save you money.`}
-                action={<Btn href={negotiateHref} variant="ink">{fr ? 'Demander une négociation TermLift' : 'Request TermLift negotiation'}</Btn>}
-              />
-            </div>
           )}
         </div>
       )}
@@ -602,15 +601,15 @@ export function DealScrollView(props: DealScrollViewProps) {
             <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Zap} />
           ) : (
             <>
-              <IconHeading icon={Zap} tone="green" eyebrow={fr ? 'Étape 2 · Analyse approfondie' : 'Step 2 · Deep Analysis'} title={fr ? 'Votre plan de négociation' : 'Your negotiation playbook'} sub={fr ? 'Quoi demander, votre levier, et quoi offrir en retour' : 'What to push for, your leverage, and what to offer in return'} />
+              <IconHeading icon={Zap} tone="green" eyebrow={fr ? 'Étape 2 · Stratégie' : 'Step 2 · Strategy'} title={fr ? 'Votre plan de négociation' : 'Your negotiation playbook'} sub={fr ? 'Quoi demander, votre levier, et quoi offrir en retour' : 'What to push for, your leverage, and what to offer in return'} />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className={cn('rounded-[14px] border border-green-line bg-green-soft', PAD)}>
                   <p className="tl-label text-green-deep mb-3.5 flex items-center gap-1.5"><Target className="w-3.5 h-3.5" />{t('output.pushFor')}</p>
                   <ol className="m-0 p-0 list-none flex flex-col gap-3">
-                    {o?.what_to_ask_for?.must_have?.map((item: string, i: number) => (
+                    {pb?.what_to_ask_for?.must_have?.map((item: string, i: number) => (
                       <li key={i} className="flex items-start gap-2 text-[13px] font-medium text-ink leading-snug"><span className="w-[18px] h-[18px] rounded-full bg-green text-white tl-label text-[10px] grid place-items-center shrink-0 mt-px">{i + 1}</span>{item}</li>
                     ))}
-                    {o?.what_to_ask_for?.nice_to_have?.map((item: string, i: number) => (
+                    {pb?.what_to_ask_for?.nice_to_have?.map((item: string, i: number) => (
                       <li key={`n${i}`} className="flex items-start gap-2 text-[12.5px] text-ink-2 leading-snug"><span className="w-[18px] h-[18px] rounded-full bg-surface border border-green-line text-green-deep tl-label text-[10px] grid place-items-center shrink-0 mt-px">+</span>{item}</li>
                     ))}
                   </ol>
@@ -618,7 +617,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                 <Card className={PAD}>
                   <p className="tl-label text-ink-3 mb-3.5 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" />{t('output.yourLeverage')}</p>
                   <ul className="m-0 p-0 list-none flex flex-col gap-3">
-                    {o?.negotiation_plan?.leverage_you_have?.map((item: string, i: number) => (
+                    {pb?.negotiation_plan?.leverage_you_have?.map((item: string, i: number) => (
                       <li key={i} className="flex items-start gap-2 text-[13px] text-ink leading-snug"><span className="w-3.5 h-3.5 rounded-full border-[1.5px] border-green shrink-0 mt-[3px]" />{item}</li>
                     ))}
                   </ul>
@@ -626,7 +625,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                 <Card className={PAD}>
                   <p className="tl-label text-ink-3 mb-3.5 flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" />{t('output.canOffer')}</p>
                   <ul className="m-0 p-0 list-none flex flex-col gap-3">
-                    {o?.negotiation_plan?.trades_you_can_offer?.map((item: string, i: number) => (
+                    {pb?.negotiation_plan?.trades_you_can_offer?.map((item: string, i: number) => (
                       <li key={i} className="flex items-start gap-2 text-[13px] text-ink leading-snug"><span className="w-3.5 h-3.5 rounded-full border-[1.5px] border-green shrink-0 mt-[3px]" />{item}</li>
                     ))}
                   </ul>
@@ -687,11 +686,11 @@ export function DealScrollView(props: DealScrollViewProps) {
                 )
               })()}
 
-              {o?.cash_flow_improvements && o.cash_flow_improvements.length > 0 && (
+              {pb?.cash_flow_improvements && pb.cash_flow_improvements.length > 0 && (
                 <div className={cn('mt-4 rounded-[14px] border border-info-line bg-info-soft', PAD)}>
                   <p className="tl-label text-info mb-2.5 flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" />{t('output.cashFlowAndRiskImprovements')}</p>
                   <ul className="m-0 p-0 list-none flex flex-col gap-2">
-                    {o.cash_flow_improvements.map((item: any, i: number) => (
+                    {pb.cash_flow_improvements.map((item: any, i: number) => (
                       <li key={i} className="flex items-start gap-2 text-[13px] text-ink leading-snug"><CheckCircle2 className="w-3.5 h-3.5 text-info shrink-0 mt-0.5" />{item.recommendation}</li>
                     ))}
                   </ul>
@@ -703,8 +702,8 @@ export function DealScrollView(props: DealScrollViewProps) {
       )}
 
       {/* ═══ 3b. MARKET BENCHMARK (deep only; absent on deals analysed before the feature) ═══ */}
-      {hasDeepContent && shouldRenderBenchmark((o as any)?.market_benchmark) && (
-        <MarketBenchmark benchmark={(o as any).market_benchmark} interpretation={(o as any).benchmark_interpretation ?? null} fmt={fmtSav} locale={locale} showEyebrow={false} />
+      {hasDeepContent && shouldRenderBenchmark((pb as any)?.market_benchmark) && (
+        <MarketBenchmark benchmark={(pb as any).market_benchmark} interpretation={(pb as any).benchmark_interpretation ?? null} fmt={fmtSav} locale={locale} showEyebrow={false} />
       )}
 
       {/* ═══ 3. EMAIL — Step 3. Rendered only once step 2 exists (trial keeps its teaser). ═══ */}
@@ -712,22 +711,40 @@ export function DealScrollView(props: DealScrollViewProps) {
       <section id="email-section" className="scroll-mt-[196px]">
         {!showFullPlaybook ? (
           <NegotiationTeaser negotiateHref={negotiateHref} locale={locale} redFlagCount={redFlagCount} potentialSavings={potentialSavings} fmtSav={fmtSav} icon={Mail} variant="email" />
-        ) : !emailSectionVisible && !demoMode ? (
-          <GateCard tone="neutral" eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'} title={fr ? 'Préparez votre négociation' : 'Prepare your negotiation'} body={fr ? `Tour ${sortedRounds.length} : TermLift rédige l'e-mail à partir du plan ci-dessus. Ajoutez d'abord ce que le document ne peut pas nous dire : objectif, budget, alternatives, échéance. Tout est facultatif.` : `Round ${sortedRounds.length}: TermLift writes the email from the playbook above. First, add what the document can’t tell us: objective, budget, alternatives, deadline. All optional.`} action={<Btn variant="primary" onClick={openEmailSection}><Mail className="w-4 h-4" />{fr ? `Préparer le tour ${sortedRounds.length}` : `Prepare Round ${sortedRounds.length}`}</Btn>} />
         ) : (
           <>
             <IconHeading
               icon={Mail}
               tone="ink"
-              eyebrow={fr ? 'Étape 3 · Négociez' : 'Step 3 · Negotiate'}
+              eyebrow={sortedRounds.length > 1 ? (fr ? `Étape 3 · Tour ${sortedRounds.length}` : `Step 3 · Round ${sortedRounds.length}`) : (fr ? 'Étape 3 · Tour 1' : 'Step 3 · Round 1')}
               title={sortedRounds.length > 1 ? (fr ? `Tour ${sortedRounds.length} — Contre-proposition` : `Round ${sortedRounds.length} — Counter proposal`) : (fr ? 'Tour 1 — Ouverture de la négociation' : 'Round 1 — Initial negotiation')}
-              sub={sortedRounds.length > 1 ? (fr ? 'Ce que la réponse du fournisseur a changé, et la réponse à envoyer.' : "What the vendor's reply changed, and the reply to send.") : (fr ? "TermLift connaît déjà le devis et la stratégie. Ajoutez ce que le document ne peut pas nous dire." : "TermLift already knows the quote and the strategy. Add any context the document can’t tell us.")}
+              sub={sortedRounds.length > 1
+                ? (hasEmail ? (fr ? 'Ce que la réponse du fournisseur a changé, et la contre-proposition à envoyer.' : "What the vendor's reply changed, and the counter to send.") : (fr ? 'Ce que la réponse du fournisseur a changé. Générez votre contre-proposition ci-dessous.' : "What the vendor's reply changed. Generate your counter below."))
+                : (hasEmail ? (fr ? 'L’e-mail d’ouverture, prêt à copier et envoyer.' : 'Your opening email, ready to copy and send.') : (fr ? 'TermLift connaît déjà le devis et la stratégie. Ajoutez ce que le document ne peut pas nous dire, puis générez l’e-mail.' : 'TermLift already knows the quote and the strategy. Add what the document can’t tell us, then generate the email.'))}
             />
 
+            {/* Round 2+: the vendor's figure first, then what their reply changed. */}
+            {sortedRounds.length > 1 && !demoMode && (() => {
+              const latest = sortedRounds[0] as any
+              const prev = sortedRounds[1] as any
+              const prevFigure = prev
+                ? (prev.vendor_offer?.amount != null
+                  ? { amount: prev.vendor_offer.amount as number, currency: prev.vendor_offer.currency as string | null }
+                  : { amount: (prev.extracted_data?.total_commitment?.amount as number | undefined) ?? (prev.output_json?.snapshot?.total_commitment ? parseMoney(String(prev.output_json.snapshot.total_commitment)).amount || null : null), currency: (prev.extracted_data?.total_commitment?.currency as string | undefined) ?? (prev.output_json?.snapshot?.currency as string | undefined) ?? null })
+                : null
+              return (
+                <Card className="mb-3 py-3">
+                  <VendorOfferField roundId={latest.id} offer={latest.vendor_offer ?? null} previous={prevFigure} fr={fr} />
+                </Card>
+              )
+            })()}
             {sortedRounds.length > 1 && (o as any)?.round_delta && <RoundDeltaCard d={(o as any).round_delta as RoundDelta} fr={fr} />}
 
             {hasEmail && (
-              <p className="text-[13px] text-ink-2 mb-2.5 leading-relaxed"><span className="font-semibold text-ink">{fr ? 'Approche recommandée : ' : 'Recommended approach: '}</span>{TONE_APPROACH[toneOrder[recommendedIdx]][fr ? 'fr' : 'en']}</p>
+              <div className="rounded-[10px] border border-line bg-surface px-4 py-3 mb-3">
+                <p className="tl-label text-ink-3 mb-1">{fr ? 'Approche recommandée' : 'Recommended approach'}</p>
+                <p className="text-[13.5px] text-ink leading-relaxed">{TONE_APPROACH[toneOrder[recommendedIdx]][fr ? 'fr' : 'en']}</p>
+              </div>
             )}
 
             {hasEmail && (
@@ -749,8 +766,13 @@ export function DealScrollView(props: DealScrollViewProps) {
                 </div>
                 <textarea value={emailBodies[emailTab]} onChange={(e) => { const n = [...emailBodies]; n[emailTab] = e.target.value; setEmailBodies(n) }} rows={14} className="w-full text-[13.5px] text-ink leading-[1.65] bg-surface px-5 py-4 border-0 resize-y focus:outline-none focus:bg-surface-2" />
                 <div className="px-5 py-3 border-t border-line flex flex-wrap items-center gap-2">
-                  <Btn variant="primary" size="sm" onClick={() => { window.location.href = `mailto:?subject=${encodeURIComponent(emailSubjects[emailTab])}&body=${encodeURIComponent(emailBodies[emailTab])}` }}><Send className="w-3.5 h-3.5" />{t('output.openInEmailClient')}</Btn>
-                  <Btn variant="ghost" size="sm" onClick={() => { setCopiedEmail(true); navigator.clipboard.writeText(emailBodies[emailTab]); setTimeout(() => setCopiedEmail(false), 2000) }}>{copiedEmail ? <><CheckCircle2 className="w-3.5 h-3.5 text-green-deep" />{fr ? 'Copié' : 'Copied'}</> : <><Copy className="w-3.5 h-3.5" />{fr ? 'Copier' : 'Copy'}</>}</Btn>
+                  <Btn variant="primary" size="sm" onClick={() => { setCopiedEmail(true); navigator.clipboard.writeText(emailBodies[emailTab]); setTimeout(() => setCopiedEmail(false), 2000) }}>{copiedEmail ? <><CheckCircle2 className="w-3.5 h-3.5" />{fr ? 'Copié' : 'Copied'}</> : <><Copy className="w-3.5 h-3.5" />{fr ? 'Copier l’e-mail' : 'Copy email'}</>}</Btn>
+                  <Btn variant="ghost" size="sm" onClick={() => { window.location.href = `mailto:?subject=${encodeURIComponent(emailSubjects[emailTab])}&body=${encodeURIComponent(emailBodies[emailTab])}` }}><Send className="w-3.5 h-3.5" />{t('output.openInEmailClient')}</Btn>
+                  {!demoMode && (
+                    <Btn variant="ghost" size="sm" onClick={handleGenerate} disabled={regenerating || remainingRegens <= 0}>
+                      {regenerating ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />{fr ? 'Génération…' : 'Generating…'}</> : <><RotateCcw className="w-3.5 h-3.5" />{fr ? 'Régénérer' : 'Regenerate'}</>}
+                    </Btn>
+                  )}
                   <span className="text-[11.5px] text-ink-3 ml-auto">{fr ? 'Objet et corps modifiables' : 'Subject and body are editable'}</span>
                 </div>
               </Card>
@@ -760,52 +782,44 @@ export function DealScrollView(props: DealScrollViewProps) {
               <div className="flex flex-col gap-3">
                 <button onClick={() => setShowEmailContext(!showEmailContext)} className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink-2 hover:text-green-deep transition-colors self-start" aria-expanded={showEmailContext}>
                   <Plus className={cn('w-3.5 h-3.5 transition-transform', showEmailContext && 'rotate-45')} />
-                  {hasEmail ? (fr ? 'Modifier le contexte de négociation' : 'Edit negotiation context') : (fr ? 'Préparer la négociation : objectif, budget, alternatives, échéance' : 'Prepare the negotiation: objective, budget, alternatives, deadline')}
+                  {hasEmail ? (fr ? 'Modifier le contexte de négociation' : 'Edit negotiation context') : (fr ? 'Préparez votre négociation' : 'Prepare your negotiation')}
                   {!showEmailContext && <span className="text-[11.5px] font-normal text-ink-3">— {fr ? 'facultatif' : 'optional'}</span>}
                 </button>
                 {showEmailContext && (
                   <Card className={cn('flex flex-col gap-3.5', PAD)}>
+                    {!hasEmail && <p className="text-[12.5px] text-ink-2 -mt-1">{fr ? 'Tout est facultatif. Ce que vous renseignez ici est repris dans l’e-mail et conservé pour les tours suivants.' : 'Everything here is optional. What you add shapes the email and carries over to later rounds.'}</p>}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Objectif de négociation' : 'Negotiation objective'}</span><input type="text" value={negotiationObjective} onChange={(e) => setNegotiationObjective(e.target.value)} placeholder={fr ? 'ex. Obtenir 10 % de remise et supprimer le renouvellement auto' : 'e.g. Get 10% off and remove auto-renewal'} className={inputCls} /></label>
-                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Budget / prix maximum' : 'Budget / maximum acceptable price'}</span><input type="text" value={budgetCeiling} onChange={(e) => setBudgetCeiling(e.target.value)} placeholder={fr ? 'ex. Budget plafonné à 45 000 €' : 'e.g. Budget capped at €45,000'} className={inputCls} /></label>
-                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Alternative / devis concurrent' : 'Alternatives / competing quote'}</span><input type="text" value={competingQuote} onChange={(e) => setCompetingQuote(e.target.value)} placeholder={fr ? 'ex. Offre concurrente à 41 000 €' : 'e.g. We have a competing offer at €41,000'} className={inputCls} /></label>
-                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Échéance interne' : 'Internal deadline'}</span><input type="text" value={internalDeadline} onChange={(e) => setInternalDeadline(e.target.value)} placeholder={fr ? 'ex. Signer avant le 15 sept.' : 'e.g. Need to sign by Sept 15'} className={inputCls} /></label>
+                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Objectif / résultat visé' : 'Target outcome'}</span><input type="text" value={negotiationObjective} onChange={(e) => setNegotiationObjective(e.target.value)} placeholder={fr ? 'ex. Obtenir 10 % de remise et supprimer le renouvellement auto' : 'e.g. Get 10% off and remove auto-renewal'} className={inputCls} /></label>
+                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Budget / prix maximum acceptable' : 'Budget / maximum acceptable price'}</span><input type="text" value={budgetCeiling} onChange={(e) => setBudgetCeiling(e.target.value)} placeholder={fr ? 'ex. Budget plafonné à 45 000 €' : 'e.g. Budget capped at €45,000'} className={inputCls} /></label>
+                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Devis concurrents / alternatives' : 'Competing quotes / alternatives'}</span><input type="text" value={competingQuote} onChange={(e) => setCompetingQuote(e.target.value)} placeholder={fr ? 'ex. Offre concurrente à 41 000 €' : 'e.g. We have a competing offer at €41,000'} className={inputCls} /></label>
+                      <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Échéance / urgence' : 'Deadline / urgency'}</span><input type="text" value={internalDeadline} onChange={(e) => setInternalDeadline(e.target.value)} placeholder={fr ? 'ex. Signer avant le 15 sept.' : 'e.g. Need to sign by Sept 15'} className={inputCls} /></label>
                     </div>
                     <div>
-                      <p className="tl-label text-ink-3 mb-1.5">{fr ? 'Marge de manœuvre' : 'Walk-away flexibility'}</p>
+                      <p className="tl-label text-ink-3 mb-1.5">{fr ? 'Relation avec le fournisseur / marge de manœuvre' : 'Relationship considerations / walk-away flexibility'}</p>
                       <div className="flex flex-wrap gap-1.5">
                         {([{ v: 'flexible', l: 'Flexible' }, { v: 'prefer_stay', l: fr ? 'Préfère rester' : 'Prefer to stay' }, { v: 'can_walk', l: fr ? 'Peut partir' : 'Can walk away' }] as const).map((opt) => (
                           <button key={opt.v} type="button" onClick={() => setWalkAwayFlexibility(walkAwayFlexibility === opt.v ? '' : opt.v)} className={cn('h-8 px-3 rounded-lg text-[12.5px] font-semibold border transition-colors', walkAwayFlexibility === opt.v ? 'bg-green-soft border-green-line text-green-deep' : 'bg-surface border-line text-ink-2 hover:border-[#C9D3CE]')} aria-pressed={walkAwayFlexibility === opt.v}>{opt.l}</button>
                         ))}
                       </div>
                     </div>
-                    <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Instructions supplémentaires' : 'Additional instructions'}</span><textarea value={customPrompt} onChange={(e) => setCustomPrompt(e.target.value)} rows={2} className={cn(inputCls, 'resize-none')} placeholder={fr ? 'ex. Mentionner que nous pouvons signer cette semaine si le prix est approuvé' : 'e.g. Mention that we can sign this week if pricing is approved'} /></label>
+                    <label className="flex flex-col gap-1"><span className="tl-label text-ink-3">{fr ? 'Contexte supplémentaire' : 'Additional context'}</span><textarea value={customPrompt} onChange={(e) => setCustomPrompt(e.target.value)} rows={2} className={cn(inputCls, 'resize-none')} placeholder={fr ? 'ex. Mentionner que nous pouvons signer cette semaine si le prix est approuvé' : 'e.g. Mention that we can sign this week if pricing is approved'} /></label>
                   </Card>
                 )}
-                <div className="flex flex-col gap-2">
-                  <Btn variant={hasEmail ? 'ghost' : 'primary'} onClick={handleGenerate} disabled={regenerating || remainingRegens <= 0} className="self-start">
-                    {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{fr ? 'Génération…' : 'Generating…'}</> : hasEmail ? <><RotateCcw className="w-4 h-4" />{fr ? 'Régénérer avec ce contexte' : 'Regenerate with this context'}</> : <><Sparkles className="w-4 h-4" />{fr ? `Générer l'e-mail du tour ${sortedRounds.length}` : `Generate Round ${sortedRounds.length} email`}</>}
-                  </Btn>
-                  {remainingRegens <= 0 && <p className="text-[12px] text-ink-3">{fr ? 'Limite de régénération atteinte.' : 'Regeneration limit reached.'}</p>}
-                  {regenError && <p role="alert" className="text-[13px] text-risk bg-risk-soft border border-risk-line rounded-[10px] px-3.5 py-2.5">{regenError}</p>}
-                </div>
+                {/* The generate button is the primary only while no email exists (or a vendor reply awaits a counter);
+                    once the round's email is on screen, regeneration lives in the email footer above. */}
+                {(!hasEmail || showEmailContext) && (
+                  <div className="flex flex-col gap-2">
+                    <Btn variant={hasEmail ? 'ghost' : 'primary'} onClick={handleGenerate} disabled={regenerating || remainingRegens <= 0} className="self-start">
+                      {regenerating ? <><Loader2 className="w-4 h-4 animate-spin" />{fr ? 'Génération…' : 'Generating…'}</> : hasEmail ? <><RotateCcw className="w-4 h-4" />{fr ? 'Régénérer avec ce contexte' : 'Regenerate with this context'}</> : <><Sparkles className="w-4 h-4" />{sortedRounds.length > 1 ? (fr ? `Générer la contre-proposition du tour ${sortedRounds.length}` : `Generate Round ${sortedRounds.length} counter`) : (fr ? 'Générer l’e-mail de négociation du tour 1' : 'Generate Round 1 negotiation email')}</>}
+                    </Btn>
+                    {remainingRegens <= 0 && <p className="text-[12px] text-ink-3">{fr ? 'Limite de régénération atteinte.' : 'Regeneration limit reached.'}</p>}
+                  </div>
+                )}
+                {regenError && <p role="alert" className="text-[13px] text-risk bg-risk-soft border border-risk-line rounded-[10px] px-3.5 py-2.5">{regenError}</p>}
               </div>
             )}
             {demoMode && !hasEmail && <Btn href="/login?from=demo" variant="primary">{fr ? 'Inscrivez-vous pour générer' : 'Sign up to generate'} <ArrowRight className="w-3.5 h-3.5" /></Btn>}
           </>
-        )}
-
-        {/* The other way to do step 3: hand it to TermLift. An add-on, offered here and nowhere else on the page. */}
-        {showFullPlaybook && !demoMode && !hasNegotiationRequest && !isClosed && hasDeepContent && (
-          <div className="mt-4">
-            <GateCard
-              tone="neutral"
-              eyebrow={fr ? 'TermLift négocie · option' : 'TermLift negotiates · add-on'}
-              title={fr ? "Vous préférez ne pas l'envoyer vous-même ?" : "Don't want to send it yourself?"}
-              body={fr ? `Nous reprenons le plan et menons les échanges avec ${o?.vendor || 'le fournisseur'}. Vous validez chaque résultat. ${NEGOTIATION_FEE_PERCENT} % des économies vérifiées, rien si nous ne vous faisons pas économiser.` : `We take the playbook from here and run the back-and-forth with ${o?.vendor || 'the vendor'}. You approve every outcome. ${NEGOTIATION_FEE_PERCENT}% of verified savings, nothing if we don't save you money.`}
-              action={<Btn href={negotiateHref} variant="ink">{fr ? 'Demander une négociation TermLift' : 'Request TermLift negotiation'}</Btn>}
-            />
-          </div>
         )}
       </section>
       )}
@@ -858,16 +872,21 @@ export function DealScrollView(props: DealScrollViewProps) {
                   <li className="grid grid-cols-[22px_1fr] gap-3">
                     <span className="w-[22px] h-[22px] rounded-full border-[1.5px] border-dashed border-line text-ink-3 tl-label text-[10px] grid place-items-center">{sortedRounds.length + 1}</span>
                     <div className="min-w-0">
-                      {hasDeepContent ? (
+                      {hasDeepContent && (anyRoundEmailed || revealAddRound || demoMode) ? (
                         <div id="add-round" className="scroll-mt-[196px]">
-                          <p className="text-[13px] font-semibold text-ink">{fr ? 'Importer la réponse du fournisseur' : "Upload the vendor's reply"}</p>
-                          <p className="text-[12px] text-ink-2">{fr ? 'Nous ré-analysons ce qui a changé et mettons le plan à jour.' : 'We re-analyse what changed and update the playbook.'}</p>
+                          <p className="text-[13px] font-semibold text-ink">{fr ? `Tour ${sortedRounds.length + 1} — ajouter la réponse du fournisseur` : `Round ${sortedRounds.length + 1} — add the vendor's response`}</p>
+                          <p className="text-[12px] text-ink-2">{fr ? 'Importez ou collez leur réponse. Nous relevons leur offre, ce qui a changé, et préparons votre contre-proposition.' : 'Upload or paste their reply. We pick out their offer, what changed, and prepare your counter.'}</p>
                           <div className="mt-2">{addRoundForm}</div>
+                        </div>
+                      ) : hasDeepContent ? (
+                        <div id="add-round" className="scroll-mt-[196px]">
+                          <p className="text-[13px] font-semibold text-ink">{fr ? `Tour ${sortedRounds.length + 1}` : `Round ${sortedRounds.length + 1}`}</p>
+                          <p className="text-[12px] text-ink-2">{fr ? 'Envoyez d’abord l’e-mail du tour 1. ' : 'Send the Round 1 email first. '}<button type="button" onClick={() => setRevealAddRound(true)} className="font-semibold text-green-deep hover:underline">{fr ? 'Vous avez déjà une réponse du fournisseur ?' : 'Already have the vendor’s response?'}</button></p>
                         </div>
                       ) : (
                         <a id="add-round" href="#deep-analysis" className="block no-underline scroll-mt-[196px]">
                           <p className="text-[13px] font-semibold text-ink">{fr ? `Tour ${sortedRounds.length + 1}` : `Round ${sortedRounds.length + 1}`}</p>
-                          <p className="text-[12px] text-ink-2">{fr ? "Se débloque avec l'analyse approfondie →" : 'Unlocks with Deep Analysis →'}</p>
+                          <p className="text-[12px] text-ink-2">{fr ? 'Se débloque avec l’analyse complète →' : 'Unlocks with Full Analysis →'}</p>
                         </a>
                       )}
                     </div>

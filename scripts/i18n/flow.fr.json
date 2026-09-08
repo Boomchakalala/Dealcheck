@@ -1,0 +1,14 @@
+{
+  "dealPage": {
+    "primaryRunFull": "Débloquer l’analyse complète",
+    "primaryRunning": "Analyse complète en cours…",
+    "primaryEmail": "Préparer le tour 1",
+    "primaryUploadReply": "Ajouter la réponse du fournisseur",
+    "closeAside": "Accord trouvé ?",
+    "closeAsideCta": "Clôturer le dossier",
+    "serviceEyebrow": "TermLift négocie · au succès",
+    "serviceTitle": "Vous préférez ne pas gérer cela vous-même ?",
+    "serviceBody": "Un négociateur TermLift mène les échanges avec {vendor} et vous validez chaque résultat. Rémunération au succès : une part des économies vérifiées, rien si nous ne vous faisons pas économiser.",
+    "serviceCta": "Laissez TermLift négocier pour vous"
+  }
+}

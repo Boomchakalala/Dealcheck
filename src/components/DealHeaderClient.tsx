@@ -26,6 +26,9 @@ interface DealHeaderClientProps {
   isAdmin?: boolean
   /** Latest confirmed/verified vendor offer — the close modal's default final total. Never inferred. */
   confirmedOffer?: ConfirmedVendorOffer | null
+  /** Controlled close-modal state, so the workspace's next-action card can open the same modal. */
+  closeModalOpen?: boolean
+  onCloseModalOpenChange?: (open: boolean) => void
 }
 
 /**
@@ -33,11 +36,13 @@ interface DealHeaderClientProps {
  * reopen. The stage-driven primary action lives in the workspace header —
  * this menu must never duplicate it.
  */
-export function DealHeaderClient({ dealId, dealStatus, currentTotal, originalTotal, roundCount, userPlan = 'free', isAdmin = false, confirmedOffer = null }: DealHeaderClientProps) {
+export function DealHeaderClient({ dealId, dealStatus, currentTotal, originalTotal, roundCount, userPlan = 'free', isAdmin = false, confirmedOffer = null, closeModalOpen, onCloseModalOpenChange }: DealHeaderClientProps) {
   const router = useRouter()
   const t = useT()
   const [open, setOpen] = useState(false)
-  const [showCloseModal, setShowCloseModal] = useState(false)
+  const [internalCloseOpen, setInternalCloseOpen] = useState(false)
+  const showCloseModal = closeModalOpen ?? internalCloseOpen
+  const setShowCloseModal = (v: boolean) => { setInternalCloseOpen(v); onCloseModalOpenChange?.(v) }
   const [reopening, setReopening] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [showRecord, setShowRecord] = useState(false)

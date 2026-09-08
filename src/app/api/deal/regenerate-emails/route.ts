@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 
 import { SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
 import { FULL_ANALYSIS_EMAIL_REGEN_LIMIT } from '@/lib/pricing'
-import { canAccessFullAnalysis } from '@/lib/deep-analysis-status'
+import { dealHasFullAnalysis } from '@/lib/deep-analysis-status'
 import { runWithAiContext } from '@/lib/ai-telemetry'
 import { recommendTone, type EmailTone } from '@/lib/tone-recommend'
 
@@ -117,11 +117,17 @@ export async function POST(request: Request) {
       }, { status: 400 })
     }
 
-    // Email generation is part of Deep Analysis — require it to be unlocked
-    // for this deal before drafting, same signal the deal page UI already
-    // gates the "Generate email" entry point on.
-    if (!profile?.is_admin && !canAccessFullAnalysis(round.output_json)) {
-      return NextResponse.json({ error: 'Unlock Deep Analysis for this deal before generating a negotiation email.' }, { status: 403 })
+    // Email generation is part of Full Analysis — require it to be unlocked
+    // for this DEAL before drafting (the round being emailed may be a vendor
+    // reply analysed at quick depth; the entitlement lives on the round Full
+    // Analysis ran on). Same signal the deal page gates its CTA on.
+    const { data: dealRounds } = await supabase
+      .from('rounds')
+      .select('output_json')
+      .eq('deal_id', round.deal_id)
+      .eq('user_id', user.id)
+    if (!profile?.is_admin && !dealHasFullAnalysis(dealRounds)) {
+      return NextResponse.json({ error: 'Unlock Full Analysis for this deal before generating a negotiation email.' }, { status: 403 })
     }
 
     // Regeneration cap — a flat abuse safeguard, not a plan limit

@@ -6,7 +6,7 @@ import { AddRoundForm } from './AddRoundForm'
 import { DealWorkspace } from '@/components/deal/DealWorkspace'
 import type { DealOutput, DealOutputV2 } from '@/types'
 import { stripAdvancedOutput, stripFlagDetailForQuick, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
-import { hasDeepContent } from '@/lib/deep-analysis-status'
+import { hasDeepContent, dealHasFullAnalysis } from '@/lib/deep-analysis-status'
 import { inferDealType } from '@/lib/deal-type-inference'
 import enMessages from '@/i18n/en.json'
 import frMessages from '@/i18n/fr.json'
@@ -32,7 +32,8 @@ export default async function DealPage({ params }: { params: Promise<{ dealId: s
   const latestRound = sortedRounds[0]
   const rawLatestOutput = latestRound?.output_json as DealOutput | DealOutputV2 | undefined
   // Redaction happens at the render boundary only — never at persistence.
-  const deepComplete = hasDeepContent(rawLatestOutput)
+  // Entitlement is per deal: a vendor reply analysed at quick depth (Round 2+) inherits Round 1's Full Analysis.
+  const deepComplete = dealHasFullAnalysis(sortedRounds) || hasDeepContent(rawLatestOutput)
   const playbookOutput = rawLatestOutput && !showFullPlaybook ? stripAdvancedOutput(rawLatestOutput) : rawLatestOutput
   // Quick stage: per-flag asks/fallbacks stay server-side until Deep Analysis has run (admins included, so the gated view is what we QA).
   const latestOutput = playbookOutput && !deepComplete ? stripFlagDetailForQuick(playbookOutput) : playbookOutput

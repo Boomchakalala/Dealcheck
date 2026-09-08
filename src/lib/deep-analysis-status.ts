@@ -55,3 +55,14 @@ export function deepAnalysisIsRunning(output: any): boolean {
 export function canAccessFullAnalysis(output: any): boolean {
   return hasDeepContent(output)
 }
+
+/**
+ * Deal-level entitlement. Full Analysis is unlocked once per deal, on the
+ * round it ran on; every later round (a vendor reply analysed at quick depth)
+ * inherits it. Checking only the latest round wrongly re-locked Round 2+
+ * counters and Round 3 uploads (found 2026-09-08). Same seam for a future
+ * purchase check as canAccessFullAnalysis().
+ */
+export function dealHasFullAnalysis(rounds: Array<{ output_json?: unknown }> | null | undefined): boolean {
+  return (rounds || []).some((r) => canAccessFullAnalysis(r.output_json))
+}

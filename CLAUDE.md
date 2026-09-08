@@ -50,6 +50,7 @@ Configured in `.env.local` (see README.md for the full list): Supabase URL/anon/
 - Fonts via `next/font`: Sora (`font-display`) for headlines, Geist for body, JetBrains Mono (`.tl-label`) for tiny labels only.
 - Shared primitives in `src/components/system/` — `Btn`, `Chip`, `StatTile`, `ScoreRing`, `StageRail`, `GateCard`, `PageHeader`/`PageBody`/`AppPage`, `Table`, `SectionHeading`/`Card`, `ImageSlot`. Use these before writing new UI.
 - The product ladder (`src/lib/deal-stage.ts`): Quick analysis → Deep Analysis → Negotiate → TermLift negotiates → Closed. Same five names everywhere (`ladder.*` i18n keys).
+- The deal page itself runs on `src/lib/negotiation-flow.ts` (Analysis → Strategy → Round n… → Outcome): one `next` action per state, shown in the header, the phone bar and the `NextActionCard`; the rail is `components/deal/NegotiationProgress.tsx`. Full Analysis entitlement is per deal (`dealHasFullAnalysis(rounds)`), never the latest round alone.
 - Deal numbers come from `src/lib/deal-metrics.ts` only; Home KPIs/insights from `src/lib/deal-insights.ts`.
 - i18n: live strings are `messages/{en,fr}.json` (nested). Add new copy in both via `scripts/i18n-merge.mjs <fragment> <locale>`. `src/i18n/*.json` is a stale flat copy still read by `DealScrollView` — don't add to it.
 - App pages wrap in `<AppPage>` (full-bleed) → `<PageHeader>` → `<PageBody>`. `/app/dashboard` and `/app/negotiations` redirect into Home tabs/filters.

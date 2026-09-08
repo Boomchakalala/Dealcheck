@@ -1337,10 +1337,10 @@
     "crumbDeals": "Dossiers",
     "round": "Tour {n}",
     "rounds": "{n, plural, one {# tour} other {# tours}}",
-    "primaryRunFull": "Lancer l'analyse complète",
+    "primaryRunFull": "Débloquer l’analyse complète",
     "primaryRunning": "Analyse complète en cours…",
-    "primaryEmail": "Générer l'e-mail",
-    "primaryUploadReply": "Importer la réponse du fournisseur",
+    "primaryEmail": "Préparer le tour 1",
+    "primaryUploadReply": "Ajouter la réponse du fournisseur",
     "primaryOpenNegotiation": "Ouvrir la négociation",
     "secondaryNegotiate": "Demander une négociation TermLift",
     "statSavings": "Économies potentielles",
@@ -1407,7 +1407,13 @@
     "statTargetBenchAt": "au niveau du marché observé",
     "statEstimatedTargetLabel": "Cible estimée",
     "statEstimatedTargetSub": "Estimée à partir de ce devis",
-    "benchNoDataNote": "TermLift ne dispose pas encore d’assez de prix observés pour ce fournisseur. Les cibles sont estimées à partir du devis et des conditions commerciales."
+    "benchNoDataNote": "TermLift ne dispose pas encore d’assez de prix observés pour ce fournisseur. Les cibles sont estimées à partir du devis et des conditions commerciales.",
+    "closeAside": "Accord trouvé ?",
+    "closeAsideCta": "Clôturer le dossier",
+    "serviceEyebrow": "TermLift négocie · au succès",
+    "serviceTitle": "Vous préférez ne pas gérer cela vous-même ?",
+    "serviceBody": "Un négociateur TermLift mène les échanges avec {vendor} et vous validez chaque résultat. Rémunération au succès : une part des économies vérifiées, rien si nous ne vous faisons pas économiser.",
+    "serviceCta": "Laissez TermLift négocier pour vous"
   },
   "tryPage": {
     "eyebrow": "Étape 1 · gratuit · sans inscription",

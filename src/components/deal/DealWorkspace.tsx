@@ -5,12 +5,17 @@ import { useState, type ReactNode } from 'react'
 import { useI18n } from '@/i18n/context'
 import { cn } from '@/lib/utils'
 import type { DealOutput } from '@/types'
+import { useRouter } from 'next/navigation'
+import { Loader2, Microscope } from 'lucide-react'
 import { DealScrollView } from '@/components/DealScrollView'
 import { DealHeaderClient } from '@/components/DealHeaderClient'
 import { HeroVerdict } from '@/components/HeroVerdict'
-import { AppPage, Btn, Chip, GateCard, PageBody, ScoreRing, StageRail, StatRow, StatTile } from '@/components/system'
+import { NegotiationProgress } from '@/components/deal/NegotiationProgress'
+import { NextActionCard } from '@/components/deal/NextActionCard'
+import { AppPage, Btn, Chip, GateCard, PageBody, ScoreRing, StatRow, StatTile } from '@/components/system'
 import { deriveDealStage, deriveNegotiationMode, stageChipKey, stageTone, type DealStage } from '@/lib/deal-stage'
-import { hasDeepContent, deepAnalysisIsRunning } from '@/lib/deep-analysis-status'
+import { deriveNegotiationFlow } from '@/lib/negotiation-flow'
+import { hasDeepContent, deepAnalysisIsRunning, dealHasFullAnalysis } from '@/lib/deep-analysis-status'
 import { benchmarkRanButUnavailable } from '@/lib/benchmark/visibility'
 import { shortenVendorDisplayName } from '@/lib/vendor-normalize'
 import {
@@ -55,6 +60,7 @@ interface DealWorkspaceProps {
  */
 export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook, negotiationRequest, addRoundForm, inferredDealType, latestOutputOverride }: DealWorkspaceProps) {
   const { t, locale } = useI18n()
+  const router = useRouter()
   // Captured once per mount so render stays pure (react-compiler rule).
   const [now] = useState(() => Date.now())
   const isTrial = mode === 'trial'
@@ -65,6 +71,13 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
   const latestRound = getLatestRound(deal)
   const latestOutput = (latestOutputOverride ?? latestRound?.output_json) as DealOutput | undefined
   const firstOutput = sortedRounds[sortedRounds.length - 1]?.output_json as DealOutput | undefined
+
+  // ── Full Analysis run — owned here so the header, the next-step card and the
+  // bottom gate all trigger the same request. Seeded from server truth so a
+  // reload mid-run shows the in-progress state.
+  const [deepLoading, setDeepLoading] = useState(deepAnalysisIsRunning(latestOutput))
+  const [deepError, setDeepError] = useState<string | null>(null)
+  const [closeOpen, setCloseOpen] = useState(false)
   if (!latestRound || !latestOutput) return null
 
   const openRequest = negotiationRequest && !negotiationRequest.status.startsWith('closed_') ? negotiationRequest : null
@@ -74,8 +87,24 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
   const closed = dealIsClosed(deal)
   const won = dealIsWon(deal)
   const waitingOnClient = openRequest?.status === 'waiting_for_client_info'
-  const deepDone = hasDeepContent(latestOutput)
-  const deepRunning = deepAnalysisIsRunning(latestOutput)
+  // Deal-level: Full Analysis unlocks once; later (quick-depth) rounds inherit it.
+  const deepDone = hasDeepContent(latestOutput) || dealHasFullAnalysis(deal.rounds)
+  const deepRunning = deepAnalysisIsRunning(latestOutput) || deepLoading
+
+  const runFullAnalysis = async () => {
+    if (isTrial || isDemo || deepLoading || deepDone) return
+    setDeepLoading(true); setDeepError(null)
+    try {
+      const res = await fetch(`/api/deal/${deal.id}/deep-analysis`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Full Analysis failed')
+      router.refresh()
+    } catch (err) {
+      setDeepError(err instanceof Error ? err.message : 'Full Analysis failed')
+    } finally {
+      setDeepLoading(false)
+    }
+  }
 
   const vendor = shortenVendorDisplayName(getVendorName(deal))
   const category = getCategory(deal)
@@ -114,6 +143,8 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
     { high: 0, medium: 0, low: 0 } as Record<'high' | 'medium' | 'low', number>,
   )
   const achieved = deal.savings_amount && deal.savings_amount > 0 ? deal.savings_amount : 0
+  const finalTotalRecorded = (deal as { final_total?: number | string | null }).final_total != null ? Number((deal as { final_total?: number | string | null }).final_total) : null
+  const initialTotalRecorded = (deal as { initial_total?: number | string | null }).initial_total != null ? Number((deal as { initial_total?: number | string | null }).initial_total) : null
   const savingsPct = deal.savings_percent ?? (achieved && totalCommitment ? (achieved / parseMoney(totalCommitment).amount) * 100 : null)
 
   const dLocale = locale === 'fr' ? 'fr-FR' : 'en-US'
@@ -123,23 +154,32 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
   const negotiateHref = isTrial ? '/negotiate' : isDemo ? '/negotiate' : `/app/deal/${deal.id}/negotiate`
   const negotiationPageHref = openRequest && !isDemo ? `/app/negotiations/${openRequest.id}` : negotiateHref
 
-  // ── the one primary action, by stage ─────────────────────────
+  // ── the guided flow: where the deal is, and the one thing to do next ──────
+  const flow = deriveNegotiationFlow({
+    dealId: deal.id,
+    status: isTrial ? 'in_progress' : deal.status,
+    rounds: (deal.rounds || []).map((r) => ({ round_number: r.round_number, output_json: r.round_number === latestRound.round_number ? latestOutput : r.output_json })),
+    negotiationRequestStatus: isTrial ? null : openRequest?.status,
+    negotiationPageHref,
+  })
+  const next = flow.next
+  const nextLabel = next.cta[locale]
+  // One dominant action, built once and shown in the header, the phone bar and the next-step card.
   let primary: ReactNode = null
   if (isTrial) primary = <Btn href="/login?from=trial" variant="primary">{t('dealPage.trialCta')}</Btn>
-  else if (closed) primary = null
-  else if (termliftRuns) primary = <Btn href={negotiationPageHref} variant={waitingOnClient ? 'primary' : 'ink'}>{t('dealPage.primaryOpenNegotiation')}</Btn>
-  else if (stage === 'quick') primary = <Btn href="#deep-analysis" variant="primary" disabled={deepRunning}>{deepRunning ? t('dealPage.primaryRunning') : t('dealPage.primaryRunFull')}</Btn>
-  else if (stage === 'full') primary = <Btn href="#email-section" variant="primary">{t('dealPage.primaryEmail')}</Btn>
-  else primary = <Btn href="#add-round" variant="primary">{t('dealPage.primaryUploadReply')}</Btn>
-  // The hand-off is an add-on, not a step — available at every stage, quietly (ghost button).
-  const secondary = !isTrial && !closed && !termliftRuns ? <Btn href={negotiateHref} variant="ghost">{t('dealPage.secondaryNegotiate')}</Btn> : null
-
-  const railHrefs: Partial<Record<DealStage, string>> | undefined = isTrial ? undefined : {
-    quick: '#overview',
-    full: deepDone ? '#playbook' : '#deep-analysis',
-    negotiate: termliftRuns ? negotiationPageHref : '#email-section',
-    closed: '#rounds',
+  else if (next.key === 'unlock_full' || next.key === 'full_running') {
+    primary = isDemo
+      ? <Btn href="/login?from=demo" variant="primary">{nextLabel}</Btn>
+      : <Btn variant="primary" onClick={runFullAnalysis} disabled={deepRunning}>{deepRunning ? <><Loader2 className="w-4 h-4 animate-spin" />{t('dealPage.primaryRunning')}</> : <><Microscope className="w-4 h-4" />{deepError ? (locale === 'fr' ? 'Réessayer' : 'Try again') : nextLabel}</>}</Btn>
   }
+  else if (next.key === 'open_negotiation') primary = <Btn href={next.href} variant={waitingOnClient ? 'primary' : 'ink'}>{nextLabel}</Btn>
+  else if (next.key === 'view_outcome') primary = won ? <Btn href={next.href} variant="ghost">{nextLabel}</Btn> : null
+  else primary = <Btn href={next.href} variant="primary">{nextLabel}</Btn>
+  // Header/phone bar: the closed state has no forward action (the ⋯ menu carries reopen).
+  const headerPrimary = closed ? null : primary
+  const closeAside = next.offerClose && mode === 'app'
+    ? <span className="text-ink-3">{t('dealPage.closeAside')} <button type="button" onClick={() => setCloseOpen(true)} className="font-semibold text-green-deep hover:underline">{t('dealPage.closeAsideCta')}</button></span>
+    : null
 
   // ── verdict copy ─────────────────────────────────────────────
   let eyebrow: ReactNode
@@ -148,7 +188,15 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
   if (won) {
     eyebrow = t('dealPage.verdictWonEyebrow', { date: deal.closed_at ? dateShort(deal.closed_at) : '' })
     title = achieved > 0 ? t('dealPage.verdictWonTitle', { v: fmtMoney(achieved, currency), pct: (savingsPct ?? 0).toFixed(1) }) : t('dealPage.verdictWonTitleNoAmount')
-    body = deal.close_summary || scoreRationale || ''
+    // close_summary is stored as JSON (see the close route); show its narrative, never the raw object.
+    body = (() => {
+      const raw = deal.close_summary
+      if (!raw) return scoreRationale || ''
+      try {
+        const p = JSON.parse(raw) as { starting_position?: string; next_action?: string }
+        return [p.starting_position, p.next_action].filter(Boolean).join(' ') || scoreRationale || ''
+      } catch { return raw }
+    })()
   } else if (closed) {
     eyebrow = t('dealPage.verdictClosedEyebrow')
     title = scoreLabel || ''
@@ -192,10 +240,9 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
             <Chip tone={stageTone(stage, { won, waitingOnClient, mode: negMode })}>{stageChipLabel}</Chip>
             {sortedRounds.length > 1 && <Chip>{t('dealPage.rounds', { n: sortedRounds.length })}</Chip>}
           </div>
-          {/* One action cluster: secondary · primary · ⋯ (export / mark as won / reopen) */}
+          {/* One action cluster: the next step · ⋯ (export / close / reopen). The hand-off lives at the bottom of the page. */}
           <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto [&>a]:flex-1 sm:[&>a]:flex-none [&>button]:flex-1 sm:[&>button]:flex-none">
-            {secondary}
-            {primary}
+            {headerPrimary}
             {mode === 'app' && (
               <DealHeaderClient
                 dealId={deal.id}
@@ -210,18 +257,20 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
                 whatChanged={deal.what_changed ?? null}
                 isAdmin={isAdmin}
                 confirmedOffer={latestConfirmedVendorOffer(deal.rounds)}
+                closeModalOpen={closeOpen}
+                onCloseModalOpenChange={setCloseOpen}
               />
             )}
           </div>
         </div>
-        <div className="px-4 sm:px-6 pb-2.5"><StageRail current={stage} hrefs={railHrefs} /></div>
+        {/* Progress: Analysis → Strategy → Round 1 → Round 2 … → Outcome. Every step links to its section. */}
+        <div className="px-4 sm:px-6 pb-2.5"><NegotiationProgress steps={flow.steps} locale={locale} /></div>
       </div>
 
-      {/* Phone: the header scrolls away, so the one primary action rides above the bottom nav. */}
-      {!isTrial && !isDemo && primary && (
+      {/* Phone: the header scrolls away, so the one next-step action rides above the bottom nav. */}
+      {!isTrial && !isDemo && headerPrimary && (
         <div className="md:hidden fixed left-0 right-0 z-30 px-4 py-2.5 bg-surface/95 backdrop-blur-sm border-t border-line flex gap-2 [&>a]:flex-1 [&>button]:flex-1" style={{ bottom: 'calc(58px + env(safe-area-inset-bottom))' }}>
-          {secondary}
-          {primary}
+          {headerPrimary}
         </div>
       )}
 
@@ -260,7 +309,8 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
           />
           {/* 2. Target price (what to aim for) — falls back to Total / Final price */}
           {won ? (
-            <StatTile label={t('dealPage.statFinal')} tone="money" value={achieved > 0 && totalCommitment ? fmtMoney(parseMoney(totalCommitment).amount - achieved, currency) : totalCommitment ? normalizeAmount(totalCommitment) : '—'} sub={achieved > 0 && totalCommitment ? t('dealPage.statWas', { v: normalizeAmount(totalCommitment) }) : term || undefined} />
+            /* The recorded final total wins; the arithmetic fallback only serves deals closed before final_total existed. */
+            <StatTile label={t('dealPage.statFinal')} tone="money" value={finalTotalRecorded != null ? fmtMoney(finalTotalRecorded, currency) : achieved > 0 && originalTotal ? fmtMoney(parseMoney(originalTotal).amount - achieved, currency) : totalCommitment ? normalizeAmount(totalCommitment) : '—'} sub={initialTotalRecorded != null ? t('dealPage.statWas', { v: fmtMoney(initialTotalRecorded, currency) }) : achieved > 0 && originalTotal ? t('dealPage.statWas', { v: normalizeAmount(originalTotal) }) : term || undefined} />
           ) : benchTile ? (
             <StatTile label={t('dealPage.statTargetLabel')} value={benchTile.value} sub={benchTile.sub} />
           ) : targetRange ? (
@@ -294,8 +344,13 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
           <p className="text-[12.5px] text-ink-3 leading-snug mt-2.5">{t('dealPage.benchNoDataNote')}</p>
         )}
 
-        {isTrial && (
+        {isTrial ? (
           <GateCard tone="green" eyebrow={t('dealPage.trialEyebrow')} title={t('dealPage.trialTitle')} body={t('dealPage.trialBody')} action={<Btn href="/login?from=trial" variant="primary">{t('dealPage.trialCta')}</Btn>} />
+        ) : (
+          /* "What should I do next?" — answered once, right under the numbers. Same action as the header. */
+          (primary || closed) && !waitingOnClient && (
+            <NextActionCard next={next} locale={locale} action={primary} aside={closeAside} error={next.key === 'unlock_full' ? deepError : null} />
+          )
         )}
 
         {/* ── Analysis sections — each section is its own object on the ground ── */}
@@ -333,7 +388,20 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
             messages={messages}
             demoMode={isDemo}
             hideNextStep
+            fullAnalysis={{ loading: deepLoading, error: deepError, run: runFullAnalysis }}
+            flowPhase={flow.phase}
           />
+
+        {/* ── Bottom service CTA: the other way to run the negotiation. Once, at the end of the flow, never a competing primary. ── */}
+        {!isTrial && !closed && !openRequest && deepDone && showFullPlaybook && (
+          <GateCard
+            tone="neutral"
+            eyebrow={t('dealPage.serviceEyebrow')}
+            title={t('dealPage.serviceTitle')}
+            body={t('dealPage.serviceBody', { vendor })}
+            action={<Btn href={negotiateHref} variant="ink">{t('dealPage.serviceCta')}</Btn>}
+          />
+        )}
 
         {/* ── TermLift negotiation status (only when a request exists; the offer itself lives inside step 3) ── */}
         {!isTrial && !closed && openRequest && (

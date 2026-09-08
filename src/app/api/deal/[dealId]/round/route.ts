@@ -11,7 +11,7 @@ import { checkFreeQuota } from '@/lib/pricing'
 import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
 import { MAX_ROUNDS_PER_DEAL } from '@/lib/ai-limits'
 import { runWithAiContext } from '@/lib/ai-telemetry'
-import { canAccessFullAnalysis } from '@/lib/deep-analysis-status'
+import { dealHasFullAnalysis } from '@/lib/deep-analysis-status'
 import type { DealOutput, DealOutputV2 } from '@/types'
 
 // Allow up to 120s for classification + analysis with retries (Vercel Pro plan)
@@ -101,26 +101,27 @@ export async function POST(
       return NextResponse.json({ error: 'Deal not found' }, { status: 404 })
     }
 
-    // Get previous rounds to find the latest output and round number
+    // Get every previous round: the latest carries the context for this analysis,
+    // and the whole set decides the deal's Full Analysis entitlement.
     const { data: previousRounds } = await supabase
       .from('rounds')
       .select('*')
       .eq('deal_id', dealId)
       .order('round_number', { ascending: false })
-      .limit(1)
 
     const lastRound = previousRounds?.[0]
     const nextRoundNumber = lastRound ? lastRound.round_number + 1 : 1
 
     // Round 2+ belongs to the deal's unlocked negotiation workspace \u2014 the
-    // UI already hides this action until Deep Analysis is unlocked, but
+    // UI already hides this action until Full Analysis is unlocked, but
     // "frontend hiding does NOT count as protection": enforce it here too,
     // since this endpoint is directly callable regardless of what the UI
-    // shows. Round 1 (nextRoundNumber === 1) has no prior output to check
-    // and is always allowed \u2014 it IS the deal's first analysis.
-    if (nextRoundNumber > 1 && !profile.is_admin && !canAccessFullAnalysis(lastRound?.output_json)) {
+    // shows. Entitlement is per deal (Full Analysis ran on one of its rounds;
+    // a vendor reply analysed at quick depth inherits it). Round 1
+    // (nextRoundNumber === 1) is always allowed \u2014 it IS the first analysis.
+    if (nextRoundNumber > 1 && !profile.is_admin && !dealHasFullAnalysis(previousRounds)) {
       return NextResponse.json(
-        { error: 'Unlock Deep Analysis for this deal before adding another round.' },
+        { error: 'Unlock Full Analysis for this deal before adding another round.' },
         { status: 403 }
       )
     }
