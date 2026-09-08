@@ -17,6 +17,7 @@ import { Btn, Card, Chip, GateCard } from '@/components/system'
 import { TONE_APPROACH } from '@/lib/tone-recommend'
 import type { RoundDelta } from '@/types'
 import { cn } from '@/lib/utils'
+import { VendorOfferField } from '@/components/deal/VendorOfferField'
 
 interface DealScrollViewProps {
   latestOutput: any
@@ -821,6 +822,13 @@ export function DealScrollView(props: DealScrollViewProps) {
                   const rTotal = ro?.snapshot?.total_commitment
                   const rFlags = ro?.red_flags?.length || 0
                   const rDate = round.created_at && !isNaN(new Date(round.created_at).getTime()) ? new Date(round.created_at).toLocaleDateString(fr ? 'fr-FR' : 'en-US', { month: 'short', day: 'numeric' }) : null
+                  // What this round's offer moved from: the previous round's confirmed/inferred offer, else its structured total.
+                  const prevRound = sortedRounds.find((r: any) => r.round_number === round.round_number - 1) as any
+                  const prevFigure = prevRound
+                    ? (prevRound.vendor_offer?.amount != null
+                      ? { amount: prevRound.vendor_offer.amount as number, currency: prevRound.vendor_offer.currency as string | null }
+                      : { amount: (prevRound.extracted_data?.total_commitment?.amount as number | undefined) ?? (prevRound.output_json?.snapshot?.total_commitment ? parseMoney(String(prevRound.output_json.snapshot.total_commitment)).amount || null : null), currency: (prevRound.extracted_data?.total_commitment?.currency as string | undefined) ?? (prevRound.output_json?.snapshot?.currency as string | undefined) ?? null })
+                    : null
                   return (
                     <li key={round.id} className="grid grid-cols-[22px_1fr] gap-3 pb-4 relative">
                       <span className="w-[22px] h-[22px] rounded-full bg-green text-white tl-label text-[10px] grid place-items-center relative after:content-[''] after:absolute after:top-[22px] after:bottom-[-16px] after:left-[10px] after:w-0.5 after:bg-line">{round.round_number}</span>
@@ -830,6 +838,9 @@ export function DealScrollView(props: DealScrollViewProps) {
                         <p className="text-[12px] text-ink-3 tl-num">{[rDate, rTotal ? normalizeAmount(rTotal) : null, rFlags > 0 ? `${rFlags} ${fr ? 'point(s)' : 'flags'}` : null].filter(Boolean).join(' · ')}</p>
                         </div>
                         {ro?.round_delta?.headline && <p className="text-[12.5px] text-ink-2 mt-0.5 leading-snug">{ro.round_delta.headline}</p>}
+                        {round.round_number > 1 && !demoMode && (
+                          <VendorOfferField roundId={round.id} offer={round.vendor_offer ?? null} previous={prevFigure} fr={fr} />
+                        )}
                       </div>
                     </li>
                   )

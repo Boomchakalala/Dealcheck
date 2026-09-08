@@ -123,6 +123,8 @@ export const AddRoundSchema = z.object({
   note: z.string().nullable().optional(),
   extractedText: z.string().min(10, 'Extracted text is too short'),
   saveExtractedText: z.boolean().default(false),
+  /** How the reply arrived. An uploaded document can back a document_verified offer; pasted text cannot. */
+  source: z.enum(['upload', 'paste']).optional(),
 })
 
 // V2 Schema - Selective, issue-driven analysis

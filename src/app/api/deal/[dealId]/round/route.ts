@@ -5,6 +5,7 @@ import { AddRoundSchema } from '@/lib/schemas'
 import { analyzeDeal } from '@/lib/claude'
 import { compareRounds } from '@/lib/claude/round-delta'
 import { toStructuredExtraction } from '@/lib/structured-extraction'
+import { extractVendorOffer, type VendorOffer } from '@/lib/vendor-offer'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { checkFreeQuota } from '@/lib/pricing'
 import { stripAdvancedOutput, SHOW_FULL_NEGOTIATION_PLAYBOOK } from '@/lib/negotiation-gating'
@@ -159,6 +160,19 @@ export async function POST(
       if (delta) (output as Record<string, unknown>).round_delta = delta
     }
 
+    // Round 2+: the vendor's current total, read from the analysis this round
+    // already ran (no extra model call), checked deterministically and stored
+    // as `inferred` until the user confirms it. Null when no reliable figure.
+    let vendorOffer: VendorOffer | null = null
+    if (nextRoundNumber > 1) {
+      const prevOffer = lastRound?.vendor_offer as VendorOffer | null | undefined
+      const prevExtraction = lastRound?.extracted_data as { total_commitment?: { amount?: number | null; currency?: string | null } } | null | undefined
+      const previous = prevOffer?.amount != null
+        ? { amount: prevOffer.amount, currency: prevOffer.currency }
+        : { amount: prevExtraction?.total_commitment?.amount ?? null, currency: prevExtraction?.total_commitment?.currency ?? (previousOutput as { snapshot?: { currency?: string } } | undefined)?.snapshot?.currency ?? null }
+      vendorOffer = extractVendorOffer({ output, replyText: validated.extractedText, previous, dealCurrency: previous.currency, source: validated.source ?? null })
+    }
+
     // Create new round
     const { data: round, error: roundError } = await supabase
       .from('rounds')
@@ -170,6 +184,7 @@ export async function POST(
         extracted_text: validated.saveExtractedText ? validated.extractedText : null,
         output_json: output,
         extracted_data: toStructuredExtraction(output),
+        vendor_offer: vendorOffer,
         output_markdown: renderMarkdown(output),
         status: 'done',
         model_version: 'claude-sonnet-4',
@@ -202,6 +217,7 @@ export async function POST(
     return NextResponse.json({
       roundId: round.id,
       output: responseOutput,
+      vendorOffer,
     })
   } catch (error) {
     console.error('Add round error:', error)

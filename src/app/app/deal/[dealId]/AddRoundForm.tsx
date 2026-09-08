@@ -36,10 +36,12 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      const response = await fetch('/api/upload', { method: 'POST', body: formData })
+      // /api/extract returns the document's text; /api/upload returns base64 for
+      // vision input and never produced `extractedText`, so uploads here were empty.
+      const response = await fetch('/api/extract', { method: 'POST', body: formData })
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Failed to process file')
-      setExtractedText(data.extractedText)
+      if (!response.ok || !data.text) throw new Error(data.error || 'Failed to process file')
+      setExtractedText(data.text)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to process file')
       setUploadedFile(null)
@@ -95,6 +97,7 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
           extractedText: textToUse,
           // Round text is analysed in-flight and not stored (see lib/retention.ts).
           saveExtractedText: false,
+          source: extractedText && uploadedFile ? 'upload' : 'paste',
         }),
       })
 

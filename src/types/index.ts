@@ -97,6 +97,8 @@ export type Database = {
           extracted_text: string | null
           /** Set when the raw text was removed under the retention policy (lib/retention.ts). */
           extracted_text_purged_at: string | null
+          /** Round 2+: the vendor's current total offer with provenance (lib/vendor-offer.ts). Null on Round 1 and historical rounds. */
+          vendor_offer: any | null
           extracted_data: any | null
           output_json: DealOutput | DealOutputV2
           output_markdown: string | null
