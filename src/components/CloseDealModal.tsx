@@ -6,11 +6,18 @@ import { trackEvent } from '@/lib/analytics'
 import { detectCurrency, formatCurrency, parseMoney } from '@/lib/currency'
 import { Btn, Chip, StatTile } from '@/components/system'
 import { cn } from '@/lib/utils'
+import type { ConfirmedVendorOffer } from '@/lib/vendor-offer'
 
 interface CloseDealModalProps {
   dealId: string
   currentTotal?: string
   roundCount?: number
+  /**
+   * Latest vendor offer a person or document stands behind (never inferred).
+   * When present it is the default final total; the user still has to
+   * confirm it before the deal can close.
+   */
+  confirmedOffer?: ConfirmedVendorOffer | null
   onClose: () => void
   onSuccess: () => void
 }
@@ -65,13 +72,19 @@ function Label({ children, required, hint }: { children: React.ReactNode; requir
  * One primary button. The "fill from the signed document" path is a plain
  * upload, not a feature pitch.
  */
-export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, onSuccess }: CloseDealModalProps) {
+export function CloseDealModal({ dealId, currentTotal, roundCount = 0, confirmedOffer = null, onClose, onSuccess }: CloseDealModalProps) {
   const currency = detectCurrency(currentTotal || '')
   const originalAmount = parseMoneyLocal(currentTotal || '')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Default final total: the latest confirmed/verified vendor offer, if any. Prefilled
+  // only — the person must still tick the confirmation box before closing.
+  const offerPrefill = confirmedOffer && confirmedOffer.amount > 0
+    ? formatMoney(confirmedOffer.amount, ((confirmedOffer.currency || currency) as ReturnType<typeof detectCurrency>))
+    : ''
+
   const [outcome, setOutcome] = useState<Outcome>('won')
-  const [finalTotal, setFinalTotal] = useState('')
+  const [finalTotal, setFinalTotal] = useState(offerPrefill)
   // The final total only counts once a person confirmed it: typing it, or ticking the box under a prefilled estimate.
   const [finalConfirmed, setFinalConfirmed] = useState(false)
   const [whatChanged, setWhatChanged] = useState<string[]>([])
@@ -325,6 +338,12 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
             <div className="flex items-center gap-2.5 text-[13px] text-ink-2">
               <Chip tone="green">Pre-filled</Chip>
               <span>From your negotiation data. Check the numbers before closing.</span>
+            </div>
+          )}
+          {!aiDone && !isLost && offerPrefill && (
+            <div className="flex items-center gap-2.5 text-[13px] text-ink-2">
+              <Chip tone="green">Pre-filled</Chip>
+              <span>From the vendor’s {confirmedOffer?.provenance === 'document_verified' ? 'document-verified' : 'confirmed'} offer in Round {confirmedOffer?.round}. Confirm or edit it before closing.</span>
             </div>
           )}
 

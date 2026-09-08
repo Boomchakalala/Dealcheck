@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
-import { extractVendorOffer, confirmVendorOffer, amountPrintedIn, offerChange } from './vendor-offer'
+import { extractVendorOffer, confirmVendorOffer, amountPrintedIn, offerChange, latestConfirmedVendorOffer } from './vendor-offer'
 
 const reply = (total: string, extra = '') => `Thanks for your note. We can offer the following revised terms.\nSeats: 500 × €188.00 = €94,000.00\n${extra}\nTotal: ${total}\nValid 30 days.`
 const out = (total: string, currency = 'EUR', qf?: Record<string, unknown>) => ({ snapshot: { total_commitment: total, currency }, quote_facts: qf ?? null })
@@ -96,6 +96,37 @@ describe('confirmVendorOffer', () => {
   it('refuses a non-positive or missing amount', () => {
     expect(confirmVendorOffer(inferred, { amount: 0, currency: 'EUR' }).ok).toBe(false)
     expect(confirmVendorOffer(null, { amount: 'abc', currency: 'EUR' }).ok).toBe(false)
+  })
+})
+
+describe('latestConfirmedVendorOffer (close-modal prefill)', () => {
+  const mk = (round: number, amount: number, provenance: 'inferred' | 'user_confirmed' | 'document_verified') => ({
+    round_number: round,
+    vendor_offer: { version: 1 as const, amount, currency: 'EUR', provenance, extracted: null, checks: { currency: 'match' as const, printed: 'found' as const, total: 'unchecked' as const, plausibility: 'ok' as const }, ceiling: 'user_confirmed' as const, source: null, confirmed_at: null, notes: [] },
+  })
+
+  it('a confirmed latest offer prefills', () => {
+    expect(latestConfirmedVendorOffer([{ round_number: 1 }, mk(2, 94000, 'user_confirmed')])).toMatchObject({ amount: 94000, round: 2, provenance: 'user_confirmed' })
+  })
+
+  it('a document-verified latest offer prefills', () => {
+    expect(latestConfirmedVendorOffer([{ round_number: 1 }, mk(2, 94000, 'document_verified')])).toMatchObject({ amount: 94000, round: 2, provenance: 'document_verified' })
+  })
+
+  it('an inferred latest offer is ignored', () => {
+    expect(latestConfirmedVendorOffer([{ round_number: 1 }, mk(2, 94000, 'inferred')])).toBeNull()
+  })
+
+  it('no offer at all → null, so the AI estimate fallback applies', () => {
+    expect(latestConfirmedVendorOffer([{ round_number: 1 }, { round_number: 2, vendor_offer: null }])).toBeNull()
+    expect(latestConfirmedVendorOffer(null)).toBeNull()
+  })
+
+  it('with several offers the latest confirmed or verified one wins, skipping a newer inferred one', () => {
+    const rounds = [{ round_number: 1 }, mk(2, 94000, 'user_confirmed'), mk(3, 91000, 'document_verified'), mk(4, 88000, 'inferred')]
+    expect(latestConfirmedVendorOffer(rounds)).toMatchObject({ amount: 91000, round: 3 })
+    // order of input does not matter
+    expect(latestConfirmedVendorOffer([...rounds].reverse())).toMatchObject({ amount: 91000, round: 3 })
   })
 })
 

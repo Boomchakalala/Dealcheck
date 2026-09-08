@@ -18,6 +18,7 @@ import {
   getRenewalDate, getSavingsRange, getScore, getTotalCommitment, getVendorName, isClosed as dealIsClosed, isWon as dealIsWon, fmtMoney, scoreHeadline,
 } from '@/lib/deal-metrics'
 import { normalizeAmount, parseMoney } from '@/lib/currency'
+import { latestConfirmedVendorOffer } from '@/lib/vendor-offer'
 
 export interface DealWorkspaceDeal extends DealLike {
   close_summary?: string | null
@@ -208,6 +209,7 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
                 roundCount={sortedRounds.length}
                 whatChanged={deal.what_changed ?? null}
                 isAdmin={isAdmin}
+                confirmedOffer={latestConfirmedVendorOffer(deal.rounds)}
               />
             )}
           </div>

@@ -28,6 +28,17 @@ describe('deriveCloseOutcome', () => {
     if (!r.ok) expect(r.error).toMatch(/confirm/i)
   })
 
+  it('the close stores the total the person confirmed, independently of a prefilled vendor offer', () => {
+    // The modal may prefill €94,000 from a confirmed vendor offer; the person edits it to €91,000 and confirms.
+    // Only the confirmed figure reaches the close arithmetic — the prefill is never read here.
+    const r = deriveCloseOutcome({ outcome: 'won', initialTotalRaw: '€100,000', finalTotalRaw: '€91,000', finalTotalConfirmed: true, finalTotalEvidence: 'manual' })
+    expect(r.ok && r.value.finalTotal).toBe(91000)
+    expect(r.ok && r.value.savingsAmount).toBe(9000)
+    expect(r.ok && r.value.provenance).toBe('user_confirmed')
+    // …and an untouched prefill still needs the explicit confirmation.
+    expect(deriveCloseOutcome({ outcome: 'won', initialTotalRaw: '€100,000', finalTotalRaw: '€94,000', finalTotalConfirmed: false }).ok).toBe(false)
+  })
+
   it('a won deal without a final total is refused', () => {
     const r = deriveCloseOutcome({ outcome: 'won', initialTotalRaw: 10000, finalTotalRaw: null, finalTotalConfirmed: true })
     expect(r.ok).toBe(false)

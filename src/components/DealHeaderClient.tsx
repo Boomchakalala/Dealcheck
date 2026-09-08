@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CloseDealModal } from '@/components/CloseDealModal'
+import type { ConfirmedVendorOffer } from '@/lib/vendor-offer'
 import { RecordObservationModal } from '@/components/RecordObservationModal'
 import { Loader2, MoreHorizontal, FileDown, CheckCircle2, RotateCcw, Database } from 'lucide-react'
 import { toast } from 'sonner'
@@ -23,6 +24,8 @@ interface DealHeaderClientProps {
   whatChanged?: string[] | null
   userPlan?: string
   isAdmin?: boolean
+  /** Latest confirmed/verified vendor offer — the close modal's default final total. Never inferred. */
+  confirmedOffer?: ConfirmedVendorOffer | null
 }
 
 /**
@@ -30,7 +33,7 @@ interface DealHeaderClientProps {
  * reopen. The stage-driven primary action lives in the workspace header —
  * this menu must never duplicate it.
  */
-export function DealHeaderClient({ dealId, dealStatus, currentTotal, originalTotal, roundCount, userPlan = 'free', isAdmin = false }: DealHeaderClientProps) {
+export function DealHeaderClient({ dealId, dealStatus, currentTotal, originalTotal, roundCount, userPlan = 'free', isAdmin = false, confirmedOffer = null }: DealHeaderClientProps) {
   const router = useRouter()
   const t = useT()
   const [open, setOpen] = useState(false)
@@ -126,6 +129,7 @@ export function DealHeaderClient({ dealId, dealStatus, currentTotal, originalTot
           dealId={dealId}
           currentTotal={originalTotal || currentTotal}
           roundCount={roundCount || 0}
+          confirmedOffer={confirmedOffer}
           onClose={() => setShowCloseModal(false)}
           onSuccess={() => { setShowCloseModal(false); router.refresh() }}
         />

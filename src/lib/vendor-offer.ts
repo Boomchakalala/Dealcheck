@@ -186,6 +186,31 @@ export function confirmVendorOffer(
 export const PROVENANCE_RANK: Record<OfferProvenance, number> = { inferred: 0, user_confirmed: 1, document_verified: 2 }
 export const isConfirmed = (p: OfferProvenance | null | undefined) => p === 'user_confirmed' || p === 'document_verified'
 
+export interface ConfirmedVendorOffer {
+  amount: number
+  currency: string | null
+  round: number
+  provenance: 'user_confirmed' | 'document_verified'
+}
+
+/**
+ * The latest vendor offer a person or a document stands behind. Inferred
+ * offers are skipped, so the close modal can prefill from this and never
+ * from an unconfirmed AI figure. Null when no round carries one.
+ */
+export function latestConfirmedVendorOffer(
+  rounds: Array<{ round_number: number; vendor_offer?: VendorOffer | null }> | null | undefined,
+): ConfirmedVendorOffer | null {
+  const sorted = [...(rounds || [])].sort((a, b) => b.round_number - a.round_number)
+  for (const r of sorted) {
+    const vo = r.vendor_offer
+    if (vo && vo.amount != null && vo.amount > 0 && isConfirmed(vo.provenance)) {
+      return { amount: vo.amount, currency: vo.currency, round: r.round_number, provenance: vo.provenance as ConfirmedVendorOffer['provenance'] }
+    }
+  }
+  return null
+}
+
 /** Change of one figure versus the previous, for display. */
 export function offerChange(current: number | null, previous: number | null): { delta: number; pct: number } | null {
   if (current == null || previous == null || previous <= 0) return null

@@ -189,6 +189,7 @@ export function HomeDealsClient({ rows: initialRows, linkBase = '/app', readOnly
           dealId={closing.id}
           currentTotal={closing.total || undefined}
           roundCount={closing.roundCount}
+          confirmedOffer={closing.confirmedOffer}
           onClose={() => setClosing(null)}
           onSuccess={() => { setClosing(null); router.refresh() }}
         />

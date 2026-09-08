@@ -33,7 +33,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   const [{ data: profile }, { data: deals, error: dealsError }, { data: requests, error: requestsError }] = await Promise.all([
     supabase.from('profiles').select('usage_count, is_admin, base_currency').eq('id', user.id).single(),
-    supabase.from('deals').select('*, rounds (id, output_json, round_number, status, created_at)').eq('user_id', user.id).order('updated_at', { ascending: false }),
+    supabase.from('deals').select('*, rounds (id, output_json, round_number, status, created_at, vendor_offer)').eq('user_id', user.id).order('updated_at', { ascending: false }),
     supabase.from('negotiation_requests').select('deal_id, status').eq('user_id', user.id),
   ])
 

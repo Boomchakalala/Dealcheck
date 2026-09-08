@@ -8,6 +8,7 @@ import {
   getRedFlagCount, getScore, getTotalCommitment, getVendorName, isClosed, isWon,
 } from '@/lib/deal-metrics'
 import { formatCurrency, normalizeAmount } from '@/lib/currency'
+import { latestConfirmedVendorOffer, type ConfirmedVendorOffer } from '@/lib/vendor-offer'
 
 export interface HomeRow {
   id: string
@@ -32,6 +33,8 @@ export interface HomeRow {
   roundCount: number
   updatedAt: string
   closedAt: string | null
+  /** Latest confirmed or document-verified vendor offer, for the close modal's prefill. Never an inferred one. */
+  confirmedOffer: ConfirmedVendorOffer | null
 }
 
 export function buildHomeRows(deals: DealLike[], requestStatusByDeal: Map<string, string> = new Map()): HomeRow[] {
@@ -74,6 +77,7 @@ export function buildHomeRows(deals: DealLike[], requestStatusByDeal: Map<string
       roundCount: d.rounds?.length || 0,
       updatedAt: d.updated_at,
       closedAt: d.closed_at ?? null,
+      confirmedOffer: latestConfirmedVendorOffer(d.rounds),
     }
   })
 }

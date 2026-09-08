@@ -6,6 +6,7 @@
  * Every screen now reads the same figure for the same deal.
  */
 import { detectCurrency, formatCurrency, parseMoney, type Currency } from '@/lib/currency'
+import type { VendorOffer } from '@/lib/vendor-offer'
 
 /** The analysis JSON is loosely typed across schema versions — read defensively. */
 interface LooseOutput {
@@ -28,6 +29,8 @@ export interface RoundLike {
   output_json?: unknown
   status?: string
   created_at?: string
+  /** Round 2+: the vendor's offer with provenance (lib/vendor-offer.ts); present only on selects that ask for it. */
+  vendor_offer?: VendorOffer | null
 }
 export interface DealLike {
   id: string
