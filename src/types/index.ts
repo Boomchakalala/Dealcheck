@@ -95,6 +95,8 @@ export type Database = {
           created_at: string
           note: string | null
           extracted_text: string | null
+          /** Set when the raw text was removed under the retention policy (lib/retention.ts). */
+          extracted_text_purged_at: string | null
           extracted_data: any | null
           output_json: DealOutput | DealOutputV2
           output_markdown: string | null

@@ -1,0 +1,70 @@
+{
+  "privacy": {
+    "encryptionDesc": "Données chiffrées en transit et au repos. Les fichiers de devis sont lus en mémoire et jamais stockés ; le texte extrait est supprimé après l'Analyse approfondie, à la clôture, ou après 90 jours."
+  },
+  "about": {
+    "card3Desc": "Vos tarifs fournisseurs sont confidentiels. Nous avons conçu TermLift avec cette exigence dès le premier jour — chiffré, jamais utilisé pour l'entraînement IA, fichiers de devis jamais stockés."
+  },
+  "settingsClient": {
+    "retentionTitle": "Ce que nous conservons, et combien de temps",
+    "retentionFiles": "Les fichiers de devis sont lus en mémoire et jamais stockés.",
+    "retentionText": "Le texte extrait d'un devis est supprimé dès que l'Analyse approfondie est terminée, à la clôture du contrat, ou au plus tard {days} jours après l'import. L'analyse elle-même reste jusqu'à ce que vous supprimiez le contrat.",
+    "retentionDocs": "Les documents joints pour le service de négociation sont supprimés {grace} jours après la clôture du dossier, ou au plus tard {months} mois après l'import.",
+    "retentionDelete": "Supprimer un contrat ou votre compte efface immédiatement ses données et documents.",
+    "retentionLink": "Lire la politique de confidentialité complète"
+  },
+  "privacyPage": {
+    "summary1": "Les fichiers de devis sont lus en mémoire et jamais stockés. Nous ne conservons le texte extrait que temporairement, et l'analyse jusqu'à ce que vous supprimiez le contrat.",
+    "summary2": "Le texte extrait du devis est supprimé à la fin de l'Analyse approfondie, à la clôture du contrat, ou 90 jours après l'import — la première de ces échéances.",
+    "summary5": "Vous pouvez supprimer votre compte et toutes les données associées à tout moment, y compris tout document que vous nous avez demandé de conserver pour une négociation.",
+    "s2DealData": "Données de contrat :",
+    "s2Deal1": "Texte extrait du devis importé (conservé temporairement — voir Conservation des données)",
+    "s2Deal4": "Si vous utilisez le service de négociation et joignez un devis ou un contrat : le document lui-même, pendant la durée du dossier (voir Conservation des données)",
+    "s3Item5": "Améliorer le service à partir de schémas d'utilisation agrégés liés à l'identifiant de votre compte, jamais à vos documents",
+    "s3Item8": "Constituer des benchmarks tarifaires dé-identifiés à partir des résultats de négociations clôturées : fournisseur, produit, prix, durée et mois de clôture. Une ligne de benchmark ne contient aucun nom, email, compte, contrat ni référence de document. Elle est pseudonymisée et non anonyme, elle est relue par une personne avant d'être ajoutée, et elle subsiste après la suppression du contrat ou du compte dont elle provient",
+    "s4PostHogDesc": "Données analytiques produit liées à l'identifiant de votre compte. Nous n'envoyons à PostHog ni votre adresse email, ni les noms de fournisseurs, ni les montants de vos documents, ni aucun contenu de document.",
+    "s5Item1Prefix": "Fichiers de devis :",
+    "s5Item1": "Lus en mémoire et jamais stockés. Un document final importé à la clôture d'un contrat est lu de la même façon ; nous ne conservons que son empreinte SHA-256, son type de fichier et les chiffres que nous y avons lus",
+    "s5Item2Prefix": "Texte extrait du devis :",
+    "s5Item2": "Conservé sur le contrat tant qu'une Analyse approfondie peut en avoir besoin, puis supprimé : à la fin de l'Analyse approfondie, à la clôture du contrat, ou 90 jours après l'import, la première de ces échéances",
+    "s5Item3Prefix": "Contrats sauvegardés :",
+    "s5Item3": "Les résultats d'analyse, les faits structurés du contrat (fournisseur, produit, montants, durée) et les résultats sont conservés jusqu'à ce que vous supprimiez le contrat ou votre compte",
+    "s5Item4Prefix": "Documents de négociation :",
+    "s5Item4": "Supprimés 30 jours après la clôture de la négociation, et jamais plus de 12 mois après l'import",
+    "s5Item5Prefix": "Données de compte :",
+    "s5Item5": "Conservées jusqu'à la suppression de votre compte",
+    "s5Item6Prefix": "Télémétrie d'utilisation et IA :",
+    "s5Item6": "Les adresses IP et les détails d'erreur sont supprimés après 90 jours ; les compteurs de tokens et de coûts sont conservés sans eux",
+    "s5Item7Prefix": "Lignes de benchmark :",
+    "s5Item7": "Les lignes de résultats dé-identifiées (section 3) sont conservées après la suppression du contrat dont elles proviennent",
+    "s5Note": "Nous ne vendons ni ne partageons vos données avec des annonceurs. Lorsque vous supprimez un contrat ou votre compte, ses lignes et documents sont immédiatement retirés de notre base et de notre stockage ; les journaux opérationnels de nos prestataires expirent selon leurs propres calendriers, et les lignes de benchmark dé-identifiées subsistent."
+  },
+  "termsPage": {
+    "s2Item5": "Les fichiers de devis importés sont supprimés après traitement ; le texte extrait est conservé temporairement selon les règles de conservation de la Politique de confidentialité",
+    "s6YourContentDesc": "Vous restez propriétaire de ce que vous importez. En utilisant le service, vous nous accordez une licence limitée pour traiter votre contenu afin de fournir l'analyse et, lorsque vous le demandez, le service de négociation, et pour constituer des benchmarks tarifaires dé-identifiés à partir des résultats de contrats clôturés, comme décrit dans la Politique de confidentialité. Nous ne revendiquons aucun droit de propriété sur vos documents.",
+    "s8Item4": "En cas de résiliation, votre droit d'utiliser le service prend fin immédiatement. Exportez ce dont vous avez besoin avant de supprimer votre compte : la suppression est immédiate et définitive"
+  },
+  "securityPage": {
+    "keyPrinciple": "Les fichiers de devis sont lus en mémoire et jamais stockés. Le texte extrait n'est conservé que jusqu'à la fin de l'Analyse approfondie, la clôture du contrat ou 90 jours ; l'analyse elle-même reste jusqu'à ce que vous la supprimiez.",
+    "step1Desc": "Nous lisons le texte de votre PDF ou de votre image. Le fichier n'est conservé qu'en mémoire.",
+    "step3Title": "3. Fichier écarté",
+    "step3Desc": "Le fichier original est écarté à la fin de la requête. Il n'atteint jamais notre base de données ni notre stockage.",
+    "bottomLineDesc": "Vos fichiers de devis originaux ne sont jamais stockés. Le texte extrait est temporaire ; l'analyse vous appartient jusqu'à ce que vous la supprimiez.",
+    "fileDeletionDesc1": "Lorsque vous importez un devis, nous en lisons le texte en mémoire et écartons le fichier à la fin de la requête. Il n'est jamais écrit dans une base de données ni dans un stockage. Nos journaux applicatifs enregistrent la taille de ce que l'IA a renvoyé, jamais son contenu.",
+    "fileDeletionDesc2": "Si vous demandez à TermLift de négocier pour vous et joignez un document, ce fichier est stocké avec votre consentement et supprimé 30 jours après la clôture du dossier, ou au plus tard 12 mois après l'import.",
+    "extractedTextTitle": "Texte extrait",
+    "onlySavedWhenYouSaySo": "Temporaire, par conception",
+    "extractedTextDesc1": "Le texte extrait de votre devis est stocké avec le contrat pour que l'Analyse approfondie puisse être lancée plus tard sans nouvel import. Ce n'est pas une copie permanente : il est supprimé à la fin de l'Analyse approfondie, à la clôture du contrat, ou au plus tard 90 jours après l'import.",
+    "extractedTextDesc2": "Ce qui reste : l'analyse générée par l'IA, les faits structurés du contrat (fournisseur, produit, montants, durée) et le résultat que vous enregistrez. Vous pouvez supprimer n'importe quel contrat à tout moment.",
+    "aiTrainingDesc2": "Nous n'utilisons pas non plus vos données pour entraîner nos propres modèles. Les résultats de négociations clôturées peuvent devenir des lignes de benchmark dé-identifiées (fournisseur, produit, prix, durée, mois de clôture), relues par une personne et dépourvues de toute référence à un compte, un contrat ou un document. C'est un jeu de données tarifaires, pas des données d'entraînement, et la Politique de confidentialité le décrit.",
+    "gdprDesc2": "Notre base de données et notre stockage de fichiers sont hébergés dans l'UE (Supabase, eu-west-1). Le traitement a lieu là où nos prestataires opèrent : notre application sur Vercel aux États-Unis et l'analyse IA chez Anthropic aux États-Unis, sous Clauses contractuelles types.",
+    "dontStore": "Stocker vos fichiers de devis originaux",
+    "ctaSubtitle": "Vos fichiers de devis ne sont jamais stockés. Le texte extrait est temporaire, et l'analyse ne reste que tant que vous conservez le contrat."
+  },
+  "help": {
+    "privacy": {
+      "a1": "Oui. Les fichiers de devis sont lus en mémoire et jamais stockés. Le texte extrait ne reste sur le contrat que jusqu'à la fin de l'Analyse approfondie, la clôture du contrat ou 90 jours ; l'analyse elle-même reste jusqu'à ce que vous supprimiez le contrat. Toutes les données sont chiffrées en transit (TLS) et au repos. Vos documents ne sont jamais utilisés pour l'entraînement IA.",
+      "a4": "Oui. Rendez-vous dans les paramètres de votre profil et choisissez « Supprimer le compte ». Votre compte, vos contrats sauvegardés, votre historique d'analyses et tout document importé pour le service de négociation sont supprimés immédiatement. Les lignes de benchmark dé-identifiées issues de contrats clôturés n'ont aucun lien avec votre compte et subsistent. Cette action est irréversible."
+    }
+  }
+}

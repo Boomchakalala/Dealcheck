@@ -1,0 +1,5 @@
+{
+  "helpPage": { "sections": { "privacy": {
+    "a1": "Oui. Les fichiers de devis sont lus en mémoire et jamais stockés. Le texte extrait ne reste sur le dossier que jusqu'à la fin de l'Analyse approfondie, la clôture du dossier ou 90 jours ; l'analyse elle-même reste jusqu'à ce que vous supprimiez le dossier. Toutes les données sont chiffrées en transit (TLS) et au repos. Vos documents ne sont jamais utilisés pour l'entraînement de l'IA."
+  } } }
+}

@@ -8,6 +8,11 @@ import type { BenchmarkInput, DealTypeKey, VerificationLevel } from './types'
  * reads structured facts only and produces a preview an admin reviews before
  * anything is written. It never receives, and therefore can never emit, a
  * user id, a deal id, a document path, a person's name or any prose.
+ *
+ * The result is DE-IDENTIFIED (pseudonymised), not anonymous: vendor plus
+ * exact prices can still be matched to a deal by someone with database
+ * access. Month-level dates and the engine's minimum-comparables gate limit
+ * that; nothing here should be described as anonymous.
  */
 
 export interface ClosedDealFacts {
@@ -57,7 +62,14 @@ export interface OutcomeMapping {
   blockers: string[]
 }
 
-const FORBIDDEN_KEYS = ['user_id', 'deal_id', 'document_path', 'close_summary', 'close_notes', 'notes', 'contact_name', 'contact_phone', 'email', 'created_by']
+const FORBIDDEN_KEYS = ['user_id', 'deal_id', 'document_path', 'close_summary', 'close_notes', 'notes', 'contact_name', 'contact_phone', 'email', 'created_by', 'verification']
+
+/** First day of the close month (UTC), as YYYY-MM-01. Today's month when the close date is unknown. */
+export function toObservationMonth(closedAt: string | null | undefined): string {
+  const d = closedAt ? new Date(closedAt) : new Date()
+  const safe = Number.isNaN(d.getTime()) ? new Date() : d
+  return `${safe.getUTCFullYear()}-${String(safe.getUTCMonth() + 1).padStart(2, '0')}-01`
+}
 
 export function mapClosedDealToObservation(
   deal: ClosedDealFacts,
@@ -108,7 +120,9 @@ export function mapClosedDealToObservation(
     initial_quote: deal.initialTotal ?? extraction?.total_commitment.amount ?? null,
     final_price: finalPrice,
     discount_from_list: unitPrice && discountFromList != null ? discountFromList : null,
-    observation_date: (deal.closedAt || new Date().toISOString()).slice(0, 10),
+    // Month precision on purpose: an exact close date joined to vendor and
+    // final price re-identifies the deal for anyone with database access.
+    observation_date: toObservationMonth(deal.closedAt),
     verification_level: v.level,
     confidence: v.confidence,
     levers: Array.isArray(deal.whatChanged) ? deal.whatChanged.filter((s): s is string => typeof s === 'string').slice(0, 12) : [],

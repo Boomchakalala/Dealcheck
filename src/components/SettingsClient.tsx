@@ -13,6 +13,7 @@ import { useI18n } from '@/i18n/context'
 import { AppPage, PageHeader } from '@/components/system'
 import { FREE_ANALYSIS_LIMIT } from '@/lib/pricing'
 import { NEGOTIATION_FEE_PERCENT } from '@/lib/pricing'
+import { RAW_TEXT_MAX_AGE_DAYS, NEGOTIATION_DOC_GRACE_DAYS, NEGOTIATION_DOC_MAX_AGE_DAYS } from '@/lib/retention'
 
 interface NegotiationPrefs {
   payment_terms: 'net_30' | 'net_60' | 'net_90' | 'no_preference'
@@ -51,7 +52,6 @@ export function SettingsClient({
   const [resetLoading, setResetLoading] = useState(false)
   const [selectedCurrency, setSelectedCurrency] = useState(initCurrency)
   const [currencySaving, setCurrencySaving] = useState(false)
-  const [saveExtractedText, setSaveExtractedText] = useState(false)
   const [productEmails, setProductEmails] = useState(true)
   const defaultPrefs: NegotiationPrefs = { payment_terms: 'no_preference', top_priority: 'lowest_price', auto_renewal: 'prefer_opt_in', contract_term_strategy: 'match_quote' }
   const [negPrefs, setNegPrefs] = useState<NegotiationPrefs>(initPrefs || defaultPrefs)
@@ -601,13 +601,19 @@ export function SettingsClient({
             {activeSection === 'privacy' && (
               <div className="space-y-5">
                 <div className="space-y-4">
-                  <ToggleRow label={t('settingsClient.saveExtractedText')} description={t('settingsClient.saveExtractedTextDesc')} value={saveExtractedText} onChange={setSaveExtractedText} />
                   <ToggleRow label={t('settingsClient.receiveEmails')} description={t('settingsClient.receiveEmailsDesc')} value={productEmails} onChange={setProductEmails} />
                 </div>
-                <div className="bg-ground rounded-[10px] p-4 border border-line-2">
-                  <p className="text-[11px] text-ink-3 leading-relaxed">
-                    Your data is encrypted at rest and in transit. Contract text is processed for analysis and discarded unless you enable text storage above. We never share your data with third parties.
-                  </p>
+                {/* Not a toggle: this is what happens, stated plainly. The old "save extracted text"
+                    switch was never wired to anything, so it was removed rather than left lying. */}
+                <div className="bg-ground rounded-[10px] p-4 border border-line-2 space-y-2">
+                  <p className="text-[12px] font-semibold text-ink">{t('settingsClient.retentionTitle')}</p>
+                  <ul className="text-[11.5px] text-ink-3 leading-relaxed list-disc pl-4 space-y-1">
+                    <li>{t('settingsClient.retentionFiles')}</li>
+                    <li>{t('settingsClient.retentionText', { days: RAW_TEXT_MAX_AGE_DAYS })}</li>
+                    <li>{t('settingsClient.retentionDocs', { grace: NEGOTIATION_DOC_GRACE_DAYS, months: Math.round(NEGOTIATION_DOC_MAX_AGE_DAYS / 30) })}</li>
+                    <li>{t('settingsClient.retentionDelete')}</li>
+                  </ul>
+                  <p className="text-[11px] text-ink-3"><a href="/privacy" className="text-green-deep font-medium hover:underline">{t('settingsClient.retentionLink')}</a></p>
                 </div>
               </div>
             )}

@@ -38,9 +38,9 @@ const faqData: Record<Category, { q: string; a: string }[]> = {
     { q: 'How are savings calculated?', a: 'Savings are calculated by comparing the original quoted price to the final agreed price when you close the deal. The potential savings shown during analysis are estimates based on market benchmarks and the specific issues found in your quote.' },
   ],
   'privacy': [
-    { q: 'Is my data private?', a: "Yes. Uploaded files are deleted immediately after text extraction. Your deal data is stored securely and encrypted in transit (TLS) and at rest. Your documents are never used for AI training. We use Anthropic\u2019s Claude API which has a zero-retention data policy." },
-    { q: 'Are my documents stored?', a: 'No. Files (PDFs, images) are processed in memory and deleted immediately after extraction. Only the structured analysis output is saved to your account \u2014 not the original document. You can delete any deal and its data at any time from your settings.' },
-    { q: 'Can I delete all my data?', a: "Yes. Go to Settings \u2192 Danger Zone and click \u2018Delete account.\u2019 This permanently removes all your deals, analysis history, and account information. This action cannot be undone." },
+    { q: 'Is my data private?', a: "Yes. Quote files are read in memory and never stored. Your deal data is encrypted in transit (TLS) and at rest, and your documents are never used for AI training. Anthropic processes the extracted text under its API terms and does not train on it." },
+    { q: 'Are my documents stored?', a: 'Quote files (PDFs, images) are never stored. The text we extract stays with the deal only until Deep Analysis has run, the deal closes, or 90 days pass; the analysis and the structured deal facts stay until you delete the deal. A document you attach for the negotiation service is kept with your consent and removed 30 days after the case closes, or 12 months after upload at the latest.' },
+    { q: 'Can I delete all my data?', a: "Yes. Go to Settings \u2192 Danger Zone and click \u2018Delete account.\u2019 Your account, deals, analysis history and any negotiation documents are removed immediately. De-identified benchmark rows built from closed deals carry no link to your account and remain. This action cannot be undone." },
   ],
   'billing': [
     { q: "Is analyzing a quote free?", a: "Yes \u2014 no credit card required. Create an account to save deals and track your history." },

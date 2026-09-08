@@ -72,16 +72,16 @@ function LoginForm() {
         const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}${nextPath}` } })
         if (error) throw error
         if (data.user) {
-          trackEvent({ name: 'signup_completed', properties: { email } })
-          identifyUser(data.user.id, { email })
+          trackEvent({ name: 'signup_completed', properties: {} })
+          identifyUser(data.user.id)
         }
         setMessage(t('login.confirmEmail'))
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
         if (data.user) {
-          trackEvent({ name: 'login_completed', properties: { email } })
-          identifyUser(data.user.id, { email })
+          trackEvent({ name: 'login_completed', properties: {} })
+          identifyUser(data.user.id)
         }
         router.push(nextPath)
         router.refresh()

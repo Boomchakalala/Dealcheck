@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createTrackedMessage, CLAUDE_MODEL, getResponseText, parseJsonFromContent, buildImageContent, SUPPORTED_IMAGE_MIME_TYPES, type ClaudeImageMediaType } from './client'
+import { logAiRaw } from '@/lib/ai-debug'
 
 const EXTRACTION_PROMPT = `You are a financial data extraction engine. Your ONLY job is to extract factual information from vendor quotes. Do NOT analyze, judge, or recommend — just extract.
 
@@ -148,7 +149,7 @@ export async function extractFinancialFacts(
 
   const content = getResponseText(response)
   if (!content) throw new Error('No response from AI')
-  console.log('[TermLift] Extract raw response (first 500 chars):', content.substring(0, 500))
+  logAiRaw('Extract raw response', content)
 
   const parsed = parseJsonFromContent(content) as ExtractedFacts
   console.log('[TermLift] Extract parsed keys:', Object.keys(parsed))

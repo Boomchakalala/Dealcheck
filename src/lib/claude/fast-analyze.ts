@@ -4,6 +4,7 @@ import { QUOTE_TYPE_OVERLAYS, buildSavingsDirective, buildClassificationContext 
 import type { QuoteClassificationType } from '../schemas'
 import type { DealOutput } from '@/types'
 import type { ExtractedFacts } from './extract'
+import { logAiRaw } from '@/lib/ai-debug'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Fast core analysis — a deliberately trimmed sibling of analyze.ts's
@@ -272,7 +273,7 @@ export async function analyzeFastCore(
 
   const content = getResponseText(response)
   if (!content) throw new Error('No response from AI')
-  console.log('[TermLift] Fast analysis raw response (first 300 chars):', content.substring(0, 300))
+  logAiRaw('Fast analysis raw response', content, 300)
 
   const raw = parseJsonFromContent(content) as FastAnalysisRaw
 

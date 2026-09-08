@@ -1,0 +1,8 @@
+{
+  "footer": { "trustNoDataStored": "Quote files never stored" },
+  "upload": { "trustDeleted": "Quote files never stored" },
+  "addRound": { "processedSecurely": "Processed securely. Quote files are never stored; the text of a round is analysed in memory and not kept." },
+  "pricingPage": { "foot": "{n} free quick analyses per account. Quote files are read in memory and never stored." },
+  "landing": { "trust2": "Files never stored", "who": { "p3": "Quote files never stored, extracted text kept only temporarily" } },
+  "tryPage": { "trust": "~2 min · quote file never stored" }
+}

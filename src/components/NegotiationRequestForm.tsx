@@ -6,6 +6,7 @@ import type { InferredDealType } from '@/lib/deal-type-inference'
 import { dealTypeLabel } from '@/lib/deal-type-inference'
 import { Btn, Chip } from '@/components/system'
 import { cn } from '@/lib/utils'
+import { NEGOTIATION_DOC_GRACE_DAYS, NEGOTIATION_DOC_MAX_AGE_DAYS } from '@/lib/retention'
 
 export interface NegotiationAnalysisContext {
   verdict?: string | null
@@ -306,7 +307,9 @@ export function NegotiationRequestForm({
               {file && (
                 <label className="flex items-start gap-2 mt-2 text-[12.5px] text-ink-2 leading-relaxed">
                   <input type="checkbox" checked={documentConsent} onChange={(e) => setDocumentConsent(e.target.checked)} className="mt-0.5" disabled={loading} />
-                  {fr ? 'J’accepte que TermLift conserve ce document pendant la durée de la négociation.' : 'I consent to this document being retained by TermLift for the duration of the negotiation.'}
+                  {fr
+                    ? `J’accepte que TermLift conserve ce document pour la négociation. Il est supprimé ${NEGOTIATION_DOC_GRACE_DAYS} jours après la clôture du dossier, ou au plus tard ${Math.round(NEGOTIATION_DOC_MAX_AGE_DAYS / 30)} mois après l’import.`
+                    : `I consent to TermLift keeping this document for the negotiation. It is removed ${NEGOTIATION_DOC_GRACE_DAYS} days after the case closes, or ${Math.round(NEGOTIATION_DOC_MAX_AGE_DAYS / 30)} months after upload at the latest.`}
                 </label>
               )}
             </>

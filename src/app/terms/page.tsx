@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 /** Bump when the wording changes — this is the date shown on the page. */
-const LAST_UPDATED = '2026-09-07'
+const LAST_UPDATED = '2026-09-08'
 const EMAIL = 'hello@termlift.com'
 
 export default async function TermsPage() {

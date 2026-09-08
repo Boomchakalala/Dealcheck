@@ -169,7 +169,7 @@ export function AnalysisUploader({
   valuePropHeadline = "In under a minute, you'll know exactly where you stand.",
   valuePropBody = "Our AI reads every line of your quote and gives you an instant score, every red flag, and the savings on the table — then you decide how to act on it.",
   showTrustLine = true,
-  trustLineText = 'Ready in under a minute · Files are deleted after extraction',
+  trustLineText = 'Ready in under a minute · Quote files are never stored',
   liveFindings,
   completionFlash,
 }: AnalysisUploaderProps) {

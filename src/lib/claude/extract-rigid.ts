@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { anthropic, CLAUDE_MODEL, getResponseText, parseJsonFromContent, buildImageContent, type ClaudeImageMediaType } from './client'
 import crypto from 'crypto'
+import { logAiRaw } from '@/lib/ai-debug'
 
 /**
  * Rigid extraction schema — forces the AI to fill a fixed template.
@@ -202,7 +203,7 @@ export async function extractRigid(
 
   const content = getResponseText(response)
   if (!content) throw new Error('No response from AI')
-  console.log('[TermLift] Rigid extract raw (first 500):', content.substring(0, 500))
+  logAiRaw('Rigid extract raw response', content)
 
   const parsed = parseJsonFromContent(content) as RigidExtraction
 

@@ -5,6 +5,7 @@ import { QUOTE_TYPE_OVERLAYS, buildSavingsDirective, buildClassificationContext 
 import type { QuoteClassificationType } from '../schemas'
 import type { DealOutput } from '@/types'
 import type { ExtractedFacts } from './extract'
+import { logAiRaw } from '@/lib/ai-debug'
 
 const ANALYSIS_PROMPT = `You are a sharp buyer-side procurement expert.
 
@@ -366,7 +367,7 @@ export async function analyzeDealFacts(
 
   const content = getResponseText(response)
   if (!content) throw new Error('No response from AI')
-  console.log('[TermLift] Analyze raw response (first 500 chars):', content.substring(0, 500))
+  logAiRaw('Analyze raw response', content)
 
   const parsed = parseJsonFromContent(content) as AnalysisOutput
   console.log('[TermLift] Analyze parsed keys:', Object.keys(parsed))

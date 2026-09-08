@@ -2,6 +2,7 @@ import { createTrackedMessage, CLAUDE_MODEL_ANALYSIS, getResponseText, parseJson
 import type { QuoteClassificationType } from '../schemas'
 import type { QuoteExtraction, RedFlagCandidate } from './types'
 import { getCategoryBenchmark, resolveSavingsTarget, adjustSavingsTarget, type QuoteCategory } from '../category-benchmarks'
+import { logAiParseFailure } from '@/lib/ai-debug'
 
 let idCounter = 0
 function nextId(prefix: string): string {
@@ -326,7 +327,7 @@ ${benchmark.numericBenchmarks ? `Numeric benchmarks: ${benchmark.numericBenchmar
   try {
     parsed = parseJsonFromContent(content) as typeof parsed
   } catch (err) {
-    console.error('[TermLift] Step 2 judgment response failed to parse. Raw content:', content)
+    logAiParseFailure('Step 2 judgment response', content, err)
     throw err
   }
   return (parsed.flags || []).map((f) => ({ ...f, id: nextId('judgment') }))

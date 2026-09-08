@@ -1,0 +1,5 @@
+{
+  "helpPage": { "sections": { "privacy": {
+    "a1": "Yes. Quote files are read in memory and never stored. The extracted text stays with the deal only until Deep Analysis has run, the deal closes, or 90 days pass; the analysis itself stays until you delete the deal. All data is encrypted in transit (TLS) and at rest. Your documents are never used for AI training."
+  } } }
+}

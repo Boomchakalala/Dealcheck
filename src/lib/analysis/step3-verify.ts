@@ -1,5 +1,6 @@
 import { createTrackedMessage, CLAUDE_CLASSIFY_MODEL, getResponseText, parseJsonFromContent } from '../claude/client'
 import type { RedFlagCandidate, VerifiedRedFlag } from './types'
+import { logAiParseFailure } from '@/lib/ai-debug'
 
 // Narrow, cheap fact-check — not a re-judgment of severity or commercial
 // relevance, only "does the original text actually support this claim."
@@ -67,8 +68,7 @@ export async function verifyRedFlags(
   try {
     parsed = parseJsonFromContent(content) as typeof parsed
   } catch (err) {
-    console.error('[TermLift] Step 3 verification response failed to parse:', err)
-    console.error('[TermLift] Step 3 raw content:', content)
+    logAiParseFailure('Step 3 verification response', content, err)
     return candidates.map((c) => ({ ...c, verified: false, verificationNote: 'Verification response could not be parsed' }))
   }
 

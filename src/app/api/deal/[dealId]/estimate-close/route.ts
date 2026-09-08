@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { getClaudeResponse, getLanguageInstruction } from '@/lib/claude'
+import { getClaudeResponse, getLanguageInstruction, CLAUDE_MODEL_ID } from '@/lib/claude'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { checkRateLimit } from '@/lib/rate-limit'
@@ -180,6 +180,8 @@ Return ONLY valid JSON (no markdown, no code fences):
       savings_percent: result.savings_percent ?? null,
       what_changed: result.what_changed || [],
       summary: result.summary || '',
+      // Which model read the document — recorded on the verification record at close.
+      model: finalDocumentText ? CLAUDE_MODEL_ID : null,
     })
   } catch (error) {
     console.error('Estimate close error:', error)

@@ -162,10 +162,12 @@ export default async function AdminNegotiationDetailPage({ params }: { params: P
               {documentUrl ? (
                 <>
                   <Btn href={documentUrl} variant="ghost" size="sm"><FileText className="w-3.5 h-3.5" /> View uploaded document</Btn>
-                  <p className="text-[11.5px] text-ink-3 mt-2">Link expires in 10 minutes. Consented {r.document_consent_at ? new Date(r.document_consent_at).toLocaleString('en-US') : 'at an unknown time'}.</p>
+                  <p className="text-[11.5px] text-ink-3 mt-2">Link expires in 10 minutes. Consented {r.document_consent_at ? new Date(r.document_consent_at).toLocaleString('en-US') : 'at an unknown time'}.{r.document_delete_at ? ` Scheduled for deletion ${fmtShort(r.document_delete_at)}${closed ? '' : ' at the latest; 30 days after close once the case closes'}.` : ''}</p>
                 </>
+              ) : r.document_deleted_at ? (
+                <p className="text-[12.5px] text-ink-3">Document removed {fmtShort(r.document_deleted_at)} under the retention policy.{r.verification?.document?.sha256 ? ' Its fingerprint is kept on the outcome record.' : ''}</p>
               ) : (
-                <p className="text-[12.5px] text-ink-3">No document uploaded{r.deals?.id ? '. The quote text lives on the linked analysis.' : '.'}</p>
+                <p className="text-[12.5px] text-ink-3">No document uploaded{r.deals?.id ? '. The structured analysis is on the linked deal.' : '.'}</p>
               )}
             </Section>
           </div>

@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { runWithAiContext } from '@/lib/ai-telemetry'
 import { deriveCloseOutcome } from '@/lib/close-outcome'
+import { buildVerificationRecord } from '@/lib/verification'
 
 /**
  * Close a deal. The financial outcome is DERIVED here from two totals — the
@@ -34,7 +35,7 @@ export async function POST(
     }
 
     const body = await request.json()
-    const { outcome, finalTotal, finalTotalConfirmed, finalTotalEvidence, whatChanged, notes } = body
+    const { outcome, finalTotal, finalTotalConfirmed, finalTotalEvidence, whatChanged, notes, verification: evidence } = body
     const validOutcomes = ['won', 'lost', 'paused', 'closed_won', 'closed_lost', 'closed_paused']
     if (!validOutcomes.includes(outcome)) {
       return NextResponse.json({ error: 'Invalid outcome' }, { status: 400 })
@@ -155,20 +156,33 @@ RULES:
       }
     }
 
+    // Structured evidence behind the provenance tier. The final document itself
+    // was never stored; what survives is its fingerprint, type and the figure
+    // the model read from it — enough to show how the number was established.
+    const verification = buildVerificationRecord({
+      tier: o.provenance,
+      method: o.provenance === 'document_verified' ? 'final_document_extract' : 'user_entry',
+      confirmedTotal: o.finalTotal,
+      currency: originalSnapshot.currency || null,
+      evidence: evidence && typeof evidence === 'object' ? evidence : null,
+    })
+
+    const closedAt = new Date().toISOString()
     const { error: updateError } = await supabase
       .from('deals')
       .update({
         status: o.status,
-        closed_at: new Date().toISOString(),
+        closed_at: closedAt,
         initial_total: o.initialTotal,
         final_total: o.finalTotal,
         final_total_provenance: o.provenance,
+        verification,
         savings_amount: o.savingsAmount,
         savings_percent: o.savingsPercent,
         what_changed: Array.isArray(whatChanged) ? whatChanged : null,
         close_notes: typeof notes === 'string' && notes.trim() ? notes : null,
         close_summary: closeSummary,
-        updated_at: new Date().toISOString(),
+        updated_at: closedAt,
       })
       .eq('id', dealId)
       .eq('user_id', user.id)
@@ -177,6 +191,16 @@ RULES:
       console.error('Update error:', updateError)
       return NextResponse.json({ error: 'Failed to update deal' }, { status: 500 })
     }
+
+    // The negotiation is over: the raw quote text has no reader left. Structured
+    // facts on the rounds stay. Best-effort — the retention job repeats this daily.
+    const { error: purgeError } = await supabase
+      .from('rounds')
+      .update({ extracted_text: null, extracted_text_purged_at: closedAt })
+      .eq('deal_id', dealId)
+      .eq('user_id', user.id)
+      .not('extracted_text', 'is', null)
+    if (purgeError) console.error('[close] raw text purge failed (non-fatal):', purgeError.message)
 
     return NextResponse.json({
       success: true,

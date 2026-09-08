@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { deleteDeal } from '@/lib/deal-deletion'
 
 export async function DELETE(
   request: Request,
@@ -30,20 +31,14 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    // Use admin client to bypass RLS for cascade delete (ownership already verified above)
-    const admin = createAdminClient()
-    const { error: deleteError } = await admin
-      .from('deals')
-      .delete()
-      .eq('id', dealId)
-
-    if (deleteError) {
-      throw new Error('Failed to delete deal')
-    }
+    // Service role: rounds cascade, linked negotiation requests and their
+    // stored documents are removed explicitly (ownership verified above).
+    const result = await deleteDeal(createAdminClient(), dealId)
+    console.log(`[deal-delete] removed; negotiation requests: ${result.requestsDeleted}, documents: ${result.documentsDeleted}`)
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Delete deal error:', error)
+    console.error('Delete deal error:', error instanceof Error ? error.message : error)
     return NextResponse.json(
       { error: 'Failed to delete deal' },
       { status: 500 }

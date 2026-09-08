@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { NegotiationRequestSchema } from '@/lib/schemas'
 import { notifyAdmins } from '@/lib/notifications'
+import { documentDeleteAt } from '@/lib/retention'
+
+const documentDeleteAt_ = (uploadedAt: Date) => documentDeleteAt(uploadedAt).toISOString()
 
 // CRITICAL: file upload handling requires Node.js runtime
 export const runtime = 'nodejs'
@@ -50,6 +53,7 @@ export async function POST(request: Request) {
     const file = formData.get('document') as File | null
     let documentPath: string | null = null
     let documentConsentAt: string | null = null
+    let documentDeleteAt: string | null = null
 
     if (file && file.size > 0) {
       if (!input.documentConsent) {
@@ -75,7 +79,11 @@ export async function POST(request: Request) {
       }
 
       documentPath = path
-      documentConsentAt = new Date().toISOString()
+      const uploadedAt = new Date()
+      documentConsentAt = uploadedAt.toISOString()
+      // Every stored document carries its deletion deadline from the moment it
+      // exists (the 12-month cap now; tightened to close + 30 days at close).
+      documentDeleteAt = documentDeleteAt_(uploadedAt)
     }
 
     const { data: negotiationRequest, error: insertError } = await supabase
@@ -97,6 +105,7 @@ export async function POST(request: Request) {
         notes: input.notes || null,
         document_path: documentPath,
         document_consent_at: documentConsentAt,
+        document_delete_at: documentDeleteAt,
         deal_type: input.dealType || null,
         deal_type_confidence: input.dealTypeConfidence || null,
         negotiation_objective: input.negotiationObjective || null,
@@ -112,10 +121,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to submit negotiation request' }, { status: 500 })
     }
 
+    // The client's email is on the request page behind the link; it does not
+    // need a second copy in the notifications table.
     await notifyAdmins({
       type: 'negotiation_new_request',
       title: 'New negotiation request',
-      body: `${input.vendor || 'A vendor'} · ${user.email || 'a client'}`,
+      body: `${input.vendor || 'A vendor'} · ${input.source === 'post_analysis' ? 'from an analysis' : 'submitted directly'}`,
       link: `/app/admin/negotiations/${negotiationRequest.id}`,
     })
 

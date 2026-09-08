@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mapClosedDealToObservation, capVerification, type ClosedDealFacts } from './outcome-mapper'
+import { mapClosedDealToObservation, capVerification, toObservationMonth, type ClosedDealFacts } from './outcome-mapper'
 import { toStructuredExtraction } from '@/lib/structured-extraction'
 import type { ProductCandidate } from './normalize'
 
@@ -30,7 +30,8 @@ describe('mapClosedDealToObservation', () => {
     expect(c.annualized_price).toBe(16750)
     expect(c.currency).toBe('USD')
     expect(c.deal_type).toBe('new')
-    expect(c.observation_date).toBe('2026-09-06')
+    // month precision only — the exact close date would re-identify the deal
+    expect(c.observation_date).toBe('2026-09-01')
     expect(c.levers).toEqual(['Price', 'Payment terms'])
     expect(c.product_id).toBe('prod-1')
     expect(c.product_match).toBe('exact')
@@ -39,8 +40,16 @@ describe('mapClosedDealToObservation', () => {
   it('carries no user, deal, document or person identifiers, and no prose', () => {
     const m = mapClosedDealToObservation(deal(), extraction, benchmarkInput, products)
     const keys = Object.keys(m.candidate!)
-    for (const k of ['user_id', 'deal_id', 'document_path', 'close_summary', 'close_notes', 'notes', 'contact_name', 'email', 'created_by']) expect(keys).not.toContain(k)
+    for (const k of ['user_id', 'deal_id', 'document_path', 'close_summary', 'close_notes', 'notes', 'contact_name', 'email', 'created_by', 'verification']) expect(keys).not.toContain(k)
     expect(JSON.stringify(m)).not.toMatch(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)
+  })
+
+  it('never emits an exact close date, only the month', () => {
+    expect(toObservationMonth('2026-09-30T23:59:59Z')).toBe('2026-09-01')
+    expect(toObservationMonth('2026-02-01T00:00:00Z')).toBe('2026-02-01')
+    expect(toObservationMonth('not a date')).toMatch(/^\d{4}-\d{2}-01$/)
+    const m = mapClosedDealToObservation(deal({ closedAt: '2026-09-17T08:00:00Z' }), extraction, benchmarkInput, products)
+    expect(m.candidate!.observation_date).toBe('2026-09-01')
   })
 
   it('maps provenance to verification and never lets inferred data claim verified', () => {

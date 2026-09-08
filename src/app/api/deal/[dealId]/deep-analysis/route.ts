@@ -64,7 +64,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
 
     const { data: round } = await supabase
       .from('rounds')
-      .select('id, output_json, extracted_text')
+      .select('id, output_json, extracted_text, extracted_text_purged_at')
       .eq('deal_id', dealId)
       .eq('user_id', user.id)
       .order('round_number', { ascending: false })
@@ -84,10 +84,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
     }
 
     if (!round.extracted_text) {
-      // Legacy deals: analysed from a file before the quote text was kept. There is no
-      // re-upload on an existing deal — the way forward is a new analysis of the same file.
+      // Either a legacy deal analysed before the quote text was kept, or the text was
+      // removed under the retention policy (closed deal, or older than the maximum age).
+      // There is no re-upload on an existing deal — the way forward is a new analysis.
+      const purged = !!round.extracted_text_purged_at
       return NextResponse.json({
-        error: 'This deal was analysed before we kept the quote text, so Deep Analysis can’t run on it. Start a new analysis with the same quote to unlock it.',
+        error: purged
+          ? 'The quote text for this deal was removed under our retention policy, so Deep Analysis can’t run on it. Start a new analysis with the same quote to unlock it.'
+          : 'This deal was analysed before we kept the quote text, so Deep Analysis can’t run on it. Start a new analysis with the same quote to unlock it.',
       }, { status: 422 })
     }
 
@@ -193,9 +197,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
         deep_analysis_completed_at: new Date().toISOString(),
       }
 
+      // Deep Analysis was the last reader of the raw quote text. Structured
+      // facts (quote_facts, extracted_data, snapshot) carry everything later
+      // steps need, so the text goes in the same write that records success —
+      // never before it (a failed run keeps the text and can be retried).
       const { error: updateError } = await supabase
         .from('rounds')
-        .update({ output_json: merged, extracted_data: toStructuredExtraction(merged) })
+        .update({
+          output_json: merged,
+          extracted_data: toStructuredExtraction(merged),
+          extracted_text: null,
+          extracted_text_purged_at: new Date().toISOString(),
+        })
         .eq('id', round.id)
         .eq('user_id', user.id)
       if (updateError) throw new Error('Failed to save deep analysis')

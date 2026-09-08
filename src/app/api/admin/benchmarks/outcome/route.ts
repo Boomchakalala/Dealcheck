@@ -83,7 +83,7 @@ async function sourceForTier(admin: ReturnType<typeof createAdminClient>, level:
   if (existing?.id) return existing.id
   const { data: created, error } = await admin.from('benchmark_sources').insert({
     name, source_type: 'termlift_negotiation', verification_level: level, is_test: false, created_by: userId,
-    notes: 'Anonymised outcomes of negotiations run through TermLift. One row per closed deal, reviewed by an admin before insertion. No customer identity is stored.',
+    notes: 'De-identified outcomes of negotiations run through TermLift (pseudonymised, not anonymous). One row per closed deal, reviewed by an admin before insertion; month-level dates; no customer identity, deal id, document reference or prose is stored.',
   }).select('id').single()
   if (error || !created) throw new Error(`Could not create source: ${error?.message}`)
   return created.id

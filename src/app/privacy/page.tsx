@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 }
 
 /** Bump when the wording changes — this is the date shown on the page. */
-const LAST_UPDATED = '2026-09-07'
+const LAST_UPDATED = '2026-09-08'
 const EMAIL = 'hello@termlift.com'
 
 export default async function PrivacyPage() {
@@ -44,7 +44,7 @@ export default async function PrivacyPage() {
           <h3>{t('s2AccountInfo')}</h3>
           <ul><li>{t('s2Account1')}</li><li>{t('s2Account2')}</li><li>{t('s2Account3')}</li></ul>
           <h3>{t('s2DealData')}</h3>
-          <ul><li>{t('s2Deal1')}</li><li>{t('s2Deal2')}</li><li>{t('s2Deal3')}</li></ul>
+          <ul><li>{t('s2Deal1')}</li><li>{t('s2Deal2')}</li><li>{t('s2Deal3')}</li><li>{t('s2Deal4')}</li></ul>
           <h3>{t('s2PaymentInfo')}</h3>
           <ul><li>{t('s2Payment1')}</li><li>{t('s2Payment2')}</li></ul>
           <h3>{t('s2AutoCollected')}</h3>
@@ -57,7 +57,7 @@ export default async function PrivacyPage() {
       title: t('s3Title'),
       body: (
         <ul>
-          {(['s3Item1', 's3Item2', 's3Item3', 's3Item4', 's3Item5', 's3Item6', 's3Item7'] as const).map((k) => <li key={k}>{t(k)}</li>)}
+          {(['s3Item1', 's3Item2', 's3Item3', 's3Item4', 's3Item5', 's3Item6', 's3Item7', 's3Item8'] as const).map((k) => <li key={k}>{t(k)}</li>)}
         </ul>
       ),
     },
@@ -87,10 +87,9 @@ export default async function PrivacyPage() {
       body: (
         <>
           <ul>
-            <li><strong>{t('s5Item1Prefix')}</strong> {t('s5Item1')}</li>
-            <li><strong>{t('s5Item2Prefix')}</strong> {t('s5Item2')}</li>
-            <li><strong>{t('s5Item3Prefix')}</strong> {t('s5Item3')}</li>
-            <li><strong>{t('s5Item4Prefix')}</strong> {t('s5Item4')}</li>
+            {([1, 2, 3, 4, 5, 6, 7] as const).map((n) => (
+              <li key={n}><strong>{t(`s5Item${n}Prefix`)}</strong> {t(`s5Item${n}`)}</li>
+            ))}
           </ul>
           <p>{t('s5Note')}</p>
         </>

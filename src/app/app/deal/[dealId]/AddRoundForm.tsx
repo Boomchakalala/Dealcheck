@@ -24,7 +24,6 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
   const [extractedText, setExtractedText] = useState('')
   const [pastedText, setPastedText] = useState('')
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [saveExtractedText, setSaveExtractedText] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -94,7 +93,8 @@ export function AddRoundForm({ dealId, roundNumber = 2 }: AddRoundFormProps) {
         body: JSON.stringify({
           note: note || undefined,
           extractedText: textToUse,
-          saveExtractedText,
+          // Round text is analysed in-flight and not stored (see lib/retention.ts).
+          saveExtractedText: false,
         }),
       })
 

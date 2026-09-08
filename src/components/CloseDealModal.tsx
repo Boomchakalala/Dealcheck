@@ -19,6 +19,16 @@ function parseMoneyLocal(str: string): number {
   return parseMoney(str).amount
 }
 
+/** SHA-256 of the file bytes, hex. Identity evidence only; null when the browser can't hash. */
+async function fingerprintFile(file: File): Promise<string | null> {
+  try {
+    const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer())
+    return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('')
+  } catch {
+    return null
+  }
+}
+
 function formatMoney(amount: number, currencyCode: ReturnType<typeof detectCurrency>): string {
   return formatCurrency(Math.round(amount), currencyCode)
 }
@@ -91,6 +101,9 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
 
   const [extractedDocText, setExtractedDocText] = useState<string | null>(null)
   const [uploadLoading, setUploadLoading] = useState(false)
+  // Evidence that survives the document: its fingerprint, type and size, plus
+  // the figure the model read from it. The file itself is never stored.
+  const [docEvidence, setDocEvidence] = useState<{ sha256: string | null; type: string; sizeBytes: number; extractedTotal: number | null; model: string | null } | null>(null)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -98,6 +111,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
     setUploadLoading(true)
     setUploadedFile(file.name)
     try {
+      const sha256 = await fingerprintFile(file)
       // Send file to /api/extract which handles PDF, DOCX, and images
       const formData = new FormData()
       formData.append('file', file)
@@ -105,6 +119,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
       const data = await res.json()
       if (res.ok && data.text) {
         setExtractedDocText(data.text)
+        setDocEvidence({ sha256, type: file.type || file.name.split('.').pop() || 'unknown', sizeBytes: file.size, extractedTotal: null, model: null })
       } else {
         setError(data.error || 'Failed to extract text from document')
         setUploadedFile(null)
@@ -112,6 +127,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
     } catch {
       setUploadedFile(null)
       setExtractedDocText(null)
+      setDocEvidence(null)
     }
     setUploadLoading(false)
   }
@@ -130,7 +146,10 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
       const data = await res.json()
       if (res.ok) {
         // A prefilled figure is a suggestion, not an outcome — confirmation resets.
-        if (data.final_total) { setFinalTotal(data.final_total); setFinalConfirmed(false) }
+        if (data.final_total) {
+          setFinalTotal(data.final_total); setFinalConfirmed(false)
+          if (extractedDocText) setDocEvidence((ev) => ev ? { ...ev, extractedTotal: parseMoneyLocal(String(data.final_total)) || null, model: data.model || null } : ev)
+        }
         if (data.what_changed?.length) setWhatChanged(data.what_changed)
         if (data.summary) setNotes(data.summary)
         setAiDone(true)
@@ -154,6 +173,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
           // The server derives savings from initial − final; nothing computed here is sent.
           finalTotalConfirmed: !isLost && finalConfirmed,
           finalTotalEvidence: extractedDocText ? 'document' : 'manual',
+          verification: extractedDocText && docEvidence ? docEvidence : null,
           whatChanged: whatChanged.length > 0 ? whatChanged : null,
           notes: notes || null,
         }),
@@ -266,7 +286,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
                     <p className="text-[13px] font-semibold text-ink truncate">{uploadedFile}</p>
                     <p className="text-[11.5px] text-ink-3 mt-0.5">{uploadLoading ? 'Extracting text…' : extractedDocText ? 'Document ready' : 'Processing…'}</p>
                   </div>
-                  <button onClick={() => { setUploadedFile(null); setExtractedDocText(null) }} className="p-1 text-ink-3 hover:text-ink rounded transition-colors" aria-label="Remove file">
+                  <button onClick={() => { setUploadedFile(null); setExtractedDocText(null); setDocEvidence(null) }} className="p-1 text-ink-3 hover:text-ink rounded transition-colors" aria-label="Remove file">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -279,7 +299,7 @@ export function CloseDealModal({ dealId, currentTotal, roundCount = 0, onClose, 
                   <Upload className="w-4 h-4 text-ink-3 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-semibold text-ink">Upload the final document</p>
-                    <p className="text-[11.5px] text-ink-3 mt-0.5">PDF, image or DOCX of the signed agreement. We compare it to the original quote.</p>
+                    <p className="text-[11.5px] text-ink-3 mt-0.5">PDF, image or DOCX of the signed agreement. We compare it to the original quote. The file is read in memory and not kept; only its fingerprint and the figures are recorded.</p>
                   </div>
                 </button>
               )}

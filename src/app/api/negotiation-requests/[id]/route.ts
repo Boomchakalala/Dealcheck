@@ -3,6 +3,8 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { notifyUser } from '@/lib/notifications'
 import { detectCurrency, formatCurrency } from '@/lib/currency'
 import { deriveCloseOutcome } from '@/lib/close-outcome'
+import { documentDeleteAt } from '@/lib/retention'
+import { buildVerificationRecord, sha256Hex, type DocumentEvidenceInput, type VerificationRecord } from '@/lib/verification'
 
 const VALID_STATUSES = [
   'new', 'reviewing', 'waiting_for_client_info', 'ready_to_negotiate',
@@ -42,8 +44,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     // figure in the body is ignored. The admin acts as the confirming person;
     // `documentVerified: true` means the figure was read off the signed contract.
     let outcome: ReturnType<typeof deriveCloseOutcome> | null = null
+    let verification: VerificationRecord | null = null
     if (isClosing) {
-      const { data: current } = await supabase.from('negotiation_requests').select('current_total').eq('id', id).single()
+      const { data: current } = await supabase.from('negotiation_requests')
+        .select('current_total, document_path, document_consent_at, document_delete_at, created_at')
+        .eq('id', id).single()
       outcome = deriveCloseOutcome({
         outcome: status === 'closed_won' ? 'won' : 'lost',
         initialTotalRaw: current?.current_total ?? null,
@@ -52,11 +57,43 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         finalTotalEvidence: documentVerified === true ? 'document' : 'manual',
       })
       if (!outcome.ok) return NextResponse.json({ error: outcome.error }, { status: 400 })
-      update.closed_at = new Date().toISOString()
+      const closedAt = new Date()
+      update.closed_at = closedAt.toISOString()
       update.final_total = outcome.value.finalTotal
       update.savings_amount = outcome.value.savingsAmount
       update.savings_percent = outcome.value.savingsPercent
       if (typeof closeNotes === 'string') update.close_notes = closeNotes
+
+      // The stored document now has 30 days left (or less, if the 12-month cap
+      // from upload comes first). Fingerprint it before it goes so a
+      // document_verified outcome keeps its evidence after deletion.
+      if (current?.document_path) {
+        const uploadedAt = current.document_consent_at || current.created_at
+        const deadline = documentDeleteAt(uploadedAt, closedAt)
+        const existing = current.document_delete_at ? new Date(current.document_delete_at) : null
+        update.document_delete_at = (existing && existing < deadline ? existing : deadline).toISOString()
+      }
+      let evidence: DocumentEvidenceInput | null = null
+      if (documentVerified === true && current?.document_path) {
+        try {
+          const { data: blob } = await createAdminClient().storage.from('negotiation-documents').download(current.document_path)
+          if (blob) {
+            const bytes = new Uint8Array(await blob.arrayBuffer())
+            evidence = { sha256: await sha256Hex(bytes), type: blob.type || null, sizeBytes: bytes.byteLength }
+          }
+        } catch (e) {
+          console.warn('[negotiation close] could not fingerprint document (non-fatal):', e instanceof Error ? e.message : e)
+        }
+      }
+      verification = buildVerificationRecord({
+        tier: outcome.value.provenance,
+        method: documentVerified === true ? 'admin_document' : 'user_entry',
+        confirmedTotal: outcome.value.finalTotal,
+        currency: current?.current_total ? detectCurrency(current.current_total) : null,
+        evidence,
+        now: closedAt,
+      })
+      update.verification = verification
     }
     if (typeof adminNotes === 'string') update.admin_notes = adminNotes
     if (typeof nextAction === 'string') update.next_action = nextAction
@@ -79,6 +116,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     // RLS policy (auth.uid() = user_id) would otherwise silently block this write.
     if (isClosing && updated?.deal_id && outcome?.ok) {
       const adminClient = createAdminClient()
+      // Closed: the raw quote text on the deal's rounds has no reader left.
+      await adminClient.from('rounds')
+        .update({ extracted_text: null, extracted_text_purged_at: update.closed_at as string })
+        .eq('deal_id', updated.deal_id)
+        .not('extracted_text', 'is', null)
       await adminClient
         .from('deals')
         .update({
@@ -87,6 +129,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
           initial_total: outcome.value.initialTotal,
           final_total: outcome.value.finalTotal,
           final_total_provenance: outcome.value.provenance,
+          verification,
           savings_amount: outcome.value.savingsAmount,
           savings_percent: outcome.value.savingsPercent,
           ...(typeof closeNotes === 'string' ? { close_notes: closeNotes } : {}),

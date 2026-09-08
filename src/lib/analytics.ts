@@ -13,7 +13,9 @@ export function initPostHog() {
   }
 }
 
-// Analytics event types
+// Analytics event types. Deliberately no email, no vendor name, no quote or
+// document content anywhere in here: PostHog receives the user id and
+// counts/booleans only (see the privacy policy's PostHog line).
 export type AnalyticsEvent =
   // Trial flow
   | { name: 'trial_started'; properties: { source: 'paste' | 'upload' | 'demo'; dealType: string } }
@@ -22,8 +24,8 @@ export type AnalyticsEvent =
 
   // Auth flow
   | { name: 'signup_started'; properties: { source?: string } }
-  | { name: 'signup_completed'; properties: { email: string } }
-  | { name: 'login_completed'; properties: { email: string } }
+  | { name: 'signup_completed'; properties: Record<string, never> }
+  | { name: 'login_completed'; properties: Record<string, never> }
 
   // Deal management
   | { name: 'deal_created'; properties: { dealType: string; source: 'upload' | 'paste' | 'trial_import'; hasGoal: boolean } }
@@ -57,12 +59,11 @@ export function trackEvent(event: AnalyticsEvent) {
   }
 }
 
-// Identify a user (call after login/signup)
-export function identifyUser(userId: string, properties?: {
-  email?: string
-  plan?: string
-  createdAt?: string
-}) {
+/**
+ * Identify a user (call after login/signup). The Supabase user id is the only
+ * identifier that reaches PostHog; the email stays in our own database.
+ */
+export function identifyUser(userId: string, properties?: { plan?: string; createdAt?: string }) {
   if (typeof window === 'undefined') return
 
   try {

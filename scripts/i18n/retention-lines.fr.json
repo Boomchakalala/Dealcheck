@@ -1,0 +1,8 @@
+{
+  "footer": { "trustNoDataStored": "Fichiers de devis jamais stockés" },
+  "upload": { "trustDeleted": "Fichiers de devis jamais stockés" },
+  "addRound": { "processedSecurely": "Traité de manière sécurisée. Les fichiers de devis ne sont jamais stockés ; le texte d'un tour est analysé en mémoire et n'est pas conservé." },
+  "pricingPage": { "foot": "{n} analyses rapides gratuites par compte. Les fichiers de devis sont lus en mémoire et jamais stockés." },
+  "landing": { "trust2": "Fichiers jamais stockés", "who": { "p3": "Fichiers de devis jamais stockés, texte extrait conservé temporairement" } },
+  "tryPage": { "trust": "~2 min · fichier de devis jamais stocké" }
+}
