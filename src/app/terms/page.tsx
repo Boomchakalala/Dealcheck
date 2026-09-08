@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 /** Bump when the wording changes — this is the date shown on the page. */
-const LAST_UPDATED = '2026-09-08'
+const LAST_UPDATED = '2026-09-09'
 const EMAIL = 'hello@termlift.com'
 
 export default async function TermsPage() {
@@ -99,6 +99,33 @@ export default async function TermsPage() {
       ),
     },
     {
+      id: 'negotiation',
+      title: t('s15Title'),
+      body: (
+        <>
+          <p>{t('s15Intro')}</p>
+          <h3>{t('s15ScopeTitle')}</h3>
+          <ul>
+            {(['s15Scope1', 's15Scope2', 's15Scope3', 's15Scope4'] as const).map((k) => <li key={k}>{t(k)}</li>)}
+          </ul>
+          <h3>{t('s15FeeTitle')}</h3>
+          <ul>
+            {(['s15Fee1', 's15Fee2', 's15Fee3', 's15Fee4', 's15Fee5', 's15Fee6'] as const).map((k) => <li key={k}>{t(k, pricing)}</li>)}
+          </ul>
+        </>
+      ),
+    },
+    {
+      id: 'confidentiality',
+      title: t('s16Title'),
+      body: (
+        <>
+          <p>{t('s16p1')}</p>
+          <p>{t('s16p2')}</p>
+        </>
+      ),
+    },
+    {
       id: 'ip',
       title: t('s6Title'),
       body: (
@@ -140,7 +167,7 @@ export default async function TermsPage() {
         <>
           <p>{t('s9Intro')}</p>
           <ul>
-            {(['s9Item1', 's9Item2', 's9Item3', 's9Item4'] as const).map((k) => <li key={k}>{t(k)}</li>)}
+            {(['s9Item1', 's9Item2', 's9Item3', 's9Item4', 's9Item5'] as const).map((k) => <li key={k}>{t(k)}</li>)}
           </ul>
         </>
       ),

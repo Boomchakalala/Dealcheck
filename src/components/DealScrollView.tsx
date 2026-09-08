@@ -189,10 +189,10 @@ export function DealScrollView(props: DealScrollViewProps) {
     try {
       const res = await fetch(`/api/deal/${dealId}/deep-analysis`, { method: 'POST' })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Full Analysis failed')
+      if (!res.ok) throw new Error(data.error || 'Building the Playbook failed')
       router.refresh()
     } catch (err) {
-      setLocalDeepError(err instanceof Error ? err.message : 'Full Analysis failed')
+      setLocalDeepError(err instanceof Error ? err.message : 'Building the Playbook failed')
     } finally {
       setLocalDeepLoading(false)
     }
@@ -484,7 +484,7 @@ export function DealScrollView(props: DealScrollViewProps) {
           title={`${t('output.redFlags')} · ${sortedFlags.length}`}
           sub={hasDeepContent || demoMode
             ? (fr ? 'Chaque point inclut quoi demander et une position de repli' : 'Each issue includes what to ask for and a fallback position')
-            : (fr ? 'Ouvrez un point pour voir pourquoi il compte. Les demandes et positions de repli arrivent avec l’analyse complète.' : 'Open an issue to see why it matters. The asks and fallback positions come with Full Analysis.')}
+            : (fr ? 'Ouvrez un point pour voir pourquoi il compte. Les demandes et positions de repli arrivent avec le Plan de négociation.' : 'Open an issue to see why it matters. The asks and fallback positions come with the Negotiation Playbook.')}
           right={
             <>
               {hasDeepContent && <Chip tone="green"><CheckCircle2 className="w-3 h-3" />{fr ? 'Analyse détaillée prête' : 'Detailed analysis ready'}</Chip>}
@@ -527,8 +527,8 @@ export function DealScrollView(props: DealScrollViewProps) {
                           /* Quick stage: the ask + fallback were stripped server-side (lib/negotiation-gating.ts). */
                           <p className="mt-3.5 flex items-center gap-2 text-[12.5px] text-ink-3">
                             <Lock className="w-3.5 h-3.5 shrink-0" />
-                            {fr ? 'La demande et la position de repli pour ce point arrivent avec l’analyse complète.' : 'The ask and fallback position for this issue come with Full Analysis.'}
-                            {showFullPlaybook && <a href="#deep-analysis" className="text-green-deep font-medium no-underline hover:underline">{fr ? 'Débloquer l’analyse complète' : 'Unlock Full Analysis'}</a>}
+                            {fr ? 'La demande et la position de repli pour ce point arrivent avec le Plan de négociation.' : 'The ask and fallback position for this issue come with the Negotiation Playbook.'}
+                            {showFullPlaybook && <a href="#deep-analysis" className="text-green-deep font-medium no-underline hover:underline">{fr ? 'Construire le Plan de négociation' : 'Build the Negotiation Playbook'}</a>}
                           </p>
                         ) : null}
                       </div>
@@ -586,10 +586,10 @@ export function DealScrollView(props: DealScrollViewProps) {
           ) : (
             <GateCard
               tone="green"
-              eyebrow={fr ? 'Étape 2 · Analyse complète' : 'Step 2 · Full Analysis'}
+              eyebrow={fr ? 'Étape 2 · Plan de négociation' : 'Step 2 · Negotiation Playbook'}
               title={fr ? 'Construisez votre stratégie de négociation' : 'Build your negotiation strategy'}
-              body={<>{fr ? 'Obtenez l’analyse complète, les positions cibles, les replis, le plan de négociation et la séquence de négociation prête à envoyer. Environ deux minutes.' : 'Get the complete analysis, target positions, fallbacks, negotiation plan and ready-to-send negotiation sequence. About two minutes.'}<span className="block mt-1.5 font-semibold text-green-deep">{deepAnalysisPriceNote(locale)}</span>{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
-              action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? 'Débloquer l’analyse complète' : 'Unlock Full Analysis')}</Btn>}
+              body={<>{fr ? 'Obtenez les demandes ordonnées et chiffrées, les positions cibles, les replis, vos leviers et la séquence de négociation prête à envoyer. Quelques minutes.' : 'Get the ordered asks with amounts, target positions, fallbacks, your leverage and the ready-to-send negotiation sequence. A couple of minutes.'}<span className="block mt-1.5 font-semibold text-green-deep">{deepAnalysisPriceNote(locale)}</span>{deepAnalysisError && <span className="block text-risk mt-1">{deepAnalysisError}</span>}</>}
+              action={<Btn variant="primary" onClick={handleDeepAnalysis}><Microscope className="w-4 h-4" />{deepAnalysisError ? (fr ? 'Réessayer' : 'Try again') : (fr ? 'Construire le Plan de négociation' : 'Build the Negotiation Playbook')}</Btn>}
             />
           )}
         </div>
@@ -893,7 +893,7 @@ export function DealScrollView(props: DealScrollViewProps) {
                       ) : (
                         <a id="add-round" href="#deep-analysis" className="block no-underline scroll-mt-[196px]">
                           <p className="text-[13px] font-semibold text-ink">{fr ? `Tour ${sortedRounds.length + 1}` : `Round ${sortedRounds.length + 1}`}</p>
-                          <p className="text-[12px] text-ink-2">{fr ? 'Se débloque avec l’analyse complète →' : 'Unlocks with Full Analysis →'}</p>
+                          <p className="text-[12px] text-ink-2">{fr ? 'Se débloque avec le Plan de négociation →' : 'Unlocks with the Negotiation Playbook →'}</p>
                         </a>
                       )}
                     </div>
@@ -944,7 +944,7 @@ function DeepAnalysisProgress({ locale }: { locale: 'en' | 'fr' }) {
   return (
     <Card>
       <div className="flex items-center justify-between mb-3">
-        <p className="text-[13.5px] font-semibold text-ink">{locale === 'fr' ? "Construction de l'analyse approfondie" : 'Building your full negotiation strategy'}</p>
+        <p className="text-[13.5px] font-semibold text-ink">{locale === 'fr' ? 'Construction de votre Plan de négociation' : 'Building your Negotiation Playbook'}</p>
         <span className="tl-label text-ink-3 tl-num">{elapsed}s</span>
       </div>
       <ul className="m-0 p-0 list-none flex flex-col gap-2">

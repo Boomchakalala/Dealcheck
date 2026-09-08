@@ -80,7 +80,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
     }
     // Already in flight (duplicate click, another tab) — don't start a second one.
     if (output?.deep_analysis_status === 'running') {
-      return NextResponse.json({ error: 'Deep analysis is already running for this deal.' }, { status: 409 })
+      return NextResponse.json({ error: 'The Negotiation Playbook is already being built for this deal.' }, { status: 409 })
     }
 
     if (!round.extracted_text) {
@@ -90,8 +90,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
       const purged = !!round.extracted_text_purged_at
       return NextResponse.json({
         error: purged
-          ? 'The quote text for this deal was removed under our retention policy, so Deep Analysis can’t run on it. Start a new analysis with the same quote to unlock it.'
-          : 'This deal was analysed before we kept the quote text, so Deep Analysis can’t run on it. Start a new analysis with the same quote to unlock it.',
+          ? 'The quote text for this deal was removed under our retention policy, so the Negotiation Playbook can’t be built on it. Start a new analysis with the same quote to unlock it.'
+          : 'This deal was analysed before we kept the quote text, so the Negotiation Playbook can’t be built on it. Start a new analysis with the same quote to unlock it.',
       }, { status: 422 })
     }
 
@@ -227,6 +227,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ dea
     }
   } catch (error) {
     console.error('[TermLift] Deep analysis error:', error instanceof Error ? error.message : error)
-    return NextResponse.json({ error: 'Deep analysis failed. Please try again.' }, { status: 500 })
+    return NextResponse.json({ error: 'Building the Negotiation Playbook failed. Please try again.' }, { status: 500 })
   }
 }

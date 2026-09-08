@@ -7,7 +7,7 @@ import { NEGOTIATION_FEE_PERCENT, NEGOTIATION_FEE_MINIMUM_EUR, FULL_ANALYSIS_EMA
 
 export const metadata: Metadata = {
   title: 'Pricing',
-  description: `Analyse a supplier quote free. Unlock Deep Analysis per deal. Or have TermLift negotiate for a ${NEGOTIATION_FEE_PERCENT}% success fee — nothing if we don't save you money.`,
+  description: `Analyse a supplier quote free. Build the Negotiation Playbook per deal. Or have TermLift negotiate for a ${NEGOTIATION_FEE_PERCENT}% success fee — nothing if we don't save you money.`,
   alternates: { canonical: 'https://www.termlift.com/pricing' },
 }
 

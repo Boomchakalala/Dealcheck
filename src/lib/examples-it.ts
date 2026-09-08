@@ -31,7 +31,7 @@ export const datadogExample: DealOutput = {
   description: 'Cloud infrastructure monitoring, APM and log management for a 60-host production estate',
   verdict: 'Push back before signing: the renewal discount is thin (8–10% off list on committed lines), overage rates carry zero discount, and the quote is not itemised by host or GB. Ask for the annual pre-pay discount and a cap on overages.',
   verdict_type: 'negotiate',
-  price_insight: 'Committed lines are 8–10% off list; Datadog routinely gives 15–25% on renewals that move to annual pre-pay. Overage lines (extra hosts, extra GB) are at full list — that is where surprise bills come from.',
+  price_insight: 'Committed lines are 8–10% off list. For this sample we assume a 15–25% move is available on renewals that switch to annual pre-pay — an illustrative assumption, not verified market data. Overage lines (extra hosts, extra GB) are at full list — that is where surprise bills come from.',
   snapshot: {
     vendor_product: 'Datadog / Infrastructure Monitoring & APM',
     term: '12 months',
@@ -231,7 +231,7 @@ export const oktaExample: DealOutput = {
   description: 'Single sign-on, multi-factor authentication and lifecycle management for 250 employees',
   verdict: 'Do not sign as quoted: you are paying for a Lifecycle Management module you have no HR-driven provisioning for, the implementation fee is at list, and the 5% annual uplift is uncapped over three years. Strip the module, waive the fee, cap the uplift.',
   verdict_type: 'overpay_risk',
-  price_insight: 'The $9.50/user bundle is list-adjacent. Okta new-logo deals at 250 seats on a 3-year term routinely land at $7–8/user for SSO + MFA once bundled modules that aren’t used are removed.',
+  price_insight: 'The $9.50/user bundle is list-adjacent. For this sample we assume a 250-seat, 3-year new-logo deal can land at $7–8/user for SSO + MFA once unused bundled modules are removed — an illustrative assumption, not verified market data.',
   snapshot: {
     vendor_product: 'Okta / Workforce Identity Cloud',
     term: '36 months',
@@ -392,7 +392,7 @@ export const atlassianExample: DealOutput = {
   description: 'Jira Software and Confluence Cloud on the Premium plan, growing from 120 to 200 users',
   verdict: 'Negotiate the shape before the price: 80 of the 200 users only view and comment, so they belong on Standard, and a 67% seat expansion at pure list price is leaving the volume discount on the table.',
   verdict_type: 'negotiate',
-  price_insight: 'Both products are quoted at published Premium list. Atlassian’s sales-assisted deals above 150 users typically carry 8–12% off, and mixed-tier user pools are standard practice.',
+  price_insight: 'Both products are quoted at published Premium list. For this sample we assume sales-assisted deals above 150 users can carry 8–12% off (an illustrative assumption, not verified market data); mixed-tier user pools are a common practice.',
   snapshot: {
     vendor_product: 'Atlassian / Jira Software + Confluence Cloud Premium',
     term: '12 months',
@@ -429,7 +429,7 @@ export const atlassianExample: DealOutput = {
       type: 'Commercial',
       severity: 'high',
       issue: '67% seat expansion quoted at published list with no volume discount',
-      why_it_matters: 'Sales-assisted Atlassian deals above 150 users are routinely 8–12% below list; self-serve list is the anchor, not the price. On the remaining $50,712 an 8% discount is $4,057.',
+      why_it_matters: 'In this sample we assume sales-assisted deals above 150 users can land 8–12% below list (an illustrative assumption); self-serve list is the anchor, not the price. On the remaining $50,712 an 8% discount is $4,057.',
       what_to_ask_for: '8% volume discount on the full expanded pool',
       if_they_push_back: '5% now, stepping to 10% at 250 users',
     },

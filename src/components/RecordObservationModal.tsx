@@ -123,7 +123,7 @@ export function RecordObservationModal({ dealId, onClose }: Props) {
                   {preview.mapping.missing.length > 0 && (
                     <p className="text-[12.5px] text-ink-2 bg-ground border border-line rounded-[10px] px-3.5 py-2.5">
                       <span className="font-semibold text-ink">Not available from this deal:</span> {preview.mapping.missing.join(', ')}.
-                      {!preview.benchmarkInputPresent && ' Quantity and unit price come from Full Analysis; this deal was closed from Quick Analysis.'}
+                      {!preview.benchmarkInputPresent && ' Quantity and unit price come from the Negotiation Playbook; this deal was closed from the quick analysis.'}
                     </p>
                   )}
                 </>

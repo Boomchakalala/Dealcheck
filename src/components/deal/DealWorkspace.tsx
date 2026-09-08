@@ -97,10 +97,10 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
     try {
       const res = await fetch(`/api/deal/${deal.id}/deep-analysis`, { method: 'POST' })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Full Analysis failed')
+      if (!res.ok) throw new Error(data.error || 'Building the Playbook failed')
       router.refresh()
     } catch (err) {
-      setDeepError(err instanceof Error ? err.message : 'Full Analysis failed')
+      setDeepError(err instanceof Error ? err.message : 'Building the Playbook failed')
     } finally {
       setDeepLoading(false)
     }
@@ -275,6 +275,7 @@ export function DealWorkspace({ deal, mode, messages, isAdmin, showFullPlaybook,
       )}
 
       <PageBody className={cn(isTrial && 'pb-4')}>
+        {isDemo && <p className="text-[12.5px] text-ink-3 -mt-2">{t('dealPage.demoNote')}</p>}
         {/* ── Verdict ─────────────────────────────────────────── */}
         <div className={cn('rounded-[14px] border px-4 py-4 sm:px-5 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-4 sm:gap-5 items-start', won ? 'bg-green-soft border-green-line' : waitingOnClient ? 'bg-warn-soft border-warn-line' : 'bg-surface border-line')}>
           {/* Top-aligned with the verdict text (not centred on the whole card, which left it floating between the verdict and the reasons list). */}

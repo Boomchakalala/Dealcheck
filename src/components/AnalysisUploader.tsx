@@ -153,7 +153,7 @@ export function AnalysisProgress({ liveFindings, completionFlash }: AnalysisProg
       )}
 
       <p className="text-[12px] text-ink-3 mt-5 pt-4 border-t border-green-line/60 leading-relaxed">
-        Usually ready in under a minute. You can leave this page while we finish.
+        Usually ready in a couple of minutes. You can leave this page while we finish.
       </p>
     </div>
   )
@@ -166,10 +166,10 @@ export function AnalysisUploader({
   onAnalyze, analyzeLabel = 'Analyse this quote',
   context, setContext, showContext = true,
   showValueProp = true,
-  valuePropHeadline = "In under a minute, you'll know exactly where you stand.",
+  valuePropHeadline = "In a couple of minutes, you'll know exactly where you stand.",
   valuePropBody = "Our AI reads every line of your quote and gives you an instant score, every red flag, and the savings on the table — then you decide how to act on it.",
   showTrustLine = true,
-  trustLineText = 'Ready in under a minute · Quote files are never stored',
+  trustLineText = 'Ready in a couple of minutes · Quote files are never stored',
   liveFindings,
   completionFlash,
 }: AnalysisUploaderProps) {

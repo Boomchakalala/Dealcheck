@@ -121,7 +121,7 @@ export async function POST(
     // (nextRoundNumber === 1) is always allowed \u2014 it IS the first analysis.
     if (nextRoundNumber > 1 && !profile.is_admin && !dealHasFullAnalysis(previousRounds)) {
       return NextResponse.json(
-        { error: 'Unlock Full Analysis for this deal before adding another round.' },
+        { error: 'Build the Negotiation Playbook for this deal before adding another round.' },
         { status: 403 }
       )
     }

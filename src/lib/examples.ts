@@ -176,7 +176,7 @@ Best regards,
   ],
   assumptions: [
     "25 of 40 licensed seats are actively used based on last-login data",
-    "PandaDoc Business at ~€35/user/month used as competitive benchmark",
+    "PandaDoc Business at ~€35/user/month used as an illustrative competitive comparison",
   ],
   disclaimer: "This analysis is for informational purposes only and does not constitute legal, financial, or professional advice.",
 }
@@ -239,7 +239,7 @@ export const salesforceExample: DealOutput = {
     {
       type: "Commercial",
       issue: "No multi-year loyalty discount after 3 years as a customer",
-      why_it_matters: "Salesforce account executives routinely offer 8-12% discounts for multi-year renewals, especially for customers who've been on the platform 3+ years. On a right-sized €28,800/year contract, an 8% discount saves €2,304/year.",
+      why_it_matters: "In this sample we assume 8-12% is available on a multi-year renewal for a customer who has been on the platform 3+ years — an illustrative assumption, not verified market data. On a right-sized €28,800/year contract, an 8% discount saves €2,304/year.",
       what_to_ask_for: "8% multi-year discount on 2-year renewal commitment — saves €2,304/year",
       if_they_push_back: "5% discount on annual renewal — saves €1,440/year",
     },
@@ -280,7 +280,7 @@ export const salesforceExample: DealOutput = {
       {
         ask: "8% multi-year discount on a 2-year commitment",
         amount: 2304,
-        rationale: "Salesforce AEs routinely offer 8-12% on multi-year renewals — 8% on the €28,800 adjusted contract",
+        rationale: "Assumed 8-12% on a multi-year renewal (illustrative) — 8% on the €28,800 adjusted contract",
       },
     ],
     nice_to_have: [],

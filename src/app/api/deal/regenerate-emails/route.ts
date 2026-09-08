@@ -127,7 +127,7 @@ export async function POST(request: Request) {
       .eq('deal_id', round.deal_id)
       .eq('user_id', user.id)
     if (!profile?.is_admin && !dealHasFullAnalysis(dealRounds)) {
-      return NextResponse.json({ error: 'Unlock Full Analysis for this deal before generating a negotiation email.' }, { status: 403 })
+      return NextResponse.json({ error: 'Build the Negotiation Playbook for this deal before generating a negotiation email.' }, { status: 403 })
     }
 
     // Regeneration cap — a flat abuse safeguard, not a plan limit

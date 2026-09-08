@@ -97,6 +97,6 @@ export function checkFreeQuota(usageCount: number): { allowed: boolean; message?
   if (isEarlyAccess()) return { allowed: true }
   return {
     allowed: false,
-    message: `You've used your ${FREE_ANALYSIS_LIMIT} free quick analyses. Each further deal is a Deep Analysis at ${deepAnalysisPriceLabel()} — payment is coming soon; contact us to continue in the meantime.`,
+    message: `You've used your ${FREE_ANALYSIS_LIMIT} free quick analyses. Each further deal is a Negotiation Playbook at ${deepAnalysisPriceLabel()} — payment is coming soon; contact us to continue in the meantime.`,
   }
 }

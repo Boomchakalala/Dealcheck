@@ -148,8 +148,8 @@ export function deriveNegotiationFlow(input: FlowInput): NegotiationFlow {
       next = {
         key: 'full_running',
         title: L('Building your negotiation strategy', 'Construction de votre stratégie de négociation'),
-        body: L('About two minutes. The playbook, target positions, fallbacks and the negotiation sequence appear below when it completes.', 'Environ deux minutes. Le plan, les positions cibles, les replis et la séquence de négociation apparaîtront ci-dessous.'),
-        cta: L('Full Analysis running…', 'Analyse complète en cours…'),
+        body: L('A couple of minutes. The ordered asks, target positions, fallbacks and the negotiation sequence appear below when it completes.', 'Quelques minutes. Les demandes ordonnées, les positions cibles, les replis et la séquence de négociation apparaîtront ci-dessous.'),
+        cta: L('Building the Playbook…', 'Construction du Plan…'),
         href: '#deep-analysis',
         offerClose: false,
       }
@@ -158,8 +158,8 @@ export function deriveNegotiationFlow(input: FlowInput): NegotiationFlow {
       next = {
         key: 'unlock_full',
         title: L('Build your negotiation strategy', 'Construisez votre stratégie de négociation'),
-        body: L('Get the complete analysis, target positions, fallbacks, negotiation plan and ready-to-send negotiation sequence.', 'Obtenez l’analyse complète, les positions cibles, les replis, le plan de négociation et la séquence prête à envoyer.'),
-        cta: L('Unlock Full Analysis', 'Débloquer l’analyse complète'),
+        body: L('Get the ordered asks with amounts, target positions, fallbacks, your leverage and the ready-to-send negotiation sequence.', 'Obtenez les demandes ordonnées et chiffrées, les positions cibles, les replis, vos leviers et la séquence prête à envoyer.'),
+        cta: L('Build the Negotiation Playbook', 'Construire le Plan de négociation'),
         href: '#deep-analysis',
         offerClose: false,
       }
